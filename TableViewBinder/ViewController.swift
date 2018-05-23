@@ -19,46 +19,34 @@ class ViewController: UIViewController {
         
         print("First VC loaded")
         
-        let sectionViewModels: [Section: Observable<[TableViewCell.ViewModel]>] = [
-            .section1: Observable<[TableViewCell.ViewModel]>.just([
-                TableViewCell.ViewModel(title: "Title", subtitle: "Subtitle")
-            ]),
-            .section2: Observable<[TableViewCell.ViewModel]>.just([
-                TableViewCell.ViewModel(title: "Title", subtitle: "Subtitle"),
-                TableViewCell.ViewModel(title: "Title", subtitle: "Subtitle")
-            ])
-        ]
-
+        // cell registration is easy - the Nib and reuse identifier are created from the cell's `UINibInitable` and
+        // `ReuseIdentifiable` conformance automatically.
+        self.tableView.register(TableViewCell.self)
+        
+        // here we set the binder up using cell view models. To do this, we:
         self.tableViewBinder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
         self.tableViewBinder
-            .onSections([.section1, .section2])
-            .bind(cellType: TableViewCell.self, viewModels: sectionViewModels)
-            .onTapped { [weak self] _, _, _ in
+            .onSections([.section1, .section2]) // declare the sections we're binding
+            .bind(
+                cellType: TableViewCell.self, // give a cell type
+                viewModels: [
+                    .section1: .just([ // then give a dictionary to specify the array of view models for each section.
+                        TableViewCell.ViewModel(title: "Title", subtitle: "Subtitle")
+                    ]),
+                    .section2: .just([
+                        TableViewCell.ViewModel(title: "Title", subtitle: "Subtitle"),
+                        TableViewCell.ViewModel(title: "Title", subtitle: "Subtitle")
+                    ])
+                ]
+            )
+            // Then we can specify a number of handlers, like 'on tapped':
+            .onTapped { [weak self] (section: Section, row: Int, cell: TableViewCell) in
                 let secondVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SecondViewController")
                 self?.present(secondVC, animated: true, completion: nil)
             }
-    }
-}
-
-class TableViewCell: UITableViewCell, ReuseIdentifiable, ViewModelBindable {
-    struct ViewModel {
-        let title: String
-        let subtitle: String
-    }
-
-    let viewModel = Variable<ViewModel?>(nil)
-
-    @IBOutlet private weak var titleLabel: UILabel!
-    @IBOutlet private weak var subtitleLabel: UILabel!
-
-    private let disposeBag = DisposeBag()
-
-    override func awakeFromNib() {
-        super.awakeFromNib()
-
-        self.viewModel.asObservable().subscribe(onNext: { model in
-            self.titleLabel.text = model?.title
-            self.subtitleLabel.text = model?.subtitle
-        }).disposed(by: self.disposeBag)
+            // or 'on dequeue', among others.
+            .onCellDequeue { (section: Section, row: Int, cell: TableViewCell) in
+                
+            }
     }
 }

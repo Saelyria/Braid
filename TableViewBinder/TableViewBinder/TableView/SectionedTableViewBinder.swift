@@ -62,6 +62,21 @@ public class SectionedTableViewBinder<S: TableViewSection> {
     var sectionCellViewModels: [S: [Any]] = [:]
     // The raw models for the cells for a section.
     var sectionCellModels: [S: [Any]] = [:]
+    
+    // Blocks to call to dequeue a header in a section.
+    var sectionHeaderDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
+    // The view models for the headers for a section.
+    var sectionHeaderViewModels: [S: Any] = [:]
+    // Titles for the headers for a section.
+    var sectionHeaderTitles: [S: String] = [:]
+    
+    // Blocks to call to dequeue a footer in a section.
+    var sectionFooterDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
+    // The view models for the footers for a section.
+    var sectionFooterViewModels: [S: Any] = [:]
+    // Titles for the footers for a section.
+    var sectionFooterTitles: [S: String] = [:]
+    
     // Blocks to call when a cell is tapped in a section.
     var sectionCellTappedCallbacks: [S: CellTapCallback] = [:]
     // Callback blocks to call when a cell is dequeued in a section.
@@ -71,10 +86,7 @@ public class SectionedTableViewBinder<S: TableViewSection> {
     // Blocks to call to get the estimated height for a cell in a section.
     var sectionEstimatedCellHeightBlocks: [S: CellHeightBlock] = [:]
     
-    // Blocks to call to dequeue a header in a section.
-    var sectionHeaderDequeueBlocks: [S: HeaderDequeueBlock] = [:]
-    // The models for the headers for a section.
-    var sectionHeaderViewModels: [S: Any] = [:]
+
     
     let disposeBag: DisposeBag = DisposeBag()
     
@@ -191,7 +203,7 @@ public class TableViewBinder {
 
 
 typealias CellDequeueBlock = (UITableView, IndexPath) -> UITableViewCell
-typealias HeaderDequeueBlock = (UITableView, Int) -> UITableViewHeaderFooterView?
+typealias HeaderFooterDequeueBlock = (UITableView, Int) -> UITableViewHeaderFooterView?
 typealias CellTapCallback = (Int, UITableViewCell) -> Void
 typealias CellDequeueCallback = (Int, UITableViewCell) -> Void
 typealias CellHeightBlock = (Int) -> CGFloat

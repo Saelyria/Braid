@@ -24,6 +24,16 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection>: NSObject, UIT
         return 0
     }
     
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        let section = self.binder.displayedSections.value[section]
+        return self.binder.sectionHeaderTitles[section]
+    }
+    
+    func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        let section = self.binder.displayedSections.value[section]
+        return self.binder.sectionFooterTitles[section]
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let section = self.binder.displayedSections.value[indexPath.section]
         guard let dequeueBlock = self.binder.sectionCellDequeueBlocks[section] else { return UITableViewCell() }
