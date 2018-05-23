@@ -158,15 +158,15 @@ public enum _SingleSection: TableViewSection {
  ```
  var cellModels: Observable<[MyCellModel]>
  
- let binder = SectionedTableViewBinder(tableView: tableView, sectionedBy: Section.self)
+ let binder = TableViewBinder(tableView: tableView)
  binder.onTable()
- .bind(cellType: MyCell.self, models: cellModels)
- .onDequeue { [unowned self] (row: Int, cell: MyCell) in
- // called when a cell in section `one` is dequeued
- }
- .onTapped { [unowned self] (row: Int, cell: MyCell) in
- // called when a cell in section `one` is tapped
- }
+    .bind(cellType: MyCell.self, models: cellModels)
+    .onDequeue { [unowned self] (row: Int, cell: MyCell) in
+        // called when a cell in section `one` is dequeued
+    }
+    .onTapped { [unowned self] (row: Int, cell: MyCell) in
+        // called when a cell in section `one` is tapped
+    }
  ```
  
  `UITableViewCell`s need to conform to a few different protocols (whose conformance can be as simple as declaring

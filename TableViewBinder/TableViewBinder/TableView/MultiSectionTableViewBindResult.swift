@@ -38,7 +38,7 @@ public class MultiSectionTableViewBindResult<C: UITableViewCell, S: TableViewSec
     */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [S: Observable<[NM]>], mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-    -> MultiSectionTableViewBindResult<NC, S> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
+    -> MultiSectionModelTableViewBindResult<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
         for section in self.sections {
             guard let sectionModels = models[section] else {
                 fatalError("No cell models array given for the section '\(section)'")
@@ -47,7 +47,7 @@ public class MultiSectionTableViewBindResult<C: UITableViewCell, S: TableViewSec
             sectionBindResult.bind(cellType: cellType, models: sectionModels, mapToViewModelsWith: mapToViewModel)
         }
         
-        return MultiSectionTableViewBindResult<NC, S>(binder: self.binder, sections: self.sections)
+        return MultiSectionModelTableViewBindResult<NC, S, NM>(binder: self.binder, sections: self.sections)
     }
     
     /**
@@ -143,6 +143,7 @@ public class MultiSectionModelTableViewBindResult<C: UITableViewCell, S: TableVi
     public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C, _ model: M) -> Void) -> MultiSectionTableViewBindResult<C, S> {
         for section in self.sections {
             let bindResult = SingleSectionModelTableViewBindResult<C, S, M>(binder: self.binder, section: section)
+            self.sectionBindResults[section] = bindResult
             bindResult.onTapped({ row, cell, model in
                 handler(section, row, cell, model)
             })

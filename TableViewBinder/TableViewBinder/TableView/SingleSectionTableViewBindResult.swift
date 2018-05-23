@@ -32,8 +32,8 @@ public class SingleSectionTableViewBindResult<C: UITableViewCell, S: TableViewSe
         
         let cellDequeueBlock: CellDequeueBlock = { [weak binder = self.binder] (tableView, indexPath) in
             if let section = binder?.displayedSections.value[indexPath.section],
-                let cell = binder?.tableView.dequeueReusableCell(withIdentifier: NC.reuseIdentifier, for: indexPath) as? NC,
-                let viewModel = (binder?.sectionCellViewModels[section] as? [NC.ViewModel])?[indexPath.row] {
+            let cell = binder?.tableView.dequeueReusableCell(withIdentifier: NC.reuseIdentifier, for: indexPath) as? NC,
+            let viewModel = (binder?.sectionCellViewModels[section] as? [NC.ViewModel])?[indexPath.row] {
                 cell.viewModel.value = viewModel
                 binder?.sectionCellDequeuedCallbacks[section]?(indexPath.row, cell)
                 return cell
@@ -66,8 +66,8 @@ public class SingleSectionTableViewBindResult<C: UITableViewCell, S: TableViewSe
         
         let cellDequeueBlock: CellDequeueBlock = { [weak binder = self.binder] (tableView, indexPath) in
             if let section = binder?.displayedSections.value[indexPath.section],
-                let cell = binder?.tableView.dequeueReusableCell(withIdentifier: NC.reuseIdentifier, for: indexPath) as? NC,
-                let viewModel = (binder?.sectionCellViewModels[section] as? [NC.ViewModel])?[indexPath.row] {
+            let cell = binder?.tableView.dequeueReusableCell(withIdentifier: NC.reuseIdentifier, for: indexPath) as? NC,
+            let viewModel = (binder?.sectionCellViewModels[section] as? [NC.ViewModel])?[indexPath.row] {
                 cell.viewModel.value = viewModel
                 binder?.sectionCellDequeuedCallbacks[section]?(indexPath.row, cell)
                 return cell
@@ -161,8 +161,9 @@ public class SingleSectionTableViewBindResult<C: UITableViewCell, S: TableViewSe
 public class SingleSectionModelTableViewBindResult<C: UITableViewCell, S: TableViewSection, M>: SingleSectionTableViewBindResult<C, S> {
     @discardableResult
     public func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C, _ model: M) -> Void) -> SingleSectionTableViewBindResult<C, S> {
-        let tappedHandler: CellTapCallback = { [unowned self] row, cell in
-            guard let cell = cell as? C, let model = self.binder.sectionCellModels[self.section] as? M else {
+        let section = self.section
+        let tappedHandler: CellTapCallback = {  [weak binder = self.binder] row, cell in
+            guard let cell = cell as? C, let model = binder?.sectionCellModels[section]?[row] as? M else {
                 fatalError("Cell or model wasn't the right type; something went awry!")
             }
             handler(row, cell, model)

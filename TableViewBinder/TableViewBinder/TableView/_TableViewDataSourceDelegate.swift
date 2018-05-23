@@ -3,7 +3,7 @@ import RxSwift
 
 /// An internal class that acts as the de facto data source / delegate to a binder's table view.
 class _TableViewDataSourceDelegate<SectionEnum: TableViewSection>: NSObject, UITableViewDataSource, UITableViewDelegate {
-    private let binder: SectionedTableViewBinder<SectionEnum>
+    private weak var binder: SectionedTableViewBinder<SectionEnum>!
     
     init(binder: SectionedTableViewBinder<SectionEnum>) {
         self.binder = binder
