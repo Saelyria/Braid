@@ -1,8 +1,10 @@
 platform :ios, '9.0'
 
-target 'TableViewBinder' do
+workspace 'Tableau'
+
+target 'TableauExample' do
+  project 'TableauExample'
   use_frameworks!
   
-  pod 'RxSwift', '~> 4.0'
-  pod 'RxCocoa', '~> 4.0'
+  pod 'Tableau', :path => '.'
 end
