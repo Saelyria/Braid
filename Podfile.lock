@@ -1,17 +1,8 @@
 PODS:
-  - Alamofire (4.7.0)
-  - Moya/Core (11.0.1):
-    - Alamofire (~> 4.1)
-    - Result (~> 3.0)
-  - Result (3.2.4)
   - RxSwift (4.1.2)
   - Tableau (0.1.0):
     - Tableau/Core (= 0.1.0)
-    - Tableau/Rx (= 0.1.0)
   - Tableau/Core (0.1.0):
-    - RxSwift (~> 4.0)
-  - Tableau/Rx (0.1.0):
-    - Moya/Core
     - RxSwift (~> 4.0)
 
 DEPENDENCIES:
@@ -22,11 +13,8 @@ EXTERNAL SOURCES:
     :path: .
 
 SPEC CHECKSUMS:
-  Alamofire: 907e0a98eb68cdb7f9d1f541a563d6ac5dc77b25
-  Moya: 3d594ada51a21cc02b18739ab578a1984f900c8a
-  Result: d2d07204ce72856f1fd9130bbe42c35a7b0fea10
   RxSwift: e49536837d9901277638493ea537394d4b55f570
-  Tableau: 0c81798aefe9d6a5b7c985a9f581727a68d534a4
+  Tableau: fa4eda74bca26f0a5691b14033bc702c07a04724
 
 PODFILE CHECKSUM: 6e1474fdab2b6f282d33f75f523b60b88d5af230
 

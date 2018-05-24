@@ -13,11 +13,10 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/Saelyria/Tableau.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '8.0'
-  #  s.default_subspec = "Core"
-  s.source_files = 'Core/*'
+  s.default_subspec = "Core"
 
   s.subspec "Core" do |ss|
-    ss.source_files = 'Core/Protocols/*.swift'
+    ss.source_files = 'Core/'
     ss.ios.framework = "UIKit"
     ss.dependency "RxSwift", "~> 4.0"
   end
