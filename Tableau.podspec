@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.default_subspec = "Core"
 
   s.subspec "Core" do |ss|
-    ss.source_files = 'Core/'
+    ss.source_files = 'Core/Protocol/', 'Core/TableView/'
     ss.ios.framework = "UIKit"
     ss.dependency "RxSwift", "~> 4.0"
   end

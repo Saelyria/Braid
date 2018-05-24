@@ -8,9 +8,11 @@ class ViewController: UIViewController {
     }
 
     let tableView = UITableView(frame: UIScreen.main.bounds, style: .grouped)
-    let binder: SectionedTableViewBinder<Section>!
+    var binder: SectionedTableViewBinder<Section>!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self, displayedSections: [.checking, .savings])
     }
 }
