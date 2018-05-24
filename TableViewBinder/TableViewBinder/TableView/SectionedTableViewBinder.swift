@@ -2,17 +2,15 @@ import UIKit
 import RxSwift
 
 /**
- A protocol describing an enum whose cases correspond to sections in a table view.
+ A protocol describing an enum whose cases or a struct whose instances correspond to sections in a table view.
  */
-public protocol TableViewSection: Hashable {
-    static var allSections: [Self] { get }
-}
+public protocol TableViewSection: Hashable { }
 
 /**
  An object that dequeues and binds data to cells in sections for a given table view.
  
  A table view data binder is setup with a given table view and an enum whose cases correspond to sections on the table
- view. This enum must conform to `TableViewSectionEnum`. After being created, each section of the table view has a cell
+ view. This enum must conform to `TableViewSection`. After being created, each section of the table view has a cell
  type and observable models bound to it via the `bind(cellType:models:)` method. This method should be called shortly
  after the data binder and table view are setup (likely in `viewDidLoad`) for each section of the table view.
  
@@ -92,30 +90,21 @@ public class SectionedTableViewBinder<S: TableViewSection> {
     
     /**
      Create a new table view data binder with the given table view whose sections are defined by the given section enum.
-     The table view will initially display all sections in the given section enum.
+     The table view will initially display the given array of sections.
      */
-    public required init(tableView: UITableView, sectionedBy sectionEnum: S.Type) {
+    public required init(tableView: UITableView, sectionedBy sectionEnum: S.Type, displayedSections: [S]) {
         self.tableView = tableView
         self.tableViewDataSourceDelegate = _TableViewDataSourceDelegate(binder: self)
         tableView.delegate = self.tableViewDataSourceDelegate
         tableView.dataSource = self.tableViewDataSourceDelegate
         
-        self.displayedSections.value = S.allSections
+        self.displayedSections.value = displayedSections
         
         let sections: Observable<[S]> = self.displayedSections.asObservable()
         Observable.zip(sections.skip(1), sections) { ($0, $1) }
             .subscribe(onNext: { [weak self] (previousDisplayedSections, newDisplayedSections) in
                 self?.tableView.reloadData() //TODO: reload affected sections
             }).disposed(by: self.disposeBag)
-    }
-    
-    /**
-     Create a new table view data binder with the given table view whose sections are defined by the given section enum.
-     The table view will initially display only the sections contained in the given array.
-     */
-    public convenience init(tableView: UITableView, sectionedBy sectionEnum: S.Type, initialDisplayedSections: [S]) {
-        self.init(tableView: tableView, sectionedBy: sectionEnum)
-        self.displayedSections.value = initialDisplayedSections
     }
     
     /**
@@ -148,8 +137,6 @@ public class SectionedTableViewBinder<S: TableViewSection> {
 /// An internal section enum used by a `TableViewBinder`.
 public enum _SingleSection: TableViewSection {
     case table
-    
-    public static let allSections: [_SingleSection] = [.table]
 }
 
 /**
@@ -192,7 +179,7 @@ public class TableViewBinder {
      Instantiate a new table view binder for the given table view.
      */
     public required init(tableView: UITableView) {
-        self._sectionBinder = SectionedTableViewBinder(tableView: tableView, sectionedBy: _SingleSection.self)
+        self._sectionBinder = SectionedTableViewBinder(tableView: tableView, sectionedBy: _SingleSection.self, displayedSections: [.table])
     }
     
     /// Starts binding on the table.

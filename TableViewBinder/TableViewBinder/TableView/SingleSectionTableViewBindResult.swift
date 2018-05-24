@@ -49,7 +49,7 @@ public class SingleSectionTableViewBindResult<C: UITableViewCell, S: TableViewSe
     }
     
     /**
-     Bind the given cell type to the declared sections, creating them based on the view models created from a given
+     Bind the given cell type to the declared section, creating them based on the view models created from a given
      array of models mapped to view models by a given function.
      
      Using this method allows a convenient mapping between the raw model objects that each cell in your table
@@ -80,6 +80,45 @@ public class SingleSectionTableViewBindResult<C: UITableViewCell, S: TableViewSe
             let cell = binder?.tableView.dequeueReusableCell(withIdentifier: NC.reuseIdentifier, for: indexPath) as? NC,
             let viewModel = (binder?.sectionCellViewModels[section] as? [NC.ViewModel])?[indexPath.row] {
                 cell.viewModel.value = viewModel
+                binder?.sectionCellDequeuedCallbacks[section]?(indexPath.row, cell)
+                return cell
+            }
+            return UITableViewCell()
+        }
+        self.binder.sectionCellDequeueBlocks[section] = cellDequeueBlock
+        
+        let tableViewBindResult = SingleSectionModelTableViewBindResult<NC, S, NM>(binder: self.binder, section: self.section)
+        return tableViewBindResult
+    }
+    
+    /**
+     Bind the given cell type to the declared section, creating a cell for each item in the given observable array of
+     models.
+     
+     Using this method allows a convenient mapping between the raw model objects that each cell in your table
+     represents and the cells. When binding with this method, various other event binding methods (most notably the
+     `onTapped` event method) can have their handlers be passed in the associated model (cast to the same type as the
+     models observable type) along with the row and cell.
+     
+     When using this method, you pass in an observable array of your raw models. From there, the binder will handle
+     dequeuing of your cells based on the observable models array.
+    */
+    @discardableResult
+    public func bind<NC, NM>(cellType: NC.Type, models: Observable<[NM]>)
+    -> SingleSectionModelTableViewBindResult<NC, S, NM> where NC: UITableViewCell & ReuseIdentifiable {
+        let section = self.section
+        guard self.binder.sectionCellDequeueBlocks[section] == nil else {
+            fatalError("Section already has a cell type bound to it - re-binding not supported.")
+        }
+        
+        models.subscribe(onNext: { [weak binder = self.binder] (models: [NM]) in
+            binder?.sectionCellModels[section] = models
+            binder?.reload(section: section)
+        }).disposed(by: self.binder.disposeBag)
+        
+        let cellDequeueBlock: CellDequeueBlock = { [weak binder = self.binder] (tableView, indexPath) in
+            if let section = binder?.displayedSections.value[indexPath.section],
+            let cell = binder?.tableView.dequeueReusableCell(withIdentifier: NC.reuseIdentifier, for: indexPath) as? NC {
                 binder?.sectionCellDequeuedCallbacks[section]?(indexPath.row, cell)
                 return cell
             }

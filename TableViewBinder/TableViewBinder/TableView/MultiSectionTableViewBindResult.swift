@@ -51,6 +51,35 @@ public class MultiSectionTableViewBindResult<C: UITableViewCell, S: TableViewSec
     }
     
     /**
+     Bind the given cell type to the declared sections, creating a cell for each item in the given observable array of
+     models.
+     
+     Using this method allows a convenient mapping between the raw model objects that each cell in your table
+     represents and the cells. When binding with this method, various other event binding methods (most notably the
+     `onTapped` event method) can have their handlers be passed in the associated model (cast to the same type as the
+     models observable type) along with the row and cell.
+     
+     When using this method, you pass in an observable array of your raw models for each section in a dictionary. Each
+     section being bound to must have an observable array of models in the dictionary. From there, the binder will
+     handle dequeuing of your cells based on the observable models array for each section. It is also expected that,
+     when using this method, you will also use an `onCellDequeue` event handler to configure the cell, where you are
+     given the model and the dequeued cell.
+    */
+    @discardableResult
+    public func bind<NC, NM>(cellType: NC.Type, models: [S: Observable<[NM]>])
+    -> MultiSectionModelTableViewBindResult<NC, S, NM> where NC: UITableViewCell & ReuseIdentifiable {
+        for section in self.sections {
+            guard let sectionModels = models[section] else {
+                fatalError("No cell models array given for the section '\(section)'")
+            }
+            let sectionBindResult = self.bindResult(for: section)
+            sectionBindResult.bind(cellType: cellType, models: sectionModels)
+        }
+        
+        return MultiSectionModelTableViewBindResult<NC, S, NM>(binder: self.binder, sections: self.sections)
+    }
+    
+    /**
      Bind the given header type to the declared section with the given observable for their view models.
     */
     @discardableResult
