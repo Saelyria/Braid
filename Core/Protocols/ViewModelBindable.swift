@@ -13,5 +13,5 @@ public protocol ViewModelBindable {
     associatedtype ViewModel
     
     /// The view model supplied to the `ViewModelBindable` instance.
-    var viewModel: Variable<ViewModel?> { get }
+    var viewModel: ViewModel? { get set }
 }

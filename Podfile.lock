@@ -1,21 +1,25 @@
 PODS:
-  - RxSwift (4.1.2)
-  - Tableau (0.1.0):
-    - Tableau/Core (= 0.1.0)
-  - Tableau/Core (0.1.0):
+  - RxCocoa (4.1.2):
     - RxSwift (~> 4.0)
+  - RxSwift (4.1.2)
+  - Tableau/Core (0.1.0)
+  - Tableau/Rx (0.1.0):
+    - RxSwift (~> 4.0)
+    - Tableau/Core
 
 DEPENDENCIES:
-  - Tableau (from `.`)
+  - RxCocoa (~> 4.0)
+  - Tableau/Rx (from `.`)
 
 EXTERNAL SOURCES:
   Tableau:
     :path: .
 
 SPEC CHECKSUMS:
+  RxCocoa: d88ba0f1f6abf040011a9eb4b539324fc426843a
   RxSwift: e49536837d9901277638493ea537394d4b55f570
-  Tableau: 6c13d70b727bb33a0391a2bde1d9a37b823acaf9
+  Tableau: 1434fa698dadce3c9f27854e1f5b46e928c0014e
 
-PODFILE CHECKSUM: 6e1474fdab2b6f282d33f75f523b60b88d5af230
+PODFILE CHECKSUM: 05035dbe8821c0aaf91ab9cd876a73b991174d60
 
 COCOAPODS: 1.4.0

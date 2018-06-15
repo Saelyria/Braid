@@ -12,6 +12,7 @@
 		938132DD20B6463000CBF8F6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 938132DB20B6463000CBF8F6 /* Main.storyboard */; };
 		938132DF20B6463200CBF8F6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 938132DE20B6463200CBF8F6 /* Assets.xcassets */; };
 		938132E220B6463200CBF8F6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 938132E020B6463200CBF8F6 /* LaunchScreen.storyboard */; };
+		9381335120B6EE2A00CBF8F6 /* TItleDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9381335020B6EE2A00CBF8F6 /* TItleDetailTableViewCell.swift */; };
 		AA8B7612901AEED60C395EB0 /* Pods_TableauExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5FEBC5088F0D7E30632BBD0 /* Pods_TableauExample.framework */; };
 /* End PBXBuildFile section */
 
@@ -38,6 +39,7 @@
 		938132DE20B6463200CBF8F6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		938132E120B6463200CBF8F6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		938132E320B6463200CBF8F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9381335020B6EE2A00CBF8F6 /* TItleDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TItleDetailTableViewCell.swift; sourceTree = "<group>"; };
 		B5FEBC5088F0D7E30632BBD0 /* Pods_TableauExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TableauExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -85,12 +87,21 @@
 			children = (
 				938132D720B6463000CBF8F6 /* AppDelegate.swift */,
 				938132D920B6463000CBF8F6 /* ViewController.swift */,
-				938132DB20B6463000CBF8F6 /* Main.storyboard */,
-				938132DE20B6463200CBF8F6 /* Assets.xcassets */,
-				938132E020B6463200CBF8F6 /* LaunchScreen.storyboard */,
+				9381335020B6EE2A00CBF8F6 /* TItleDetailTableViewCell.swift */,
+				9381334F20B6EDFA00CBF8F6 /* Resources */,
 				938132E320B6463200CBF8F6 /* Info.plist */,
 			);
 			path = TableauExample;
+			sourceTree = "<group>";
+		};
+		9381334F20B6EDFA00CBF8F6 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				938132DE20B6463200CBF8F6 /* Assets.xcassets */,
+				938132E020B6463200CBF8F6 /* LaunchScreen.storyboard */,
+				938132DB20B6463000CBF8F6 /* Main.storyboard */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		EBF40F86B284BBBC4E5ACCEB /* Frameworks */ = {
@@ -179,11 +190,13 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-TableauExample/Pods-TableauExample-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/Tableau/Tableau.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Tableau.framework",
 			);
@@ -234,6 +247,7 @@
 			files = (
 				938132DA20B6463000CBF8F6 /* ViewController.swift in Sources */,
 				938132D820B6463000CBF8F6 /* AppDelegate.swift in Sources */,
+				9381335120B6EE2A00CBF8F6 /* TItleDetailTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
