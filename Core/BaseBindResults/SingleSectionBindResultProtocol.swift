@@ -92,7 +92,8 @@ public extension SingleSectionBindResultProtocol {
 // Internal extension that provides partial implementation for methods that share some implementation between the KVO and
 // Rx variants of a single-section bind result (e.g. cell dequeueing).
 internal extension SingleSectionBindResultProtocol {
-    internal func bind<NC>(cellType: NC.Type, viewModelBindHandler: @escaping (NC.ViewModel) -> Void) where NC: UITableViewCell & BaseViewModelBindable & ReuseIdentifiable {
+    ///
+    internal func addDequeueBlock<NC>(cellType: NC.Type, viewModelBindHandler: @escaping (NC, NC.ViewModel) -> Void) where NC: UITableViewCell & BaseViewModelBindable & ReuseIdentifiable {
         guard self.binder.sectionCellDequeueBlocks[self.section] == nil else {
             print("WARNING: Section already has a cell type bound to it - re-binding not supported.")
             return
@@ -102,7 +103,7 @@ internal extension SingleSectionBindResultProtocol {
             if let section = binder?._displayedSections[indexPath.section],
             let cell = binder?.tableView.dequeueReusableCell(withIdentifier: NC.reuseIdentifier, for: indexPath) as? NC,
             let viewModel = (binder?.sectionCellViewModels[section] as? [NC.ViewModel])?[indexPath.row] {
-                viewModelBindHandler(viewModel)
+                viewModelBindHandler(cell, viewModel)
                 binder?.sectionCellDequeuedCallbacks[section]?(indexPath.row, cell)
                 return cell
             }
@@ -112,7 +113,26 @@ internal extension SingleSectionBindResultProtocol {
         self.binder.sectionCellDequeueBlocks[self.section] = cellDequeueBlock
     }
     
-    internal func bind<H>(headerType: H.Type, viewModelBindHandler: @escaping (H.ViewModel) -> Void) where H: UITableViewHeaderFooterView & RxViewModelBindable & ReuseIdentifiable {
+    internal func addDequeueBlock<NC>(cellType: NC.Type) where NC: UITableViewCell & ReuseIdentifiable {
+        guard self.binder.sectionCellDequeueBlocks[self.section] == nil else {
+            print("WARNING: Section already has a cell type bound to it - re-binding not supported.")
+            return
+        }
+        
+        let cellDequeueBlock: CellDequeueBlock = { [weak binder = self.binder] (tableView, indexPath) in
+            if let section = binder?._displayedSections[indexPath.section],
+            let cell = binder?.tableView.dequeueReusableCell(withIdentifier: NC.reuseIdentifier, for: indexPath) as? NC {
+                binder?.sectionCellDequeuedCallbacks[section]?(indexPath.row, cell)
+                return cell
+            }
+            print("ERROR: Didn't return the right cell type - something went awry!")
+            return UITableViewCell()
+        }
+        self.binder.sectionCellDequeueBlocks[self.section] = cellDequeueBlock
+    }
+    
+    
+    internal func addDequeueBlock<H>(headerType: H.Type, viewModelBindHandler: @escaping (H, H.ViewModel) -> Void) where H: UITableViewHeaderFooterView & RxViewModelBindable & ReuseIdentifiable {
         guard self.binder.sectionHeaderDequeueBlocks[self.section] == nil else {
             print("WARNING: Section already has a header type bound to it - re-binding not supported.")
             return
@@ -122,7 +142,7 @@ internal extension SingleSectionBindResultProtocol {
             if let section = binder?._displayedSections[sectionInt],
             let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: H.reuseIdentifier) as? H,
             let viewModel = binder?.sectionHeaderViewModels[section] as? H.ViewModel {
-                viewModelBindHandler(viewModel)
+                viewModelBindHandler(header, viewModel)
                 return header
             }
             print("ERROR: Didn't return a header - something went awry!")

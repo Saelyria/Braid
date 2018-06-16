@@ -135,18 +135,6 @@ public class SectionedTableViewBinder<S: TableViewSection>: _BaseTableViewBinder
     public func onSections(_ sections: [S]) -> MultiSectionTableViewBindResult<UITableViewCell, S> {
         return MultiSectionTableViewBindResult<UITableViewCell, S>(binder: self, sections: sections)
     }
-    
-    /// Reloads the specified section.
-    public func reload(section: S) {
-        if let sectionToReloadIndex = self.displayedSections.index(of: section) {
-            let startIndex = self.displayedSections.startIndex
-            let sectionInt = startIndex.distance(to: sectionToReloadIndex)
-            let indexSet: IndexSet = [sectionInt]
-            self.tableView.reloadSections(indexSet, with: .none)
-        } else {
-            self.tableView.reloadData()
-        }
-    }
 }
 
 /// An internal section enum used by a `TableViewBinder`.

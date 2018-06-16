@@ -43,6 +43,18 @@ public class _BaseTableViewBinder<S: TableViewSection> {
         tableView.delegate = self.tableViewDataSourceDelegate
         tableView.dataSource = self.tableViewDataSourceDelegate        
     }
+    
+    /// Reloads the specified section.
+    public func reload(section: S) {
+        if let sectionToReloadIndex = self._displayedSections.index(of: section) {
+            let startIndex = self._displayedSections.startIndex
+            let sectionInt = startIndex.distance(to: sectionToReloadIndex)
+            let indexSet: IndexSet = [sectionInt]
+            self.tableView.reloadSections(indexSet, with: .none)
+        } else {
+            self.tableView.reloadData()
+        }
+    }
 }
 
 /// An internal class that acts as the de facto data source / delegate to a binder's table view.
