@@ -25,13 +25,13 @@ public protocol TableViewSection: Hashable { }
  
  let binder = TableViewBinder(tableView: tableView)
  binder.onTable()
- .bind(cellType: MyCell.self, models: cellModels)
- .onDequeue { [unowned self] (row: Int, cell: MyCell) in
- // called when a cell in section `one` is dequeued
- }
- .onTapped { [unowned self] (row: Int, cell: MyCell) in
- // called when a cell in section `one` is tapped
- }
+    .bind(cellType: MyCell.self, models: cellModels)
+    .onDequeue { [unowned self] (row: Int, cell: MyCell) in
+        // called when a cell in section `one` is dequeued
+    }
+    .onTapped { [unowned self] (row: Int, cell: MyCell) in
+        // called when a cell in section `one` is tapped
+    }
  ```
  
  `UITableViewCell`s need to conform to a few different protocols (whose conformance can be as simple as declaring
@@ -39,18 +39,18 @@ public protocol TableViewSection: Hashable { }
  `ViewModelBindable`, and should conform to `UINibInitable` if they are meant to be created from a Nib.
  */
 public class TableViewBinder {
-    private let _sectionBinder: RxSectionedTableViewBinder<_SingleSection>
+    private let _sectionBinder: SectionedTableViewBinder<_SingleSection>
     
     /**
      Instantiate a new table view binder for the given table view.
      */
     public required init(tableView: UITableView) {
-        self._sectionBinder = RxSectionedTableViewBinder(tableView: tableView, sectionedBy: _SingleSection.self, displayedSections: [.table])
+        self._sectionBinder = SectionedTableViewBinder(tableView: tableView, sectionedBy: _SingleSection.self, displayedSections: [.table])
     }
     
     /// Starts binding on the table.
-    public func onTable() -> RxSingleSectionTableViewBindResult<UITableViewCell, _SingleSection> {
-        return RxSingleSectionTableViewBindResult(binder: self._sectionBinder, section: .table)
+    public func onTable() -> SingleSectionTableViewBindResult<UITableViewCell, _SingleSection> {
+        return SingleSectionTableViewBindResult(binder: self._sectionBinder, section: .table)
     }
 }
 
@@ -125,21 +125,21 @@ public class SectionedTableViewBinder<S: TableViewSection>: _BaseTableViewBinder
     /**
      Declares a section to begin binding handlers to.
      */
-    public func onSection(_ section: S) -> RxSingleSectionTableViewBindResult<UITableViewCell, S> {
+    public func onSection(_ section: S) -> SingleSectionTableViewBindResult<UITableViewCell, S> {
         return SingleSectionTableViewBindResult<UITableViewCell, S>(binder: self, section: section)
     }
     
     /**
      Declares sections to begin binding handlers to.
      */
-    public func onSections(_ sections: [S]) -> RxMultiSectionTableViewBindResult<UITableViewCell, S> {
-        return RxMultiSectionTableViewBindResult<UITableViewCell, S>(binder: self, sections: sections)
+    public func onSections(_ sections: [S]) -> MultiSectionTableViewBindResult<UITableViewCell, S> {
+        return MultiSectionTableViewBindResult<UITableViewCell, S>(binder: self, sections: sections)
     }
     
     /// Reloads the specified section.
     public func reload(section: S) {
-        if let sectionToReloadIndex = self.displayedSections.value.index(of: section) {
-            let startIndex = self.displayedSections.value.startIndex
+        if let sectionToReloadIndex = self.displayedSections.index(of: section) {
+            let startIndex = self.displayedSections.startIndex
             let sectionInt = startIndex.distance(to: sectionToReloadIndex)
             let indexSet: IndexSet = [sectionInt]
             self.tableView.reloadSections(indexSet, with: .none)

@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.default_subspec = "Core"
 
   s.subspec "Core" do |ss|
-    ss.source_files = 'Core/Protocols/', 'Core/TableView/'
+    ss.source_files = 'Core/Protocols/', 'Core/TableView/', 'Core/BaseBindResults/'
     ss.ios.framework = "UIKit"
   end
 
