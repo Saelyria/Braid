@@ -10,7 +10,7 @@ public protocol MutliSectionBindResultProtocol {
     var sections: [S] { get }
     
     @discardableResult
-    public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C) -> Void) -> Self
+    public func configureCell(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C) -> Void) -> Self
     
     @discardableResult
     public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C) -> Void) -> Self

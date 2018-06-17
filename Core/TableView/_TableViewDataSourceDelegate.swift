@@ -3,6 +3,7 @@ import RxSwift
 
 /// An internally-used base class that the vanilla and Rx table view binders inherit from. You should not use this class in your app.
 public class _BaseTableViewBinder<S: TableViewSection> {
+    // common backing for the displayed sections since it's a Variable in Rx
     var _displayedSections: [S] = []
     var tableView: UITableView!
     var tableViewDataSourceDelegate: _TableViewDataSourceDelegate<S>!
