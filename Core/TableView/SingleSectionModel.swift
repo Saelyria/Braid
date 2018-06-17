@@ -16,7 +16,8 @@ public class SingleSectionModelTableViewBindResult<C: UITableViewCell, S: TableV
         let section = self.section
         let tappedHandler: CellTapCallback = {  [weak binder = self.binder] (row, cell) in
             guard let cell = cell as? C, let model = binder?.sectionCellModels[section]?[row] as? M else {
-                fatalError("Cell or model wasn't the right type; something went awry!")
+                assertionFailure("ERROR: Cell or model wasn't the right type; something went awry!")
+                return
             }
             handler(row, cell, model)
         }
@@ -37,7 +38,8 @@ public class SingleSectionModelTableViewBindResult<C: UITableViewCell, S: TableV
         let section = self.section
         let dequeueCallback: CellDequeueCallback = { [weak binder = self.binder] row, cell in
             guard let cell = cell as? C, let model = binder?.sectionCellModels[section]?[row] as? M else {
-                fatalError("Cell wasn't the right type; something went awry!")
+                assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
+                return
             }
             handler(row, cell, model)
         }

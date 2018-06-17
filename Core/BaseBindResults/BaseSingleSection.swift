@@ -1,5 +1,15 @@
 import UIKit
 
+public protocol BaseSingleSectionTableViewBindResultProtocol {
+    associatedtype C: UITableViewCell
+    associatedtype S: TableViewSection
+    
+    /// The bind result's original binder. This is mostly used internally and can be ignored.
+    var baseBinder: _BaseTableViewBinder<S> { get }
+    /// The section the bind result is for. This is mostly used internally and can be ignored.
+    var section: S { get }
+}
+
 /**
  A protocol declaring the shared methods of both the KVO and Rx variants of a single-section bind result.
  */
@@ -24,7 +34,10 @@ public class BaseSingleSectionTableViewBindResult<C: UITableViewCell, S: TableVi
     @discardableResult
     public func configureCell(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void) -> BaseSingleSectionTableViewBindResult<C, S> {
         let dequeueCallback: CellDequeueCallback = { row, cell in
-            guard let cell = cell as? C else { fatalError("Cell wasn't the right type; something went awry!") }
+            guard let cell = cell as? C else {
+                assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
+                return
+            }
             handler(row, cell)
         }
         
@@ -42,7 +55,10 @@ public class BaseSingleSectionTableViewBindResult<C: UITableViewCell, S: TableVi
     @discardableResult
     public func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C) -> Void) -> BaseSingleSectionTableViewBindResult<C, S> {
         let tappedHandler: CellTapCallback = { row, cell in
-            guard let cell = cell as? C else { fatalError("Cell wasn't the right type; something went awry!") }
+            guard let cell = cell as? C else {
+                assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
+                return
+            }
             handler(row, cell)
         }
         
@@ -96,7 +112,7 @@ internal extension BaseSingleSectionTableViewBindResult {
                 binder?.sectionCellDequeuedCallbacks[section]?(indexPath.row, cell)
                 return cell
             }
-            print("ERROR: Didn't return the right cell type - something went awry!")
+            assertionFailure("ERROR: Didn't return the right cell type - something went awry!")
             return UITableViewCell()
         }
         self.baseBinder.sectionCellDequeueBlocks[self.section] = cellDequeueBlock
@@ -114,7 +130,7 @@ internal extension BaseSingleSectionTableViewBindResult {
                 binder?.sectionCellDequeuedCallbacks[section]?(indexPath.row, cell)
                 return cell
             }
-            print("ERROR: Didn't return the right cell type - something went awry!")
+            assertionFailure("ERROR: Didn't return the right cell type - something went awry!")
             return UITableViewCell()
         }
         self.baseBinder.sectionCellDequeueBlocks[self.section] = cellDequeueBlock
@@ -134,7 +150,7 @@ internal extension BaseSingleSectionTableViewBindResult {
                 viewModelBindHandler(header, viewModel)
                 return header
             }
-            print("ERROR: Didn't return a header - something went awry!")
+            assertionFailure("ERROR: Didn't return a header - something went awry!")
             return nil
         }
         self.baseBinder.sectionHeaderDequeueBlocks[self.section] = headerDequeueBlock
@@ -153,7 +169,7 @@ internal extension BaseSingleSectionTableViewBindResult {
                 viewModelBindHandler(header, viewModel)
                 return header
             }
-            print("ERROR: Didn't return a footer - something went awry!")
+            assertionFailure("ERROR: Didn't return a footer - something went awry!")
             return nil
         }
         self.baseBinder.sectionFooterDequeueBlocks[self.section] = footerDequeueBlock

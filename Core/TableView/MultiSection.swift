@@ -7,7 +7,6 @@ import UIKit
 public class MultiSectionTableViewBindResult<C: UITableViewCell, S: TableViewSection> {
     internal let binder: SectionedTableViewBinder<S>
     internal let sections: [S]
-    internal var sectionBindResults: [S: SingleSectionTableViewBindResult<C, S>] = [:]
     
     internal init(binder: SectionedTableViewBinder<S>, sections: [S]) {
         self.binder = binder
@@ -18,17 +17,18 @@ public class MultiSectionTableViewBindResult<C: UITableViewCell, S: TableViewSec
      Bind the given cell type to the declared sections, creating them based on the view models from a given observable.
      */
     @discardableResult
-    public func bind<NC>(cellType: NC.Type, byObserving keyPath: KeyPath<T, [NC.ViewModel]>, on provider: T)
-    -> MultiSectionTableViewBindResult<NC, S> where NC: UITableViewCell & RxViewModelBindable & ReuseIdentifiable {
-        for section in self.sections {
-            guard let sectionViewModels = viewModels[section] else {
-                fatalError("No cell view models array given for the section '\(section)'")
+    public func bind<NC>(cellType: NC.Type, byObserving keyPath: KeyPath<T, [S: [NC.ViewModel]]>, on provider: T)
+        -> MultiSectionTableViewBindResult<NC, S> where NC: UITableViewCell & RxViewModelBindable & ReuseIdentifiable {
+            for section in self.sections {
+                guard let sectionViewModels = viewModels[section] else {
+                    assertionFailure("ERROR: No cell view models array given for the section '\(section)'")
+                    return
+                }
+                let sectionBindResult = self.bindResult(for: section)
+                sectionBindResult.bind(cellType: cellType, byObserving: keyPath, on: provider)
             }
-            let sectionBindResult = self.bindResult(for: section)
-            sectionBindResult.bind(cellType: cellType, byObserving: keyPath, on: provider)
-        }
-        
-        return MultiSectionTableViewBindResult<NC, S>(binder: self.binder, sections: self.sections)
+            
+            return MultiSectionTableViewBindResult<NC, S>(binder: self.binder, sections: self.sections)
     }
     
     /**
