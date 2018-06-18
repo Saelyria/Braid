@@ -50,7 +50,7 @@ public class SingleSectionModelTableViewBindResult<C: UITableViewCell, S: TableV
     }
     
     @discardableResult
-    override public func bind<H>(headerType: H.Type, viewModel: Observable<H.ViewModel>) -> SingleSectionModelTableViewBindResult<C, S, M>
+    override public func bind<H>(headerType: H.Type, viewModel: H.ViewModel) -> SingleSectionModelTableViewBindResult<C, S, M>
     where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
         super.bind(headerType: headerType, viewModel: viewModel)
         return self
@@ -77,7 +77,7 @@ public class SingleSectionModelTableViewBindResult<C: UITableViewCell, S: TableV
     
     @discardableResult
     override public func configureCell(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void) -> SingleSectionModelTableViewBindResult<C, S, M> {
-        super.onCellDequeue(handler)
+        super.configureCell(handler)
         return self
     }
     

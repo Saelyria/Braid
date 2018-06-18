@@ -1,6 +1,7 @@
 import UIKit
 import RxSwift
 
+/*
 /**
  An object that dequeues and binds data to cells in sections for a given table view.
  
@@ -149,3 +150,4 @@ public class RxTableViewBinder {
         return RxSingleSectionTableViewBindResult(binder: self._sectionBinder, section: .table)
     }
 }
+*/

@@ -1,12 +1,12 @@
 import UIKit
 
-public class SingleSectionTableViewBindResult<C: UITableViewCell, S: TableViewSection>: BaseSingleSectionTableViewBindResult<C, S> {
-    var binder: SectionedTableViewBinder<S> {
-        return self.baseBinder as! SectionedTableViewBinder<S>
-    }
+public class SingleSectionTableViewBindResult<C: UITableViewCell, S: TableViewSection> {
+    let binder: SectionedTableViewBinder<S>
+    let section: S
     
     required init(binder: SectionedTableViewBinder<S>, section: S) {
-        super.init(binder: binder, section: section)
+        self.binder = binder
+        self.section = section
     }
     
     // MARK: Cell and header / footer view binding
@@ -151,27 +151,70 @@ public class SingleSectionTableViewBindResult<C: UITableViewCell, S: TableViewSe
         return self
     }
     
+    
+    /**
+     Add a handler to be called whenever a cell is dequeued in the declared section.
+     
+     The handler is called whenever a cell in the section is dequeued, passing in the row and the dequeued cell. The
+     cell will be cast to the cell type bound to the section if this method is called in a chain after the
+     `bind(cellType:viewModels:)` method.
+     */
     @discardableResult
-    public override func configureCell(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void) -> SingleSectionTableViewBindResult<C, S> {
-        super.onCellDequeue(handler)
+    public func configureCell(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void) -> SingleSectionTableViewBindResult<C, S> {
+        let dequeueCallback: CellDequeueCallback = { row, cell in
+            guard let cell = cell as? C else {
+                assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
+                return
+            }
+            handler(row, cell)
+        }
+        
+        self.binder.sectionCellDequeuedCallbacks[self.section] = dequeueCallback
         return self
     }
-
+    
+    /**
+     Add a handler to be called whenever a cell in the declared section is tapped.
+     
+     The handler is called whenever a cell in the section is tapped, passing in the row and cell that was tapped. The
+     cell will be cast to the cell type bound to the section if this method is called in a chain after the
+     `bind(cellType:viewModels:)` method.
+     */
     @discardableResult
-    public override func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C) -> Void) -> SingleSectionTableViewBindResult<C, S> {
-        super.onTapped(handler)
+    public func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C) -> Void) -> SingleSectionTableViewBindResult<C, S> {
+        let tappedHandler: CellTapCallback = { row, cell in
+            guard let cell = cell as? C else {
+                assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
+                return
+            }
+            handler(row, cell)
+        }
+        
+        self.binder.sectionCellTappedCallbacks[section] = tappedHandler
         return self
     }
-
+    
+    /**
+     Add a callback handler to provide the cell height for cells in the declared section.
+     
+     The given handler is called whenever the section reloads for each visible row, passing in the row the handler
+     should provide the height for.
+     */
     @discardableResult
-    public override func cellHeight(_ handler: @escaping (_ row: Int) -> CGFloat) -> BaseSingleSectionTableViewBindResult<C, S> {
-        super.cellHeight(handler)
+    public func cellHeight(_ handler: @escaping (_ row: Int) -> CGFloat) -> SingleSectionTableViewBindResult<C, S> {
+        self.binder.sectionCellHeightBlocks[section] = handler
         return self
     }
-
+    
+    /**
+     Add a callback handler to provide the estimated cell height for cells in the declared section.
+     
+     The given handler is called whenever the section reloads for each visible row, passing in the row the handler
+     should provide the estimated height for.
+     */
+    
     @discardableResult
-    public override func estimatedCellHeight(_ handler: @escaping (_ row: Int) -> CGFloat) -> SingleSectionTableViewBindResult<C, S> {
-        super.estimatedCellHeight(handler)
+    public func estimatedCellHeight(_ handler: @escaping (_ row: Int) -> CGFloat) -> SingleSectionTableViewBindResult<C, S> {
+        self.binder.sectionEstimatedCellHeightBlocks[section] = handler
         return self
-    }
-}
+    }}

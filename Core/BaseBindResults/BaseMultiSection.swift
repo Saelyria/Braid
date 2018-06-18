@@ -1,5 +1,6 @@
 import UIKit
 
+/*
 public class BaseMultiSectionTableViewBindResult<C: UITableViewCell, S: TableViewSection> {
     /// The bind result's original binder. This is mostly used internally and can be ignored.
     let baseBinder: _BaseTableViewBinder<S>
@@ -17,9 +18,9 @@ public class BaseMultiSectionTableViewBindResult<C: UITableViewCell, S: TableVie
      Add a handler to be called whenever a cell is dequeued in the declared sections.
      */
     @discardableResult
-    public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C) -> Void) -> RxMultiSectionTableViewBindResult<C, S> {
+    public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C) -> Void) -> BaseMultiSectionTableViewBindResult<C, S> {
         for section in self.sections {
-            let bindResult: RxSingleSectionTableViewBindResult<C, S> = self.bindResult(for: section)
+            let bindResult: SingleSectionTableViewBindResult<C, S> = self.bindResult(for: section)
             bindResult.onCellDequeue({ row, cell in
                 handler(section, row, cell)
             })
@@ -31,9 +32,9 @@ public class BaseMultiSectionTableViewBindResult<C: UITableViewCell, S: TableVie
      Add a handler to be called whenever a cell in the declared sections is tapped.
      */
     @discardableResult
-    public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C) -> Void) -> RxMultiSectionTableViewBindResult<C, S> {
+    public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C) -> Void) -> BaseMultiSectionTableViewBindResult<C, S> {
         for section in self.sections {
-            let bindResult: RxSingleSectionTableViewBindResult<C, S> = self.bindResult(for: section)
+            let bindResult: SingleSectionTableViewBindResult<C, S> = self.bindResult(for: section)
             bindResult.onTapped({ row, cell in
                 handler(section, row, cell)
             })
@@ -45,9 +46,9 @@ public class BaseMultiSectionTableViewBindResult<C: UITableViewCell, S: TableVie
      Add a callback handler to provide the cell height for cells in the declared sections.
      */
     @discardableResult
-    public func cellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> RxMultiSectionTableViewBindResult<C, S> {
+    public func cellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> BaseMultiSectionTableViewBindResult<C, S> {
         for section in self.sections {
-            let bindResult: RxSingleSectionTableViewBindResult<C, S> = self.bindResult(for: section)
+            let bindResult: SingleSectionTableViewBindResult<C, S> = self.bindResult(for: section)
             bindResult.cellHeight({ row in
                 handler(section, row)
             })
@@ -59,9 +60,9 @@ public class BaseMultiSectionTableViewBindResult<C: UITableViewCell, S: TableVie
      Add a callback handler to provide the estimated cell height for cells in the declared sections.
      */
     @discardableResult
-    public func estimatedCellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> RxMultiSectionTableViewBindResult<C, S> {
+    public func estimatedCellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> MultiSectionTableViewBindResult<C, S> {
         for section in self.sections {
-            let bindResult: RxSingleSectionTableViewBindResult<C, S> = self.bindResult(for: section)
+            let bindResult: SingleSectionTableViewBindResult<C, S> = self.bindResult(for: section)
             bindResult.estimatedCellHeight({ row in
                 handler(section, row)
             })
@@ -70,3 +71,4 @@ public class BaseMultiSectionTableViewBindResult<C: UITableViewCell, S: TableVie
     }
 
 }
+*/

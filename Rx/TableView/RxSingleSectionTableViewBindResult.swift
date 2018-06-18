@@ -1,6 +1,7 @@
 import UIKit
 import RxSwift
 
+/*
 /**
  A throwaway object created when a table view binder's `onSection(_:)` method is called. This object declares a number
  of methodss that take a binding handler and give it to the original table view binder to store for callback.
@@ -387,3 +388,4 @@ public class RxSingleSectionModelTableViewBindResult<C: UITableViewCell, S: Tabl
         return self
     }
 }
+*/
