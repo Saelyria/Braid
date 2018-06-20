@@ -10,7 +10,7 @@ public protocol MultiSectionTableViewBindResultProtocol {
  A throwaway object created when a table view binder's `onSections(_:)` method is called. This object declares a number
  of methodss that take a binding handler and give it to the original table view binder to store for callback.
  */
-public class MultiSectionTableViewBindResult<C: UITableViewCell, S: TableViewSection>: MultiSectionTableViewBindResultProtocol {
+public class MultiSectionTableViewBindResult<C: UITableViewCell, S: TableViewSection>: NSObject, MultiSectionTableViewBindResultProtocol {
     internal let binder: SectionedTableViewBinder<S>
     internal let sections: [S]
     internal var sectionBindResults: [S: SingleSectionTableViewBindResult<C, S>] = [:]

@@ -19,14 +19,12 @@ public extension Reactive where Base: SingleSectionTableViewBindResultProtocol {
      */
     @discardableResult
     public func bind<NC>(cellType: NC.Type, viewModels: Observable<[NC.ViewModel]>) -> SingleSectionTableViewBindResult<Base.C, Base.S>
-    where NC: UITableViewCell & RxViewModelBindable & ReuseIdentifiable {
+    where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
         guard let bindResult = self.base as? SingleSectionTableViewBindResult<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
-        bindResult.addDequeueBlock(cellType: cellType, viewModelBindHandler: { (cell, viewModel) in
-            cell.viewModel.value = viewModel
-        })
+        bindResult.addDequeueBlock(cellType: cellType)
         
         let section = bindResult.section
         viewModels.subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [NC.ViewModel]) in
@@ -83,14 +81,12 @@ public extension Reactive where Base: SingleSectionTableViewBindResultProtocol {
      */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: Observable<[NM]>, mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-    -> SingleSectionModelTableViewBindResult<NC, Base.S, NM> where NC: UITableViewCell & RxViewModelBindable & ReuseIdentifiable {
+    -> SingleSectionModelTableViewBindResult<NC, Base.S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
         guard let bindResult = self.base as? SingleSectionTableViewBindResult<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
-        bindResult.addDequeueBlock(cellType: cellType, viewModelBindHandler: { (cell, viewModel) in
-            cell.viewModel.value = viewModel
-        })
+        bindResult.addDequeueBlock(cellType: cellType)
         
         let section = bindResult.section
         models.subscribe(onNext: { [weak binder = bindResult.binder] (models: [NM]) in
@@ -112,14 +108,12 @@ public extension Reactive where Base: SingleSectionTableViewBindResultProtocol {
      */
     @discardableResult
     public func bind<H>(headerType: H.Type, viewModel: Observable<H.ViewModel>) -> SingleSectionTableViewBindResult<Base.C, Base.S>
-    where H: UITableViewHeaderFooterView & RxViewModelBindable & ReuseIdentifiable {
+    where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
         guard let bindResult = self.base as? SingleSectionTableViewBindResult<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
-        bindResult.addDequeueBlock(headerType: headerType, viewModelBindHandler: { (header, viewModel) in
-            header.viewModel.value = viewModel
-        })
+        bindResult.addDequeueBlock(headerType: headerType)
 
         let section = bindResult.section
         viewModel.subscribe(onNext: { [weak binder = bindResult.binder] (viewModel: H.ViewModel) in
@@ -157,14 +151,12 @@ public extension Reactive where Base: SingleSectionTableViewBindResultProtocol {
      */
     @discardableResult
     public func bind<F>(footerType: F.Type, viewModel: Observable<F.ViewModel>) -> SingleSectionTableViewBindResult<Base.C, Base.S>
-    where F: UITableViewHeaderFooterView & RxViewModelBindable & ReuseIdentifiable {
+    where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
         guard let bindResult = self.base as? SingleSectionTableViewBindResult<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
-        bindResult.addDequeueBlock(footerType: footerType, viewModelBindHandler: { (footer, viewModel) in
-            footer.viewModel.value = viewModel
-        })
+        bindResult.addDequeueBlock(footerType: footerType)
         
         let section = bindResult.section
         viewModel.subscribe(onNext: { [weak binder = bindResult.binder] (viewModel: F.ViewModel) in

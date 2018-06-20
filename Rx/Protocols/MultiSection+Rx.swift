@@ -7,7 +7,7 @@ public extension Reactive where Base: MultiSectionTableViewBindResultProtocol {
      */
     @discardableResult
     public func bind<NC>(cellType: NC.Type, viewModels: [Base.S: Observable<[NC.ViewModel]>]) -> MultiSectionTableViewBindResult<NC, Base.S>
-    where NC: UITableViewCell & RxViewModelBindable & ReuseIdentifiable {
+    where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
         guard let bindResult = self.base as? MultiSectionTableViewBindResult<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
@@ -29,7 +29,7 @@ public extension Reactive where Base: MultiSectionTableViewBindResultProtocol {
      */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [Base.S: Observable<[NM]>], mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-    -> MultiSectionModelTableViewBindResult<NC, Base.S, NM> where NC: UITableViewCell & RxViewModelBindable & ReuseIdentifiable {
+    -> MultiSectionModelTableViewBindResult<NC, Base.S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
         guard let bindResult = self.base as? MultiSectionTableViewBindResult<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
@@ -83,7 +83,7 @@ public extension Reactive where Base: MultiSectionTableViewBindResultProtocol {
      */
     @discardableResult
     public func bind<H>(headerType: H.Type, viewModels: [Base.S: Observable<H.ViewModel>]) -> MultiSectionTableViewBindResult<Base.C, Base.S>
-    where H: UITableViewHeaderFooterView & RxViewModelBindable & ReuseIdentifiable {
+    where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
         guard let bindResult = self.base as? MultiSectionTableViewBindResult<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
@@ -128,7 +128,7 @@ public extension Reactive where Base: MultiSectionTableViewBindResultProtocol {
      */
     @discardableResult
     public func bind<F>(footerType: F.Type, viewModels: [Base.S: Observable<F.ViewModel>]) -> MultiSectionTableViewBindResult<Base.C, Base.S>
-    where F: UITableViewHeaderFooterView & RxViewModelBindable & ReuseIdentifiable {
+    where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
         guard let bindResult = self.base as? MultiSectionTableViewBindResult<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
