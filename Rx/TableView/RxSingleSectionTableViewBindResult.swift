@@ -92,18 +92,7 @@ public class RxSingleSectionTableViewBindResult<C: UITableViewCell, S: TableView
         return tableViewBindResult
     }
     
-    /**
-     Bind the given cell type to the declared section, creating a cell for each item in the given observable array of
-     models.
-     
-     Using this method allows a convenient mapping between the raw model objects that each cell in your table
-     represents and the cells. When binding with this method, various other event binding methods (most notably the
-     `onTapped` event method) can have their handlers be passed in the associated model (cast to the same type as the
-     models observable type) along with the row and cell.
-     
-     When using this method, you pass in an observable array of your raw models. From there, the binder will handle
-     dequeuing of your cells based on the observable models array.
-    */
+
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: Observable<[NM]>)
     -> RxSingleSectionModelTableViewBindResult<NC, S, NM> where NC: UITableViewCell & ReuseIdentifiable {
