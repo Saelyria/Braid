@@ -10,7 +10,7 @@ public protocol SingleSectionTableViewBindResultProtocol {
  A throwaway object created when a table view binder's `onSection(_:)` method is called. This object declares a number
  of methodss that take a binding handler and give it to the original table view binder to store for callback.
 */
-public class SingleSectionTableViewBindResult<C: UITableViewCell, S: TableViewSection>: NSObject, SingleSectionTableViewBindResultProtocol {
+public class SingleSectionTableViewBindResult<C: UITableViewCell, S: TableViewSection>: SingleSectionTableViewBindResultProtocol {
     let binder: SectionedTableViewBinder<S>
     let section: S
     
@@ -25,17 +25,10 @@ public class SingleSectionTableViewBindResult<C: UITableViewCell, S: TableViewSe
      Bind the given cell type to the declared sections, creating them based on the view models from a given observable.
      */
     @discardableResult
-    public func bind<NC, T: NSObject>(cellType: NC.Type, byObserving keyPath: KeyPath<T, [NC.ViewModel]>, on provider: T)
-    -> SingleSectionTableViewBindResult<NC, S> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
+    public func bind<NC>(cellType: NC.Type, viewModels: [NC.ViewModel]) -> SingleSectionTableViewBindResult<NC, S>
+    where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
         self.addDequeueBlock(cellType: cellType)
-        
-        let section = self.section
-        let token = provider.observe(keyPath, options: [.initial, .new]) { [weak binder = self.binder] (_, value) in
-            let viewModels: [NC.ViewModel]? = value.newValue
-            binder?.sectionCellViewModels[section] = viewModels
-            binder?.reload(section: section)
-        }
-        self.binder.observationTokens.append(token)
+        self.binder.sectionCellViewModels[self.section] = viewModels
         
         return SingleSectionTableViewBindResult<NC, S>(binder: self.binder, section: self.section)
     }
@@ -54,19 +47,14 @@ public class SingleSectionTableViewBindResult<C: UITableViewCell, S: TableViewSe
      models array.
      */
     @discardableResult
-    public func bind<NC, NM, T: NSObject>(cellType: NC.Type, byObserving keyPath: KeyPath<T, [NM]>, on provider: T, mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+    public func bind<NC, NM>(cellType: NC.Type, models: [NM], mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
     -> SingleSectionModelTableViewBindResult<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
         self.addDequeueBlock(cellType: cellType)
         
-        let section = self.section
-        let token = provider.observe(keyPath, options: [.initial, .new]) { [weak binder = self.binder] (_, value) in
-            let models: [NM]? = value.newValue
-            binder?.sectionCellModels[section] = models
-            binder?.sectionCellViewModels[section] = models?.map(mapToViewModel)
-            binder?.reload(section: section)
-        }
-        self.binder.observationTokens.append(token)
+        self.binder.sectionCellModels[self.section] = models
+        self.binder.sectionCellViewModels[self.section] = models.map(mapToViewModel)
         
+        // TODO: pass the 'map to view model' function to the model bind result
         return SingleSectionModelTableViewBindResult<NC, S, NM>(binder: self.binder, section: self.section)
     }
     
@@ -83,17 +71,10 @@ public class SingleSectionTableViewBindResult<C: UITableViewCell, S: TableViewSe
      dequeuing of your cells based on the observable models array.
      */
     @discardableResult
-    public func bind<NC, NM, T: NSObject>(cellType: NC.Type, byObserving keyPath: KeyPath<T, [NM]>, on provider: T)
-    -> SingleSectionModelTableViewBindResult<NC, S, NM> where NC: UITableViewCell & ReuseIdentifiable {
+    public func bind<NC, NM>(cellType: NC.Type, models: [NM]) -> SingleSectionModelTableViewBindResult<NC, S, NM>
+    where NC: UITableViewCell & ReuseIdentifiable {
         self.addDequeueBlock(cellType: cellType)
-
-        let section = self.section
-        let token = provider.observe(keyPath, options: [.initial, .new]) { [weak binder = self.binder] (_, value) in
-            let models: [NM]? = value.newValue
-            binder?.sectionCellModels[section] = models
-            binder?.reload(section: section)
-        }
-        self.binder.observationTokens.append(token)
+        self.binder.sectionCellModels[self.section] = models
         
         return SingleSectionModelTableViewBindResult<NC, S, NM>(binder: self.binder, section: self.section)
     }
@@ -226,7 +207,7 @@ internal extension SingleSectionTableViewBindResult {
         }
         
         let cellDequeueBlock: CellDequeueBlock = { [weak binder = self.binder] (tableView, indexPath) in
-            if let section = binder?._displayedSections[indexPath.section],
+            if let section = binder?.displayedSections[indexPath.section],
             var cell = binder?.tableView.dequeueReusableCell(withIdentifier: NC.reuseIdentifier, for: indexPath) as? NC,
             let viewModel = (binder?.sectionCellViewModels[section] as? [NC.ViewModel])?[indexPath.row] {
                 cell.viewModel = viewModel
@@ -246,7 +227,7 @@ internal extension SingleSectionTableViewBindResult {
         }
         
         let cellDequeueBlock: CellDequeueBlock = { [weak binder = self.binder] (tableView, indexPath) in
-            if let section = binder?._displayedSections[indexPath.section],
+            if let section = binder?.displayedSections[indexPath.section],
                 let cell = binder?.tableView.dequeueReusableCell(withIdentifier: NC.reuseIdentifier, for: indexPath) as? NC {
                 binder?.sectionCellDequeuedCallbacks[section]?(indexPath.row, cell)
                 return cell
@@ -265,7 +246,7 @@ internal extension SingleSectionTableViewBindResult {
         }
         
         let headerDequeueBlock: HeaderFooterDequeueBlock = { [weak binder = self.binder] (tableView, sectionInt) in
-            if let section = binder?._displayedSections[sectionInt],
+            if let section = binder?.displayedSections[sectionInt],
             var header = tableView.dequeueReusableHeaderFooterView(withIdentifier: H.reuseIdentifier) as? H,
             let viewModel = binder?.sectionHeaderViewModels[section] as? H.ViewModel {
                 header.viewModel = viewModel
@@ -284,7 +265,7 @@ internal extension SingleSectionTableViewBindResult {
         }
         
         let footerDequeueBlock: HeaderFooterDequeueBlock = { [weak binder = self.binder] (tableView, sectionInt) in
-            if let section = binder?._displayedSections[sectionInt],
+            if let section = binder?.displayedSections[sectionInt],
             var footer = tableView.dequeueReusableHeaderFooterView(withIdentifier: F.reuseIdentifier) as? F,
             let viewModel = binder?.sectionFooterViewModels[section] as? F.ViewModel {
                 footer.viewModel = viewModel

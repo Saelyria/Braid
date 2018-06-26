@@ -1,5 +1,4 @@
 import Foundation
-import RxSwift
 
 /**
  Describes an object that can have a view model bound to it with which it can configure itself.
@@ -8,12 +7,10 @@ import RxSwift
  view model, binds that data to itself. The object conforming to this protocol declares what its view model type is
  with its associated `ViewModel` type.
  */
-public protocol ViewModelBindable: BaseViewModelBindable {
-    /// The view model supplied to the `ViewModelBindable` instance.
-    var viewModel: ViewModel? { get set }
-}
-
-public protocol BaseViewModelBindable {
+public protocol ViewModelBindable {
     /// The type that this object's view model must be.
     associatedtype ViewModel
+    
+    /// The view model supplied to the `ViewModelBindable` instance.
+    var viewModel: ViewModel? { get set }
 }

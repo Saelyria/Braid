@@ -7,5 +7,6 @@ target 'TableauExample' do
   use_frameworks!
   
   pod 'Tableau/Rx', :path => '.'
+#  pod 'Tableau', :path => '.'
   pod 'RxCocoa', '~> 4.0'
 end

@@ -34,10 +34,10 @@ class HomeViewController: UIViewController {
         self.tableView.register(TitleDetailTableViewCell.self)
         
         self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self, displayedSections: [])
-        self.binder.onSections([.accounts, .bills, .info])
-            .bind(cellType: TitleDetailTableViewCell.self, byObserving: \.rows, on: self)
-            .onTapped { (section: Section, row: Int, cell: TitleDetailTableViewCell) in
-                
-            }
+//        self.binder.onSections([.accounts, .bills, .info])
+//            .bind(cellType: TitleDetailTableViewCell.self, byObserving: \.rows, on: self)
+//            .onTapped { (section: Section, row: Int, cell: TitleDetailTableViewCell) in
+//
+//            }
     }
 }

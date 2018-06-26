@@ -1,6 +1,8 @@
 import UIKit
 import RxSwift
 
+extension MultiSectionTableViewBindResult: ReactiveCompatible { }
+
 public extension Reactive where Base: MultiSectionTableViewBindResultProtocol {
     /**
      Bind the given cell type to the declared sections, creating them based on the view models from a given observable.

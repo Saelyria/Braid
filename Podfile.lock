@@ -4,6 +4,7 @@ PODS:
   - RxSwift (4.1.2)
   - Tableau/Core (0.1.0)
   - Tableau/Rx (0.1.0):
+    - RxCocoa (~> 4.0)
     - RxSwift (~> 4.0)
     - Tableau/Core
 
@@ -18,8 +19,8 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   RxCocoa: d88ba0f1f6abf040011a9eb4b539324fc426843a
   RxSwift: e49536837d9901277638493ea537394d4b55f570
-  Tableau: 1434fa698dadce3c9f27854e1f5b46e928c0014e
+  Tableau: 6ded8935f9f4756129cc140d4f04f1e60dc10f39
 
-PODFILE CHECKSUM: 05035dbe8821c0aaf91ab9cd876a73b991174d60
+PODFILE CHECKSUM: 2c660d4c4fc917a2ee98a95494f6915a1788b4a2
 
 COCOAPODS: 1.4.0

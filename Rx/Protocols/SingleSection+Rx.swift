@@ -1,17 +1,7 @@
 import UIKit
 import RxSwift
 
-private var binderDisposeBagKey: String = "binder_dispose_bag"
-extension SectionedTableViewBinder {
-    var disposeBag: DisposeBag {
-        get {
-            return objc_getAssociatedObject(self, &binderDisposeBagKey) as! DisposeBag
-        }
-        set {
-            objc_setAssociatedObject(self, &binderDisposeBagKey, newValue, .OBJC_ASSOCIATION_RETAIN)
-        }
-    }
-}
+extension SingleSectionTableViewBindResult: ReactiveCompatible { }
 
 public extension Reactive where Base: SingleSectionTableViewBindResultProtocol {
     /**

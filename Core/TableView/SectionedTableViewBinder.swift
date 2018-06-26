@@ -1,4 +1,7 @@
 import UIKit
+#if RX_TABLEAU
+import RxSwift
+#endif
 
 /**
  A protocol describing an enum whose cases or a struct whose instances correspond to sections in a table view.
@@ -54,6 +57,9 @@ public class TableViewBinder {
     }
 }
 
+public protocol SectionedTableViewBinderProtocol: AnyObject {
+    associatedtype S: TableViewSection    
+}
 
 /**
  An object that dequeues and binds data to cells in sections for a given table view.
@@ -95,33 +101,83 @@ binder.onSection(.one)
  conformance) to be compatible with a data binder. Specifically, they must at least conform to `ReuseIdentifiable` and
  `ViewModelBindable`, and should conform to `UINibInitable` if they are meant to be created from a Nib.
  */
-public class SectionedTableViewBinder<S: TableViewSection>: _BaseTableViewBinder<S> {
+public class SectionedTableViewBinder<S: TableViewSection>: NSObject {
     /// The currently displayed sections of the table view. Updating the value of this will automatically cause the data
     /// binder to update its associated table view. Defaults to the section enum's `allSections` value if not set.
     public var displayedSections: [S] = [] {
         didSet {
-            self._displayedSections = self.displayedSections
             // TODO: create diff and reload affected sections
             self.tableView.reloadData()
+#if RX_TABLEAU
+            self.displayedSectionsSubject.onNext(self.displayedSections)
+#endif
         }
     }
+
+#if RX_TABLEAU
+    let disposeBag = DisposeBag()
+    let displayedSectionsSubject = BehaviorSubject<[S]>(value: [])
+#endif
+
+    var tableView: UITableView!
+    var tableViewDataSourceDelegate: _TableViewDataSourceDelegate<S>!
     
-    var observationTokens: [NSKeyValueObservation] = []
+    // Blocks to call to dequeue a cell in a section.
+    var sectionCellDequeueBlocks: [S: CellDequeueBlock] = [:]
+    // The view models for the cells for a section.
+    var sectionCellViewModels: [S: [Any]] = [:]
+    // The raw models for the cells for a section.
+    var sectionCellModels: [S: [Any]] = [:]
+    
+    // Blocks to call to dequeue a header in a section.
+    var sectionHeaderDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
+    // The view models for the headers for a section.
+    var sectionHeaderViewModels: [S: Any] = [:]
+    // Titles for the headers for a section.
+    var sectionHeaderTitles: [S: String] = [:]
+    
+    // Blocks to call to dequeue a footer in a section.
+    var sectionFooterDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
+    // The view models for the footers for a section.
+    var sectionFooterViewModels: [S: Any] = [:]
+    // Titles for the footers for a section.
+    var sectionFooterTitles: [S: String] = [:]
+    
+    // Blocks to call when a cell is tapped in a section.
+    var sectionCellTappedCallbacks: [S: CellTapCallback] = [:]
+    // Callback blocks to call when a cell is dequeued in a section.
+    var sectionCellDequeuedCallbacks: [S: CellDequeueCallback] = [:]
+    // Blocks to call to get the height for a cell in a section.
+    var sectionCellHeightBlocks: [S: CellHeightBlock] = [:]
+    // Blocks to call to get the estimated height for a cell in a section.
+    var sectionEstimatedCellHeightBlocks: [S: CellHeightBlock] = [:]
     
     // TODO: this is currently not working; the casting of 'allCases' is weird
     //    public convenience init<S>(tableView: UITableView, sectionedBy sectionEnum: S.Type) where S: CaseIterable {
     //        self.init(tableView: tableView, sectionedBy: sectionEnum, displayedSections: S.allCases as! [S])
     //    }
     
-    /**
-     Create a new table view data binder with the given table view whose sections are defined by the given section enum.
-     The table view will initially display the given array of sections.
-     */
+    
     public required init(tableView: UITableView, sectionedBy sectionEnum: S.Type, displayedSections: [S]) {
-        super.init(tableView: tableView, sectionedBy: sectionEnum, displayedSections: displayedSections)
-        self.displayedSections = displayedSections
+        super.init()
+        self.tableView = tableView
+        self.tableViewDataSourceDelegate = _TableViewDataSourceDelegate(binder: self)
+        tableView.delegate = self.tableViewDataSourceDelegate
+        tableView.dataSource = self.tableViewDataSourceDelegate
     }
     
+    /// Reloads the specified section.
+    public func reload(section: S) {
+        if let sectionToReloadIndex = self.displayedSections.index(of: section) {
+            let startIndex = self.displayedSections.startIndex
+            let sectionInt = startIndex.distance(to: sectionToReloadIndex)
+            let indexSet: IndexSet = [sectionInt]
+            self.tableView.reloadSections(indexSet, with: .none)
+        } else {
+            self.tableView.reloadData()
+        }
+    }
+
     /**
      Declares a section to begin binding handlers to.
      */
