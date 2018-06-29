@@ -1,6 +1,16 @@
 import UIKit
 
-public class SingleSectionModelTableViewBindResult<C: UITableViewCell, S: TableViewSection, M>: SingleSectionTableViewBindResult<C, S> {
+/**
+ A binder for a section whose cells were setup to be dequeued with an array of an arbitrary 'model' type.
+ */
+public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewSection, M>: BaseTableViewSingleSectionBinder<C, S> {
+    public var sectionUpdateCallback: ([M]) -> Void {
+        return { (models: [M]) in
+            self.binder.sectionCellModels[self.section] = models
+            self.binder.reload(section: self.section)
+        }
+    }
+    
     /**
      Add a handler to be called whenever a cell in the declared section is tapped.
      
@@ -12,7 +22,7 @@ public class SingleSectionModelTableViewBindResult<C: UITableViewCell, S: TableV
      `bind(cellType:models:mapToViewModelsWith:)` method was used to bind the cell type to the section.
      */
     @discardableResult
-    public func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C, _ model: M) -> Void) -> SingleSectionModelTableViewBindResult<C, S, M> {
+    public func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C, _ model: M) -> Void) -> TableViewModelSingleSectionBinder<C, S, M> {
         let section = self.section
         let tappedHandler: CellTapCallback = {  [weak binder = self.binder] (row, cell) in
             guard let cell = cell as? C, let model = binder?.sectionCellModels[section]?[row] as? M else {
@@ -34,7 +44,7 @@ public class SingleSectionModelTableViewBindResult<C: UITableViewCell, S: TableV
      `bind(cellType:viewModels:)` method.
      */
     @discardableResult
-    public func configureCell(_ handler: @escaping (_ row: Int, _ dequeuedCell: C, _ model: M) -> Void) -> SingleSectionModelTableViewBindResult<C, S, M> {
+    public func configureCell(_ handler: @escaping (_ row: Int, _ dequeuedCell: C, _ model: M) -> Void) -> TableViewModelSingleSectionBinder<C, S, M> {
         let section = self.section
         let dequeueCallback: CellDequeueCallback = { [weak binder = self.binder] row, cell in
             guard let cell = cell as? C, let model = binder?.sectionCellModels[section]?[row] as? M else {
@@ -50,54 +60,52 @@ public class SingleSectionModelTableViewBindResult<C: UITableViewCell, S: TableV
     }
     
     @discardableResult
-    override public func bind<H>(headerType: H.Type, viewModel: H.ViewModel) -> SingleSectionModelTableViewBindResult<C, S, M>
+    override public func bind<H>(headerType: H.Type, viewModel: H.ViewModel) -> TableViewModelSingleSectionBinder<C, S, M>
     where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
         super.bind(headerType: headerType, viewModel: viewModel)
         return self
     }
     
     @discardableResult
-    public override func headerTitle(_ title: String) -> SingleSectionModelTableViewBindResult<C, S, M> {
+    public override func headerTitle(_ title: String) -> TableViewModelSingleSectionBinder<C, S, M> {
         super.headerTitle(title)
         return self
     }
     
     @discardableResult
-    public override func bind<F>(footerType: F.Type, viewModel: F.ViewModel) -> SingleSectionModelTableViewBindResult<C, S, M>
+    public override func bind<F>(footerType: F.Type, viewModel: F.ViewModel) -> TableViewModelSingleSectionBinder<C, S, M>
     where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
         super.bind(footerType: footerType, viewModel: viewModel)
         return self
     }
     
     @discardableResult
-    public override func footerTitle(_ title: String) -> SingleSectionModelTableViewBindResult<C, S, M> {
+    public override func footerTitle(_ title: String) -> TableViewModelSingleSectionBinder<C, S, M> {
         super.footerTitle(title)
         return self
     }
     
     @discardableResult
-    override public func configureCell(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void) -> SingleSectionModelTableViewBindResult<C, S, M> {
+    override public func configureCell(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void) -> TableViewModelSingleSectionBinder<C, S, M> {
         super.configureCell(handler)
         return self
     }
     
     @discardableResult
-    override public func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C) -> Void) -> SingleSectionModelTableViewBindResult<C, S, M> {
+    override public func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C) -> Void) -> TableViewModelSingleSectionBinder<C, S, M> {
         super.onTapped(handler)
         return self
     }
     
     @discardableResult
-    override public func cellHeight(_ handler: @escaping (_ row: Int) -> CGFloat) -> SingleSectionModelTableViewBindResult<C, S, M> {
+    override public func cellHeight(_ handler: @escaping (_ row: Int) -> CGFloat) -> TableViewModelSingleSectionBinder<C, S, M> {
         super.cellHeight(handler)
         return self
     }
     
     @discardableResult
-    override public func estimatedCellHeight(_ handler: @escaping (_ row: Int) -> CGFloat) -> SingleSectionModelTableViewBindResult<C, S, M> {
+    override public func estimatedCellHeight(_ handler: @escaping (_ row: Int) -> CGFloat) -> TableViewModelSingleSectionBinder<C, S, M> {
         super.estimatedCellHeight(handler)
         return self
     }
 }
-
-

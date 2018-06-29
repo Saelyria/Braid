@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9360CCB520E5D5D200DF8886 /* SingleSectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9360CCB420E5D5D200DF8886 /* SingleSectionViewModel.swift */; };
+		9360CCB920E5E37700DF8886 /* SingleSectionModelViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9360CCB820E5E37700DF8886 /* SingleSectionModelViewModel.swift */; };
 		9378E76620D6E51A0039849F /* SingleSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9378E76520D6E51A0039849F /* SingleSectionModel.swift */; };
 		9378E76820D71D530039849F /* SingleSection+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9378E76720D71D530039849F /* SingleSection+Rx.swift */; };
 		9378E76A20D72D180039849F /* MultiSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9378E76920D72D180039849F /* MultiSectionModel.swift */; };
@@ -27,6 +29,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9360CCB420E5D5D200DF8886 /* SingleSectionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleSectionViewModel.swift; sourceTree = "<group>"; };
+		9360CCB820E5E37700DF8886 /* SingleSectionModelViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleSectionModelViewModel.swift; sourceTree = "<group>"; };
 		9378E76520D6E51A0039849F /* SingleSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleSectionModel.swift; sourceTree = "<group>"; };
 		9378E76720D71D530039849F /* SingleSection+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SingleSection+Rx.swift"; sourceTree = "<group>"; };
 		9378E76920D72D180039849F /* MultiSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiSectionModel.swift; sourceTree = "<group>"; };
@@ -59,6 +63,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9360CCB620E5E1B400DF8886 /* SingleSection */ = {
+			isa = PBXGroup;
+			children = (
+				93BF737620CF229B000F0FB0 /* SingleSection.swift */,
+				9360CCB420E5D5D200DF8886 /* SingleSectionViewModel.swift */,
+				9378E76520D6E51A0039849F /* SingleSectionModel.swift */,
+				9360CCB820E5E37700DF8886 /* SingleSectionModelViewModel.swift */,
+			);
+			path = SingleSection;
+			sourceTree = "<group>";
+		};
+		9360CCB720E5E1CA00DF8886 /* MultiSection */ = {
+			isa = PBXGroup;
+			children = (
+				93BF737820D3E654000F0FB0 /* MultiSection.swift */,
+				9378E76920D72D180039849F /* MultiSectionModel.swift */,
+			);
+			path = MultiSection;
+			sourceTree = "<group>";
+		};
 		938132E920B6469F00CBF8F6 = {
 			isa = PBXGroup;
 			children = (
@@ -113,10 +137,8 @@
 			children = (
 				93BF737420CDA232000F0FB0 /* SectionedTableViewBinder.swift */,
 				9381334020B6EC5600CBF8F6 /* _TableViewDataSourceDelegate.swift */,
-				93BF737620CF229B000F0FB0 /* SingleSection.swift */,
-				9378E76520D6E51A0039849F /* SingleSectionModel.swift */,
-				93BF737820D3E654000F0FB0 /* MultiSection.swift */,
-				9378E76920D72D180039849F /* MultiSectionModel.swift */,
+				9360CCB620E5E1B400DF8886 /* SingleSection */,
+				9360CCB720E5E1CA00DF8886 /* MultiSection */,
 			);
 			path = TableView;
 			sourceTree = "<group>";
@@ -235,8 +257,10 @@
 				9378E76620D6E51A0039849F /* SingleSectionModel.swift in Sources */,
 				9381334520B6EC5600CBF8F6 /* ViewModelBindable.swift in Sources */,
 				9381334A20B6EC5600CBF8F6 /* RxMultiSectionTableViewBindResult.swift in Sources */,
+				9360CCB920E5E37700DF8886 /* SingleSectionModelViewModel.swift in Sources */,
 				93BF737520CDA232000F0FB0 /* SectionedTableViewBinder.swift in Sources */,
 				93BF737920D3E654000F0FB0 /* MultiSection.swift in Sources */,
+				9360CCB520E5D5D200DF8886 /* SingleSectionViewModel.swift in Sources */,
 				9381334720B6EC5600CBF8F6 /* UITableView+Registering.swift in Sources */,
 				9381334B20B6EC5600CBF8F6 /* RxSectionedTableViewBinder.swift in Sources */,
 				9378E76820D71D530039849F /* SingleSection+Rx.swift in Sources */,

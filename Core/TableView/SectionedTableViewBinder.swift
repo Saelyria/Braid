@@ -52,13 +52,13 @@ public class TableViewBinder {
     }
     
     /// Starts binding on the table.
-    public func onTable() -> SingleSectionTableViewBindResult<UITableViewCell, _SingleSection> {
-        return SingleSectionTableViewBindResult(binder: self._sectionBinder, section: .table)
+    public func onTable() -> TableViewSingleSectionBinder<UITableViewCell, _SingleSection> {
+        return TableViewSingleSectionBinder(binder: self._sectionBinder, section: .table)
     }
 }
 
 public protocol SectionedTableViewBinderProtocol: AnyObject {
-    associatedtype S: TableViewSection    
+    associatedtype S: TableViewSection
 }
 
 /**
@@ -181,7 +181,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: NSObject {
     /**
      Declares a section to begin binding handlers to.
      */
-    public func onSection(_ section: S) -> SingleSectionTableViewBindResult<UITableViewCell, S> {
+    public func onSection(_ section: S) -> TableViewSingleSectionBinder<UITableViewCell, S> {
         return SingleSectionTableViewBindResult<UITableViewCell, S>(binder: self, section: section)
     }
     
