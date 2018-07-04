@@ -1,45 +1,32 @@
 import UIKit
 
 /// Protocol that allows us to have Reactive extensions
-public protocol MultiSectionTableViewBindResultProtocol {
+public protocol TableViewMutliSectionBinderProtocol {
     associatedtype C: UITableViewCell
     associatedtype S: TableViewSection
 }
 
 /**
  A throwaway object created when a table view binder's `onSections(_:)` method is called. This object declares a number
- of methodss that take a binding handler and give it to the original table view binder to store for callback.
+ of methods that take a binding handler and give it to the original table view binder to store for callback.
  */
-public class MultiSectionTableViewBindResult<C: UITableViewCell, S: TableViewSection>: MultiSectionTableViewBindResultProtocol {
-    internal let binder: SectionedTableViewBinder<S>
-    internal let sections: [S]
-    internal var sectionBindResults: [S: SingleSectionTableViewBindResult<C, S>] = [:]
-    
-    internal init(binder: SectionedTableViewBinder<S>, sections: [S]) {
-        self.binder = binder
-        self.sections = sections
-    }
-    
+public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection>: BaseTableViewMutliSectionBinder<C, S> {
     /**
      Bind the given cell type to the declared sections, creating them based on the view models from a given observable.
      */
     @discardableResult
-    public func bind<NC, T: NSObject>(cellType: NC.Type, byObserving keyPath: KeyPath<T, [S: [NC.ViewModel]]>, on provider: T)
-    -> MultiSectionTableViewBindResult<NC, S> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
-        let sections = self.sections
-        let token = provider.observe(keyPath, options: [.initial, .new]) { [weak binder = self.binder] (_, value) in
-            let allViewModels: [S: [NC.ViewModel]]? = value.newValue
-            for section in sections {
-                guard let sectionViewModels: [NC.ViewModel] = allViewModels?[section] else {
-                    assertionFailure("ERROR: No cell view models array given for the section '\(section)'")
-                    return
-                }
-                binder?.sectionCellViewModels[section] = sectionViewModels
-                binder?.reload(section: section)
+    public func bind<NC>(cellType: NC.Type, viewModels: [S: [NC.ViewModel]])
+    -> TableViewViewModelMultiSectionBinder<NC, S> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
+        for section in self.sections {
+            guard let sectionViewModels: [NC.ViewModel] = viewModels[section] else {
+                assertionFailure("ERROR: No cell view models array given for the section '\(section)'")
+                return TableViewViewModelMultiSectionBinder<NC, S>(binder: self.binder, sections: self.sections)
             }
+            self.binder.sectionCellViewModels[section] = sectionViewModels
+            self.binder.reload(section: section)
         }
 
-        return MultiSectionTableViewBindResult<NC, S>(binder: self.binder, sections: self.sections)
+        return TableViewViewModelMultiSectionBinder<NC, S>(binder: self.binder, sections: self.sections)
     }
     
     /**
@@ -47,24 +34,20 @@ public class MultiSectionTableViewBindResult<C: UITableViewCell, S: TableViewSec
      array of models mapped to view models by a given function.
      */
     @discardableResult
-    public func bind<NC, NM, T: NSObject>(cellType: NC.Type, byObserving keyPath: KeyPath<T, [S: [NM]]>, on provider: T, mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-    -> MultiSectionModelTableViewBindResult<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
-        let sections = self.sections
-        let token = provider.observe(keyPath, options: [.initial, .new]) { [weak binder = self.binder] (_, value) in
-            let allModels: [S: [NM]]? = value.newValue
-            for section in sections {
-                guard let sectionModels: [NM] = allModels?[section] else {
-                    assertionFailure("ERROR: No cell models array given for the section '\(section)'")
-                    return
-                }
-                let sectionViewModels: [NC.ViewModel] = sectionModels.map(mapToViewModel)
-                binder?.sectionCellModels[section] = sectionModels
-                binder?.sectionCellViewModels[section] = sectionViewModels
-                binder?.reload(section: section)
+    public func bind<NC, NM>(cellType: NC.Type, models: [S: [NM]], mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+    -> TableViewModelViewModelMultiSectionBinder<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
+        for section in self.sections {
+            guard let sectionModels: [NM] = models[section] else {
+                assertionFailure("ERROR: No cell models array given for the section '\(section)'")
+                return TableViewModelViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections, mapToViewModel: mapToViewModel)
             }
+            let sectionViewModels: [NC.ViewModel] = sectionModels.map(mapToViewModel)
+            self.binder.sectionCellModels[section] = sectionModels
+            self.binder.sectionCellViewModels[section] = sectionViewModels
+            self.binder.reload(section: section)
         }
         
-        return MultiSectionModelTableViewBindResult<NC, S, NM>(binder: self.binder, sections: self.sections)
+        return TableViewModelViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections, mapToViewModel: mapToViewModel)
     }
     
     /**
@@ -83,29 +66,36 @@ public class MultiSectionTableViewBindResult<C: UITableViewCell, S: TableViewSec
      given the model and the dequeued cell.
      */
     @discardableResult
-    public func bind<NC, NM, T: NSObject>(cellType: NC.Type, byObserving keyPath: KeyPath<T, [S: [NM]]>, on provider: T)
-    -> MultiSectionModelTableViewBindResult<NC, S, NM> where NC: UITableViewCell & ReuseIdentifiable {
-        let sections = self.sections
-        let token = provider.observe(keyPath, options: [.initial, .new]) { [weak binder = self.binder] (_, value) in
-            let allModels: [S: [NM]]? = value.newValue
-            for section in sections {
-                guard let sectionModels: [NM] = allModels?[section] else {
-                    assertionFailure("ERROR: No cell models array given for the section '\(section)'")
-                    return
-                }
-                binder?.sectionCellModels[section] = sectionModels
-                binder?.reload(section: section)
+    public func bind<NC, NM>(cellType: NC.Type, models: [S: [NM]]) -> TableViewModelMultiSectionBinder<NC, S, NM>
+    where NC: UITableViewCell & ReuseIdentifiable {
+        for section in self.sections {
+            guard let sectionModels: [NM] = models[section] else {
+                assertionFailure("ERROR: No cell models array given for the section '\(section)'")
+                return TableViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections)
             }
+            self.binder.sectionCellModels[section] = sectionModels
+            self.binder.reload(section: section)
         }
         
-        return MultiSectionModelTableViewBindResult<NC, S, NM>(binder: self.binder, sections: self.sections)
+        return TableViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections)
+    }
+}
+
+public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection>: TableViewMutliSectionBinderProtocol {
+    internal let binder: SectionedTableViewBinder<S>
+    internal let sections: [S]
+    internal var sectionBindResults: [S: TableViewSingleSectionBinder<C, S>] = [:]
+    
+    internal init(binder: SectionedTableViewBinder<S>, sections: [S]) {
+        self.binder = binder
+        self.sections = sections
     }
     
     /**
      Bind the given header type to the declared section with the given observable for their view models.
      */
     @discardableResult
-    public func bind<H>(headerType: H.Type, viewModels: [S: H.ViewModel]) -> MultiSectionTableViewBindResult<C, S>
+    public func bind<H>(headerType: H.Type, viewModels: [S: H.ViewModel]) -> BaseTableViewMutliSectionBinder<C, S>
     where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
         for section in self.sections {
             guard let sectionViewModel = viewModels[section] else {
@@ -122,9 +112,9 @@ public class MultiSectionTableViewBindResult<C: UITableViewCell, S: TableViewSec
      Add a handler to be called whenever a cell is dequeued in the declared sections.
      */
     @discardableResult
-    public func configureCell(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C) -> Void) -> MultiSectionTableViewBindResult<C, S> {
+    public func configureCell(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C) -> Void) -> BaseTableViewMutliSectionBinder<C, S> {
         for section in self.sections {
-            let bindResult: SingleSectionTableViewBindResult<C, S> = self.bindResult(for: section)
+            let bindResult: BaseTableViewSingleSectionBinder<C, S> = self.bindResult(for: section)
             bindResult.configureCell({ row, cell in
                 handler(section, row, cell)
             })
@@ -136,9 +126,9 @@ public class MultiSectionTableViewBindResult<C: UITableViewCell, S: TableViewSec
      Add a handler to be called whenever a cell in the declared sections is tapped.
      */
     @discardableResult
-    public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C) -> Void) -> MultiSectionTableViewBindResult<C, S> {
+    public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C) -> Void) -> BaseTableViewMutliSectionBinder<C, S> {
         for section in self.sections {
-            let bindResult: SingleSectionTableViewBindResult<C, S> = self.bindResult(for: section)
+            let bindResult: BaseTableViewSingleSectionBinder<C, S> = self.bindResult(for: section)
             bindResult.onTapped({ row, cell in
                 handler(section, row, cell)
             })
@@ -150,9 +140,9 @@ public class MultiSectionTableViewBindResult<C: UITableViewCell, S: TableViewSec
      Add a callback handler to provide the cell height for cells in the declared sections.
      */
     @discardableResult
-    public func cellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> MultiSectionTableViewBindResult<C, S> {
+    public func cellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
         for section in self.sections {
-            let bindResult: SingleSectionTableViewBindResult<C, S> = self.bindResult(for: section)
+            let bindResult: BaseTableViewSingleSectionBinder<C, S> = self.bindResult(for: section)
             bindResult.cellHeight({ row in
                 handler(section, row)
             })
@@ -164,9 +154,9 @@ public class MultiSectionTableViewBindResult<C: UITableViewCell, S: TableViewSec
      Add a callback handler to provide the estimated cell height for cells in the declared sections.
      */
     @discardableResult
-    public func estimatedCellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> MultiSectionTableViewBindResult<C, S> {
+    public func estimatedCellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
         for section in self.sections {
-            let bindResult: SingleSectionTableViewBindResult<C, S> = self.bindResult(for: section)
+            let bindResult: BaseTableViewSingleSectionBinder<C, S> = self.bindResult(for: section)
             bindResult.estimatedCellHeight({ row in
                 handler(section, row)
             })
@@ -174,7 +164,7 @@ public class MultiSectionTableViewBindResult<C: UITableViewCell, S: TableViewSec
         return self
     }
     
-    internal func bindResult(`for` section: S) -> SingleSectionTableViewBindResult<C, S> {
+    internal func bindResult(`for` section: S) -> BaseTableViewSingleSectionBinder<C, S> {
         if let bindResult = self.sectionBindResults[section] {
             return bindResult
         } else {

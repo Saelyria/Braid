@@ -4,7 +4,7 @@ import UIKit
  A binder for a section whose cells were setup to be dequeued with an array of the cell type's 'view model' type.
  */
 public class TableViewViewModelSingleSectionBinder<C: UITableViewCell & ViewModelBindable, S: TableViewSection>: BaseTableViewSingleSectionBinder<C, S> {
-    public var sectionUpdateCallback: ([C.ViewModel]) -> Void {
+    public var sectionUpdateCallback: (_ viewModels: [C.ViewModel]) -> Void {
         return { (viewModels: [C.ViewModel]) in
             self.binder.sectionCellViewModels[self.section] = viewModels
             self.binder.reload(section: self.section)

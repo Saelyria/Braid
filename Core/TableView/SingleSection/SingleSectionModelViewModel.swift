@@ -2,7 +2,7 @@ import UIKit
 
 /**
  A binder for a section whose cells were setup to be dequeued with an array of an arbitrary 'model' type,
- mapped to the cell's 'view model' type with a given function.
+ mapped to the cell's 'view model' type with a given mapping function.
  */
 public class TableViewModelViewModelSingleSectionBinder<C: UITableViewCell & ViewModelBindable, S: TableViewSection, M>: BaseTableViewSingleSectionBinder<C, S> {
     public var sectionUpdateCallback: ([M]) -> Void {

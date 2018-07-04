@@ -11,7 +11,7 @@ public protocol TableViewSingleSectionBinderProtocol {
  the user can declare which way they want cells for the section to be created - from an array of the cell's view
  models, an array of arbitrary models, or from an array of arbitrary models mapped to view models with a given function.
  */
-public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSection>: BaseTableViewSingleSectionBinder<C, S> {    
+public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSection>: BaseTableViewSingleSectionBinder<C, S> {
     /**
      Bind the given cell type to the declared sections, creating them based on the view models from a given observable.
      */
