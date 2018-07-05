@@ -1,15 +1,16 @@
 import UIKit
 
 /**
- A binder for a section whose cells were setup to be dequeued with an array of the cell type's 'view model' type.
+ A section binder for a section whose cells were setup to be dequeued with an array of the cell type's 'view model'
+ type.
  */
 public class TableViewViewModelSingleSectionBinder<C: UITableViewCell & ViewModelBindable, S: TableViewSection>: BaseTableViewSingleSectionBinder<C, S> {
     /**
      Returns a closure that can be called to update the view models for the cells for the section.
      
-     This closure is retrieved at the end of the binding sequence and stored somewhere useful. Whenever the
-     underlying data the table view is displaying is updated, call this closure with the new view models
-     and the table view binder will update the displayed cells to match the given array.
+     This closure is retrieved at the end of the binding sequence and stored somewhere useful. Whenever the underlying
+     data the table view is displaying is updated, call this closure with the new view models and the table view binder
+     will update the displayed cells to match the given array.
      */
     public func createSectionUpdateCallback() -> (_ viewModels: [C.ViewModel]) -> Void {
         return { (viewModels: [C.ViewModel]) in
@@ -45,7 +46,7 @@ public class TableViewViewModelSingleSectionBinder<C: UITableViewCell & ViewMode
     }
     
     @discardableResult
-    override public func configureCell(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void) -> TableViewViewModelSingleSectionBinder<C, S> {
+    override public func onCellDequeue(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void) -> TableViewViewModelSingleSectionBinder<C, S> {
         super.configureCell(handler)
         return self
     }

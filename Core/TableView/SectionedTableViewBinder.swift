@@ -52,8 +52,8 @@ public class TableViewBinder {
     }
     
     /// Starts binding on the table.
-    public func onTable() -> TableViewSingleSectionBinder<UITableViewCell, _SingleSection> {
-        return TableViewSingleSectionBinder(binder: self._sectionBinder, section: .table)
+    public func onTable() -> TableViewInitialSingleSectionBinder<_SingleSection> {
+        return TableViewInitialSingleSectionBinder<_SingleSection>(binder: self._sectionBinder, section: .table)
     }
 }
 
@@ -181,15 +181,19 @@ public class SectionedTableViewBinder<S: TableViewSection>: NSObject {
     /**
      Declares a section to begin binding handlers to.
      */
-    public func onSection(_ section: S) -> TableViewSingleSectionBinder<UITableViewCell, S> {
-        return SingleSectionTableViewBindResult<UITableViewCell, S>(binder: self, section: section)
+    public func onSection(_ section: S) -> TableViewInitialSingleSectionBinder<S> {
+        return TableViewInitialSingleSectionBinder<S>(binder: self, section: section)
     }
     
     /**
      Declares sections to begin binding handlers to.
      */
-    public func onSections(_ sections: [S]) -> MultiSectionTableViewBindResult<UITableViewCell, S> {
-        return MultiSectionTableViewBindResult<UITableViewCell, S>(binder: self, sections: sections)
+    public func onSections(_ sections: [S]) -> TableViewInitialMutliSectionBinder<S> {
+        return TableViewInitialMutliSectionBinder<S>(binder: self, sections: sections)
+    }
+    
+    public func onAllSections() {
+        
     }
 }
 

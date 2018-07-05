@@ -1,7 +1,7 @@
 import UIKit
 
 /**
- A binder for a section whose cells were setup to be dequeued with an array of an arbitrary 'model' type.
+ A section binder for a section whose cells were setup to be dequeued with an array of an arbitrary 'model' type.
  */
 public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewSection, M>: BaseTableViewSingleSectionBinder<C, S> {
     public func createSectionUpdateCallback() -> ([M]) -> Void {
@@ -44,7 +44,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
      `bind(cellType:viewModels:)` method.
      */
     @discardableResult
-    public func configureCell(_ handler: @escaping (_ row: Int, _ dequeuedCell: C, _ model: M) -> Void) -> TableViewModelSingleSectionBinder<C, S, M> {
+    public func onCellDequeue(_ handler: @escaping (_ row: Int, _ dequeuedCell: C, _ model: M) -> Void) -> TableViewModelSingleSectionBinder<C, S, M> {
         let section = self.section
         let dequeueCallback: CellDequeueCallback = { [weak binder = self.binder] row, cell in
             guard let cell = cell as? C, let model = binder?.sectionCellModels[section]?[row] as? M else {

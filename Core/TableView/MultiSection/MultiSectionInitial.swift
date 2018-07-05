@@ -10,7 +10,7 @@ public protocol TableViewMutliSectionBinderProtocol {
  A throwaway object created when a table view binder's `onSections(_:)` method is called. This object declares a number
  of methods that take a binding handler and give it to the original table view binder to store for callback.
  */
-public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection>: BaseTableViewMutliSectionBinder<C, S> {
+public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableViewMutliSectionBinder<UITableViewCell, S> {
     /**
      Bind the given cell type to the declared sections, creating them based on the view models from a given observable.
      */
@@ -75,99 +75,5 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         }
         
         return TableViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections)
-    }
-}
-
-public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection>: TableViewMutliSectionBinderProtocol {
-    internal let binder: SectionedTableViewBinder<S>
-    internal let sections: [S]
-    internal var sectionBindResults: [S: BaseTableViewSingleSectionBinder<C, S>] = [:]
-    
-    internal init(binder: SectionedTableViewBinder<S>, sections: [S]) {
-        self.binder = binder
-        self.sections = sections
-    }
-    
-    /**
-     Bind the given header type to the declared section with the given observable for their view models.
-     */
-    @discardableResult
-    public func bind<H>(headerType: H.Type, viewModels: [S: H.ViewModel]) -> BaseTableViewMutliSectionBinder<C, S>
-    where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
-        for section in self.sections {
-            guard let sectionViewModel = viewModels[section] else {
-                fatalError("No header view model given for the section '\(section)'")
-            }
-            let sectionBindResult = self.bindResult(for: section)
-            sectionBindResult.bind(headerType: headerType, viewModel: sectionViewModel)
-        }
-        
-        return self
-    }
-    
-    /**
-     Add a handler to be called whenever a cell is dequeued in the declared sections.
-     */
-    @discardableResult
-    public func configureCell(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C) -> Void) -> BaseTableViewMutliSectionBinder<C, S> {
-        for section in self.sections {
-            let bindResult: BaseTableViewSingleSectionBinder<C, S> = self.bindResult(for: section)
-            bindResult.configureCell({ row, cell in
-                handler(section, row, cell)
-            })
-        }
-        return self
-    }
-    
-    /**
-     Add a handler to be called whenever a cell in the declared sections is tapped.
-     */
-    @discardableResult
-    public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C) -> Void) -> BaseTableViewMutliSectionBinder<C, S> {
-        for section in self.sections {
-            let bindResult: BaseTableViewSingleSectionBinder<C, S> = self.bindResult(for: section)
-            bindResult.onTapped({ row, cell in
-                handler(section, row, cell)
-            })
-        }
-        return self
-    }
-    
-    /**
-     Add a callback handler to provide the cell height for cells in the declared sections.
-     */
-    @discardableResult
-    public func cellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
-        for section in self.sections {
-            let bindResult: BaseTableViewSingleSectionBinder<C, S> = self.bindResult(for: section)
-            bindResult.cellHeight({ row in
-                handler(section, row)
-            })
-        }
-        return self
-    }
-    
-    /**
-     Add a callback handler to provide the estimated cell height for cells in the declared sections.
-     */
-    @discardableResult
-    public func estimatedCellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
-        for section in self.sections {
-            let bindResult: BaseTableViewSingleSectionBinder<C, S> = self.bindResult(for: section)
-            bindResult.estimatedCellHeight({ row in
-                handler(section, row)
-            })
-        }
-        return self
-    }
-    
-    internal func bindResult(`for` section: S) -> BaseTableViewSingleSectionBinder<C, S> {
-        if let bindResult = self.sectionBindResults[section] {
-            return bindResult
-        } else {
-            let bindResult = BaseTableViewSingleSectionBinder<C, S>(binder: self.binder, section: section)
-            self.sectionBindResults[section] = bindResult
-            return bindResult
-        }
     }
 }
