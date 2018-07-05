@@ -2,7 +2,7 @@
 
 Tableau is an RxSwift-compatible library for making your table and collection view setup routine smaller, more declarative, and more type safe that lets you switch from the tired data source / delegate routine to a cleaner function chain that reads like a sentence. At the bare minimum, here's what a super simple, static, section-less table view looks like with Tableau:
 
-```
+```swift
 // MyViewController.swift
 
 var models: [MyModel] = ...
@@ -21,7 +21,7 @@ binder.onTable()
 Easy! Just from this example, you can see how your normal data source / delegate methods are shortened into a much more legible kind phrase. This can be read as *"Okay binder, on the entire table, bind the 'MyCell' cell type based on the model objects from the given array. Whenever a cell is dequeued, give me the model object it was dequeued for and let me configure the cell. Whenever a cell is tapped, I want this to happen."* Everything is type safe and you don't need to map rows to model array indexes.
 
 Tableau can do a lot more than that, though. To really demonstrate it, we'll look at a more complex example of what your table and collection views can look like. Let's say we're making a home view for a banking app that lists all of a user's accounts in different sections according to the account type. Checking and savings accounts have a shared model type (`Account`) and cell type (`AccountCell`),  but investing accounts have their own model (`InvestingAccount`) and cell type (`InvestingCell`). Just to make it complicated, your designers want a banner at the top (`BannerCell`) too. Your analytics team also wants to know anytime a cell is tapped on the home page. Here's what that can look like:
-```
+```swift
 // HomeViewController.swift
 
 enum Section: TableViewSection {
