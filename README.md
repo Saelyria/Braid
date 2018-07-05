@@ -1,6 +1,9 @@
 # Tableau
 
-Tableau is an RxSwift-compatible library for making your table and collection view setup routine smaller, more declarative, and more type safe that lets you switch from the tired data source / delegate routine to a cleaner function chain that reads like a sentence. At the bare minimum, here's what a super simple, static, section-less table view looks like with Tableau:
+Tableau is an RxSwift-compatible library for making your table and collection view setup routine smaller, more declarative, and more type safe that lets you switch from the tired data source / delegate routine to a cleaner function chain that reads like a sentence.
+
+## The basics
+At the bare minimum, here's what a super simple, static, section-less table view looks like with Tableau:
 
 ```swift
 // MyViewController.swift
@@ -18,7 +21,9 @@ binder.onTable()
     }
 ```
 
-Easy! Just from this example, you can see how your normal data source / delegate methods are shortened into a much more legible kind phrase. This can be read as *"Okay binder, on the entire table, bind the 'MyCell' cell type based on the model objects from the given array. Whenever a cell is dequeued, give me the model object it was dequeued for and let me configure the cell. Whenever a cell is tapped, I want this to happen."* Everything is type safe and you don't need to map rows to model array indexes.
+Easy! Just from this example, you can see how your normal data source / delegate methods are shortened into a much more legible phrase. This can be read as *"Okay binder, on the entire table, bind the `MyCell` cell type based on the model objects from the given array. Whenever a cell is dequeued, give me the model object it was dequeued for and let me configure the cell. Whenever a cell is tapped, I want this to happen."* Everything is type safe and you don't need to map rows to model array indexes.
+
+## Getting a little more advanced
 
 Tableau can do a lot more than that, though. To really demonstrate it, we'll look at a more complex example of what your table and collection views can look like. Let's say we're making a home view for a banking app that lists all of a user's accounts in different sections according to the account type. Checking and savings accounts have a shared model type (`Account`) and cell type (`AccountCell`),  but investing accounts have their own model (`InvestingAccount`) and cell type (`InvestingCell`). Just to make it complicated, your designers want a banner at the top (`BannerCell`) too. Your analytics team also wants to know anytime a cell is tapped on the home page. Here's what that can look like:
 ```swift
@@ -73,7 +78,7 @@ binder.onAllSections()
     }
 ```
 
-While that's pretty dense, it's still *pretty* legible as it is, and reads a lot like our given requirements. This is read something like *"First, create a sectioned table binder whose sections are cases of the `Section` enum. Then, in the 'banner' section, bind the `BannerCell` type with the given banner view model. Next, for both the 'checking' and 'savings' sections, bind the `AccountCell` cell type based on these model arrays. Set the section titles for these sections to these strings. Whenever a cell is dequeued, run this block of code. Whenever a cell is tapped, run this other block of code. Now, on just the 'investing' section, bind the `InvestingCell` cell type with the models from this array, running these code blocks when cells are dequeued or tapped. Finally, on any section, run this other code block whenever a cell is tapped."*
+While that's pretty dense, it's still pretty legible as it is, and reads a lot like our given requirements. This is read something like *"First, create a sectioned table binder whose sections are cases of the `Section` enum. Then, in the 'banner' section, bind the `BannerCell` type with the given banner view model. Next, for both the 'checking' and 'savings' sections, bind the `AccountCell` cell type based on these model arrays. Set the section titles for these sections to these strings. Whenever a cell is dequeued, run this block of code. Whenever a cell is tapped, run this other block of code. Now, on just the 'investing' section, bind the `InvestingCell` cell type with the models from this array, running these code blocks when cells are dequeued or tapped. Finally, on any section, run this other code block whenever a cell is tapped."*
 
 While this example is pretty self-explanatory in many ways, to give it a bit more detail, here you can see:
 - Sections of a table view correspond to cases of an enum (or, if you're dealing with dynamic sections, you can use instances of a struct you define) so it's easier to read and more flexible than using integers
