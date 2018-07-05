@@ -4,7 +4,7 @@ import UIKit
  A binder for a section whose cells were setup to be dequeued with an array of an arbitrary 'model' type.
  */
 public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewSection, M>: BaseTableViewSingleSectionBinder<C, S> {
-    public var sectionUpdateCallback: ([M]) -> Void {
+    public func createSectionUpdateCallback() -> ([M]) -> Void {
         return { (models: [M]) in
             self.binder.sectionCellModels[self.section] = models
             self.binder.reload(section: self.section)

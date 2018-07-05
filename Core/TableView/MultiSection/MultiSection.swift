@@ -69,10 +69,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<NC, NM>(cellType: NC.Type, models: [S: [NM]]) -> TableViewModelMultiSectionBinder<NC, S, NM>
     where NC: UITableViewCell & ReuseIdentifiable {
         for section in self.sections {
-            guard let sectionModels: [NM] = models[section] else {
-                assertionFailure("ERROR: No cell models array given for the section '\(section)'")
-                return TableViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections)
-            }
+            let sectionModels: [NM] = models[section] ?? []
             self.binder.sectionCellModels[section] = sectionModels
             self.binder.reload(section: section)
         }
@@ -84,7 +81,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
 public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection>: TableViewMutliSectionBinderProtocol {
     internal let binder: SectionedTableViewBinder<S>
     internal let sections: [S]
-    internal var sectionBindResults: [S: TableViewSingleSectionBinder<C, S>] = [:]
+    internal var sectionBindResults: [S: BaseTableViewSingleSectionBinder<C, S>] = [:]
     
     internal init(binder: SectionedTableViewBinder<S>, sections: [S]) {
         self.binder = binder
@@ -168,7 +165,7 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
         if let bindResult = self.sectionBindResults[section] {
             return bindResult
         } else {
-            let bindResult = SingleSectionTableViewBindResult<C, S>(binder: self.binder, section: section)
+            let bindResult = BaseTableViewSingleSectionBinder<C, S>(binder: self.binder, section: section)
             self.sectionBindResults[section] = bindResult
             return bindResult
         }

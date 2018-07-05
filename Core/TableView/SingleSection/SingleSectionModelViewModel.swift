@@ -5,19 +5,19 @@ import UIKit
  mapped to the cell's 'view model' type with a given mapping function.
  */
 public class TableViewModelViewModelSingleSectionBinder<C: UITableViewCell & ViewModelBindable, S: TableViewSection, M>: BaseTableViewSingleSectionBinder<C, S> {
-    public var sectionUpdateCallback: ([M]) -> Void {
+    private let mapToViewModelFunc: (M) -> C.ViewModel
+    
+    internal init(binder: SectionedTableViewBinder<S>, section: S, mapToViewModel: @escaping (M) -> C.ViewModel) {
+        super.init(binder: binder, section: section)
+        self.mapToViewModelFunc = mapToViewModel
+    }
+    
+    public func createSectionUpdateCallback() -> ([M]) -> Void {
         return { (models: [M]) in
             self.binder.sectionCellModels[self.section] = models
             self.binder.sectionCellViewModels[self.section] = models.map(self.mapToViewModelFunc)
             self.binder.reload(section: self.section)
         }
-    }
-    
-    private let mapToViewModelFunc: (M) -> C.ViewModel
-    
-    init(binder: SectionedTableViewBinder<S>, section: S, mapToViewModel: @escaping (M) -> C.ViewModel) {
-        super.init(binder: binder, section: section)
-        self.mapToViewModelFunc = mapToViewModel
     }
     
     /**
