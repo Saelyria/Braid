@@ -4,7 +4,8 @@ import UIKit
  A section binder for a section whose cells were setup to be dequeued with an array of an arbitrary 'model' type,
  mapped to the cell's 'view model' type with a given mapping function.
  */
-public class TableViewModelViewModelSingleSectionBinder<C: UITableViewCell & ViewModelBindable, S: TableViewSection, M>: BaseTableViewSingleSectionBinder<C, S> {
+public class TableViewModelViewModelSingleSectionBinder<C, S: TableViewSection, M>: BaseTableViewSingleSectionBinder<C, S>, TableViewSingleSectionBinderProtocol
+where C: UITableViewCell & ViewModelBindable {    
     private let mapToViewModelFunc: (M) -> C.ViewModel
     
     internal init(binder: SectionedTableViewBinder<S>, section: S, mapToViewModel: @escaping (M) -> C.ViewModel) {
@@ -95,8 +96,8 @@ public class TableViewModelViewModelSingleSectionBinder<C: UITableViewCell & Vie
     }
     
     @discardableResult
-    override public func configureCell(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void) -> TableViewModelViewModelSingleSectionBinder<C, S, M> {
-        super.configureCell(handler)
+    override public func onCellDequeue(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void) -> TableViewModelViewModelSingleSectionBinder<C, S, M> {
+        super.onCellDequeue(handler)
         return self
     }
     

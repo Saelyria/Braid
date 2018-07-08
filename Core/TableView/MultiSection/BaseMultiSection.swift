@@ -1,6 +1,15 @@
 import UIKit
 
-public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection>: TableViewMutliSectionBinderProtocol {
+/// Protocol that allows us to have Reactive extensions
+public protocol TableViewMutliSectionBinderProtocol {
+    associatedtype C: UITableViewCell
+    associatedtype S: TableViewSection
+}
+
+// Need this second protocol so Reactive extension methods for binding celltype are only on 'inital' binders
+public protocol TableViewInitialMutliSectionBinderProtocol: TableViewMutliSectionBinderProtocol { }
+
+public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection> {
     internal let binder: SectionedTableViewBinder<S>
     internal let sections: [S]
     internal var baseSectionBindResults: [S: BaseTableViewSingleSectionBinder<C, S>] = [:]
@@ -34,7 +43,7 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
     public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C) -> Void) -> BaseTableViewMutliSectionBinder<C, S> {
         for section in self.sections {
             let bindResult: BaseTableViewSingleSectionBinder<C, S> = self.baseBindResult(for: section)
-            bindResult.configureCell({ row, cell in
+            bindResult.onCellDequeue({ row, cell in
                 handler(section, row, cell)
             })
         }

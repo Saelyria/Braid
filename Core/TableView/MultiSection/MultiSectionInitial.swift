@@ -1,16 +1,12 @@
 import UIKit
 
-/// Protocol that allows us to have Reactive extensions
-public protocol TableViewMutliSectionBinderProtocol {
-    associatedtype C: UITableViewCell
-    associatedtype S: TableViewSection
-}
-
 /**
  A throwaway object created when a table view binder's `onSections(_:)` method is called. This object declares a number
  of methods that take a binding handler and give it to the original table view binder to store for callback.
  */
 public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableViewMutliSectionBinder<UITableViewCell, S> {
+    public typealias C = UITableViewCell
+    
     /**
      Bind the given cell type to the declared sections, creating them based on the view models from a given observable.
      */

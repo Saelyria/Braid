@@ -6,13 +6,16 @@ public protocol TableViewSingleSectionBinderProtocol {
     associatedtype S: TableViewSection
 }
 
+// Need this second protocol so Reactive extension methods for binding celltype are only on 'inital' binders
+public protocol TableViewInitialSingleSectionBinderProtocol: TableViewSingleSectionBinderProtocol { }
+
 /**
  An abstract superclass for all single-section binders. This class contains the implementations for the
  handler methods that are common to all types of single-section binders. Specialized binder subclasses
  should override each of this class's methods to override their return type to themselves so any special
  methods of theirs can still be used in the chain.
  */
-public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSection>: TableViewSingleSectionBinderProtocol {
+public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSection> {    
     let binder: SectionedTableViewBinder<S>
     let section: S
     

@@ -3,7 +3,7 @@ import UIKit
 /**
  A section binder for a section whose cells were setup to be dequeued with an array of an arbitrary 'model' type.
  */
-public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewSection, M>: BaseTableViewSingleSectionBinder<C, S> {
+public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewSection, M>: BaseTableViewSingleSectionBinder<C, S>, TableViewSingleSectionBinderProtocol {    
     public func createSectionUpdateCallback() -> ([M]) -> Void {
         return { (models: [M]) in
             self.binder.sectionCellModels[self.section] = models
@@ -86,8 +86,8 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     @discardableResult
-    override public func configureCell(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void) -> TableViewModelSingleSectionBinder<C, S, M> {
-        super.configureCell(handler)
+    override public func onCellDequeue(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void) -> TableViewModelSingleSectionBinder<C, S, M> {
+        super.onCellDequeue(handler)
         return self
     }
     

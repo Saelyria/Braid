@@ -4,7 +4,7 @@ import UIKit
  A section binder for a section whose cells were setup to be dequeued with an array of the cell type's 'view model'
  type.
  */
-public class TableViewViewModelSingleSectionBinder<C: UITableViewCell & ViewModelBindable, S: TableViewSection>: BaseTableViewSingleSectionBinder<C, S> {
+public class TableViewViewModelSingleSectionBinder<C: UITableViewCell & ViewModelBindable, S: TableViewSection>: BaseTableViewSingleSectionBinder<C, S>, TableViewSingleSectionBinderProtocol {    
     /**
      Returns a closure that can be called to update the view models for the cells for the section.
      
@@ -47,7 +47,7 @@ public class TableViewViewModelSingleSectionBinder<C: UITableViewCell & ViewMode
     
     @discardableResult
     override public func onCellDequeue(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void) -> TableViewViewModelSingleSectionBinder<C, S> {
-        super.configureCell(handler)
+        super.onCellDequeue(handler)
         return self
     }
     

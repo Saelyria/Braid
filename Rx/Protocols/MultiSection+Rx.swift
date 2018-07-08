@@ -1,28 +1,29 @@
 import UIKit
 import RxSwift
 
-extension MultiSectionTableViewBindResult: ReactiveCompatible { }
+extension BaseTableViewMutliSectionBinder: ReactiveCompatible { }
 
-public extension Reactive where Base: MultiSectionTableViewBindResultProtocol {
+public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol {
     /**
      Bind the given cell type to the declared sections, creating them based on the view models from a given observable.
      */
     @discardableResult
-    public func bind<NC>(cellType: NC.Type, viewModels: [Base.S: Observable<[NC.ViewModel]>]) -> MultiSectionTableViewBindResult<NC, Base.S>
+    public func bind<NC>(cellType: NC.Type, viewModels: [Base.S: Observable<[NC.ViewModel]>]) -> TableViewViewModelMultiSectionBinder<NC, Base.S>
     where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
-        guard let bindResult = self.base as? MultiSectionTableViewBindResult<Base.C, Base.S> else {
+        guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
         for section in bindResult.sections {
-            guard let sectionViewModels = viewModels[section] else {
+            guard let sectionViewModels: Observable<[NC.ViewModel]> = viewModels[section] else {
                 fatalError("No cell view models array given for the section '\(section)'")
             }
-            let sectionBindResult = bindResult.bindResult(for: section)
+            let sectionBindResult = TableViewInitialSingleSectionBinder<Base.S>(binder: bindResult.binder, section: section)
+            bindResult.baseSectionBindResults[section] = sectionBindResult
             sectionBindResult.rx.bind(cellType: cellType, viewModels: sectionViewModels)
         }
         
-        return MultiSectionTableViewBindResult<NC, Base.S>(binder: bindResult.binder, sections: bindResult.sections)
+        return TableViewViewModelMultiSectionBinder<NC, Base.S>(binder: bindResult.binder, sections: bindResult.sections)
     }
     
     /**
@@ -31,20 +32,21 @@ public extension Reactive where Base: MultiSectionTableViewBindResultProtocol {
      */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [Base.S: Observable<[NM]>], mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-    -> MultiSectionModelTableViewBindResult<NC, Base.S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
-        guard let bindResult = self.base as? MultiSectionTableViewBindResult<Base.C, Base.S> else {
+    -> TableViewModelViewModelMultiSectionBinder<NC, Base.S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
+        guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
         for section in bindResult.sections {
-            guard let sectionModels = models[section] else {
+            guard let sectionModels: Observable<[NM]> = models[section] else {
                 fatalError("No cell models array given for the section '\(section)'")
             }
-            let sectionBindResult = bindResult.bindResult(for: section)
+            let sectionBindResult = TableViewInitialSingleSectionBinder<Base.S>(binder: bindResult.binder, section: section)
+            bindResult.baseSectionBindResults[section] = sectionBindResult
             sectionBindResult.rx.bind(cellType: cellType, models: sectionModels, mapToViewModelsWith: mapToViewModel)
         }
-        
-        return MultiSectionModelTableViewBindResult<NC, Base.S, NM>(binder: bindResult.binder, sections: bindResult.sections)
+            
+        return TableViewModelViewModelMultiSectionBinder<NC, Base.S, NM>(binder: bindResult.binder, sections: bindResult.sections, mapToViewModel: mapToViewModel)
     }
     
     /**
@@ -64,29 +66,33 @@ public extension Reactive where Base: MultiSectionTableViewBindResultProtocol {
      */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [Base.S: Observable<[NM]>])
-    -> MultiSectionModelTableViewBindResult<NC, Base.S, NM> where NC: UITableViewCell & ReuseIdentifiable {
-        guard let bindResult = self.base as? MultiSectionTableViewBindResult<Base.C, Base.S> else {
-            fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
-        }
-        
-        for section in bindResult.sections {
-            guard let sectionModels: Observable<[NM]> = models[section] else {
-                fatalError("No cell models array given for the section '\(section)'")
+        -> TableViewModelMultiSectionBinder<NC, Base.S, NM> where NC: UITableViewCell & ReuseIdentifiable {
+            guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
+                fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
             }
-            let sectionBindResult = bindResult.bindResult(for: section)
-            sectionBindResult.rx.bind(cellType: cellType, models: sectionModels)
-        }
-        
-        return MultiSectionModelTableViewBindResult<NC, Base.S, NM>(binder: bindResult.binder, sections: bindResult.sections)
+            
+            for section in bindResult.sections {
+                guard let sectionModels: Observable<[NM]> = models[section] else {
+                    fatalError("No cell models array given for the section '\(section)'")
+                }
+                let sectionBindResult = TableViewInitialSingleSectionBinder<Base.S>(binder: bindResult.binder, section: section)
+                bindResult.baseSectionBindResults[section] = sectionBindResult
+                sectionBindResult.rx.bind(cellType: cellType, models: sectionModels)
+            }
+            
+            return TableViewModelMultiSectionBinder<NC, Base.S, NM>(binder: bindResult.binder, sections: bindResult.sections)
     }
-    
+
+}
+
+public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
     /**
      Bind the given header type to the declared section with the given observable for their view models.
      */
     @discardableResult
-    public func bind<H>(headerType: H.Type, viewModels: [Base.S: Observable<H.ViewModel>]) -> MultiSectionTableViewBindResult<Base.C, Base.S>
+    public func bind<H>(headerType: H.Type, viewModels: [Base.S: Observable<H.ViewModel>]) -> Base._BinderType
     where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
-        guard let bindResult = self.base as? MultiSectionTableViewBindResult<Base.C, Base.S> else {
+        guard let bindResult = self.base as? Base._BinderType else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
@@ -94,7 +100,9 @@ public extension Reactive where Base: MultiSectionTableViewBindResultProtocol {
             guard let sectionViewModel: Observable<H.ViewModel> = viewModels[section] else {
                 fatalError("No header view model given for the section '\(section)'")
             }
-            let sectionBindResult = bindResult.bindResult(for: section)
+            
+            let sectionBindResult = TableViewInitialSingleSectionBinder<Base.S>(binder: bindResult.binder, section: section)
+            bindResult.baseSectionBindResults[section] = sectionBindResult
             sectionBindResult.rx.bind(headerType: headerType, viewModel: sectionViewModel)
         }
         
@@ -105,8 +113,8 @@ public extension Reactive where Base: MultiSectionTableViewBindResultProtocol {
      Bind the given observable title to the section's header.
      */
     @discardableResult
-    public func headerTitle(_ titles: [Base.S: Observable<String>]) -> MultiSectionTableViewBindResult<Base.C, Base.S> {
-        guard let bindResult = self.base as? MultiSectionTableViewBindResult<Base.C, Base.S> else {
+    public func headerTitle(_ titles: [Base.S: Observable<String>]) -> Base._BinderType {
+        guard let bindResult = self.base as? Base._BinderType else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
@@ -129,9 +137,9 @@ public extension Reactive where Base: MultiSectionTableViewBindResultProtocol {
      header's section when the given observable view model changes.
      */
     @discardableResult
-    public func bind<F>(footerType: F.Type, viewModels: [Base.S: Observable<F.ViewModel>]) -> MultiSectionTableViewBindResult<Base.C, Base.S>
+    public func bind<F>(footerType: F.Type, viewModels: [Base.S: Observable<F.ViewModel>]) -> Base._BinderType
     where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
-        guard let bindResult = self.base as? MultiSectionTableViewBindResult<Base.C, Base.S> else {
+        guard let bindResult = self.base as? Base._BinderType else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
@@ -150,8 +158,8 @@ public extension Reactive where Base: MultiSectionTableViewBindResultProtocol {
      Bind the given observable title to the section's footer.
      */
     @discardableResult
-    public func footerTitle(_ titles: [Base.S: Observable<String>]) -> MultiSectionTableViewBindResult<Base.C, Base.S> {
-        guard let bindResult = self.base as? MultiSectionTableViewBindResult<Base.C, Base.S> else {
+    public func footerTitle(_ titles: [Base.S: Observable<String>]) -> Base._BinderType {
+        guard let bindResult = self.base as? Base._BinderType else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
