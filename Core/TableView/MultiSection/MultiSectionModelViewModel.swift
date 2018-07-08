@@ -5,8 +5,8 @@ public class TableViewModelViewModelMultiSectionBinder<C: UITableViewCell & View
     internal var sectionBindResults: [S: TableViewModelViewModelSingleSectionBinder<C, S, M>] = [:]
     
     init(binder: SectionedTableViewBinder<S>, sections: [S], mapToViewModel: @escaping (M) -> C.ViewModel) {
-        super.init(binder: binder, sections: sections)
         self.mapToViewModelFunc = mapToViewModel
+        super.init(binder: binder, sections: sections)
     }
     
     @discardableResult

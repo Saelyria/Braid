@@ -9,8 +9,8 @@ where C: UITableViewCell & ViewModelBindable {
     private let mapToViewModelFunc: (M) -> C.ViewModel
     
     internal init(binder: SectionedTableViewBinder<S>, section: S, mapToViewModel: @escaping (M) -> C.ViewModel) {
-        super.init(binder: binder, section: section)
         self.mapToViewModelFunc = mapToViewModel
+        super.init(binder: binder, section: section)
     }
     
     public func createSectionUpdateCallback() -> ([M]) -> Void {

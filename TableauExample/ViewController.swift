@@ -31,11 +31,18 @@ class ViewController: UIViewController {
         super.viewDidLoad()
 
         self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self, displayedSections: [])
+        
         self.binder.onSections([.checking, .savings])
             .rx.bind(cellType: TitleDetailTableViewCell.self, models: [
-                .checking: Observable.just([1]),
-                .savings: Observable.just([2])
+                Section.checking: Observable.just([1, 2, 3]),
+                Section.savings: Observable.just([3, 2, 1])
             ])
+//        self.binder.onSection(.checking)
+//            .rx.bind(cellType: TitleDetailTableViewCell.self, viewModels: Observable.just([
+//                TitleDetailTableViewCell.ViewModel(title: "1", subtitle: "", detail: ""),
+//                TitleDetailTableViewCell.ViewModel(title: "2", subtitle: "", detail: ""),
+//                TitleDetailTableViewCell.ViewModel(title: "3", subtitle: "", detail: "")
+//            ]))
 //
 //        let accounts = self.getAccountsFromServer().share()
 //        accounts.filter({ accounts in

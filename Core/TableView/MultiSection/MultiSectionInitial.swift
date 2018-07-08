@@ -4,7 +4,7 @@ import UIKit
  A throwaway object created when a table view binder's `onSections(_:)` method is called. This object declares a number
  of methods that take a binding handler and give it to the original table view binder to store for callback.
  */
-public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableViewMutliSectionBinder<UITableViewCell, S> {
+public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableViewMutliSectionBinder<UITableViewCell, S>, TableViewInitialMutliSectionBinderProtocol {
     public typealias C = UITableViewCell
     
     /**
