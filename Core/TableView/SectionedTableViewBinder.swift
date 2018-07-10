@@ -177,6 +177,18 @@ public class SectionedTableViewBinder<S: TableViewSection>: NSObject {
             self.tableView.reloadData()
         }
     }
+    
+    public func reload(sections: [S]) {
+        var indexSet: IndexSet = []
+        for section in sections {
+            if let sectionToReloadIndex = self.displayedSections.index(of: section) {
+                let startIndex = self.displayedSections.startIndex
+                let sectionInt = startIndex.distance(to: sectionToReloadIndex)
+                indexSet.update(with: sectionInt)
+            }
+        }
+        self.tableView.reloadSections(indexSet, with: .none)
+    }
 
     /**
      Declares a section to begin binding handlers to.

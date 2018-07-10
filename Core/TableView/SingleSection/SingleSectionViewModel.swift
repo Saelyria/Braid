@@ -12,7 +12,7 @@ public class TableViewViewModelSingleSectionBinder<C: UITableViewCell & ViewMode
      data the table view is displaying is updated, call this closure with the new view models and the table view binder
      will update the displayed cells to match the given array.
      */
-    public func createSectionUpdateCallback() -> (_ viewModels: [C.ViewModel]) -> Void {
+    public func createUpdateCallback() -> (_ viewModels: [C.ViewModel]) -> Void {
         return { (viewModels: [C.ViewModel]) in
             self.binder.sectionCellViewModels[self.section] = viewModels
             self.binder.reload(section: self.section)

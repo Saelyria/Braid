@@ -9,6 +9,18 @@ public class TableViewModelViewModelMultiSectionBinder<C: UITableViewCell & View
         super.init(binder: binder, sections: sections)
     }
     
+    public func createUpdateCallback() -> ([S: [M]]) -> Void {
+        return { (models: [S: [M]]) in
+            var _sections: [S] = []
+            for (section, sectionModels) in models {
+                _sections.append(section)
+                self.binder.sectionCellModels[section] = sectionModels
+                self.binder.sectionCellViewModels[section] = sectionModels.map(self.mapToViewModelFunc)
+            }
+            self.binder.reload(sections: _sections)
+        }
+    }
+    
     @discardableResult
     public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C, _ model: M) -> Void) -> TableViewModelViewModelMultiSectionBinder<C, S, M> {
         for section in self.sections {

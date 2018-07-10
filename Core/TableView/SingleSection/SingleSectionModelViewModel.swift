@@ -13,7 +13,7 @@ where C: UITableViewCell & ViewModelBindable {
         super.init(binder: binder, section: section)
     }
     
-    public func createSectionUpdateCallback() -> ([M]) -> Void {
+    public func createUpdateCallback() -> ([M]) -> Void {
         return { (models: [M]) in
             self.binder.sectionCellModels[self.section] = models
             self.binder.sectionCellViewModels[self.section] = models.map(self.mapToViewModelFunc)
