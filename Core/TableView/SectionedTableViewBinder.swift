@@ -101,7 +101,7 @@ binder.onSection(.one)
  conformance) to be compatible with a data binder. Specifically, they must at least conform to `ReuseIdentifiable` and
  `ViewModelBindable`, and should conform to `UINibInitable` if they are meant to be created from a Nib.
  */
-public class SectionedTableViewBinder<S: TableViewSection>: NSObject {
+public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBinderProtocol {
     /// The currently displayed sections of the table view. Updating the value of this will automatically cause the data
     /// binder to update its associated table view. Defaults to the section enum's `allSections` value if not set.
     public var displayedSections: [S] = [] {
@@ -158,13 +158,15 @@ public class SectionedTableViewBinder<S: TableViewSection>: NSObject {
     //    }
     
     
-    public required init(tableView: UITableView, sectionedBy sectionEnum: S.Type, displayedSections: [S]) {
-        super.init()
+    public init(tableView: UITableView, sectionedBy sectionEnum: S.Type, displayedSections: [S]) {
         self.tableView = tableView
-        self.displayedSections = displayedSections
         self.tableViewDataSourceDelegate = _TableViewDataSourceDelegate(binder: self)
         tableView.delegate = self.tableViewDataSourceDelegate
         tableView.dataSource = self.tableViewDataSourceDelegate
+        self.displayedSections = displayedSections
+#if RX_TABLEAU
+        self.displayedSectionsSubject.onNext(self.displayedSections)
+#endif
     }
     
     /// Reloads the specified section.
@@ -174,11 +176,10 @@ public class SectionedTableViewBinder<S: TableViewSection>: NSObject {
             let sectionInt = startIndex.distance(to: sectionToReloadIndex)
             let indexSet: IndexSet = [sectionInt]
             self.tableView.reloadSections(indexSet, with: .none)
-        } else {
-            self.tableView.reloadData()
         }
     }
     
+    /// Reloads the specified sections.
     public func reload(sections: [S]) {
         var indexSet: IndexSet = []
         for section in sections {
@@ -188,7 +189,9 @@ public class SectionedTableViewBinder<S: TableViewSection>: NSObject {
                 indexSet.update(with: sectionInt)
             }
         }
-        self.tableView.reloadSections(indexSet, with: .none)
+        if !indexSet.isEmpty {
+            self.tableView.reloadSections(indexSet, with: .none)
+        }
     }
 
     /**

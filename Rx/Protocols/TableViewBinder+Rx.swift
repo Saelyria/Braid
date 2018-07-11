@@ -2,6 +2,9 @@ import UIKit
 import RxSwift
 import RxCocoa
 
+extension TableViewBinder: ReactiveCompatible { }
+extension SectionedTableViewBinder: ReactiveCompatible { }
+
 extension Reactive where Base: SectionedTableViewBinderProtocol {
     var displayedSections: ControlProperty<[Base.S]> {
         guard let binder = self.base as? SectionedTableViewBinder<Base.S> else { fatalError("Base wasn't the right type") }
