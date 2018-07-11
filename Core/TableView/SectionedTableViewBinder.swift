@@ -161,6 +161,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: NSObject {
     public required init(tableView: UITableView, sectionedBy sectionEnum: S.Type, displayedSections: [S]) {
         super.init()
         self.tableView = tableView
+        self.displayedSections = displayedSections
         self.tableViewDataSourceDelegate = _TableViewDataSourceDelegate(binder: self)
         tableView.delegate = self.tableViewDataSourceDelegate
         tableView.dataSource = self.tableViewDataSourceDelegate

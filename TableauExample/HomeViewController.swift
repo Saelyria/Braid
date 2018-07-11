@@ -8,36 +8,38 @@ class HomeViewController: UIViewController {
         case info
     }
     
-    private let tableView = UITableView(frame: UIScreen.main.bounds, style: .grouped)
+    private var tableView: UITableView!
     private var binder: SectionedTableViewBinder<Section>!
     
     private var rows: [Section: [TitleDetailTableViewCell.ViewModel]] = [
         .accounts: [
-            TitleDetailTableViewCell.ViewModel(title: "", subtitle: "", detail: ""),
-            TitleDetailTableViewCell.ViewModel(title: "", subtitle: "", detail: ""),
-            TitleDetailTableViewCell.ViewModel(title: "", subtitle: "", detail: "")
+            TitleDetailTableViewCell.ViewModel(title: "1", subtitle: "", detail: ""),
+            TitleDetailTableViewCell.ViewModel(title: "2", subtitle: "", detail: ""),
+            TitleDetailTableViewCell.ViewModel(title: "3", subtitle: "", detail: "")
         ],
         .bills: [
-            TitleDetailTableViewCell.ViewModel(title: "", subtitle: "", detail: ""),
-            TitleDetailTableViewCell.ViewModel(title: "", subtitle: "", detail: "")
+            TitleDetailTableViewCell.ViewModel(title: "4", subtitle: "", detail: ""),
+            TitleDetailTableViewCell.ViewModel(title: "5", subtitle: "", detail: "")
         ],
         .info: [
-            TitleDetailTableViewCell.ViewModel(title: "", subtitle: "", detail: "")
+            TitleDetailTableViewCell.ViewModel(title: "6", subtitle: "", detail: "")
         ]
     ]
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.backgroundColor = UIColor.red
         
+        self.tableView = UITableView(frame: self.view.frame, style: .grouped)
         self.view.addSubview(self.tableView)
-        self.tableView.frame = self.view.frame
         self.tableView.register(TitleDetailTableViewCell.self)
         
-        self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self, displayedSections: [])
-//        self.binder.onSections([.accounts, .bills, .info])
-//            .bind(cellType: TitleDetailTableViewCell.self, byObserving: \.rows, on: self)
-//            .onTapped { (section: Section, row: Int, cell: TitleDetailTableViewCell) in
-//
-//            }
+        self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self, displayedSections: [.accounts, .bills, .info])
+        self.binder.onSections([.accounts, .bills, .info])
+            .bind(cellType: TitleDetailTableViewCell.self, viewModels: self.rows)
+            .onTapped { (section: Section, row: Int, cell: TitleDetailTableViewCell) in
+
+            }
+        self.tableView.reloadData()
     }
 }

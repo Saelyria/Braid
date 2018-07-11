@@ -21,7 +21,7 @@ class ViewController: UIViewController {
         case savings
     }
 
-    private let tableView = UITableView(frame: UIScreen.main.bounds, style: .grouped)
+    private var tableView: UITableView!
     private var binder: SectionedTableViewBinder<Section>!
 
     private let savingsAccounts = Variable<[Account]>([])
@@ -30,13 +30,26 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self, displayedSections: [])
+        self.tableView = UITableView()
+        self.tableView.tableFooterView = UIView()
+        self.tableView.register(TitleDetailTableViewCell.self)
+        self.view.addSubview(self.tableView)
+        self.tableView.frame = self.view.frame
+        self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self, displayedSections: [.checking, .savings])
         
         self.binder.onSections([.checking, .savings])
             .rx.bind(cellType: TitleDetailTableViewCell.self, models: [
-                Section.checking: Observable.just([1, 2, 3]),
-                Section.savings: Observable.just([3, 2, 1])
+                .checking: Observable.just([1, 2, 3]),
+                .savings: Observable.just([3, 2, 1])
             ])
+            .onCellDequeue({ (_, _, cell, number) in
+                print("uh")
+            })
+            .headerTitles([
+                .checking: "CHECKING",
+                .savings: "SAVINGS"
+            ])
+        
 //        self.binder.onSection(.checking)
 //            .rx.bind(cellType: TitleDetailTableViewCell.self, viewModels: Observable.just([
 //                TitleDetailTableViewCell.ViewModel(title: "1", subtitle: "", detail: ""),
@@ -48,6 +61,7 @@ class ViewController: UIViewController {
 //        accounts.filter({ accounts in
 //            accounts.filter({ $0.type == .checking })
 //        })
+        print("")
     }
 
     private func getAccountsFromServer() -> Observable<[Account]> {

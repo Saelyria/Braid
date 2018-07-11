@@ -14,13 +14,13 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection>: NSObject, UIT
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let section = self.binder.displayedSections[section]
-        if let numModels = self.binder.sectionCellViewModels[section]?.count {
-            return numModels
+        if let models = self.binder.sectionCellModels[section] {
+            return models.count
+        } else if let models = self.binder.sectionCellViewModels[section] {
+            return models.count
+        } else {
+            return 0
         }
-//        else if let numCells = self.binder.sectionNumberOfCells[section] {
-//            return numCells
-//        }
-        return 0
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -32,11 +32,11 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection>: NSObject, UIT
         let section = self.binder.displayedSections[section]
         return self.binder.sectionFooterTitles[section]
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let section = self.binder.displayedSections[indexPath.section]
         guard let dequeueBlock = self.binder.sectionCellDequeueBlocks[section] else { return UITableViewCell() }
-        
+
         let cell = dequeueBlock(tableView, indexPath)
         return cell
     }

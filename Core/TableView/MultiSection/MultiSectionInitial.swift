@@ -19,7 +19,7 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
                 return TableViewViewModelMultiSectionBinder<NC, S>(binder: self.binder, sections: self.sections)
             }
             self.binder.sectionCellViewModels[section] = sectionViewModels
-            self.binder.reload(section: section)
+//            self.binder.reload(section: section)
         }
 
         return TableViewViewModelMultiSectionBinder<NC, S>(binder: self.binder, sections: self.sections)

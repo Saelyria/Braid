@@ -20,6 +20,21 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
     }
     
     /**
+     Bind the given observable title to the section's header.
+     */
+    @discardableResult
+    public func headerTitles(_ titles: [S: String]) -> BaseTableViewMutliSectionBinder<C, S> {
+        for section in self.sections {
+            if let title = titles[section] {
+                let sectionBindResult = self.baseBindResult(for: section)
+                sectionBindResult.headerTitle(title)
+            }
+        }
+        
+        return self
+    }
+    
+    /**
      Bind the given header type to the declared section with the given observable for their view models.
      */
     @discardableResult
@@ -31,6 +46,18 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
             }
             let sectionBindResult = self.baseBindResult(for: section)
             sectionBindResult.bind(headerType: headerType, viewModel: sectionViewModel)
+        }
+        
+        return self
+    }
+    
+    @discardableResult
+    public func footerTitles(_ titles: [S: String]) -> BaseTableViewMutliSectionBinder<C, S> {
+        for section in self.sections {
+            if let title = titles[section] {
+                let sectionBindResult = self.baseBindResult(for: section)
+                sectionBindResult.footerTitle(title)
+            }
         }
         
         return self
