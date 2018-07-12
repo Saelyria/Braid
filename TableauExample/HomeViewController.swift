@@ -40,6 +40,5 @@ class HomeViewController: UIViewController {
             .onTapped { (section: Section, row: Int, cell: TitleDetailTableViewCell) in
 
             }
-        self.tableView.reloadData()
     }
 }

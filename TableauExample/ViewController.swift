@@ -30,7 +30,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.tableView = UITableView()
+        self.tableView = UITableView(frame: .zero, style: .grouped)
         self.tableView.tableFooterView = UIView()
         self.tableView.register(TitleDetailTableViewCell.self)
         self.view.addSubview(self.tableView)
@@ -42,26 +42,10 @@ class ViewController: UIViewController {
                 .checking: Observable.just([1, 2, 3]),
                 .savings: Observable.just([3, 2, 1])
             ])
-            .onCellDequeue({ (_, _, cell, number) in
-                print("uh")
-            })
             .headerTitles([
                 .checking: "CHECKING",
                 .savings: "SAVINGS"
             ])
-        
-//        self.binder.onSection(.checking)
-//            .rx.bind(cellType: TitleDetailTableViewCell.self, viewModels: Observable.just([
-//                TitleDetailTableViewCell.ViewModel(title: "1", subtitle: "", detail: ""),
-//                TitleDetailTableViewCell.ViewModel(title: "2", subtitle: "", detail: ""),
-//                TitleDetailTableViewCell.ViewModel(title: "3", subtitle: "", detail: "")
-//            ]))
-//
-//        let accounts = self.getAccountsFromServer().share()
-//        accounts.filter({ accounts in
-//            accounts.filter({ $0.type == .checking })
-//        })
-        print("")
     }
 
     private func getAccountsFromServer() -> Observable<[Account]> {
