@@ -179,4 +179,4 @@ Aaron Bosnjak (aaron.bosnjak707@gmail.com)
 
 ## License
 
-Coordinator is available under the MIT license. See the LICENSE file for more info.
+Tableau is available under the MIT license. See the LICENSE file for more info.
