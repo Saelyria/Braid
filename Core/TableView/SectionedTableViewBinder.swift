@@ -102,8 +102,8 @@ binder.onSection(.one)
  `ViewModelBindable`, and should conform to `UINibInitable` if they are meant to be created from a Nib.
  */
 public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBinderProtocol {
-    /// The currently displayed sections of the table view. Updating the value of this will automatically cause the data
-    /// binder to update its associated table view. Defaults to the section enum's `allSections` value if not set.
+    /// The table view's displayed sections. This array can be changed or reordered at any time to dynamically update
+    /// the displayed sections on the table view.
     public var displayedSections: [S] = [] {
         didSet {
             // TODO: create diff and reload affected sections

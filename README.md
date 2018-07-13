@@ -158,6 +158,7 @@ The binder will then take care of setting the `viewModel` property of your cells
 
 That's not all, though. Tableau has a number of other features:
 - Easily hot swap or reload sections by changing the binder's `displayedSections` property
+- Easier cell registration and dequeuing using the `UINibInitable` and `ReuseIdentifiable` protocols
 - Support for static sections via an enum or dynamic sections via a section model struct you define
 - Type safe updating of cells in a section via callback closures created during binding
 - RxSwift support for updating sections from `Observable` arrays for truly declarative setup
@@ -166,8 +167,7 @@ That's not all, though. Tableau has a number of other features:
 
 ## Installation
 
-Tableau (will be) available through [CocoaPods](http://cocoapods.org). To install
-it, simply add the following line to your Podfile:
+Tableau (will be) available through [CocoaPods](http://cocoapods.org). To install it, simply add the following line to your Podfile:
 
 ```ruby
 pod 'Tableau'

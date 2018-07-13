@@ -6,6 +6,9 @@ extension BaseTableViewSingleSectionBinder: ReactiveCompatible { }
 public extension Reactive where Base: TableViewInitialSingleSectionBinderProtocol {
     /**
      Bind the given cell type to the declared sections, creating them based on the view models from a given observable.
+     
+     When using this method, you pass in an observable array of the cell's view models. From there, the binder will
+     handle dequeuing of your cells based on the observable view models array.
      */
     @discardableResult
     public func bind<NC>(cellType: NC.Type, viewModels: Observable<[NC.ViewModel]>) -> TableViewViewModelSingleSectionBinder<NC, Base.S>
@@ -35,7 +38,8 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
      models observable type) along with the row and cell.
      
      When using this method, you pass in an observable array of your raw models. From there, the binder will handle
-     dequeuing of your cells based on the observable models array.
+     dequeuing of your cells based on the observable models array. It's expected that you will add an `onCellDequeue`
+     handler to your chain when using this method to configure dequeued cells with their associated model objects.
      */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: Observable<[NM]>)
@@ -66,7 +70,8 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
      
      When using this method, you pass in an observable array of your raw models and a function that transforms them into
      the view models for the cells. From there, the binder will handle dequeuing of your cells based on the observable
-     models array.
+     models array. Whenever a cell is dequeued, the binder will create an instance of the cell's view model from the
+     associated model using the given `mapToViewModel` function.
      */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: Observable<[NM]>, mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)

@@ -21,7 +21,7 @@ Pod::Spec.new do |s|
   end
 
   s.subspec "Rx" do |ss|
-    ss.source_files = 'Rx/Protocols/', 'Rx/TableView/'
+    ss.source_files = 'Rx/'
     ss.ios.framework = "UIKit"
     ss.dependency 'Tableau/Core'
     ss.dependency 'RxSwift', '~> 4.0'

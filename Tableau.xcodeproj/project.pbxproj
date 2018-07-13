@@ -121,7 +121,9 @@
 		9381330820B6482B00CBF8F6 /* Rx */ = {
 			isa = PBXGroup;
 			children = (
-				93992F9920CC77BA00A7FDAC /* Protocols */,
+				93C36A4C20DDD90C006B7ECF /* TableViewBinder+Rx.swift */,
+				9378E76720D71D530039849F /* SingleSection+Rx.swift */,
+				93C36A4520D9D4E4006B7ECF /* MultiSection+Rx.swift */,
 			);
 			path = Rx;
 			sourceTree = "<group>";
@@ -146,16 +148,6 @@
 				9360CCB720E5E1CA00DF8886 /* MultiSection */,
 			);
 			path = TableView;
-			sourceTree = "<group>";
-		};
-		93992F9920CC77BA00A7FDAC /* Protocols */ = {
-			isa = PBXGroup;
-			children = (
-				93C36A4C20DDD90C006B7ECF /* TableViewBinder+Rx.swift */,
-				9378E76720D71D530039849F /* SingleSection+Rx.swift */,
-				93C36A4520D9D4E4006B7ECF /* MultiSection+Rx.swift */,
-			);
-			path = Protocols;
 			sourceTree = "<group>";
 		};
 		93C36A4B20DB209F006B7ECF /* CollectionView */ = {
