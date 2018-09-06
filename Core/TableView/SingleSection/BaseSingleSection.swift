@@ -44,6 +44,9 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
     
     /**
      Bind the given observable title to the section's header.
+     
+     If you have bound a custom header type to the table view using the `bind(headerType:viewModel:)` method, this
+     method will do nothing.
      */
     @discardableResult
     public func headerTitle(_ title: String) -> BaseTableViewSingleSectionBinder<C, S> {
@@ -69,6 +72,9 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
     
     /**
      Bind the given observable title to the section's footer.
+     
+     If you have bound a custom footer type to the table view using the `bind(footerType:viewModel:)` method, this
+     method will do nothing.
      */
     @discardableResult
     public func footerTitle(_ title: String) -> BaseTableViewSingleSectionBinder<C, S> {
@@ -142,6 +148,42 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
         self.binder.sectionEstimatedCellHeightBlocks[section] = handler
         return self
     }
+    
+    /**
+     Add a callback handler to provide the height for the section header in the declared section.
+     */
+    @discardableResult
+    public func headerHeight(_ handler: @escaping () -> CGFloat) -> BaseTableViewSingleSectionBinder<C, S> {
+        self.binder.sectionHeaderHeightBlocks[section] = handler
+        return self
+    }
+    
+    /**
+     Add a callback handler to provide the estimated height for the section header in the declared section
+     */
+    @discardableResult
+    public func estimatedHeaderHeight(_ handler: @escaping () -> CGFloat) -> BaseTableViewSingleSectionBinder<C, S> {
+        self.binder.sectionHeaderEstimatedHeightBlocks[section] = handler
+        return self
+    }
+    
+    /**
+     Add a callback handler to provide the height for the section footer in the declared section.
+     */
+    @discardableResult
+    public func footerHeight(_ handler: @escaping () -> CGFloat) -> BaseTableViewSingleSectionBinder<C, S> {
+        self.binder.sectionFooterHeightBlocks[section] = handler
+        return self
+    }
+    
+    /**
+     Add a callback handler to provide the estimated height for the section footer in the declared section
+     */
+    @discardableResult
+    public func estimatedFooterHeight(_ handler: @escaping () -> CGFloat) -> BaseTableViewSingleSectionBinder<C, S> {
+        self.binder.sectionFooterEstimatedHeightBlocks[section] = handler
+        return self
+    }
 }
 
 
@@ -155,12 +197,12 @@ internal extension BaseTableViewSingleSectionBinder {
         
         let headerDequeueBlock: HeaderFooterDequeueBlock = { [weak binder = self.binder] (tableView, sectionInt) in
             if let section = binder?.displayedSections[sectionInt],
-                var header = tableView.dequeueReusableHeaderFooterView(withIdentifier: H.reuseIdentifier) as? H,
-                let viewModel = binder?.sectionHeaderViewModels[section] as? H.ViewModel {
+            var header = tableView.dequeueReusableHeaderFooterView(withIdentifier: H.reuseIdentifier) as? H,
+            let viewModel = binder?.sectionHeaderViewModels[section] as? H.ViewModel {
                 header.viewModel = viewModel
                 return header
             }
-            assertionFailure("ERROR: Didn't return a header - something went awry!")
+//            assertionFailure("ERROR: Didn't return a header - something went awry!")
             return nil
         }
         self.binder.sectionHeaderDequeueBlocks[self.section] = headerDequeueBlock
@@ -174,12 +216,12 @@ internal extension BaseTableViewSingleSectionBinder {
         
         let footerDequeueBlock: HeaderFooterDequeueBlock = { [weak binder = self.binder] (tableView, sectionInt) in
             if let section = binder?.displayedSections[sectionInt],
-                var footer = tableView.dequeueReusableHeaderFooterView(withIdentifier: F.reuseIdentifier) as? F,
-                let viewModel = binder?.sectionFooterViewModels[section] as? F.ViewModel {
+            var footer = tableView.dequeueReusableHeaderFooterView(withIdentifier: F.reuseIdentifier) as? F,
+            let viewModel = binder?.sectionFooterViewModels[section] as? F.ViewModel {
                 footer.viewModel = viewModel
                 return footer
             }
-            assertionFailure("ERROR: Didn't return a footer - something went awry!")
+//            assertionFailure("ERROR: Didn't return a footer - something went awry!")
             return nil
         }
         self.binder.sectionFooterDequeueBlocks[self.section] = footerDequeueBlock

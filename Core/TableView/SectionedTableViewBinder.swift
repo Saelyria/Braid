@@ -135,6 +135,10 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     var sectionHeaderViewModels: [S: Any] = [:]
     // Titles for the headers for a section.
     var sectionHeaderTitles: [S: String] = [:]
+    // Blocks to call to get the height for a section header.
+    var sectionHeaderHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
+    // Blocks to call to get the estimated height for a section header.
+    var sectionHeaderEstimatedHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
     
     // Blocks to call to dequeue a footer in a section.
     var sectionFooterDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
@@ -142,6 +146,10 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     var sectionFooterViewModels: [S: Any] = [:]
     // Titles for the footers for a section.
     var sectionFooterTitles: [S: String] = [:]
+    // Blocks to call to get the height for a section footer.
+    var sectionFooterHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
+    // Blocks to call to get the estimated height for a section footer.
+    var sectionFooterEstimatedHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
     
     // Blocks to call when a cell is tapped in a section.
     var sectionCellTappedCallbacks: [S: CellTapCallback] = [:]
@@ -171,27 +179,29 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     
     /// Reloads the specified section.
     public func reload(section: S) {
-        if let sectionToReloadIndex = self.displayedSections.index(of: section) {
-            let startIndex = self.displayedSections.startIndex
-            let sectionInt = startIndex.distance(to: sectionToReloadIndex)
-            let indexSet: IndexSet = [sectionInt]
-            self.tableView.reloadSections(indexSet, with: .none)
-        }
+        self.tableView.reloadData()
+//        if let sectionToReloadIndex = self.displayedSections.index(of: section) {
+//            let startIndex = self.displayedSections.startIndex
+//            let sectionInt = startIndex.distance(to: sectionToReloadIndex)
+//            let indexSet: IndexSet = [sectionInt]
+//            self.tableView.reloadSections(indexSet, with: .none)
+//        }
     }
     
     /// Reloads the specified sections.
     public func reload(sections: [S]) {
-        var indexSet: IndexSet = []
-        for section in sections {
-            if let sectionToReloadIndex = self.displayedSections.index(of: section) {
-                let startIndex = self.displayedSections.startIndex
-                let sectionInt = startIndex.distance(to: sectionToReloadIndex)
-                indexSet.update(with: sectionInt)
-            }
-        }
-        if !indexSet.isEmpty {
-            self.tableView.reloadSections(indexSet, with: .none)
-        }
+        self.tableView.reloadData()
+//        var indexSet: IndexSet = []
+//        for section in sections {
+//            if let sectionToReloadIndex = self.displayedSections.index(of: section) {
+//                let startIndex = self.displayedSections.startIndex
+//                let sectionInt = startIndex.distance(to: sectionToReloadIndex)
+//                indexSet.update(with: sectionInt)
+//            }
+//        }
+//        if !indexSet.isEmpty {
+//            self.tableView.reloadSections(indexSet, with: .none)
+//        }
     }
 
     /**
@@ -223,3 +233,4 @@ typealias HeaderFooterDequeueBlock = (UITableView, Int) -> UITableViewHeaderFoot
 typealias CellTapCallback = (Int, UITableViewCell) -> Void
 typealias CellDequeueCallback = (Int, UITableViewCell) -> Void
 typealias CellHeightBlock = (Int) -> CGFloat
+typealias HeaderFooterHeightBlock = () -> CGFloat

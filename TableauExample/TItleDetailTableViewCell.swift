@@ -2,7 +2,7 @@ import UIKit
 import Tableau
 import RxSwift
 
-class TitleDetailTableViewCell: UITableViewCell, ReuseIdentifiable, ViewModelBindable, UINibInitable {
+final class TitleDetailTableViewCell: UITableViewCell, ReuseIdentifiable, ViewModelBindable, UINibInitable {
     struct ViewModel {
         let title: String
         let subtitle: String

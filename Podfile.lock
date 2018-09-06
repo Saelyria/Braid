@@ -12,9 +12,14 @@ DEPENDENCIES:
   - RxCocoa (~> 4.0)
   - Tableau/Rx (from `.`)
 
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - RxCocoa
+    - RxSwift
+
 EXTERNAL SOURCES:
   Tableau:
-    :path: .
+    :path: "."
 
 SPEC CHECKSUMS:
   RxCocoa: d88ba0f1f6abf040011a9eb4b539324fc426843a
@@ -23,4 +28,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 2c660d4c4fc917a2ee98a95494f6915a1788b4a2
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.5.3

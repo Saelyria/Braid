@@ -15,6 +15,7 @@
 		93C36A4820DAFF97006B7ECF /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C36A4720DAFF97006B7ECF /* HomeViewController.swift */; };
 		93C36A4A20DB02E0006B7ECF /* TitleDetailTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 93C36A4920DB02E0006B7ECF /* TitleDetailTableViewCell.xib */; };
 		AA8B7612901AEED60C395EB0 /* Pods_TableauExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5FEBC5088F0D7E30632BBD0 /* Pods_TableauExample.framework */; };
+		AB86C3BF2141718C00FA4945 /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -42,6 +43,7 @@
 		9381335020B6EE2A00CBF8F6 /* TItleDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TItleDetailTableViewCell.swift; sourceTree = "<group>"; };
 		93C36A4720DAFF97006B7ECF /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		93C36A4920DB02E0006B7ECF /* TitleDetailTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TitleDetailTableViewCell.xib; sourceTree = "<group>"; };
+		AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
 		B5FEBC5088F0D7E30632BBD0 /* Pods_TableauExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TableauExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -92,6 +94,7 @@
 				938132D920B6463000CBF8F6 /* ViewController.swift */,
 				9381335020B6EE2A00CBF8F6 /* TItleDetailTableViewCell.swift */,
 				93C36A4920DB02E0006B7ECF /* TitleDetailTableViewCell.xib */,
+				AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */,
 				9381334F20B6EDFA00CBF8F6 /* Resources */,
 				938132E320B6463200CBF8F6 /* Info.plist */,
 			);
@@ -128,7 +131,6 @@
 				938132D220B6463000CBF8F6 /* Resources */,
 				9381330C20B6486400CBF8F6 /* Embed Frameworks */,
 				01E321FF9D1B381B3D30A111 /* [CP] Embed Pods Frameworks */,
-				D524F30E6E2B341FB6FD45A5 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -226,21 +228,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		D524F30E6E2B341FB6FD45A5 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-TableauExample/Pods-TableauExample-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -250,6 +237,7 @@
 			files = (
 				938132DA20B6463000CBF8F6 /* ViewController.swift in Sources */,
 				938132D820B6463000CBF8F6 /* AppDelegate.swift in Sources */,
+				AB86C3BF2141718C00FA4945 /* SectionHeaderView.swift in Sources */,
 				9381335120B6EE2A00CBF8F6 /* TItleDetailTableViewCell.swift in Sources */,
 				93C36A4820DAFF97006B7ECF /* HomeViewController.swift in Sources */,
 			);

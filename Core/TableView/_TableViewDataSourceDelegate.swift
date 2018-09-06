@@ -25,11 +25,17 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection>: NSObject, UIT
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         let section = self.binder.displayedSections[section]
+        if self.binder.sectionHeaderDequeueBlocks[section] != nil {
+            return nil
+        }
         return self.binder.sectionHeaderTitles[section]
     }
     
     func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         let section = self.binder.displayedSections[section]
+        if self.binder.sectionFooterDequeueBlocks[section] != nil {
+            return nil
+        }
         return self.binder.sectionFooterTitles[section]
     }
 
@@ -64,6 +70,47 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection>: NSObject, UIT
             return header
         }
         return nil
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection sectionInt: Int) -> CGFloat {
+        let section = self.binder.displayedSections[sectionInt]
+        if let heightBlock = self.binder.sectionHeaderHeightBlocks[section] {
+            return heightBlock()
+        }
+        return UITableViewAutomaticDimension
+    }
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection sectionInt: Int) -> CGFloat {
+        let section = self.binder.displayedSections[sectionInt]
+        if let heightBlock = self.binder.sectionHeaderEstimatedHeightBlocks[section] {
+            return heightBlock()
+        }
+        return UITableViewAutomaticDimension
+    }
+    
+    func tableView(_ tableView: UITableView, viewForFooterInSection sectionInt: Int) -> UIView? {
+        let section = self.binder.displayedSections[sectionInt]
+        if let dequeueBlock = self.binder.sectionFooterDequeueBlocks[section] {
+            let footer: UITableViewHeaderFooterView? = dequeueBlock(tableView, sectionInt)
+            return footer
+        }
+        return nil
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection sectionInt: Int) -> CGFloat {
+        let section = self.binder.displayedSections[sectionInt]
+        if let heightBlock = self.binder.sectionFooterHeightBlocks[section] {
+            return heightBlock()
+        }
+        return UITableViewAutomaticDimension
+    }
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection sectionInt: Int) -> CGFloat {
+        let section = self.binder.displayedSections[sectionInt]
+        if let heightBlock = self.binder.sectionFooterEstimatedHeightBlocks[section] {
+            return heightBlock()
+        }
+        return UITableViewAutomaticDimension
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

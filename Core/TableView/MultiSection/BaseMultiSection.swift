@@ -119,6 +119,58 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
         return self
     }
     
+    /**
+     Add a callback handler to provide the height for the section header in the declared section.
+     */
+    @discardableResult
+    public func headerHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
+        for section in self.sections {
+            self.binder.sectionHeaderHeightBlocks[section] = {
+                return handler(section)
+            }
+        }
+        return self
+    }
+    
+    /**
+     Add a callback handler to provide the estimated height for the section header in the declared section
+     */
+    @discardableResult
+    public func estimatedHeaderHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
+        for section in self.sections {
+            self.binder.sectionHeaderEstimatedHeightBlocks[section] = {
+                return handler(section)
+            }
+        }
+        return self
+    }
+    
+    /**
+     Add a callback handler to provide the height for the section footer in the declared section.
+     */
+    @discardableResult
+    public func footerHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
+        for section in self.sections {
+            self.binder.sectionFooterHeightBlocks[section] = {
+                return handler(section)
+            }
+        }
+        return self
+    }
+    
+    /**
+     Add a callback handler to provide the estimated height for the section footer in the declared section
+     */
+    @discardableResult
+    public func estimatedFooterHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
+        for section in self.sections {
+            self.binder.sectionFooterEstimatedHeightBlocks[section] = {
+                return handler(section)
+            }
+        }
+        return self
+    }
+    
     internal func baseBindResult(`for` section: S) -> BaseTableViewSingleSectionBinder<C, S> {
         if let bindResult = self.baseSectionBindResults[section] {
             return bindResult
