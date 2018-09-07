@@ -53,6 +53,9 @@ class ViewController: UIViewController {
                 .checking: "CHECKING",
                 .savings: "SAVINGS"
             ])
+            .estimatedCellHeight { _, _ in
+                return 44
+            }
         
         self.binder.onSection(.other)
             .rx.bind(cellType: TitleDetailTableViewCell.self, models: self.checkingAccounts.asObservable(), mapToViewModelsWith: { account in
@@ -60,6 +63,9 @@ class ViewController: UIViewController {
                     title: account.accountName, subtitle: account.accountNumber, detail: "\(account.balance)")
             })
             .bind(headerType: SectionHeaderView.self, viewModel: "OTHER")
+            .estimatedCellHeight { _ in
+                return 44
+            }
         
         self.getAccountsFromServer().subscribe(onNext: { accounts in
             self.savingsAccounts.value = accounts

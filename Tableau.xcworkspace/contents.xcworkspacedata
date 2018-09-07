@@ -11,7 +11,7 @@
       location = "group:README.md">
    </FileRef>
    <FileRef
-      location = "group:/Users/Aaron/Documents/Xcode/TableViewBinder/ContributorQuickstart.md">
+      location = "container:ContributorQuickstart.md">
    </FileRef>
    <FileRef
       location = "group:Tableau.xcodeproj">

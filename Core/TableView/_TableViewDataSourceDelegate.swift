@@ -47,20 +47,20 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection>: NSObject, UIT
         return cell
     }
     
-    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        let section = self.binder.displayedSections[indexPath.section]
-        if let estimatedHeightBlock = self.binder.sectionEstimatedCellHeightBlocks[section] {
-            return estimatedHeightBlock(indexPath.row)
-        }
-        return UITableViewAutomaticDimension
-    }
-    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let section = self.binder.displayedSections[indexPath.section]
         if let heightBlock = self.binder.sectionCellHeightBlocks[section] {
             return heightBlock(indexPath.row)
         }
-        return UITableViewAutomaticDimension
+        return tableView.rowHeight
+    }
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        let section = self.binder.displayedSections[indexPath.section]
+        if let estimatedHeightBlock = self.binder.sectionEstimatedCellHeightBlocks[section] {
+            return estimatedHeightBlock(indexPath.row)
+        }
+        return tableView.estimatedRowHeight
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection sectionInt: Int) -> UIView? {
@@ -77,7 +77,7 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection>: NSObject, UIT
         if let heightBlock = self.binder.sectionHeaderHeightBlocks[section] {
             return heightBlock()
         }
-        return UITableViewAutomaticDimension
+        return tableView.sectionHeaderHeight
     }
     
     func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection sectionInt: Int) -> CGFloat {
@@ -85,7 +85,7 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection>: NSObject, UIT
         if let heightBlock = self.binder.sectionHeaderEstimatedHeightBlocks[section] {
             return heightBlock()
         }
-        return UITableViewAutomaticDimension
+        return tableView.estimatedSectionHeaderHeight
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection sectionInt: Int) -> UIView? {
@@ -102,7 +102,7 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection>: NSObject, UIT
         if let heightBlock = self.binder.sectionFooterHeightBlocks[section] {
             return heightBlock()
         }
-        return UITableViewAutomaticDimension
+        return tableView.sectionFooterHeight
     }
     
     func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection sectionInt: Int) -> CGFloat {
@@ -110,7 +110,7 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection>: NSObject, UIT
         if let heightBlock = self.binder.sectionFooterEstimatedHeightBlocks[section] {
             return heightBlock()
         }
-        return UITableViewAutomaticDimension
+        return tableView.estimatedSectionFooterHeight
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

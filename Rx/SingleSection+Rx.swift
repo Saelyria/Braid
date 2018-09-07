@@ -91,7 +91,6 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
             
             return TableViewModelViewModelSingleSectionBinder<NC, Base.S, NM>(binder: bindResult.binder, section: bindResult.section, mapToViewModel: mapToViewModel)
     }
-
 }
 
 public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
