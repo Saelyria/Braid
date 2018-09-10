@@ -19,6 +19,7 @@ binder.onTable()
     .onTapped { (row: Int, cell: MyCell, model: MyModel)
         // e.g. go to a detail view controller with the 'model'
     }
+binder.finish()
 ```
 
 Easy! Just from this example, you can see how your normal data source / delegate methods are shortened into a much more legible phrase. This can be read as *"Okay binder, on the entire table, bind the `MyCell` cell type based on the model objects from the given array. Whenever a cell is dequeued, give me the model object it was dequeued for and let me configure the cell. Whenever a cell is tapped, I want this to happen."* Everything is type safe and you don't need to map rows to model array indexes.
@@ -33,7 +34,6 @@ var updateTable: ([MyModel]) -> Void
 self.updateTable = binder.onTable()
     .bind(cellType: MyCell.self, models: models)
     .createUpdateCallback()
-    
 ...
 
 self.updateTable(newModels)
@@ -55,6 +55,7 @@ binder.onTable()
     .onTapped { (row: Int, cell: MyCell, model: MyModel)
         // e.g. go to a detail view controller with the 'model'
     }
+binder.finish()
 ```
 
 Here, the 'table view binder' object will subscribe to changes to the `models` observable array and auto-update the table.
@@ -113,6 +114,8 @@ binder.onAllSections()
     .onTapped { (section: Section, row: Int, cell: UITableViewCell)
         // analytics stuff
     }
+    
+binder.finish()
 ```
 
 While that's pretty dense, it's still pretty legible as it is, and reads a lot like our given requirements. This is read something like *"First, create a sectioned table binder whose sections are cases of the `Section` enum. Then, in the 'banner' section, bind the `BannerCell` type with the given banner view model. Next, for both the 'checking' and 'savings' sections, bind the `AccountCell` cell type based on these model arrays. Set the section titles for these sections to these strings. Whenever a cell is dequeued, run this block of code. Whenever a cell is tapped, run this other block of code. Now, on just the 'investing' section, bind the `InvestingCell` cell type with the models from this array, running these code blocks when cells are dequeued or tapped. Finally, on any section, run this other code block whenever a cell is tapped."*
