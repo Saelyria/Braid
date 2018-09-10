@@ -115,14 +115,16 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         }
     }
     
+    /// Whether this binder has had its binding completed by having its `finish()` method called.
     public private(set) var hasFinishedBinding: Bool = false
+    /// The table view this binder performs binding for.
+    public private(set) var tableView: UITableView!
 
 #if RX_TABLEAU
     let disposeBag = DisposeBag()
     let displayedSectionsSubject = BehaviorSubject<[S]>(value: [])
 #endif
 
-    var tableView: UITableView!
     private var tableViewDataSourceDelegate: (UITableViewDataSource & UITableViewDelegate)?
     
     // Blocks to call to dequeue a cell in a section.
@@ -180,36 +182,39 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     /// Reloads the specified section.
     public func reload(section: S) {
         guard self.hasFinishedBinding else { return }
-        self.tableView.reloadData()
-//        if let sectionToReloadIndex = self.displayedSections.index(of: section) {
-//            let startIndex = self.displayedSections.startIndex
-//            let sectionInt = startIndex.distance(to: sectionToReloadIndex)
-//            let indexSet: IndexSet = [sectionInt]
-//            self.tableView.reloadSections(indexSet, with: .none)
-//        }
+//        self.tableView.reloadData()
+        if let sectionToReloadIndex = self.displayedSections.index(of: section) {
+            let startIndex = self.displayedSections.startIndex
+            let sectionInt = startIndex.distance(to: sectionToReloadIndex)
+            let indexSet: IndexSet = [sectionInt]
+            self.tableView.reloadSections(indexSet, with: .none)
+        }
     }
     
     /// Reloads the specified sections.
     public func reload(sections: [S]) {
         guard self.hasFinishedBinding else { return }
-        self.tableView.reloadData()
-//        var indexSet: IndexSet = []
-//        for section in sections {
-//            if let sectionToReloadIndex = self.displayedSections.index(of: section) {
-//                let startIndex = self.displayedSections.startIndex
-//                let sectionInt = startIndex.distance(to: sectionToReloadIndex)
-//                indexSet.update(with: sectionInt)
-//            }
-//        }
-//        if !indexSet.isEmpty {
-//            self.tableView.reloadSections(indexSet, with: .none)
-//        }
+//        self.tableView.reloadData()
+        var indexSet: IndexSet = []
+        for section in sections {
+            if let sectionToReloadIndex = self.displayedSections.index(of: section) {
+                let startIndex = self.displayedSections.startIndex
+                let sectionInt = startIndex.distance(to: sectionToReloadIndex)
+                indexSet.update(with: sectionInt)
+            }
+        }
+        if !indexSet.isEmpty {
+            self.tableView.reloadSections(indexSet, with: .none)
+        }
     }
 
     /**
      Declares a section to begin binding handlers to.
      */
     public func onSection(_ section: S) -> TableViewInitialSingleSectionBinder<S> {
+        guard !self.hasFinishedBinding else {
+            fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
+        }
         return TableViewInitialSingleSectionBinder<S>(binder: self, section: section)
     }
     
@@ -217,11 +222,16 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      Declares sections to begin binding handlers to.
      */
     public func onSections(_ sections: [S]) -> TableViewInitialMutliSectionBinder<S> {
+        guard !self.hasFinishedBinding else {
+            fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
+        }
         return TableViewInitialMutliSectionBinder<S>(binder: self, sections: sections)
     }
     
     public func onAllSections() {
-        
+        guard !self.hasFinishedBinding else {
+            fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
+        }
     }
     
     public func finish() {

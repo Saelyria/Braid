@@ -36,6 +36,7 @@ class ViewController: UIViewController {
         // create and setup table view
         self.tableView = UITableView(frame: self.view.frame, style: .grouped)
         self.tableView.tableFooterView = UIView()
+        self.tableView.tableHeaderView = UIView(frame: CGRect(origin: .zero, size: CGSize(width: self.view.frame.width, height: CGFloat.leastNormalMagnitude)))
 //        self.tableView.register(SectionHeaderView.self)
         self.tableView.register(TitleDetailTableViewCell.self)
         self.view.addSubview(self.tableView)
@@ -53,8 +54,7 @@ class ViewController: UIViewController {
                 return TitleDetailTableViewCell.ViewModel(
                     title: account.accountName, subtitle: account.accountNumber, detail: "\(account.balance)")
             })
-//            .bind(headerType: SectionHeaderView.self, viewModels: [
-            .headerTitles([
+            .bind(headerType: SectionHeaderView.self, viewModels: [
                 .checking: "CHECKING",
                 .savings: "SAVINGS"
             ])
@@ -80,6 +80,11 @@ class ViewController: UIViewController {
             self.savingsAccounts.value = accounts
             self.checkingAccounts.value = accounts
         }).disposed(by: self.disposeBag)
+        
+        
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(2)) {
+            self.binder.displayedSections = [.other, .checking]
+        }
     }
 
     private func getAccountsFromServer() -> Observable<[Account]> {

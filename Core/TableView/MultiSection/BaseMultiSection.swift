@@ -34,10 +34,10 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
     public func bind<H>(headerType: H.Type, viewModels: [S: H.ViewModel]) -> BaseTableViewMutliSectionBinder<C, S>
     where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
         for section in self.sections {
-            if let viewModel = viewModels[section] {
+            if viewModels[section] != nil {
                 BaseTableViewSingleSectionBinder<C, S>.addHeaderFooterDequeueBlock(type: headerType, binder: self.binder, section: section, isHeader: true)
-                self.binder.sectionHeaderViewModels[section] = viewModel
             }
+            self.binder.sectionHeaderViewModels[section] = viewModels[section]
         }
         return self
     }
@@ -75,10 +75,10 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
     public func bind<F>(footerType: F.Type, viewModels: [S: F.ViewModel]) -> BaseTableViewMutliSectionBinder<C, S>
         where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
             for section in self.sections {
-                if let viewModel = viewModels[section] {
+                if viewModels[section] != nil {
                     BaseTableViewSingleSectionBinder<C, S>.addHeaderFooterDequeueBlock(type: footerType, binder: self.binder, section: section, isHeader: false)
-                    self.binder.sectionFooterViewModels[section] = viewModel
                 }
+                self.binder.sectionFooterViewModels[section] = viewModels[section]
             }
             return self
     }

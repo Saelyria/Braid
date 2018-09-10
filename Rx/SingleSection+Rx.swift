@@ -20,10 +20,13 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
         bindResult.addDequeueBlock(cellType: cellType)
         
         let section = bindResult.section
-        viewModels.subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [NC.ViewModel]) in
-            binder?.sectionCellViewModels[section] = viewModels
-            binder?.reload(section: section)
-        }).disposed(by: bindResult.binder.disposeBag)
+        viewModels
+            .asDriver(onErrorJustReturn: [])
+            .asObservable()
+            .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [NC.ViewModel]) in
+                binder?.sectionCellViewModels[section] = viewModels
+                binder?.reload(section: section)
+            }).disposed(by: bindResult.binder.disposeBag)
         
         return TableViewViewModelSingleSectionBinder<NC, Base.S>(binder: bindResult.binder, section: bindResult.section)
     }
@@ -51,10 +54,13 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
         bindResult.addDequeueBlock(cellType: cellType)
         
         let section = bindResult.section
-        models.subscribe(onNext: { [weak binder = bindResult.binder] (models: [NM]) in
-            binder?.sectionCellModels[section] = models
-            binder?.reload(section: section)
-        }).disposed(by: bindResult.binder.disposeBag)
+        models
+            .asDriver(onErrorJustReturn: [])
+            .asObservable()
+            .subscribe(onNext: { [weak binder = bindResult.binder] (models: [NM]) in
+                binder?.sectionCellModels[section] = models
+                binder?.reload(section: section)
+            }).disposed(by: bindResult.binder.disposeBag)
         
         return TableViewModelSingleSectionBinder<NC, Base.S, NM>(binder: bindResult.binder, section: bindResult.section)
     }
@@ -83,11 +89,14 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
             bindResult.addDequeueBlock(cellType: cellType)
             
             let section = bindResult.section
-            models.subscribe(onNext: { [weak binder = bindResult.binder] (models: [NM]) in
-                binder?.sectionCellModels[section] = models
-                binder?.sectionCellViewModels[section] = models.map(mapToViewModel)
-                binder?.reload(section: section)
-            }).disposed(by: bindResult.binder.disposeBag)
+            models
+                .asDriver(onErrorJustReturn: [])
+                .asObservable()
+                .subscribe(onNext: { [weak binder = bindResult.binder] (models: [NM]) in
+                    binder?.sectionCellModels[section] = models
+                    binder?.sectionCellViewModels[section] = models.map(mapToViewModel)
+                    binder?.reload(section: section)
+                }).disposed(by: bindResult.binder.disposeBag)
             
             return TableViewModelViewModelSingleSectionBinder<NC, Base.S, NM>(binder: bindResult.binder, section: bindResult.section, mapToViewModel: mapToViewModel)
     }
@@ -102,7 +111,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      header's section when the given observable view model changes.
      */
     @discardableResult
-    public func bind<H>(headerType: H.Type, viewModel: Observable<H.ViewModel>) -> Base
+    public func bind<H>(headerType: H.Type, viewModel: Observable<H.ViewModel?>) -> Base
     where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
         guard let bindResult = self.base as? BaseTableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
@@ -112,10 +121,13 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
                                                                      section: bindResult.section, isHeader: true)
 
         let section = bindResult.section
-        viewModel.subscribe(onNext: { [weak binder = bindResult.binder] (viewModel: H.ViewModel) in
-            binder?.sectionHeaderViewModels[section] = viewModel
-            binder?.reload(section: section)
-        }).disposed(by: bindResult.binder.disposeBag)
+        viewModel
+            .asDriver(onErrorJustReturn: nil)
+            .asObservable()
+            .subscribe(onNext: { [weak binder = bindResult.binder] (viewModel: H.ViewModel?) in
+                binder?.sectionHeaderViewModels[section] = viewModel
+                binder?.reload(section: section)
+            }).disposed(by: bindResult.binder.disposeBag)
         
         return self.base
     }
@@ -124,16 +136,20 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      Bind the given observable title to the section's header.
      */
     @discardableResult
-    public func headerTitle(_ title: Observable<String>) -> Base {
+    public func headerTitle(_ title: Observable<String?>) -> Base {
         guard let bindResult = self.base as? BaseTableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
         let section = bindResult.section
-        title.subscribe(onNext: { [weak binder = bindResult.binder] (title: String) in
-            binder?.sectionHeaderTitles[section] = title
-            binder?.reload(section: section)
-        }).disposed(by: bindResult.binder.disposeBag)
+        title
+            .asDriver(onErrorJustReturn: nil)
+            .asObservable()
+            .distinctUntilChanged()
+            .subscribe(onNext: { [weak binder = bindResult.binder] (title: String?) in
+                binder?.sectionHeaderTitles[section] = title
+                binder?.reload(section: section)
+            }).disposed(by: bindResult.binder.disposeBag)
         
         return self.base
     }
@@ -146,7 +162,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      header's section when the given observable view model changes.
      */
     @discardableResult
-    public func bind<F>(footerType: F.Type, viewModel: Observable<F.ViewModel>) -> Base
+    public func bind<F>(footerType: F.Type, viewModel: Observable<F.ViewModel?>) -> Base
     where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
         guard let bindResult = self.base as? BaseTableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
@@ -156,10 +172,13 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
                                                                                      section: bindResult.section, isHeader: false)
         
         let section = bindResult.section
-        viewModel.subscribe(onNext: { [weak binder = bindResult.binder] (viewModel: F.ViewModel) in
-            binder?.sectionFooterViewModels[section] = viewModel
-            binder?.reload(section: section)
-        }).disposed(by: bindResult.binder.disposeBag)
+        viewModel
+            .asDriver(onErrorJustReturn: nil)
+            .asObservable()
+            .subscribe(onNext: { [weak binder = bindResult.binder] (viewModel: F.ViewModel?) in
+                binder?.sectionFooterViewModels[section] = viewModel
+                binder?.reload(section: section)
+            }).disposed(by: bindResult.binder.disposeBag)
         
         return self.base
     }
@@ -168,16 +187,20 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      Bind the given observable title to the section's footer.
      */
     @discardableResult
-    public func footerTitle(_ title: Observable<String>) -> Base {
+    public func footerTitle(_ title: Observable<String?>) -> Base {
         guard let bindResult = self.base as? BaseTableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
         let section = bindResult.section
-        title.subscribe(onNext: { [weak binder = bindResult.binder] (title: String) in
-            binder?.sectionFooterTitles[section] = title
-            binder?.reload(section: section)
-        }).disposed(by: bindResult.binder.disposeBag)
+        title
+            .asDriver(onErrorJustReturn: nil)
+            .asObservable()
+            .distinctUntilChanged()
+            .subscribe(onNext: { [weak binder = bindResult.binder] (title: String?) in
+                binder?.sectionFooterTitles[section] = title
+                binder?.reload(section: section)
+            }).disposed(by: bindResult.binder.disposeBag)
         
         return self.base
     }
