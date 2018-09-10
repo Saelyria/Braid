@@ -33,14 +33,18 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.tableView = UITableView(frame: .zero, style: .grouped)
+        // create and setup table view
+        self.tableView = UITableView(frame: self.view.frame, style: .grouped)
         self.tableView.tableFooterView = UIView()
-        self.tableView.register(SectionHeaderView.self)
+//        self.tableView.register(SectionHeaderView.self)
         self.tableView.register(TitleDetailTableViewCell.self)
         self.view.addSubview(self.tableView)
         self.tableView.frame = self.view.frame
-        self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self, displayedSections: [.checking, .savings, .other])
         
+        // create the table view binder
+        self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self, displayedSections: [])
+        
+        // bind the 'checking' and 'savings' sections
         self.binder.onSections([.checking, .savings])
             .rx.bind(cellType: TitleDetailTableViewCell.self, models: [
                 .checking: self.savingsAccounts.asObservable(),
@@ -49,25 +53,30 @@ class ViewController: UIViewController {
                 return TitleDetailTableViewCell.ViewModel(
                     title: account.accountName, subtitle: account.accountNumber, detail: "\(account.balance)")
             })
-            .bind(headerType: SectionHeaderView.self, viewModels: [
+//            .bind(headerType: SectionHeaderView.self, viewModels: [
+            .headerTitles([
                 .checking: "CHECKING",
                 .savings: "SAVINGS"
             ])
-            .estimatedCellHeight { _, _ in
-                return 44
-            }
+            .footerTitles([
+                .checking: "These are your checking accounts",
+                .savings: "These are your savings accounts."
+            ])
+            .estimatedCellHeight { _, _ in return 44 }
         
+        // bind the 'other' section
         self.binder.onSection(.other)
             .rx.bind(cellType: TitleDetailTableViewCell.self, models: self.checkingAccounts.asObservable(), mapToViewModelsWith: { account in
                 return TitleDetailTableViewCell.ViewModel(
                     title: account.accountName, subtitle: account.accountNumber, detail: "\(account.balance)")
             })
-            .bind(headerType: SectionHeaderView.self, viewModel: "OTHER")
-            .estimatedCellHeight { _ in
-                return 44
-            }
+            .headerTitle("OTHER")
+            .estimatedCellHeight { _ in return 44 }
+        
+        self.binder.finish()
         
         self.getAccountsFromServer().subscribe(onNext: { accounts in
+            self.binder.displayedSections = [.checking, .savings, .other]
             self.savingsAccounts.value = accounts
             self.checkingAccounts.value = accounts
         }).disposed(by: self.disposeBag)

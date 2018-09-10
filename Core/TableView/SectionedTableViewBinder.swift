@@ -106,13 +106,16 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     /// the displayed sections on the table view.
     public var displayedSections: [S] = [] {
         didSet {
-            // TODO: create diff and reload affected sections
-            self.tableView.reloadData()
 #if RX_TABLEAU
             self.displayedSectionsSubject.onNext(self.displayedSections)
 #endif
+            guard self.hasFinishedBinding else { return }
+            // TODO: create diff and reload affected sections
+            self.tableView.reloadData()
         }
     }
+    
+    public private(set) var hasFinishedBinding: Bool = false
 
 #if RX_TABLEAU
     let disposeBag = DisposeBag()
@@ -120,7 +123,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
 #endif
 
     var tableView: UITableView!
-    var tableViewDataSourceDelegate: _TableViewDataSourceDelegate<S>!
+    private var tableViewDataSourceDelegate: (UITableViewDataSource & UITableViewDelegate)?
     
     // Blocks to call to dequeue a cell in a section.
     var sectionCellDequeueBlocks: [S: CellDequeueBlock] = [:]
@@ -168,9 +171,6 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     
     public init(tableView: UITableView, sectionedBy sectionEnum: S.Type, displayedSections: [S]) {
         self.tableView = tableView
-        self.tableViewDataSourceDelegate = _TableViewDataSourceDelegate(binder: self)
-        tableView.delegate = self.tableViewDataSourceDelegate
-        tableView.dataSource = self.tableViewDataSourceDelegate
         self.displayedSections = displayedSections
 #if RX_TABLEAU
         self.displayedSectionsSubject.onNext(self.displayedSections)
@@ -179,6 +179,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     
     /// Reloads the specified section.
     public func reload(section: S) {
+        guard self.hasFinishedBinding else { return }
         self.tableView.reloadData()
 //        if let sectionToReloadIndex = self.displayedSections.index(of: section) {
 //            let startIndex = self.displayedSections.startIndex
@@ -190,6 +191,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     
     /// Reloads the specified sections.
     public func reload(sections: [S]) {
+        guard self.hasFinishedBinding else { return }
         self.tableView.reloadData()
 //        var indexSet: IndexSet = []
 //        for section in sections {
@@ -220,6 +222,36 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     
     public func onAllSections() {
         
+    }
+    
+    public func finish() {
+        self.hasFinishedBinding = true
+        
+        let rowEstimatedHeightBound = !self.sectionEstimatedCellHeightBlocks.isEmpty
+        let headerEstimatedHeightBound = !self.sectionHeaderEstimatedHeightBlocks.isEmpty
+        let footerEstimatedHeightBound = !self.sectionFooterEstimatedHeightBlocks.isEmpty
+        
+        if rowEstimatedHeightBound && headerEstimatedHeightBound && footerEstimatedHeightBound {
+            self.tableViewDataSourceDelegate = _TableViewDataSourceDelegate<S, EstimatedHeightOption_RowHeaderFooter>(binder: self)
+        } else if rowEstimatedHeightBound && headerEstimatedHeightBound {
+            self.tableViewDataSourceDelegate = _TableViewDataSourceDelegate<S, EstimatedHeightOption_RowHeader>(binder: self)
+        } else if rowEstimatedHeightBound && footerEstimatedHeightBound {
+            self.tableViewDataSourceDelegate = _TableViewDataSourceDelegate<S, EstimatedHeightOption_RowFooter>(binder: self)
+        } else if headerEstimatedHeightBound && footerEstimatedHeightBound {
+            self.tableViewDataSourceDelegate = _TableViewDataSourceDelegate<S, EstimatedHeightOption_HeaderFooter>(binder: self)
+        } else if rowEstimatedHeightBound {
+            self.tableViewDataSourceDelegate = _TableViewDataSourceDelegate<S, EstimatedHeightOption_Row>(binder: self)
+        } else if headerEstimatedHeightBound {
+            self.tableViewDataSourceDelegate = _TableViewDataSourceDelegate<S, EstimatedHeightOption_Header>(binder: self)
+        } else if footerEstimatedHeightBound {
+            self.tableViewDataSourceDelegate = _TableViewDataSourceDelegate<S, EstimatedHeightOption_Footer>(binder: self)
+        } else {
+            self.tableViewDataSourceDelegate = _TableViewDataSourceDelegate<S, Void>(binder: self)
+        }
+        
+        self.tableView.delegate = self.tableViewDataSourceDelegate
+        self.tableView.dataSource = self.tableViewDataSourceDelegate
+        self.tableView.reloadData()
     }
 }
 

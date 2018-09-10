@@ -108,7 +108,8 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
-        bindResult.addDequeueBlock(headerType: headerType)
+        BaseTableViewSingleSectionBinder<Base.C, Base.S>.addHeaderFooterDequeueBlock(type: headerType, binder: bindResult.binder,
+                                                                     section: bindResult.section, isHeader: true)
 
         let section = bindResult.section
         viewModel.subscribe(onNext: { [weak binder = bindResult.binder] (viewModel: H.ViewModel) in
@@ -151,7 +152,8 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
-        bindResult.addDequeueBlock(footerType: footerType)
+        BaseTableViewSingleSectionBinder<Base.C, Base.S>.addHeaderFooterDequeueBlock(type: footerType, binder: bindResult.binder,
+                                                                                     section: bindResult.section, isHeader: false)
         
         let section = bindResult.section
         viewModel.subscribe(onNext: { [weak binder = bindResult.binder] (viewModel: F.ViewModel) in

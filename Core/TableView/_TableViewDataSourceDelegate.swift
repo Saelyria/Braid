@@ -1,13 +1,29 @@
 import UIKit
 
+/*
+ These structs/protocols are used to effectively 'add' the 'estimated height' delegate methods to the
+ datasource/delegate object, as the table view has different behaviour for calculating heights for rows/headers/footers
+ depending on whether or not the delegate responds to the methods.
+ */
+struct EstimatedHeightOption_RowHeaderFooter: _EstimatedHeightOption_Row, _EstimatedHeightOption_Header, _EstimatedHeightOption_Footer { }
+struct EstimatedHeightOption_RowHeader: _EstimatedHeightOption_Row, _EstimatedHeightOption_Header { }
+struct EstimatedHeightOption_RowFooter: _EstimatedHeightOption_Row, _EstimatedHeightOption_Footer { }
+struct EstimatedHeightOption_HeaderFooter: _EstimatedHeightOption_Header, _EstimatedHeightOption_Footer { }
+struct EstimatedHeightOption_Row: _EstimatedHeightOption_Row { }
+struct EstimatedHeightOption_Header: _EstimatedHeightOption_Header { }
+struct EstimatedHeightOption_Footer: _EstimatedHeightOption_Footer { }
+protocol _EstimatedHeightOption_Row { }
+protocol _EstimatedHeightOption_Header { }
+protocol _EstimatedHeightOption_Footer { }
+
 /// An internal class that acts as the de facto data source / delegate to a binder's table view.
-class _TableViewDataSourceDelegate<SectionEnum: TableViewSection>: NSObject, UITableViewDataSource, UITableViewDelegate {
+class _TableViewDataSourceDelegate<SectionEnum: TableViewSection, EstimatedHeightOption>: NSObject, UITableViewDataSource, UITableViewDelegate {
     private weak var binder: SectionedTableViewBinder<SectionEnum>!
     
     init(binder: SectionedTableViewBinder<SectionEnum>) {
         self.binder = binder
     }
-    
+
     func numberOfSections(in tableView: UITableView) -> Int {
         return self.binder.displayedSections.count
     }
@@ -16,8 +32,8 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection>: NSObject, UIT
         let section = self.binder.displayedSections[section]
         if let models = self.binder.sectionCellModels[section] {
             return models.count
-        } else if let models = self.binder.sectionCellViewModels[section] {
-            return models.count
+        } else if let viewModels = self.binder.sectionCellViewModels[section] {
+            return viewModels.count
         } else {
             return 0
         }
@@ -55,14 +71,6 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection>: NSObject, UIT
         return tableView.rowHeight
     }
     
-    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        let section = self.binder.displayedSections[indexPath.section]
-        if let estimatedHeightBlock = self.binder.sectionEstimatedCellHeightBlocks[section] {
-            return estimatedHeightBlock(indexPath.row)
-        }
-        return tableView.estimatedRowHeight
-    }
-    
     func tableView(_ tableView: UITableView, viewForHeaderInSection sectionInt: Int) -> UIView? {
         let section = self.binder.displayedSections[sectionInt]
         if let dequeueBlock = self.binder.sectionHeaderDequeueBlocks[section] {
@@ -78,14 +86,6 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection>: NSObject, UIT
             return heightBlock()
         }
         return tableView.sectionHeaderHeight
-    }
-    
-    func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection sectionInt: Int) -> CGFloat {
-        let section = self.binder.displayedSections[sectionInt]
-        if let heightBlock = self.binder.sectionHeaderEstimatedHeightBlocks[section] {
-            return heightBlock()
-        }
-        return tableView.estimatedSectionHeaderHeight
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection sectionInt: Int) -> UIView? {
@@ -105,17 +105,39 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection>: NSObject, UIT
         return tableView.sectionFooterHeight
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let section = self.binder.displayedSections[indexPath.section]
+        guard let cell = tableView.cellForRow(at: indexPath) else { return }
+        self.binder.sectionCellTappedCallbacks[section]?(indexPath.row, cell)
+    }
+}
+
+extension _TableViewDataSourceDelegate where EstimatedHeightOption: _EstimatedHeightOption_Row {
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        let section = self.binder.displayedSections[indexPath.section]
+        if let estimatedHeightBlock = self.binder.sectionEstimatedCellHeightBlocks[section] {
+            return estimatedHeightBlock(indexPath.row)
+        }
+        return tableView.estimatedRowHeight
+    }
+}
+
+extension _TableViewDataSourceDelegate where EstimatedHeightOption: _EstimatedHeightOption_Header {
+    func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection sectionInt: Int) -> CGFloat {
+        let section = self.binder.displayedSections[sectionInt]
+        if let heightBlock = self.binder.sectionHeaderEstimatedHeightBlocks[section] {
+            return heightBlock()
+        }
+        return tableView.estimatedSectionHeaderHeight
+    }
+}
+
+extension _TableViewDataSourceDelegate where EstimatedHeightOption: _EstimatedHeightOption_Footer {
     func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection sectionInt: Int) -> CGFloat {
         let section = self.binder.displayedSections[sectionInt]
         if let heightBlock = self.binder.sectionFooterEstimatedHeightBlocks[section] {
             return heightBlock()
         }
         return tableView.estimatedSectionFooterHeight
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let section = self.binder.displayedSections[indexPath.section]
-        guard let cell = tableView.cellForRow(at: indexPath) else { return }
-        self.binder.sectionCellTappedCallbacks[section]?(indexPath.row, cell)
     }
 }
