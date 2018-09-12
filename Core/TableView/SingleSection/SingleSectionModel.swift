@@ -3,7 +3,14 @@ import UIKit
 /**
  A section binder for a section whose cells were setup to be dequeued with an array of an arbitrary 'model' type.
  */
-public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewSection, M>: BaseTableViewSingleSectionBinder<C, S>, TableViewSingleSectionBinderProtocol {    
+public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewSection, M>: BaseTableViewSingleSectionBinder<C, S>, TableViewSingleSectionBinderProtocol {
+    /**
+     Returns a closure that can be called to update the models for the cells for the section.
+     
+     This closure is retrieved at the end of the binding sequence and stored somewhere useful. Whenever the underlying
+     data the table view is displaying is updated, call this closure with the new models and the table view binder will
+     update the displayed cells in the section to match the given array.
+    */
     public func createUpdateCallback() -> ([M]) -> Void {
         return { (models: [M]) in
             self.binder.sectionCellModels[self.section] = models
@@ -12,15 +19,20 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     /**
-     Add a handler to be called whenever a cell in the declared section is tapped.
+     Adds a handler to be called whenever a cell in the declared section is tapped.
      
      The handler is called whenever a cell in the section is tapped, passing in the row and cell that was tapped, along
-     with the raw model object associated with the cell. The cell will be cast to the cell type bound to the section if
-     this method is called in a chain after the `bind(cellType:viewModels:)` method.
+     with the raw model object associated with the cell. The cell will be safely cast to the cell type bound to the
+     section if this method is called in a chain after the `bind(cellType:viewModels:)` method.
      
-     Note that this `onTapped` variation with the raw model object is only available if the
-     `bind(cellType:models:mapToViewModelsWith:)` method was used to bind the cell type to the section.
-     */
+     Note that this `onTapped` variation with the raw model object is only available if the `bind(cellType:models:)`
+     method was used to bind the cell type to the section.
+     - parameter handler: The closure to be called whenever a cell is tapped in the bound section.
+     - parameter row: The row of the cell that was tapped.
+     - parameter tappedCell: The cell that was tapped.
+     - parameter model: The model object that the cell was dequeued to represent in the table.
+     - returns: A section binder to continue the binding chain with.
+    */
     @discardableResult
     public func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C, _ model: M) -> Void) -> TableViewModelSingleSectionBinder<C, S, M> {
         let section = self.section
@@ -37,11 +49,17 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     /**
-     Add a handler to be called whenever a cell is dequeued in the declared section.
+     Adds a handler to be called whenever a cell is dequeued in the declared section.
      
-     The handler is called whenever a cell in the section is dequeued, passing in the row and the dequeued cell. The
-     cell will be cast to the cell type bound to the section if this method is called in a chain after the
-     `bind(cellType:viewModels:)` method.
+     The handler is called whenever a cell in the section is dequeued, passing in the row, the dequeued cell, and the
+     model object that the cell was dequeued to represent. The cell will be cast to the cell type bound to the section
+     if this method is called in a chain after the `bind(cellType:viewModels:)` method. This method can be used to
+     perform any additional configuration of the cell.
+     - parameter handler: The closure to be called whenever a cell is dequeued in the bound section.
+     - parameter row: The row of the cell that was dequeued.
+     - parameter dequeuedCell: The cell that was dequeued that can now be configured.
+     - parameter model: The model object that the cell was dequeued to represent in the table.
+     - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func onCellDequeue(_ handler: @escaping (_ row: Int, _ dequeuedCell: C, _ model: M) -> Void) -> TableViewModelSingleSectionBinder<C, S, M> {
@@ -106,6 +124,30 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     @discardableResult
     override public func estimatedCellHeight(_ handler: @escaping (_ row: Int) -> CGFloat) -> TableViewModelSingleSectionBinder<C, S, M> {
         super.estimatedCellHeight(handler)
+        return self
+    }
+    
+    @discardableResult
+    override public func footerHeight(_ handler: @escaping () -> CGFloat) -> TableViewModelSingleSectionBinder<C, S, M> {
+        super.footerHeight(handler)
+        return self
+    }
+    
+    @discardableResult
+    override public func estimatedFooterHeight(_ handler: @escaping () -> CGFloat) -> TableViewModelSingleSectionBinder<C, S, M> {
+        super.estimatedFooterHeight(handler)
+        return self
+    }
+    
+    @discardableResult
+    override public func headerHeight(_ handler: @escaping () -> CGFloat) -> TableViewModelSingleSectionBinder<C, S, M> {
+        super.headerHeight(handler)
+        return self
+    }
+    
+    @discardableResult
+    override public func estimatedHeaderHeight(_ handler: @escaping () -> CGFloat) -> TableViewModelSingleSectionBinder<C, S, M> {
+        super.estimatedHeaderHeight(handler)
         return self
     }
 }

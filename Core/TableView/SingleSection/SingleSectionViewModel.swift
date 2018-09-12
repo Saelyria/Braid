@@ -10,7 +10,7 @@ public class TableViewViewModelSingleSectionBinder<C: UITableViewCell & ViewMode
      
      This closure is retrieved at the end of the binding sequence and stored somewhere useful. Whenever the underlying
      data the table view is displaying is updated, call this closure with the new view models and the table view binder
-     will update the displayed cells to match the given array.
+     will update the displayed cells in the section to match the given array.
      */
     public func createUpdateCallback() -> (_ viewModels: [C.ViewModel]) -> Void {
         return { (viewModels: [C.ViewModel]) in
@@ -66,6 +66,30 @@ public class TableViewViewModelSingleSectionBinder<C: UITableViewCell & ViewMode
     @discardableResult
     override public func estimatedCellHeight(_ handler: @escaping (_ row: Int) -> CGFloat) -> TableViewViewModelSingleSectionBinder<C, S> {
         super.estimatedCellHeight(handler)
+        return self
+    }
+    
+    @discardableResult
+    override public func footerHeight(_ handler: @escaping () -> CGFloat) -> TableViewViewModelSingleSectionBinder<C, S, M> {
+        super.footerHeight(handler)
+        return self
+    }
+    
+    @discardableResult
+    override public func estimatedFooterHeight(_ handler: @escaping () -> CGFloat) -> TableViewViewModelSingleSectionBinder<C, S, M> {
+        super.estimatedFooterHeight(handler)
+        return self
+    }
+    
+    @discardableResult
+    override public func headerHeight(_ handler: @escaping () -> CGFloat) -> TableViewViewModelSingleSectionBinder<C, S, M> {
+        super.headerHeight(handler)
+        return self
+    }
+    
+    @discardableResult
+    override public func estimatedHeaderHeight(_ handler: @escaping () -> CGFloat) -> TableViewViewModelSingleSectionBinder<C, S, M> {
+        super.estimatedHeaderHeight(handler)
         return self
     }
 }

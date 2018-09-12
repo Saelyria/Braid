@@ -19,7 +19,6 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
                 return TableViewViewModelMultiSectionBinder<NC, S>(binder: self.binder, sections: self.sections)
             }
             self.binder.sectionCellViewModels[section] = sectionViewModels
-//            self.binder.reload(section: section)
         }
 
         return TableViewViewModelMultiSectionBinder<NC, S>(binder: self.binder, sections: self.sections)
@@ -40,7 +39,6 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
             let sectionViewModels: [NC.ViewModel] = sectionModels.map(mapToViewModel)
             self.binder.sectionCellModels[section] = sectionModels
             self.binder.sectionCellViewModels[section] = sectionViewModels
-            self.binder.reload(section: section)
         }
         
         return TableViewModelViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections, mapToViewModel: mapToViewModel)
@@ -67,7 +65,6 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
         for section in self.sections {
             let sectionModels: [NM] = models[section] ?? []
             self.binder.sectionCellModels[section] = sectionModels
-            self.binder.reload(section: section)
         }
         
         return TableViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections)

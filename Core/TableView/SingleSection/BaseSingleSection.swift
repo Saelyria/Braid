@@ -35,12 +35,12 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      */
     @discardableResult
     public func bind<H>(headerType: H.Type, viewModel: H.ViewModel) -> BaseTableViewSingleSectionBinder<C, S>
-        where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
-            BaseTableViewSingleSectionBinder.addHeaderFooterDequeueBlock(type: headerType, binder: self.binder,
-                                                                         section: self.section, isHeader: true)
-            self.binder.sectionHeaderViewModels[self.section] = viewModel
-            
-            return self
+    where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
+        BaseTableViewSingleSectionBinder.addHeaderFooterDequeueBlock(type: headerType, binder: self.binder,
+                                                                     section: self.section, isHeader: true)
+        self.binder.sectionHeaderViewModels[self.section] = viewModel
+        
+        return self
     }
     
     /**
@@ -68,12 +68,11 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      */
     @discardableResult
     public func bind<F>(footerType: F.Type, viewModel: F.ViewModel) -> BaseTableViewSingleSectionBinder<C, S>
-        where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
-            BaseTableViewSingleSectionBinder.addHeaderFooterDequeueBlock(type: footerType, binder: self.binder,
-                                                                         section: self.section, isHeader: false)
-            self.binder.sectionFooterViewModels[self.section] = viewModel
-            
-            return self
+    where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
+        BaseTableViewSingleSectionBinder.addHeaderFooterDequeueBlock(type: footerType, binder: self.binder,
+                                                                     section: self.section, isHeader: false)
+        self.binder.sectionFooterViewModels[self.section] = viewModel
+        return self
     }
     
     /**
@@ -89,7 +88,6 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
         self.binder.sectionFooterTitles[self.section] = title
         return self
     }
-    
     
     /**
      Adds a handler to be called whenever a cell is dequeued in the declared section.
