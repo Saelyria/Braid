@@ -9,7 +9,7 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTable
     public typealias C = UITableViewCell
     
     /**
-     Bind the given cell type to the declared sections, creating them based on the view models from a given array.
+     Bind the given cell type to the declared section, creating them based on the view models from a given array.
      
      Use this method to use a custom `UITableViewCell` for cells in the bound section with a table view binder. The cell
      must conform to `ViewModelBindable` and `ReuseIdentifiable` to be compatible. The table view binder will then, for
@@ -22,7 +22,7 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTable
     @discardableResult
     public func bind<NC>(cellType: NC.Type, viewModels: [NC.ViewModel]) -> TableViewViewModelSingleSectionBinder<NC, S>
     where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
-        self.addDequeueBlock(cellType: cellType)
+        TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: self.section)
         self.binder.sectionCellViewModels[self.section] = viewModels
         
         return TableViewViewModelSingleSectionBinder<NC, S>(binder: self.binder, section: self.section)
@@ -41,7 +41,7 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTable
      models for the cells. This function is stored so, if you later update the models for the section using the section
      binder's created 'update' callback, the models can be mapped to the cells' view models.
      - parameter cellType: The class of the header to bind.
-     - parameter models: The models objects to bind to the dequeued cells for this section.
+     - parameter models: The model objects to bind to the dequeued cells for this section.
      - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
         for the associated cell using the data from the model object.
      - returns: A section binder to continue the binding chain with.
@@ -49,7 +49,7 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTable
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [NM], mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
     -> TableViewModelViewModelSingleSectionBinder<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
-        self.addDequeueBlock(cellType: cellType)
+        TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: self.section)
         
         self.binder.sectionCellModels[self.section] = models
         self.binder.sectionCellViewModels[self.section] = models.map(mapToViewModel)
@@ -75,7 +75,7 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTable
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [NM]) -> TableViewModelSingleSectionBinder<NC, S, NM>
     where NC: UITableViewCell & ReuseIdentifiable {
-        self.addDequeueBlock(cellType: cellType)
+        TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: self.section)
         self.binder.sectionCellModels[self.section] = models
         
         return TableViewModelSingleSectionBinder<NC, S, NM>(binder: self.binder, section: self.section)
@@ -83,13 +83,14 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTable
 }
 
 internal extension TableViewInitialSingleSectionBinder {
-    internal func addDequeueBlock<NC>(cellType: NC.Type) where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
-        guard self.binder.sectionCellDequeueBlocks[self.section] == nil else {
+    internal static func addDequeueBlock<NC>(cellType: NC.Type, binder: SectionedTableViewBinder<S>, section: S)
+    where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
+        guard binder.sectionCellDequeueBlocks[section] == nil else {
             print("WARNING: Section already has a cell type bound to it - re-binding not supported.")
             return
         }
         
-        let cellDequeueBlock: CellDequeueBlock = { [weak binder = self.binder] (tableView, indexPath) in
+        let cellDequeueBlock: CellDequeueBlock = { [weak binder = binder] (tableView, indexPath) in
             if let section = binder?.displayedSections[indexPath.section],
             var cell = binder?.tableView.dequeueReusableCell(withIdentifier: NC.reuseIdentifier, for: indexPath) as? NC,
             let viewModel = (binder?.sectionCellViewModels[section] as? [NC.ViewModel])?[indexPath.row] {
@@ -100,16 +101,17 @@ internal extension TableViewInitialSingleSectionBinder {
             assertionFailure("ERROR: Didn't return the right cell type - something went awry!")
             return UITableViewCell()
         }
-        self.binder.sectionCellDequeueBlocks[self.section] = cellDequeueBlock
+        binder.sectionCellDequeueBlocks[section] = cellDequeueBlock
     }
     
-    internal func addDequeueBlock<NC>(cellType: NC.Type) where NC: UITableViewCell & ReuseIdentifiable {
-        guard self.binder.sectionCellDequeueBlocks[self.section] == nil else {
+    internal static func addDequeueBlock<NC>(cellType: NC.Type, binder: SectionedTableViewBinder<S>, section: S)
+    where NC: UITableViewCell & ReuseIdentifiable {
+        guard binder.sectionCellDequeueBlocks[section] == nil else {
             print("WARNING: Section already has a cell type bound to it - re-binding not supported.")
             return
         }
         
-        let cellDequeueBlock: CellDequeueBlock = { [weak binder = self.binder] (tableView, indexPath) in
+        let cellDequeueBlock: CellDequeueBlock = { [weak binder = binder] (tableView, indexPath) in
             if let section = binder?.displayedSections[indexPath.section],
             let cell = binder?.tableView.dequeueReusableCell(withIdentifier: NC.reuseIdentifier, for: indexPath) as? NC {
                 binder?.sectionCellDequeuedCallbacks[section]?(indexPath.row, cell)
@@ -118,7 +120,7 @@ internal extension TableViewInitialSingleSectionBinder {
             assertionFailure("ERROR: Didn't return the right cell type - something went awry!")
             return UITableViewCell()
         }
-        self.binder.sectionCellDequeueBlocks[self.section] = cellDequeueBlock
+        binder.sectionCellDequeueBlocks[section] = cellDequeueBlock
     }
 }
 

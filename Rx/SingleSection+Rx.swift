@@ -17,7 +17,7 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
-        bindResult.addDequeueBlock(cellType: cellType)
+        TableViewInitialSingleSectionBinder<Base.S>.addDequeueBlock(cellType: cellType, binder: bindResult.binder, section: bindResult.section)
         
         let section = bindResult.section
         viewModels
@@ -51,7 +51,7 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
-        bindResult.addDequeueBlock(cellType: cellType)
+        TableViewInitialSingleSectionBinder<Base.S>.addDequeueBlock(cellType: cellType, binder: bindResult.binder, section: bindResult.section)
         
         let section = bindResult.section
         models
@@ -81,24 +81,24 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
      */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: Observable<[NM]>, mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-        -> TableViewModelViewModelSingleSectionBinder<NC, Base.S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
-            guard let bindResult = self.base as? TableViewInitialSingleSectionBinder<Base.S> else {
-                fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
-            }
-            
-            bindResult.addDequeueBlock(cellType: cellType)
-            
-            let section = bindResult.section
-            models
-                .asDriver(onErrorJustReturn: [])
-                .asObservable()
-                .subscribe(onNext: { [weak binder = bindResult.binder] (models: [NM]) in
-                    binder?.sectionCellModels[section] = models
-                    binder?.sectionCellViewModels[section] = models.map(mapToViewModel)
-                    binder?.reload(section: section)
-                }).disposed(by: bindResult.binder.disposeBag)
-            
-            return TableViewModelViewModelSingleSectionBinder<NC, Base.S, NM>(binder: bindResult.binder, section: bindResult.section, mapToViewModel: mapToViewModel)
+    -> TableViewModelViewModelSingleSectionBinder<NC, Base.S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
+        guard let bindResult = self.base as? TableViewInitialSingleSectionBinder<Base.S> else {
+            fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
+        }
+        
+        TableViewInitialSingleSectionBinder<Base.S>.addDequeueBlock(cellType: cellType, binder: bindResult.binder, section: bindResult.section)
+        
+        let section = bindResult.section
+        models
+            .asDriver(onErrorJustReturn: [])
+            .asObservable()
+            .subscribe(onNext: { [weak binder = bindResult.binder] (models: [NM]) in
+                binder?.sectionCellModels[section] = models
+                binder?.sectionCellViewModels[section] = models.map(mapToViewModel)
+                binder?.reload(section: section)
+            }).disposed(by: bindResult.binder.disposeBag)
+        
+        return TableViewModelViewModelSingleSectionBinder<NC, Base.S, NM>(binder: bindResult.binder, section: bindResult.section, mapToViewModel: mapToViewModel)
     }
 }
 

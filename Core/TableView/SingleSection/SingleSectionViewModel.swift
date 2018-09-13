@@ -70,25 +70,25 @@ public class TableViewViewModelSingleSectionBinder<C: UITableViewCell & ViewMode
     }
     
     @discardableResult
-    override public func footerHeight(_ handler: @escaping () -> CGFloat) -> TableViewViewModelSingleSectionBinder<C, S, M> {
+    override public func footerHeight(_ handler: @escaping () -> CGFloat) -> TableViewViewModelSingleSectionBinder<C, S> {
         super.footerHeight(handler)
         return self
     }
     
     @discardableResult
-    override public func estimatedFooterHeight(_ handler: @escaping () -> CGFloat) -> TableViewViewModelSingleSectionBinder<C, S, M> {
+    override public func estimatedFooterHeight(_ handler: @escaping () -> CGFloat) -> TableViewViewModelSingleSectionBinder<C, S> {
         super.estimatedFooterHeight(handler)
         return self
     }
     
     @discardableResult
-    override public func headerHeight(_ handler: @escaping () -> CGFloat) -> TableViewViewModelSingleSectionBinder<C, S, M> {
+    override public func headerHeight(_ handler: @escaping () -> CGFloat) -> TableViewViewModelSingleSectionBinder<C, S> {
         super.headerHeight(handler)
         return self
     }
     
     @discardableResult
-    override public func estimatedHeaderHeight(_ handler: @escaping () -> CGFloat) -> TableViewViewModelSingleSectionBinder<C, S, M> {
+    override public func estimatedHeaderHeight(_ handler: @escaping () -> CGFloat) -> TableViewViewModelSingleSectionBinder<C, S> {
         super.estimatedHeaderHeight(handler)
         return self
     }
