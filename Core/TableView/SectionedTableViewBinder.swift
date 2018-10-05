@@ -179,22 +179,28 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
 #endif
     }
     
-    /// Reloads the specified section.
-    public func reload(section: S) {
+    /**
+     Reloads the specified section with the given animation.
+     - parameter section: The section to reload.
+     - parameter animation: The row animation to use to reload the section.
+    */
+    public func reload(section: S, withAnimation animation: UITableViewRowAnimation = .automatic) {
         guard self.hasFinishedBinding else { return }
-//        self.tableView.reloadData()
         if let sectionToReloadIndex = self.displayedSections.index(of: section) {
             let startIndex = self.displayedSections.startIndex
             let sectionInt = startIndex.distance(to: sectionToReloadIndex)
             let indexSet: IndexSet = [sectionInt]
-            self.tableView.reloadSections(indexSet, with: .none)
+            self.tableView.reloadSections(indexSet, with: animation)
         }
     }
     
-    /// Reloads the specified sections.
-    public func reload(sections: [S]) {
+    /**
+     Reloads the specified sections with the given animation.
+     - parameter sections: An array specifying the sections to reload.
+     - parameter animation: The row animation to use to reload the sections.
+    */
+    public func reload(sections: [S], withAnimation animation: UITableViewRowAnimation = .automatic) {
         guard self.hasFinishedBinding else { return }
-//        self.tableView.reloadData()
         var indexSet: IndexSet = []
         for section in sections {
             if let sectionToReloadIndex = self.displayedSections.index(of: section) {
@@ -204,12 +210,18 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
             }
         }
         if !indexSet.isEmpty {
-            self.tableView.reloadSections(indexSet, with: .none)
+            self.tableView.reloadSections(indexSet, with: animation)
         }
     }
 
     /**
      Declares a section to begin binding handlers to.
+     
+     This method is used to begin a binding chain. It does so by returning a 'section binder' - an object that exposes
+     methods like `bind(cellType:models:)` or `onTapped(_:)` - that will, using the section given to this method, bind
+     various handlers to events involving the section.
+     - parameter section: The section to begin binding handlers to.
+     - returns: A 'section binder' object used to begin binding handlers to the given section.
      */
     public func onSection(_ section: S) -> TableViewInitialSingleSectionBinder<S> {
         guard !self.hasFinishedBinding else {
@@ -219,7 +231,13 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     }
     
     /**
-     Declares sections to begin binding handlers to.
+     Declares multiple sections to begin binding shared handlers to.
+     
+     This method is used to begin a binding chain. It does so by returning a 'section binder' - an object that exposes
+     methods like `bind(cellType:models:)` or `onTapped(_:)` - that will, using the sections given to this method, bind
+     various handlers to events involving the sections.
+     - parameter section: An array of sections to begin binding common handlers to.
+     - returns: A 'mulit-section binder' object used to begin binding handlers to the given sections.
      */
     public func onSections(_ sections: [S]) -> TableViewInitialMutliSectionBinder<S> {
         guard !self.hasFinishedBinding else {
