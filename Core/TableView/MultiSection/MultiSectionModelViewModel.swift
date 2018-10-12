@@ -11,13 +11,10 @@ public class TableViewModelViewModelMultiSectionBinder<C: UITableViewCell & View
     
     public func createUpdateCallback() -> ([S: [M]]) -> Void {
         return { (models: [S: [M]]) in
-            var _sections: [S] = []
             for (section, sectionModels) in models {
-                _sections.append(section)
                 self.binder.nextDataModel.sectionCellModels[section] = sectionModels
                 self.binder.nextDataModel.sectionCellViewModels[section] = sectionModels.map(self.mapToViewModelFunc)
             }
-            self.binder.reload(sections: _sections)
         }
     }
     

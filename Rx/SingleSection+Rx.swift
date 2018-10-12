@@ -25,7 +25,6 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
             .asObservable()
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [NC.ViewModel]) in
                 binder?.nextDataModel.sectionCellViewModels[section] = viewModels
-                binder?.reload(section: section)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return TableViewViewModelSingleSectionBinder<NC, Base.S>(binder: bindResult.binder, section: bindResult.section)
