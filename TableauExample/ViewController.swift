@@ -82,14 +82,14 @@ class ViewController: UIViewController {
         }).disposed(by: self.disposeBag)
         
         
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(2)) {
-            self.binder.displayedSections = [.other, .checking]
-        }
+//        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(2)) {
+//            self.binder.displayedSections = [.other, .checking]
+//        }
     }
 
     private func getAccountsFromServer() -> Observable<[Account]> {
         return Observable.create({ observer in
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(1)) {
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(3)) {
                 observer.onNext([
                     Account(accountName: "Every Day Checking", accountNumber: "123***123", balance: 2305.82, type: .checking),
                     Account(accountName: "US Checking", accountNumber: "321***123", balance: 2305.82, type: .checking),

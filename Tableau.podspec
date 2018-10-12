@@ -14,10 +14,11 @@ Pod::Spec.new do |s|
   s.swift_version    = '4.2'
 
   s.ios.deployment_target = '8.0'
+  s.dependency 'Differ', '~> 1.3'
   s.default_subspec = "Core"
 
   s.subspec "Core" do |ss|
-    ss.source_files = 'Core/Protocols/', 'Core/TableView/', 'Core/TableView/SingleSection', 'Core/TableView/MultiSection'
+    ss.source_files = 'Core/', 'Core/Protocols/', 'Core/TableView/', 'Core/TableView/SingleSection', 'Core/TableView/MultiSection'
     ss.ios.framework = "UIKit"
   end
 

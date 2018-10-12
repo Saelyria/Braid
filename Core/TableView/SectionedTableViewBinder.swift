@@ -184,7 +184,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      - parameter section: The section to reload.
      - parameter animation: The row animation to use to reload the section.
     */
-    public func reload(section: S, withAnimation animation: UITableViewRowAnimation = .automatic) {
+    public func reload(section: S, withAnimation animation: UITableView.RowAnimation = .automatic) {
         guard self.hasFinishedBinding else { return }
         if let sectionToReloadIndex = self.displayedSections.index(of: section) {
             let startIndex = self.displayedSections.startIndex
@@ -199,7 +199,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      - parameter sections: An array specifying the sections to reload.
      - parameter animation: The row animation to use to reload the sections.
     */
-    public func reload(sections: [S], withAnimation animation: UITableViewRowAnimation = .automatic) {
+    public func reload(sections: [S], withAnimation animation: UITableView.RowAnimation = .automatic) {
         guard self.hasFinishedBinding else { return }
         var indexSet: IndexSet = []
         for section in sections {

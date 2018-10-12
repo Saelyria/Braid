@@ -18,8 +18,8 @@ class HomeViewController: UIViewController {
             TitleDetailTableViewCell.ViewModel(title: "3", subtitle: "", detail: "")
         ],
         .bills: [
-            TitleDetailTableViewCell.ViewModel(title: "4", subtitle: "", detail: ""),
-            TitleDetailTableViewCell.ViewModel(title: "5", subtitle: "", detail: "")
+            TitleDetailTableViewCell.ViewModel(title: "3", subtitle: "", detail: ""),
+            TitleDetailTableViewCell.ViewModel(title: "1", subtitle: "", detail: "")
         ],
         .info: [
             TitleDetailTableViewCell.ViewModel(title: "6", subtitle: "", detail: "")
