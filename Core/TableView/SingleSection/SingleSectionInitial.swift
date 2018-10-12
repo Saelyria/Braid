@@ -23,7 +23,7 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTable
     public func bind<NC>(cellType: NC.Type, viewModels: [NC.ViewModel]) -> TableViewViewModelSingleSectionBinder<NC, S>
     where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
         TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: self.section)
-        self.binder.sectionCellViewModels[self.section] = viewModels
+        self.binder.nextDataModel.sectionCellViewModels[self.section] = viewModels
         
         return TableViewViewModelSingleSectionBinder<NC, S>(binder: self.binder, section: self.section)
     }
@@ -51,8 +51,8 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTable
     -> TableViewModelViewModelSingleSectionBinder<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
         TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: self.section)
         
-        self.binder.sectionCellModels[self.section] = models
-        self.binder.sectionCellViewModels[self.section] = models.map(mapToViewModel)
+        self.binder.nextDataModel.sectionCellModels[self.section] = models
+        self.binder.nextDataModel.sectionCellViewModels[self.section] = models.map(mapToViewModel)
         
         return TableViewModelViewModelSingleSectionBinder<NC, S, NM>(binder: self.binder, section: self.section, mapToViewModel: mapToViewModel)
     }
@@ -76,7 +76,7 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTable
     public func bind<NC, NM>(cellType: NC.Type, models: [NM]) -> TableViewModelSingleSectionBinder<NC, S, NM>
     where NC: UITableViewCell & ReuseIdentifiable {
         TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: self.section)
-        self.binder.sectionCellModels[self.section] = models
+        self.binder.nextDataModel.sectionCellModels[self.section] = models
         
         return TableViewModelSingleSectionBinder<NC, S, NM>(binder: self.binder, section: self.section)
     }
@@ -93,7 +93,7 @@ internal extension TableViewInitialSingleSectionBinder {
         let cellDequeueBlock: CellDequeueBlock = { [weak binder = binder] (tableView, indexPath) in
             if let section = binder?.displayedSections[indexPath.section],
             var cell = binder?.tableView.dequeueReusableCell(withIdentifier: NC.reuseIdentifier, for: indexPath) as? NC,
-            let viewModel = (binder?.sectionCellViewModels[section] as? [NC.ViewModel])?[indexPath.row] {
+            let viewModel = (binder?.currentDataModel.sectionCellViewModels[section] as? [NC.ViewModel])?[indexPath.row] {
                 cell.viewModel = viewModel
                 binder?.sectionCellDequeuedCallbacks[section]?(indexPath.row, cell)
                 return cell

@@ -24,7 +24,7 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
     public func bind<NC>(cellType: NC.Type, viewModels: [S: [NC.ViewModel]])
     -> TableViewViewModelMultiSectionBinder<NC, S> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
         for section in self.sections {
-            self.binder.sectionCellViewModels[section] = viewModels[section] ?? []
+            self.binder.nextDataModel.sectionCellViewModels[section] = viewModels[section] ?? []
             TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: section)
         }
         
@@ -53,13 +53,13 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
     */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [S: [NM]], mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-    -> TableViewModelViewModelMultiSectionBinder<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
+    -> TableViewModelViewModelMultiSectionBinder<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Identifiable {
         for section in self.sections {
             let sectionModels: [NM] = models[section] ?? []
             let sectionViewModels: [NC.ViewModel] = sectionModels.map(mapToViewModel)
             TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: section)
-            self.binder.sectionCellModels[section] = sectionModels
-            self.binder.sectionCellViewModels[section] = sectionViewModels
+            self.binder.nextDataModel.sectionCellModels[section] = sectionModels
+            self.binder.nextDataModel.sectionCellViewModels[section] = sectionViewModels
         }
         
         return TableViewModelViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections, mapToViewModel: mapToViewModel)
@@ -84,11 +84,11 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
     */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [S: [NM]]) -> TableViewModelMultiSectionBinder<NC, S, NM>
-    where NC: UITableViewCell & ReuseIdentifiable {
+    where NC: UITableViewCell & ReuseIdentifiable, NM: Identifiable {
         for section in self.sections {
             let sectionModels: [NM] = models[section] ?? []
             TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: section)
-            self.binder.sectionCellModels[section] = sectionModels
+            self.binder.nextDataModel.sectionCellModels[section] = sectionModels
         }
         
         return TableViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections)

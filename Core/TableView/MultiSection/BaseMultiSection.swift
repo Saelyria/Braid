@@ -37,7 +37,7 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
             if viewModels[section] != nil {
                 BaseTableViewSingleSectionBinder<C, S>.addHeaderFooterDequeueBlock(type: headerType, binder: self.binder, section: section, isHeader: true)
             }
-            self.binder.sectionHeaderViewModels[section] = viewModels[section]
+            self.binder.nextDataModel.sectionHeaderViewModels[section] = viewModels[section]
         }
         return self
     }
@@ -55,7 +55,7 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
     @discardableResult
     public func headerTitles(_ titles: [S: String]) -> BaseTableViewMutliSectionBinder<C, S> {
         for section in self.sections {
-            self.binder.sectionHeaderTitles[section] = titles[section]
+            self.binder.nextDataModel.sectionHeaderTitles[section] = titles[section]
         }
         return self
     }
@@ -78,7 +78,7 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
                 if viewModels[section] != nil {
                     BaseTableViewSingleSectionBinder<C, S>.addHeaderFooterDequeueBlock(type: footerType, binder: self.binder, section: section, isHeader: false)
                 }
-                self.binder.sectionFooterViewModels[section] = viewModels[section]
+                self.binder.nextDataModel.sectionFooterViewModels[section] = viewModels[section]
             }
             return self
     }
@@ -96,7 +96,7 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
     @discardableResult
     public func footerTitles(_ titles: [S: String]) -> BaseTableViewMutliSectionBinder<C, S> {
         for section in self.sections {
-            self.binder.sectionFooterTitles[section] = titles[section]
+            self.binder.nextDataModel.sectionFooterTitles[section] = titles[section]
         }
         return self
     }

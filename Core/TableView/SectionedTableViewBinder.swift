@@ -1,4 +1,5 @@
 import UIKit
+import Differ
 #if RX_TABLEAU
 import RxSwift
 #endif
@@ -110,8 +111,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
             self.displayedSectionsSubject.onNext(self.displayedSections)
 #endif
             guard self.hasFinishedBinding else { return }
-            // TODO: create diff and reload affected sections
-            self.tableView.reloadData()
+            self.nextDataModel.displayedSections = self.displayedSections
         }
     }
     
@@ -129,17 +129,13 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     
     // Blocks to call to dequeue a cell in a section.
     var sectionCellDequeueBlocks: [S: CellDequeueBlock] = [:]
-    // The view models for the cells for a section.
-    var sectionCellViewModels: [S: [Any]] = [:]
-    // The raw models for the cells for a section.
-    var sectionCellModels: [S: [Any]] = [:]
+    // Blocks to call to get the height for a cell in a section.
+    var sectionCellHeightBlocks: [S: CellHeightBlock] = [:]
+    // Blocks to call to get the estimated height for a cell in a section.
+    var sectionEstimatedCellHeightBlocks: [S: CellHeightBlock] = [:]
     
     // Blocks to call to dequeue a header in a section.
     var sectionHeaderDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
-    // The view models for the headers for a section.
-    var sectionHeaderViewModels: [S: Any] = [:]
-    // Titles for the headers for a section.
-    var sectionHeaderTitles: [S: String] = [:]
     // Blocks to call to get the height for a section header.
     var sectionHeaderHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
     // Blocks to call to get the estimated height for a section header.
@@ -147,10 +143,6 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     
     // Blocks to call to dequeue a footer in a section.
     var sectionFooterDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
-    // The view models for the footers for a section.
-    var sectionFooterViewModels: [S: Any] = [:]
-    // Titles for the footers for a section.
-    var sectionFooterTitles: [S: String] = [:]
     // Blocks to call to get the height for a section footer.
     var sectionFooterHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
     // Blocks to call to get the estimated height for a section footer.
@@ -160,11 +152,16 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     var sectionCellTappedCallbacks: [S: CellTapCallback] = [:]
     // Callback blocks to call when a cell is dequeued in a section.
     var sectionCellDequeuedCallbacks: [S: CellDequeueCallback] = [:]
-    // Blocks to call to get the height for a cell in a section.
-    var sectionCellHeightBlocks: [S: CellHeightBlock] = [:]
-    // Blocks to call to get the estimated height for a cell in a section.
-    var sectionEstimatedCellHeightBlocks: [S: CellHeightBlock] = [:]
     
+    private(set) var currentDataModel: TableViewDataModel<S>!
+    var nextDataModel: TableViewDataModel<S> = TableViewDataModel<S>() {
+        didSet {
+            DispatchQueue.main.async {
+                self.applyBatchedUpdates()
+            }
+        }
+    }
+
     // TODO: this is currently not working; the casting of 'allCases' is weird
     //    public convenience init<S>(tableView: UITableView, sectionedBy sectionEnum: S.Type) where S: CaseIterable {
     //        self.init(tableView: tableView, sectionedBy: sectionEnum, displayedSections: S.allCases as! [S])
@@ -280,6 +277,11 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         self.tableView.delegate = self.tableViewDataSourceDelegate
         self.tableView.dataSource = self.tableViewDataSourceDelegate
         self.tableView.reloadData()
+    }
+    
+    private func applyBatchedUpdates() {
+        guard self.hasFinishedBinding else { return }
+        
     }
 }
 

@@ -4,7 +4,7 @@ import UIKit
  A section binder for a section whose cells were setup to be dequeued with an array of an arbitrary 'model' type,
  mapped to the cell's 'view model' type with a given mapping function.
  */
-public class TableViewModelViewModelSingleSectionBinder<C, S: TableViewSection, M>: BaseTableViewSingleSectionBinder<C, S>, TableViewSingleSectionBinderProtocol
+public class TableViewModelViewModelSingleSectionBinder<C, S: TableViewSection, M: Identifiable>: BaseTableViewSingleSectionBinder<C, S>, TableViewSingleSectionBinderProtocol
 where C: UITableViewCell & ViewModelBindable {    
     private let mapToViewModelFunc: (M) -> C.ViewModel
     
@@ -22,9 +22,8 @@ where C: UITableViewCell & ViewModelBindable {
     */
     public func createUpdateCallback() -> ([M]) -> Void {
         return { (models: [M]) in
-            self.binder.sectionCellModels[self.section] = models
-            self.binder.sectionCellViewModels[self.section] = models.map(self.mapToViewModelFunc)
-            self.binder.reload(section: self.section)
+            self.binder.nextDataModel.sectionCellModels[self.section] = models
+            self.binder.nextDataModel.sectionCellViewModels[self.section] = models.map(self.mapToViewModelFunc)
         }
     }
     
@@ -47,7 +46,7 @@ where C: UITableViewCell & ViewModelBindable {
     public func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C, _ model: M) -> Void) -> TableViewModelViewModelSingleSectionBinder<C, S, M> {
         let section = self.section
         let tappedHandler: CellTapCallback = {  [weak binder = self.binder] (row, cell) in
-            guard let cell = cell as? C, let model = binder?.sectionCellModels[section]?[row] as? M else {
+            guard let cell = cell as? C, let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
                 assertionFailure("ERROR: Cell or model wasn't the right type; something went awry!")
                 return
             }
@@ -75,7 +74,7 @@ where C: UITableViewCell & ViewModelBindable {
     public func onCellDequeue(_ handler: @escaping (_ row: Int, _ dequeuedCell: C, _ model: M) -> Void) -> TableViewModelViewModelSingleSectionBinder<C, S, M> {
         let section = self.section
         let dequeueCallback: CellDequeueCallback = { [weak binder = self.binder] row, cell in
-            guard let cell = cell as? C, let model = binder?.sectionCellModels[section]?[row] as? M else {
+            guard let cell = cell as? C, let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
                 assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
                 return
             }
