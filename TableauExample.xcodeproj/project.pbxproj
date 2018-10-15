@@ -399,6 +399,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = HE8Y2NA5B5;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = TableauExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

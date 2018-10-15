@@ -113,6 +113,7 @@
 		938132F520B6469F00CBF8F6 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				ABB96356217192E900519963 /* Diffing */,
 				9381333A20B6EC5600CBF8F6 /* Protocols */,
 				9381333F20B6EC5600CBF8F6 /* TableView */,
 				93C36A4B20DB209F006B7ECF /* CollectionView */,
@@ -158,6 +159,13 @@
 			children = (
 			);
 			path = CollectionView;
+			sourceTree = "<group>";
+		};
+		ABB96356217192E900519963 /* Diffing */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Diffing;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

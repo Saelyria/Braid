@@ -3,7 +3,7 @@ import Tableau
 import RxSwift
 import RxCocoa
 
-struct Account {
+struct Account: Identifiable {
     enum AccountType {
         case checking
         case savings
@@ -13,6 +13,8 @@ struct Account {
     let accountNumber: String
     let balance: Double
     let type: AccountType
+    
+    var id: String { return self.accountNumber }
 }
 
 class ViewController: UIViewController {
@@ -82,9 +84,9 @@ class ViewController: UIViewController {
         }).disposed(by: self.disposeBag)
         
         
-//        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(2)) {
-//            self.binder.displayedSections = [.other, .checking]
-//        }
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(6)) {
+            self.binder.displayedSections = [.checking]
+        }
     }
 
     private func getAccountsFromServer() -> Observable<[Account]> {

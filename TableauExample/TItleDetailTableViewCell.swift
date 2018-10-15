@@ -3,10 +3,12 @@ import Tableau
 import RxSwift
 
 final class TitleDetailTableViewCell: UITableViewCell, ReuseIdentifiable, ViewModelBindable, UINibInitable {
-    struct ViewModel {
+    struct ViewModel: Identifiable {
         let title: String
         let subtitle: String
         let detail: String
+        
+        var id: String { return self.title }
     }
     
     @IBOutlet private weak var titleLabel: UILabel!

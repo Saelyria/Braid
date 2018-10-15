@@ -110,7 +110,6 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
 #if RX_TABLEAU
             self.displayedSectionsSubject.onNext(self.displayedSections)
 #endif
-            guard self.hasFinishedBinding else { return }
             self.nextDataModel.displayedSections = self.displayedSections
         }
     }
@@ -119,6 +118,11 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     public private(set) var hasFinishedBinding: Bool = false
     /// The table view this binder performs binding for.
     public private(set) var tableView: UITableView!
+    
+    public var rowDeletionAnimation: UITableView.RowAnimation = .automatic
+    public var rowInsertionAnimation: UITableView.RowAnimation = .automatic
+    public var sectionDeletionAnimation: UITableView.RowAnimation = .automatic
+    public var sectionInsertionAnimation: UITableView.RowAnimation = .automatic
 
 #if RX_TABLEAU
     let disposeBag = DisposeBag()
@@ -153,14 +157,10 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     // Callback blocks to call when a cell is dequeued in a section.
     var sectionCellDequeuedCallbacks: [S: CellDequeueCallback] = [:]
     
-    private(set) var currentDataModel: TableViewDataModel<S>!
-    var nextDataModel: TableViewDataModel<S> = TableViewDataModel<S>() {
-        didSet {
-            DispatchQueue.main.async {
-                self.applyBatchedUpdates()
-            }
-        }
-    }
+    private(set) var currentDataModel = TableViewDataModel<S>()
+    var nextDataModel = TableViewDataModel<S>()
+    
+    private var hasRefreshQueued: Bool = false
 
     // TODO: this is currently not working; the casting of 'allCases' is weird
     //    public convenience init<S>(tableView: UITableView, sectionedBy sectionEnum: S.Type) where S: CaseIterable {
@@ -171,6 +171,8 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     public init(tableView: UITableView, sectionedBy sectionEnum: S.Type, displayedSections: [S]) {
         self.tableView = tableView
         self.displayedSections = displayedSections
+        self.nextDataModel.displayedSections = displayedSections
+        self.nextDataModel.delegate = self
 #if RX_TABLEAU
         self.displayedSectionsSubject.onNext(self.displayedSections)
 #endif
@@ -274,14 +276,35 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
             self.tableViewDataSourceDelegate = _TableViewDataSourceDelegate<S, Void>(binder: self)
         }
         
+        self.currentDataModel = self.nextDataModel
+        self.nextDataModel = TableViewDataModel<S>()
+        self.nextDataModel.delegate = self
         self.tableView.delegate = self.tableViewDataSourceDelegate
         self.tableView.dataSource = self.tableViewDataSourceDelegate
         self.tableView.reloadData()
     }
-    
-    private func applyBatchedUpdates() {
-        guard self.hasFinishedBinding else { return }
+}
+
+extension SectionedTableViewBinder: TableViewDataModelDelegate {
+    func dataModelDidChange() {
+        guard self.hasFinishedBinding, !self.hasRefreshQueued else { return }
         
+        self.hasRefreshQueued = true
+        DispatchQueue.main.async {
+            self.tableView.animateRowAndSectionChanges(
+                oldData: self.currentDataModel.asSectionModels(),
+                newData: self.nextDataModel.asSectionModels(),
+                isEqualSection: { $0.section == $1.section },
+                isEqualElement: { $0.id == $1.id },
+                rowDeletionAnimation: self.rowDeletionAnimation,
+                rowInsertionAnimation: self.rowInsertionAnimation,
+                sectionDeletionAnimation: self.sectionDeletionAnimation,
+                sectionInsertionAnimation: self.sectionInsertionAnimation)
+            self.currentDataModel = self.nextDataModel
+            self.nextDataModel = TableViewDataModel<S>()
+            self.nextDataModel.delegate = self
+            self.hasRefreshQueued = false
+        }
     }
 }
 
