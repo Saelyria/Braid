@@ -172,7 +172,6 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         self.tableView = tableView
         self.displayedSections = displayedSections
         self.nextDataModel.displayedSections = displayedSections
-        self.nextDataModel.delegate = self
 #if RX_TABLEAU
         self.displayedSectionsSubject.onNext(self.displayedSections)
 #endif
@@ -277,7 +276,8 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         }
         
         self.currentDataModel = self.nextDataModel
-        self.nextDataModel = TableViewDataModel<S>()
+        self.currentDataModel.delegate = nil
+        self.nextDataModel = TableViewDataModel<S>(from: self.currentDataModel)
         self.nextDataModel.delegate = self
         self.tableView.delegate = self.tableViewDataSourceDelegate
         self.tableView.dataSource = self.tableViewDataSourceDelegate
@@ -291,18 +291,24 @@ extension SectionedTableViewBinder: TableViewDataModelDelegate {
         
         self.hasRefreshQueued = true
         DispatchQueue.main.async {
+            let current = self.currentDataModel.asSectionModels()
+            let next = self.nextDataModel.asSectionModels()
+            
+            self.currentDataModel = self.nextDataModel
+            self.currentDataModel.delegate = nil
+            self.nextDataModel = TableViewDataModel<S>(from: self.currentDataModel)
+            self.nextDataModel.delegate = self
+            
             self.tableView.animateRowAndSectionChanges(
-                oldData: self.currentDataModel.asSectionModels(),
-                newData: self.nextDataModel.asSectionModels(),
+                oldData: current,
+                newData: next,
                 isEqualSection: { $0.section == $1.section },
                 isEqualElement: { $0.id == $1.id },
                 rowDeletionAnimation: self.rowDeletionAnimation,
                 rowInsertionAnimation: self.rowInsertionAnimation,
                 sectionDeletionAnimation: self.sectionDeletionAnimation,
                 sectionInsertionAnimation: self.sectionInsertionAnimation)
-            self.currentDataModel = self.nextDataModel
-            self.nextDataModel = TableViewDataModel<S>()
-            self.nextDataModel.delegate = self
+            
             self.hasRefreshQueued = false
         }
     }

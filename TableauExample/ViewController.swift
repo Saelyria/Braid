@@ -66,6 +66,16 @@ class ViewController: UIViewController {
             ])
             .estimatedCellHeight { _, _ in return 44 }
         
+        self.binder.onSection(.savings)
+            .onTapped { (_, _) in
+                self.binder.displayedSections = [.savings, .checking]
+            }
+        
+        self.binder.onSection(.checking)
+            .onTapped { (_, _) in
+                self.binder.displayedSections = [.savings, .other, .checking]
+            }
+        
         // bind the 'other' section
         self.binder.onSection(.other)
             .rx.bind(cellType: TitleDetailTableViewCell.self, models: self.checkingAccounts.asObservable(), mapToViewModelsWith: { account in
@@ -74,6 +84,9 @@ class ViewController: UIViewController {
             })
             .headerTitle("OTHER")
             .estimatedCellHeight { _ in return 44 }
+            .onTapped { (_, _) in
+                self.binder.displayedSections = [.checking, .savings, .other]
+            }
         
         self.binder.finish()
         
@@ -82,11 +95,6 @@ class ViewController: UIViewController {
             self.savingsAccounts.value = accounts
             self.checkingAccounts.value = accounts
         }).disposed(by: self.disposeBag)
-        
-        
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(6)) {
-            self.binder.displayedSections = [.checking]
-        }
     }
 
     private func getAccountsFromServer() -> Observable<[Account]> {

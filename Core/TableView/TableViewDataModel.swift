@@ -77,6 +77,18 @@ internal class TableViewDataModel<S: TableViewSection> {
     
     weak var delegate: TableViewDataModelDelegate?
     
+    init() { }
+    
+    init(from other: TableViewDataModel<S>) {
+        self.displayedSections = other.displayedSections
+        self.sectionCellViewModels = other.sectionCellViewModels
+        self.sectionCellModels = other.sectionCellModels
+        self.sectionHeaderViewModels = other.sectionHeaderViewModels
+        self.sectionHeaderTitles = other.sectionHeaderTitles
+        self.sectionFooterViewModels = other.sectionFooterViewModels
+        self.sectionFooterTitles = other.sectionFooterTitles
+    }
+    
     func asSectionModels() -> [SectionModel] {
         return self.displayedSections.map { (section) -> SectionModel in
             return SectionModel(section: section, items: self.sectionCellViewModels[section] ?? self.sectionCellModels[section] ?? [])
