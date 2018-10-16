@@ -37,8 +37,6 @@ class ViewController: UIViewController {
 
         // create and setup table view
         self.tableView = UITableView(frame: self.view.frame, style: .grouped)
-        self.tableView.tableFooterView = UIView()
-        self.tableView.tableHeaderView = UIView(frame: CGRect(origin: .zero, size: CGSize(width: self.view.frame.width, height: CGFloat.leastNormalMagnitude)))
         self.tableView.register(SectionHeaderView.self)
         self.tableView.register(TitleDetailTableViewCell.self)
         self.view.addSubview(self.tableView)
