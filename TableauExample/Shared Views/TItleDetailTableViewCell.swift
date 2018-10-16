@@ -11,10 +11,6 @@ final class TitleDetailTableViewCell: UITableViewCell, ReuseIdentifiable, ViewMo
         var id: String { return self.title }
     }
     
-    @IBOutlet private weak var titleLabel: UILabel!
-    @IBOutlet private weak var subtitleLabel: UILabel!
-    @IBOutlet private weak var detailLabel: UILabel!
-    
     var viewModel: TitleDetailTableViewCell.ViewModel? {
         didSet {
             self.titleLabel.text = self.viewModel?.title
@@ -22,4 +18,8 @@ final class TitleDetailTableViewCell: UITableViewCell, ReuseIdentifiable, ViewMo
             self.detailLabel.text = self.viewModel?.detail
         }
     }
+    
+    @IBOutlet private weak var titleLabel: UILabel!
+    @IBOutlet private weak var subtitleLabel: UILabel!
+    @IBOutlet private weak var detailLabel: UILabel!
 }
