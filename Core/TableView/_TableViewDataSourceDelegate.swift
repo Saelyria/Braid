@@ -30,9 +30,9 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection, EstimatedHeigh
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let section = self.binder.displayedSections[section]
-        if let models = self.binder.sectionCellModels[section] {
+        if let models = self.binder.currentDataModel.sectionCellModels[section] {
             return models.count
-        } else if let viewModels = self.binder.sectionCellViewModels[section] {
+        } else if let viewModels = self.binder.currentDataModel.sectionCellViewModels[section] {
             return viewModels.count
         } else {
             return 0
@@ -44,7 +44,7 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection, EstimatedHeigh
         if self.binder.sectionHeaderDequeueBlocks[section] != nil {
             return nil
         }
-        return self.binder.sectionHeaderTitles[section]
+        return self.binder.currentDataModel.sectionHeaderTitles[section]
     }
     
     func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
@@ -52,7 +52,7 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection, EstimatedHeigh
         if self.binder.sectionFooterDequeueBlocks[section] != nil {
             return nil
         }
-        return self.binder.sectionFooterTitles[section]
+        return self.binder.currentDataModel.sectionFooterTitles[section]
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

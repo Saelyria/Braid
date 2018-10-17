@@ -14,8 +14,7 @@ public class TableViewViewModelSingleSectionBinder<C: UITableViewCell & ViewMode
      */
     public func createUpdateCallback() -> (_ viewModels: [C.ViewModel]) -> Void {
         return { (viewModels: [C.ViewModel]) in
-            self.binder.sectionCellViewModels[self.section] = viewModels
-            self.binder.reload(section: self.section)
+            self.binder.nextDataModel.sectionCellViewModels[self.section] = viewModels
         }
     }
     

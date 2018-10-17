@@ -4,27 +4,28 @@ import UIKit
  A throwaway object created when a table view binder's `onSections(_:)` method is called. This object declares a number
  of methodss that take a binding handler and give it to the original table view binder to store for callback.
  */
-public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSection, M>: BaseTableViewMutliSectionBinder<C, S>, TableViewMutliSectionBinderProtocol {
+public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSection, M: Identifiable>: BaseTableViewMutliSectionBinder<C, S>, TableViewMutliSectionBinderProtocol {
     internal var sectionBindResults: [S: TableViewModelSingleSectionBinder<C, S, M>] = [:]
     
     public func createUpdateCallback() -> ([S: [M]]) -> Void {
         return { (models: [S: [M]]) in
-            var _sections: [S] = []
             for (section, sectionModels) in models {
-                _sections.append(section)
-                self.binder.sectionCellModels[section] = sectionModels
+                self.binder.nextDataModel.sectionCellModels[section] = sectionModels
             }
-            self.binder.reload(sections: _sections)
         }
     }
     
     @discardableResult
     public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C, _ model: M) -> Void) -> TableViewModelMultiSectionBinder<C, S, M> {
         for section in self.sections {
-            let bindResult = self.bindResult(for: section)
-            bindResult.onTapped({ row, cell, model in
+            let tappedHandler: CellTapCallback = {  [weak binder = self.binder] (row, cell) in
+                guard let cell = cell as? C, let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
+                    assertionFailure("ERROR: Cell or model wasn't the right type; something went awry!")
+                    return
+                }
                 handler(section, row, cell, model)
-            })
+            }
+            self.binder.sectionCellTappedCallbacks[section] = tappedHandler
         }
         return self
     }
@@ -32,10 +33,15 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     @discardableResult
     public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C, _ model: M) -> Void) -> TableViewModelMultiSectionBinder<C, S, M> {
         for section in self.sections {
-            let bindResult = self.bindResult(for: section)
-            bindResult.onCellDequeue({ row, cell, model in
+            let dequeueCallback: CellDequeueCallback = { [weak binder = self.binder] row, cell in
+                guard let cell = cell as? C, let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
+                    assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
+                    return
+                }
                 handler(section, row, cell, model)
-            })
+            }
+            
+            self.binder.sectionCellDequeuedCallbacks[section] = dequeueCallback
         }
         return self
     }
@@ -112,17 +118,5 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     public override func estimatedFooterHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> TableViewModelMultiSectionBinder<C, S, M> {
         super.estimatedFooterHeight(handler)
         return self
-    }
-}
-
-internal extension TableViewModelMultiSectionBinder {
-    internal func bindResult(`for` section: S) -> TableViewModelSingleSectionBinder<C, S, M> {
-        if let bindResult = self.sectionBindResults[section] {
-            return bindResult
-        } else {
-            let bindResult = TableViewModelSingleSectionBinder<C, S, M>(binder: self.binder, section: section)
-            self.sectionBindResults[section] = bindResult
-            return bindResult
-        }
     }
 }

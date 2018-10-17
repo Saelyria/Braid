@@ -1,4 +1,5 @@
 import UIKit
+import Differ
 #if RX_TABLEAU
 import RxSwift
 #endif
@@ -55,6 +56,10 @@ public class TableViewBinder {
     public func onTable() -> TableViewInitialSingleSectionBinder<_SingleSection> {
         return TableViewInitialSingleSectionBinder<_SingleSection>(binder: self._sectionBinder, section: .table)
     }
+    
+    public func finish() {
+        self._sectionBinder.finish()
+    }
 }
 
 public protocol SectionedTableViewBinderProtocol: AnyObject {
@@ -109,9 +114,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
 #if RX_TABLEAU
             self.displayedSectionsSubject.onNext(self.displayedSections)
 #endif
-            guard self.hasFinishedBinding else { return }
-            // TODO: create diff and reload affected sections
-            self.tableView.reloadData()
+            self.nextDataModel.displayedSections = self.displayedSections
         }
     }
     
@@ -119,6 +122,11 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     public private(set) var hasFinishedBinding: Bool = false
     /// The table view this binder performs binding for.
     public private(set) var tableView: UITableView!
+    
+    public var rowDeletionAnimation: UITableView.RowAnimation = .automatic
+    public var rowInsertionAnimation: UITableView.RowAnimation = .automatic
+    public var sectionDeletionAnimation: UITableView.RowAnimation = .automatic
+    public var sectionInsertionAnimation: UITableView.RowAnimation = .automatic
 
 #if RX_TABLEAU
     let disposeBag = DisposeBag()
@@ -129,17 +137,13 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     
     // Blocks to call to dequeue a cell in a section.
     var sectionCellDequeueBlocks: [S: CellDequeueBlock] = [:]
-    // The view models for the cells for a section.
-    var sectionCellViewModels: [S: [Any]] = [:]
-    // The raw models for the cells for a section.
-    var sectionCellModels: [S: [Any]] = [:]
+    // Blocks to call to get the height for a cell in a section.
+    var sectionCellHeightBlocks: [S: CellHeightBlock] = [:]
+    // Blocks to call to get the estimated height for a cell in a section.
+    var sectionEstimatedCellHeightBlocks: [S: CellHeightBlock] = [:]
     
     // Blocks to call to dequeue a header in a section.
     var sectionHeaderDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
-    // The view models for the headers for a section.
-    var sectionHeaderViewModels: [S: Any] = [:]
-    // Titles for the headers for a section.
-    var sectionHeaderTitles: [S: String] = [:]
     // Blocks to call to get the height for a section header.
     var sectionHeaderHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
     // Blocks to call to get the estimated height for a section header.
@@ -147,10 +151,6 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     
     // Blocks to call to dequeue a footer in a section.
     var sectionFooterDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
-    // The view models for the footers for a section.
-    var sectionFooterViewModels: [S: Any] = [:]
-    // Titles for the footers for a section.
-    var sectionFooterTitles: [S: String] = [:]
     // Blocks to call to get the height for a section footer.
     var sectionFooterHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
     // Blocks to call to get the estimated height for a section footer.
@@ -160,11 +160,12 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     var sectionCellTappedCallbacks: [S: CellTapCallback] = [:]
     // Callback blocks to call when a cell is dequeued in a section.
     var sectionCellDequeuedCallbacks: [S: CellDequeueCallback] = [:]
-    // Blocks to call to get the height for a cell in a section.
-    var sectionCellHeightBlocks: [S: CellHeightBlock] = [:]
-    // Blocks to call to get the estimated height for a cell in a section.
-    var sectionEstimatedCellHeightBlocks: [S: CellHeightBlock] = [:]
     
+    private(set) var currentDataModel = TableViewDataModel<S>()
+    var nextDataModel = TableViewDataModel<S>()
+    
+    private var hasRefreshQueued: Bool = false
+
     // TODO: this is currently not working; the casting of 'allCases' is weird
     //    public convenience init<S>(tableView: UITableView, sectionedBy sectionEnum: S.Type) where S: CaseIterable {
     //        self.init(tableView: tableView, sectionedBy: sectionEnum, displayedSections: S.allCases as! [S])
@@ -174,6 +175,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     public init(tableView: UITableView, sectionedBy sectionEnum: S.Type, displayedSections: [S]) {
         self.tableView = tableView
         self.displayedSections = displayedSections
+        self.nextDataModel.displayedSections = displayedSections
 #if RX_TABLEAU
         self.displayedSectionsSubject.onNext(self.displayedSections)
 #endif
@@ -184,7 +186,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      - parameter section: The section to reload.
      - parameter animation: The row animation to use to reload the section.
     */
-    public func reload(section: S, withAnimation animation: UITableViewRowAnimation = .automatic) {
+    public func reload(section: S, withAnimation animation: UITableView.RowAnimation = .automatic) {
         guard self.hasFinishedBinding else { return }
         if let sectionToReloadIndex = self.displayedSections.index(of: section) {
             let startIndex = self.displayedSections.startIndex
@@ -199,7 +201,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      - parameter sections: An array specifying the sections to reload.
      - parameter animation: The row animation to use to reload the sections.
     */
-    public func reload(sections: [S], withAnimation animation: UITableViewRowAnimation = .automatic) {
+    public func reload(sections: [S], withAnimation animation: UITableView.RowAnimation = .automatic) {
         guard self.hasFinishedBinding else { return }
         var indexSet: IndexSet = []
         for section in sections {
@@ -277,9 +279,42 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
             self.tableViewDataSourceDelegate = _TableViewDataSourceDelegate<S, Void>(binder: self)
         }
         
+        self.currentDataModel = self.nextDataModel
+        self.currentDataModel.delegate = nil
+        self.nextDataModel = TableViewDataModel<S>(from: self.currentDataModel)
+        self.nextDataModel.delegate = self
         self.tableView.delegate = self.tableViewDataSourceDelegate
         self.tableView.dataSource = self.tableViewDataSourceDelegate
         self.tableView.reloadData()
+    }
+}
+
+extension SectionedTableViewBinder: TableViewDataModelDelegate {
+    func dataModelDidChange() {
+        guard self.hasFinishedBinding, !self.hasRefreshQueued else { return }
+        
+        self.hasRefreshQueued = true
+        DispatchQueue.main.async {
+            let current = self.currentDataModel.asSectionModels()
+            let next = self.nextDataModel.asSectionModels()
+            
+            self.currentDataModel = self.nextDataModel
+            self.currentDataModel.delegate = nil
+            self.nextDataModel = TableViewDataModel<S>(from: self.currentDataModel)
+            self.nextDataModel.delegate = self
+            
+            self.tableView.animateRowAndSectionChanges(
+                oldData: current,
+                newData: next,
+                isEqualSection: { $0.section == $1.section },
+                isEqualElement: { $0.id == $1.id },
+                rowDeletionAnimation: self.rowDeletionAnimation,
+                rowInsertionAnimation: self.rowInsertionAnimation,
+                sectionDeletionAnimation: self.sectionDeletionAnimation,
+                sectionInsertionAnimation: self.sectionInsertionAnimation)
+            
+            self.hasRefreshQueued = false
+        }
     }
 }
 

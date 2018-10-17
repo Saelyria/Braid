@@ -14,4 +14,3 @@ public extension ReuseIdentifiable {
         return String(describing: Self.self)
     }
 }
-
