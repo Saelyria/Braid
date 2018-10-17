@@ -13,16 +13,41 @@ var models: [MyModel] = ...
 let binder = TableViewBinder(tableView: self.tableView)
 binder.onTable()
     .bind(cellType: MyCell.self, models: models)
-    .onCellDequeue { (row: Int, cell: MyCell, model: MyModel)
+    .onCellDequeue { (row: Int, cell: MyCell, model: MyModel) in
         // setup the 'cell' with the 'model'
     }
-    .onTapped { (row: Int, cell: MyCell, model: MyModel)
+    .onTapped { (row: Int, cell: MyCell, model: MyModel) in
         // e.g. go to a detail view controller with the 'model'
     }
 binder.finish()
 ```
 
 Easy! Just from this example, you can see how your normal data source / delegate methods are shortened into a much more legible phrase. This can be read as *"Okay binder, on the entire table, bind the `MyCell` cell type based on the model objects from the given array. Whenever a cell is dequeued, give me the model object it was dequeued for and let me configure the cell. Whenever a cell is tapped, I want this to happen."* Everything is type safe and you don't need to map rows to model array indexes.
+
+Sectioned table views in Tableau are easy too. Here's what a static table view with three sections looks like using a 'section' enum:
+```swift
+// MyViewController.swift
+
+enum Section: TableViewSection {
+    case firstSection
+    case secondSection
+    case thirdSection
+}
+
+let binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
+binder.onSection(.firstSection)
+    .bind(cellType: MyCell.self, models: [...])
+    ...
+    
+binder.onSections(.secondSection, .thirdSection)
+    .bind(cellType: MyOtherCell.self, models: [
+        .secondSection: [...],
+        .thirdSection: [...]
+    ])
+    ...
+binder.finish()
+```
+Adding handlers for 'on dequeue', 'on tap', and others is done the same way, with that handler being called for the sections being bound.
 
 ## Updating tables
 
@@ -49,16 +74,15 @@ var models: Observable<[MyModel]> = ...
 let binder = TableViewBinder(tableView: self.tableView)
 binder.onTable()
     .rx.bind(cellType: MyCell.self, models: models)
-    .onCellDequeue { (row: Int, cell: MyCell, model: MyModel)
+    .onCellDequeue { (row: Int, cell: MyCell, model: MyModel) in
         // setup the 'cell' with the 'model'
     }
-    .onTapped { (row: Int, cell: MyCell, model: MyModel)
+    .onTapped { (row: Int, cell: MyCell, model: MyModel) in
         // e.g. go to a detail view controller with the 'model'
     }
 binder.finish()
 ```
-
-Here, the 'table view binder' object will subscribe to changes to the `models` observable array and auto-update the table.
+Here, the 'table view binder' object will subscribe to changes to the `models` observable array and auto-update the table. In either case, Tableau will batch all changes made to all data bound to its table view and animate the changes, including insertion, deletion, and movement between sections.
 
 ## Getting a little more advanced
 
@@ -79,7 +103,8 @@ let savingsAccounts: Observable<[Account]> = ...
 let investingAccounts: Observable<[InvestingAccount]> = ...
 let bannerViewModel: BannerCell.ViewModel = ...
 
-let binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
+// start off the binder with no displayed sections to start
+let binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self, displayedSections: [])
 
 binder.onSection(.banner)
     .bind(cellType: BannerCell.self, viewModels: [bannerViewModel])
@@ -116,6 +141,13 @@ binder.onAllSections()
     }
     
 binder.finish()
+
+// once binding setup is done, make a request to get the accounts
+MyService.getAccounts().subscribe(onNext: { accounts in 
+    // fire off the different observables (checkingAccounts, savingsAccounts, etc), then figure out
+    // which sections to display and simply update the 'displayedSections' property on the binder
+    self.binder.dislayedSections = [...]
+})
 ```
 
 While that's pretty dense, it's still pretty legible as it is, and reads a lot like our given requirements. This is read something like *"First, create a sectioned table binder whose sections are cases of the `Section` enum. Then, in the 'banner' section, bind the `BannerCell` type with the given banner view model. Next, for both the 'checking' and 'savings' sections, bind the `AccountCell` cell type based on these model arrays. Set the section titles for these sections to these strings. Whenever a cell is dequeued, run this block of code. Whenever a cell is tapped, run this other block of code. Now, on just the 'investing' section, bind the `InvestingCell` cell type with the models from this array, running these code blocks when cells are dequeued or tapped. Finally, on any section, run this other code block whenever a cell is tapped."*
@@ -125,6 +157,7 @@ While this example is pretty self-explanatory in many ways, to give it a bit mor
 - Supports different model types for different sections of your table view with the ability to batch similar sections in one binding chain
 - Ability to add multiple handlers for some events like 'on tapped'
 - You're always dealing with the type you want - sections are returned as cases of your 'section' enum and cells/models are of the type you give
+- You can dynamically update which sections are displayed, and Tableau will automatically generate the diff and animate changes to your model on your table
 
 ## Using view models
 
@@ -151,7 +184,7 @@ Your binding chain can then either be passed in an array of view models as seen 
 ```swift
 let models: [MyModel] = ...
 let modelToViewModel = { (model: MyModel) -> MyCell.ViewModel in
-    // create a view model for `MyCell` from the model and return
+    // create a view model for `MyCell` from the model and return it
 }
 
 binder.onSection(.someSection)
@@ -161,11 +194,11 @@ The binder will then take care of setting the `viewModel` property of your cells
 
 That's not all, though. Tableau has a number of other features:
 - Easily hot swap or reload sections by changing the binder's `displayedSections` property
-- Easier cell registration and dequeuing using the `UINibInitable` and `ReuseIdentifiable` protocols
+- Easier cell registration and dequeuing using  `UINibInitable` and `ReuseIdentifiable` protocols
 - Support for static sections via an enum or dynamic sections via a section model struct you define
 - Type safe updating of cells in a section via callback closures created during binding
 - RxSwift support for updating sections from `Observable` arrays for truly declarative setup
-- Automatic diffing between updates to the table's underlying models (coming soon!)
+- Automatic diffing between updates to the table's underlying models
 - `UICollectionView` and `UIPickerView` support (coming soon!)
 
 ## Installation
@@ -176,10 +209,14 @@ Tableau (will be) available through [CocoaPods](http://cocoapods.org). To instal
 pod 'Tableau'
 ```
 
-## Author
+## Contributors
 
-Aaron Bosnjak (aaron.bosnjak707@gmail.com)
+Aaron Bosnjak (email: aaron.bosnjak707@gmail.com, Twitter: @aaron_bosnjak)
+
+## Acknowledgement
+
+Tableau uses Tony Arnold's super-awesome [Differ](https://github.com/tonyarnold/Differ) library to do its diffing work. If you like Tableau, make sure to give that repo a star as well!
 
 ## License
 
-Tableau is available under the MIT license. See the LICENSE file for more info.
+Tableau is available under the MIT license, so do pretty much anything you want with it. As always, see the LICENSE file for more info.
