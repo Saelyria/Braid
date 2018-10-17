@@ -56,6 +56,10 @@ public class TableViewBinder {
     public func onTable() -> TableViewInitialSingleSectionBinder<_SingleSection> {
         return TableViewInitialSingleSectionBinder<_SingleSection>(binder: self._sectionBinder, section: .table)
     }
+    
+    public func finish() {
+        self._sectionBinder.finish()
+    }
 }
 
 public protocol SectionedTableViewBinderProtocol: AnyObject {

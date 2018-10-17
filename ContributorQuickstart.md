@@ -1,6 +1,6 @@
 # Contributor Quickstart Guide
 
-*shameless foreword - this document is as much for myself to remember how everything works as for contributors.*
+*Shameless foreword - this document is as much for myself to remember how everything works as for contributors.*
 
 Hey! Whether you're looking to contribute or just want to know how Tableau works under the hood, this file's the right place to start. I like to 
 think the code is easy enough to understand on its own, but I'm sure there's a bunch of stuff there that's a little mucky. Diving into this code is 
@@ -8,8 +8,9 @@ also a dive into some pretty tricky stuff about Swift's generics system, so if y
 keyword, that'd be a good place to start before continuing. It's super interesting stuff and Swift has a *very* powerful generics system, so it's 
 worth taking a bit to get comfortable with it. Barring that, let's get started!
 
-To start off, there are three main object types that perform specific roles in the table binding process:
+To start off, there are four main object types that perform specific roles in the table binding process:
 - The 'data source/delegate'
+- The 'table data model'
 - The 'table binder'
 - The 'section binders'
 
@@ -22,13 +23,25 @@ The easiest one of those three to understand is the 'data source/delegate' objec
 `UITableViewDataSource` and `UITableViewDelegate`. It gets its data and callback closures from its 'table binder' object. Its concrete 
 class type is `_TableViewDataSourceDelegate`. That's pretty much it.
 
+## The 'table data model'
+This object is the collection of view models/models/title strings/etc. that represents a 'data state' of a table view. Its properties are a serires of
+dictionaries and arrays that stores the data the table view displays. Table data models are used to create with the Differ library that Tableau 
+has as a CocoaPods dependency to animate changes in data on the table view. The concrete class for this object type is the 
+`TableViewDataModel`.
+
 ## The 'table binder'
 
 Next is the 'table binder' object, whose concrete class is `SectionedTableViewBinder`. This is a generic class (its generic type `S` is the 
 section enum type the binder was setup with) that holds a reference to the underlying table view and the 'data source/delegate' object. Most
-importantly, this object has a number of dictionary objects that stores a reference to bound models/view models/callback handlers for given 
+importantly, this object has a number of dictionary objects that store references to bound models/view models/callback handlers for given 
 sections. So, for example, when the `onTapped` method is called, the closure given to this method eventually makes its way into the
-`sectionCellTappedCallbacks` dictionary under the section it's setup to handle.
+`sectionCellTappedCallbacks` dictionary under the section it's setup to handle. 
+
+The table binder also keeps a reference to two 'table data model' objects - a 'current' model (with the data the table is currently displaying) 
+and a 'next' model (a model that represents all the changes yet to be made to the table). Whenever the table is told to update changes (the 
+binder's `displayedSections` property is changed, an observable 'models' array fires, an 'update callback' is called), the changes are 
+ultimately saved into the binder's 'next' model. When the binder detects that the 'next' model has changed, it queues itself to animate the 
+changes from the 'current' to 'next' data model on the app's next render frame using the Differ library.
 
 The 'section-less' `TableViewBinder` class is also technically in this role, but it's basically a wrapper around a sectioned one that it stores as
 a property. The sectioned table binder that it stores has its `S` generic type set to the `_SingleSection` enum, which just has one case: 
@@ -47,7 +60,7 @@ This is best explained by just walking through a binding chain. To start, we cal
 mouthful of a class name `TableViewInitialSingleSectionBinder`. This is read as 'a section binder for a single section for a table view 
 who is first in the binding chain'. Phew. This section binder is the only one that has the various 'bind cell type' methods, which is where we
 get the type information from. When a cell is bound, we return a specialized section binder that 'stores' that type information and 'forwards' it
-from that point on in the chain by returning itself form its bind methods, one for each of the 'bind cell type' methods. These are:
+from that point on in the chain by returning itself from its bind methods, one for each of the 'bind cell type' methods. These are:
 
 - `TableViewModelSingleSectionBinder` - returned from the `bind(cellType:models:)` method.
 - `TableViewViewModelSingleSectionBinder` - returned from the `bind(cellType:viewModel:)` method.
