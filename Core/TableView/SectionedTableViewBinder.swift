@@ -165,14 +165,16 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     var nextDataModel = TableViewDataModel<S>()
     
     private var hasRefreshQueued: Bool = false
-
-    // TODO: this is currently not working; the casting of 'allCases' is weird
-    //    public convenience init<S>(tableView: UITableView, sectionedBy sectionEnum: S.Type) where S: CaseIterable {
-    //        self.init(tableView: tableView, sectionedBy: sectionEnum, displayedSections: S.allCases as! [S])
-    //    }
     
-    
-    public init(tableView: UITableView, sectionedBy sectionEnum: S.Type, displayedSections: [S]) {
+    /**
+     Create a new table view binder to manage the given table view whose sections are described by cases of the given
+     enum or instances of the given struct conforming to `TableViewSection`.
+     - parameter tableView: The `UITableView` that this binder manages.
+     - parameter sectionModel: The enum whose cases or struct whose instances uniquely identify sections on the table
+        view. This type must conform to the `TableViewSection` protocol.
+     - parameter displayedSections: The sections to initially display on the table view when it is first shown.
+    */
+    public init(tableView: UITableView, sectionedBy sectionModel: S.Type, displayedSections: [S]) {
         self.tableView = tableView
         self.displayedSections = displayedSections
         self.nextDataModel.displayedSections = displayedSections
@@ -286,6 +288,23 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         self.tableView.delegate = self.tableViewDataSourceDelegate
         self.tableView.dataSource = self.tableViewDataSourceDelegate
         self.tableView.reloadData()
+    }
+}
+
+public extension SectionedTableViewBinder where S: CaseIterable {
+    /**
+     Create a new table view binder to manage the given table view whose sections are described by cases of the given
+     enum. The table view will initially display all sections of the table view included in the given enum type.
+     - parameter tableView: The `UITableView` that this binder manages.
+     - parameter sectionModel: The enum whose cases uniquely identify sections on the table view. This enum must conform
+        to the `TableViewSection` protocol.
+     */
+    public convenience init(tableView: UITableView, sectionedBy sectionEnum: S.Type) {
+        var sections: [S] = []
+        for `case` in S.allCases {
+            sections.append(`case`)
+        }
+        self.init(tableView: tableView, sectionedBy: sectionEnum, displayedSections: sections)
     }
 }
 
