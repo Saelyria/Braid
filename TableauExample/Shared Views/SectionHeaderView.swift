@@ -5,11 +5,14 @@ import Tableau
  An example of how a custom table header/footer view would be implemented for use with Tableau.
  */
 class SectionHeaderView: UITableViewHeaderFooterView, ReuseIdentifiable, ViewModelBindable {
-    typealias ViewModel = String
+    struct ViewModel: Identifiable {
+        let title: String
+        var id: String { return self.title }
+    }
     
-    var viewModel: String? {
+    var viewModel: ViewModel? {
         didSet {
-            self.textLabel?.text = viewModel
+            self.textLabel?.text = viewModel?.title
         }
     }
 }

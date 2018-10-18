@@ -31,17 +31,14 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      - parameter viewModels: A dictionary where the key is a section and the value is the header view model for the
         header created for the section. This dictionary does not need to contain a view model for each section being
         bound - sections not present in the dictionary have no header view created for them. This view models dictionary
-        cannot contain entries for sections not declared as a part of the current binding chain.
+        should not contain entries for sections not declared as a part of the current binding chain.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind<H>(headerType: H.Type, viewModels: [S: H.ViewModel]) -> BaseTableViewMutliSectionBinder<C, S>
     where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
-        for section in viewModels.keys {
-            guard self.sections.contains(section) else {
-                fatalError("A header view model for a section not declared as part of this binding chain given in the 'viewModels' dictionary")
-            }
+        for section in self.sections {
             if viewModels[section] != nil {
                 BaseTableViewSingleSectionBinder<C, S>.addHeaderFooterDequeueBlock(type: headerType, binder: self.binder, section: section, isHeader: true)
             }
@@ -65,10 +62,7 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func headerTitles(_ titles: [S: String]) -> BaseTableViewMutliSectionBinder<C, S> {
-        for section in titles.keys {
-            guard self.sections.contains(section) else {
-                fatalError("A title for a section not declared as part of this binding chain given in the 'titles' dictionary")
-            }
+        for section in self.sections {
             self.binder.nextDataModel.sectionHeaderTitles[section] = titles[section]
         }
         return self
@@ -91,13 +85,8 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
     @discardableResult
     public func bind<F>(footerType: F.Type, viewModels: [S: F.ViewModel]) -> BaseTableViewMutliSectionBinder<C, S>
     where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
-        for section in viewModels.keys {
-            guard self.sections.contains(section) else {
-                fatalError("A footer view model for a section not declared as part of this binding chain given in the 'viewModels' dictionary")
-            }
-            if viewModels[section] != nil {
-                BaseTableViewSingleSectionBinder<C, S>.addHeaderFooterDequeueBlock(type: footerType, binder: self.binder, section: section, isHeader: false)
-            }
+        for section in self.sections {
+            BaseTableViewSingleSectionBinder<C, S>.addHeaderFooterDequeueBlock(type: footerType, binder: self.binder, section: section, isHeader: false)
             self.binder.nextDataModel.sectionFooterViewModels[section] = viewModels[section]
         }
         return self
@@ -118,10 +107,7 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func footerTitles(_ titles: [S: String]) -> BaseTableViewMutliSectionBinder<C, S> {
-        for section in titles.keys {
-            guard self.sections.contains(section) else {
-                fatalError("A footer title for a section not declared as part of this binding chain given in the 'titles' dictionary")
-            }
+        for section in self.sections {
             self.binder.nextDataModel.sectionFooterTitles[section] = titles[section]
         }
         return self

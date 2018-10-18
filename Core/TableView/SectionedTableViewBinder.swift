@@ -289,6 +289,10 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         return TableViewInitialMutliSectionBinder<S>(binder: self, sections: [], isForAllSections: true)
     }
     
+    public func onSections(passing check: (S) -> Bool) {
+        
+    }
+    
     /**
      Tells that binder that all setup binding has been completed.
      

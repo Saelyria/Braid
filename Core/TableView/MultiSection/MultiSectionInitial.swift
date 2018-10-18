@@ -20,12 +20,9 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
     @discardableResult
     public func bind<NC>(cellType: NC.Type, viewModels: [S: [NC.ViewModel]])
     -> TableViewViewModelMultiSectionBinder<NC, S> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
-        for section in viewModels.keys {
-            guard self.sections.contains(section) else {
-                fatalError("A view model for a section not declared as part of this binding chain given in the 'viewModels' dictionary")
-            }
-            self.binder.nextDataModel.sectionCellViewModels[section] = viewModels[section] ?? []
+        for section in self.sections {
             TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: section)
+            self.binder.nextDataModel.sectionCellViewModels[section] = viewModels[section]
         }
         
         return TableViewViewModelMultiSectionBinder<NC, S>(binder: self.binder, sections: self.sections, isForAllSections: self.isForAllSections)
@@ -51,13 +48,10 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [S: [NM]], mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
     -> TableViewModelViewModelMultiSectionBinder<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Identifiable {
-        for section in models.keys {
-            guard self.sections.contains(section) else {
-                fatalError("A model for a section not declared as part of this binding chain given in the 'viewModels' dictionary")
-            }
-            let sectionModels: [NM] = models[section] ?? []
-            let sectionViewModels: [NC.ViewModel] = sectionModels.map(mapToViewModel)
+        for section in self.sections {
             TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: section)
+            let sectionModels: [NM]? = models[section]
+            let sectionViewModels: [NC.ViewModel]? = sectionModels?.map(mapToViewModel)
             self.binder.nextDataModel.sectionCellModels[section] = sectionModels
             self.binder.nextDataModel.sectionCellViewModels[section] = sectionViewModels
         }
@@ -82,12 +76,9 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [S: [NM]]) -> TableViewModelMultiSectionBinder<NC, S, NM>
     where NC: UITableViewCell & ReuseIdentifiable, NM: Identifiable {
-        for section in models.keys {
-            guard self.sections.contains(section) else {
-                fatalError("A model for a section not declared as part of this binding chain given in the 'viewModels' dictionary")
-            }
-            let sectionModels: [NM] = models[section] ?? []
+        for section in self.sections {
             TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: section)
+            let sectionModels: [NM]? = models[section]
             self.binder.nextDataModel.sectionCellModels[section] = sectionModels
         }
         

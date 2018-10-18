@@ -27,10 +27,10 @@ class AccountsViewController: UIViewController {
     private var tableView: UITableView!
     // A reference to binders must be kept for binding to work.
     private var binder: SectionedTableViewBinder<Section>!
-
-    private let savingsAccounts = BehaviorRelay<[Account]>(value: [])
-    private let checkingAccounts = BehaviorRelay<[Account]>(value: [])
-    private let otherAccounts = BehaviorRelay<[Account]>(value: [])
+    
+    // This is effectively the 'data source' for the table view. This property is observed by the binder, which will
+    // update the data for its sections based on the dictionary returned from this.
+    private let accountsForSections = BehaviorRelay<[Section: [Account]]>(value: [:])
     
     private let disposeBag = DisposeBag()
 
@@ -71,22 +71,19 @@ class AccountsViewController: UIViewController {
             .bind(cellType: CenterLabelTableViewCell.self, viewModels: [
                 "This is a sample view controller demonstrating how to use an enum for the cases in a table view. Tap the 'Refresh' button to cycle through different combinations."])
         
-        // Bind the 'checking', 'savings', and 'other' sections. When we bind multiple sections, we provide a dictionary
-        // for the models/view models where the key is each section being bound and the value is the Observable models
-        // to be observed for that section. Here we use an Observable array of Account objects, so we also provide a
-        // function the binder can use to turn Account objects into TitleDetailTableViewCell ViewModels.
+        // Bind the 'checking', 'savings', and 'other' sections. When we bind multiple sections, we provide an
+        // Observable dictionary for the models/view models where the key is each section being bound and the value is
+        // the models for that section. 'TitleDetailTableViewCell' is view model compatible, so we also provide a 'map
+        // to view model' function that the binder uses to turn our 'Account' arrays into cell view model objects.
         self.binder.onSections([.checking, .savings, .other])
             .rx.bind(cellType: TitleDetailTableViewCell.self,
-                     models: [
-                        .checking: self.checkingAccounts.asObservable(),
-                        .savings: self.savingsAccounts.asObservable(),
-                        .other: self.otherAccounts.asObservable()],
+                     models: self.accountsForSections.asObservable(),
                      mapToViewModelsWith: { (account: Account) in return account.asTitleDetailCellViewModel() })
-            // Next, we bind a custom header class and an dictionary of view models for it just like for cells.
+            // Next, we bind a custom header class and a dictionary of view models for it just like for cells.
             .bind(headerType: SectionHeaderView.self, viewModels: [
-                .checking: "CHECKING",
-                .savings: "SAVINGS",
-                .other: "OTHER"])
+                .checking: SectionHeaderView.ViewModel(title: "CHECKING"),
+                .savings: SectionHeaderView.ViewModel(title: "SAVINGS"),
+                .other: SectionHeaderView.ViewModel(title: "OTHER")])
             // For footers, we'll just use the default footer view. Note that for the dictionaries we provide for cells,
             // headers, and footers, we only need to provide data for the sections we care about - we only want a footer
             // for the 'other' section, so we only need to include that section in the dictionary.
@@ -127,9 +124,7 @@ class AccountsViewController: UIViewController {
         var displayedSections: [Section] = [.message]
         displayedSections.append(contentsOf: Array(accounts.keys))
         self.binder.displayedSections = displayedSections.sorted(by: { $0.rawValue < $1.rawValue })
-        self.savingsAccounts.accept(accounts[.savings] ?? [])
-        self.checkingAccounts.accept(accounts[.checking] ?? [])
-        self.otherAccounts.accept(accounts[.other] ?? [])
+        self.accountsForSections.accept(accounts)
     }
 }
 
