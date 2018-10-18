@@ -26,6 +26,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
      
      Note that this `onTapped` variation with the raw model object is only available if the `bind(cellType:models:)`
      method was used to bind the cell type to the section.
+     
      - parameter handler: The closure to be called whenever a cell is tapped in the bound section.
      - parameter row: The row of the cell that was tapped.
      - parameter tappedCell: The cell that was tapped.
@@ -54,6 +55,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
      model object that the cell was dequeued to represent. The cell will be cast to the cell type bound to the section
      if this method is called in a chain after the `bind(cellType:viewModels:)` method. This method can be used to
      perform any additional configuration of the cell.
+     
      - parameter handler: The closure to be called whenever a cell is dequeued in the bound section.
      - parameter row: The row of the cell that was dequeued.
      - parameter dequeuedCell: The cell that was dequeued that can now be configured.

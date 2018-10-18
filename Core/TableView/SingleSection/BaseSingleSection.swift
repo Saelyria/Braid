@@ -29,6 +29,7 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      
      Use this method to use a custom `UITableViewHeaderFooterView` subclass for the section header with a table view
      binder. The view must conform to `ViewModelBindable` and `ReuseIdentifiable` to be compatible.
+     
      - parameter headerType: The class of the header to bind.
      - parameter viewModel: The view model to bind to the section's header when it is dequeued.
      - returns: A section binder to continue the binding chain with.
@@ -48,6 +49,7 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      
      This method will provide the given title as the title for the iOS native section headers. If you have bound a custom
      header type to the table view using the `bind(headerType:viewModel:)` method, this method will do nothing.
+     
      - parameter title: The title to use for the section's header.
      - returns: A section binder to continue the binding chain with.
      */
@@ -62,6 +64,7 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      
      Use this method to use a custom `UITableViewHeaderFooterView` subclass for the section footer with a table view
      binder. The view must conform to `ViewModelBindable` and `ReuseIdentifiable` to be compatible.
+     
      - parameter footerType: The class of the footer to bind.
      - parameter viewModel: The view model to bind to the section's footer when it is dequeued.
      - returns: A section binder to continue the binding chain with.
@@ -80,6 +83,7 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      
      This method will provide the given title as the title for the iOS native section footers. If you have bound a custom
      footer type to the table view using the `bind(footerType:viewModel:)` method, this method will do nothing.
+     
      - parameter title: The title to use for the section's footer.
      - returns: A section binder to continue the binding chain with.
      */
@@ -95,6 +99,7 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      The given handler is called whenever a cell in the section is dequeued, passing in the row and the dequeued cell.
      The cell will be safely cast to the cell type bound to the section if this method is called in a chain after the
      `bind(cellType:viewModels:)` method. This method can be used to perform any additional configuration of the cell.
+     
      - parameter handler: The closure to be called whenever a cell is dequeued in the bound section.
      - parameter row: The row of the cell that was dequeued.
      - parameter dequeuedCell: The cell that was dequeued that can now be configured.
@@ -120,6 +125,7 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      The given handler is called whenever a cell in the section is tapped, passing in the row and cell that was tapped.
      The cell will be safely cast to the cell type bound to the section if this method is called in a chain after the
      `bind(cellType:viewModels:)` method.
+     
      - parameter handler: The closure to be called whenever a cell is tapped in the bound section.
      - parameter row: The row of the cell that was tapped.
      - parameter tappedCell: The cell that was tapped.
@@ -144,6 +150,7 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      
      The given handler is called whenever the section reloads for each visible row, passing in the row the handler
      should provide the height for.
+     
      - parameter handler: The closure to be called that will return the height for cells in the section.
      - parameter row: The row of the cell to provide the height for.
      - returns: A section binder to continue the binding chain with.
@@ -159,6 +166,7 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      
      The given handler is called whenever the section reloads for each visible row, passing in the row the handler
      should provide the estimated height for.
+     
      - parameter handler: The closure to be called that will return the estimated height for cells in the section.
      - parameter row: The row of the cell to provide the estimated height for.
      - returns: A section binder to continue the binding chain with.
@@ -171,6 +179,7 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
     
     /**
      Adds a callback handler to provide the height for the section header in the declared section.
+     
      - parameter handler: The closure to be called that will return the height for the section header.
      - returns: A section binder to continue the binding chain with.
      */
@@ -182,6 +191,7 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
     
     /**
      Adds a callback handler to provide the estimated height for the section header in the declared section.
+     
      - parameter handler: The closure to be called that will return the estimated height for the section header.
      - returns: A section binder to continue the binding chain with.
      */
@@ -193,6 +203,7 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
     
     /**
      Adds a callback handler to provide the height for the section footer in the declared section.
+     
      - parameter handler: The closure to be called that will return the height for the section footer.
      - returns: A section binder to continue the binding chain with.
      */
@@ -204,6 +215,7 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
     
     /**
      Adds a callback handler to provide the estimated height for the section footer in the declared section.
+     
      - parameter handler: The closure to be called that will return the estimated height for the section footer.
      - returns: A section binder to continue the binding chain with.
      */

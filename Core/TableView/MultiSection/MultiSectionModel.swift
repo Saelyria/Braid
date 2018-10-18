@@ -2,7 +2,7 @@ import UIKit
 
 /**
  A throwaway object created when a table view binder's `onSections(_:)` method is called. This object declares a number
- of methodss that take a binding handler and give it to the original table view binder to store for callback.
+ of methods that take a binding handler and give it to the original table view binder to store for callback.
  */
 public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSection, M: Identifiable>: BaseTableViewMutliSectionBinder<C, S>, TableViewMutliSectionBinderProtocol {
     internal var sectionBindResults: [S: TableViewModelSingleSectionBinder<C, S, M>] = [:]

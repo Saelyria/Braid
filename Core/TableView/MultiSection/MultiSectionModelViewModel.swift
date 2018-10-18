@@ -4,9 +4,9 @@ public class TableViewModelViewModelMultiSectionBinder<C: UITableViewCell & View
     private let mapToViewModelFunc: (M) -> C.ViewModel
     internal var sectionBindResults: [S: TableViewModelViewModelSingleSectionBinder<C, S, M>] = [:]
     
-    init(binder: SectionedTableViewBinder<S>, sections: [S], mapToViewModel: @escaping (M) -> C.ViewModel) {
+    init(binder: SectionedTableViewBinder<S>, sections: [S], mapToViewModel: @escaping (M) -> C.ViewModel, isForAllSections: Bool) {
         self.mapToViewModelFunc = mapToViewModel
-        super.init(binder: binder, sections: sections)
+        super.init(binder: binder, sections: sections, isForAllSections: isForAllSections)
     }
     
     public func createUpdateCallback() -> ([S: [M]]) -> Void {
