@@ -16,7 +16,7 @@ import RxCocoa
  */
 class AccountsViewController: UIViewController {
     // An enum corresponding to the sections able to be shown on the table view.
-    enum Section: Int, TableViewSection {
+    enum Section: Int, TableViewSection, CaseIterable {
         case message
         case checking
         case savings

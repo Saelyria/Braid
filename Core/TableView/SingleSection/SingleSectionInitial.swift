@@ -40,7 +40,7 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTable
      */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [NM], mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-    -> TableViewModelViewModelSingleSectionBinder<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
+    -> TableViewModelViewModelSingleSectionBinder<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Identifiable {
         TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: self.section)
         
         self.binder.nextDataModel.sectionCellModels[self.section] = models
@@ -67,7 +67,7 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTable
      */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [NM]) -> TableViewModelSingleSectionBinder<NC, S, NM>
-    where NC: UITableViewCell & ReuseIdentifiable {
+    where NC: UITableViewCell & ReuseIdentifiable, NM: Identifiable {
         TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: self.section)
         self.binder.nextDataModel.sectionCellModels[self.section] = models
         

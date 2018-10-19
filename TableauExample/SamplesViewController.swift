@@ -1,7 +1,7 @@
 import UIKit
 import Tableau
 
-class HomeViewController: UIViewController {
+class SamplesViewController: UIViewController {
     private var tableView: UITableView!
     private var binder: TableViewBinder!
     

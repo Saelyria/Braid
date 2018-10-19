@@ -13,9 +13,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
         guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
-        
-        // Add a dequeue block for each section being bound. This is only ever done once, so it can't be done in the
-        // subscription below.
+
         for section in bindResult.sections {
             TableViewInitialSingleSectionBinder<Base.S>.addDequeueBlock(cellType: cellType, binder: bindResult.binder, section: section)
         }
@@ -24,9 +22,8 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
             .asDriver(onErrorJustReturn: [:])
             .asObservable()
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [Base.S: [NC.ViewModel]]) in
-                for section in bindResult.sections {
-                    binder?.nextDataModel.sectionCellViewModels[section] = viewModels[section]
-                }
+                guard let binder = binder else { return }
+                TableViewInitialMutliSectionBinder<Base.S>.updateNextModelForAllSections(binder: binder, models: nil, viewModels: viewModels)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return TableViewViewModelMultiSectionBinder<NC, Base.S>(binder: bindResult.binder, sections: bindResult.sections, isForAllSections: bindResult.isForAllSections)
@@ -38,7 +35,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
      */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: Observable<[Base.S: [NM]]>, mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-    -> TableViewModelViewModelMultiSectionBinder<NC, Base.S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
+    -> TableViewModelViewModelMultiSectionBinder<NC, Base.S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Identifiable {
         guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
@@ -51,11 +48,13 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
             .asDriver(onErrorJustReturn: [:])
             .asObservable()
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [Base.S: [NM]]) in
-                for section in bindResult.sections {
-                    let models: [NM]? = models[section]
-                    binder?.nextDataModel.sectionCellModels[section] = models
-                    binder?.nextDataModel.sectionCellViewModels[section] = models?.map(mapToViewModel)
+                guard let binder = binder else { return }
+                
+                var viewModels: [Base.S: [Identifiable]] = [:]
+                for (s, m) in models {
+                    viewModels[s] = m.map(mapToViewModel)
                 }
+                TableViewInitialMutliSectionBinder<Base.S>.updateNextModelForAllSections(binder: binder, models: models, viewModels: viewModels)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return TableViewModelViewModelMultiSectionBinder<NC, Base.S, NM>(binder: bindResult.binder,
@@ -87,9 +86,8 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
             .asDriver(onErrorJustReturn: [:])
             .asObservable()
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [Base.S: [NM]]) in
-                for section in bindResult.sections {
-                    binder?.nextDataModel.sectionCellModels[section] = models[section]
-                }
+                guard let binder = binder else { return }
+                TableViewInitialMutliSectionBinder<Base.S>.updateNextModelForAllSections(binder: binder, models: models, viewModels: nil)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return TableViewModelMultiSectionBinder<NC, Base.S, NM>(

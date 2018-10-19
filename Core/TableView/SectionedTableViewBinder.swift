@@ -6,8 +6,14 @@ import RxSwift
 
 /**
  A protocol describing an enum whose cases or a struct whose instances correspond to sections in a table view.
- */
-public protocol TableViewSection: Hashable { }
+*/
+public protocol TableViewSection: Hashable, Identifiable { }
+
+public extension TableViewSection {
+    public var id: String {
+        return String(self.hashValue)
+    }
+}
 
 /**
  An object that dequeues and binds data to cells in sections for a given table view.
@@ -135,7 +141,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
 
 #if RX_TABLEAU
     let disposeBag = DisposeBag()
-    let displayedSectionsSubject = BehaviorSubject<[S]>(value: [])
+    let displayedSectionsSubject = BehaviorSubject<[S]>(value: [])    
 #endif
 
     private var tableViewDataSourceDelegate: (UITableViewDataSource & UITableViewDelegate)?
@@ -244,6 +250,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
+        self.nextDataModel.uniquelyBoundSections.append(section)
         return TableViewInitialSingleSectionBinder<S>(binder: self, section: section)
     }
     
@@ -265,6 +272,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         guard sections.isEmpty == false else {
             fatalError("The given 'sections' array to begin a binding chain was empty.")
         }
+        self.nextDataModel.uniquelyBoundSections.append(contentsOf: sections)
         return TableViewInitialMutliSectionBinder<S>(binder: self, sections: sections, isForAllSections: false)
     }
     
@@ -287,10 +295,6 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
         return TableViewInitialMutliSectionBinder<S>(binder: self, sections: [], isForAllSections: true)
-    }
-    
-    public func onSections(passing check: (S) -> Bool) {
-        
     }
     
     /**
@@ -390,7 +394,7 @@ extension SectionedTableViewBinder: TableViewDataModelDelegate {
 }
 
 /// An internal section enum used by a `TableViewBinder`.
-public enum _SingleSection: TableViewSection {
+public enum _SingleSection: TableViewSection, CaseIterable {
     case table
 }
 
