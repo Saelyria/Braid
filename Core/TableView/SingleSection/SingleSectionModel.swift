@@ -12,8 +12,8 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
      update the displayed cells in the section to match the given array.
     */
     public func createUpdateCallback() -> ([M]) -> Void {
-        return { (models: [M]) in
-            self.binder.nextDataModel.sectionCellModels[self.section] = models
+        return { [weak binder = self.binder, section = self.section] (models: [M]) in
+            binder?.updateCellModels([section: models], viewModels: nil, sections: [section])
         }
     }
     

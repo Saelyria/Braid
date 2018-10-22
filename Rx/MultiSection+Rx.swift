@@ -13,27 +13,18 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
         guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
-
-        // Add a dequeue block for the sections being bound, or stored as the 'all sections' dequeue block if we're
-        // binding 'all sections' in this chain.
-        if bindResult.isForAllSections {
-            TableViewInitialSingleSectionBinder<Base.S>.addDequeueBlock(cellType: cellType, binder: bindResult.binder, section: nil, isForAllSections: bindResult.isForAllSections)
-        } else {
-            for section in bindResult.sections {
-                TableViewInitialSingleSectionBinder<Base.S>.addDequeueBlock(cellType: cellType, binder: bindResult.binder, section: section, isForAllSections: bindResult.isForAllSections)
-            }
-        }
+        let sections = bindResult.sections
         
-        // Observe the view models for updates, updating the binder's 'next model' view models array when they update.
+        bindResult.binder.addCellDequeueBlock(cellType: cellType, sections: sections)
+        
         viewModels
             .asDriver(onErrorJustReturn: [:])
             .asObservable()
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [Base.S: [NC.ViewModel]]) in
-                guard let binder = binder else { return }
-                TableViewInitialMutliSectionBinder<Base.S>.updateNextCellsForAllSections(binder: binder, models: nil, viewModels: viewModels)
+                binder?.updateCellModels(nil, viewModels: viewModels, sections: sections)
             }).disposed(by: bindResult.binder.disposeBag)
         
-        return TableViewViewModelMultiSectionBinder<NC, Base.S>(binder: bindResult.binder, sections: bindResult.sections, isForAllSections: bindResult.isForAllSections)
+        return TableViewViewModelMultiSectionBinder<NC, Base.S>(binder: bindResult.binder, sections: sections)
     }
     
     /**
@@ -46,34 +37,23 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
         guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
+        let sections = bindResult.sections
         
-        // Add a dequeue block for the sections being bound, or stored as the 'all sections' dequeue block if we're
-        // binding 'all sections' in this chain.
-        if bindResult.isForAllSections {
-            TableViewInitialSingleSectionBinder<Base.S>.addDequeueBlock(cellType: cellType, binder: bindResult.binder, section: nil, isForAllSections: bindResult.isForAllSections)
-        } else {
-            for section in bindResult.sections {
-                TableViewInitialSingleSectionBinder<Base.S>.addDequeueBlock(cellType: cellType, binder: bindResult.binder, section: section, isForAllSections: bindResult.isForAllSections)
-            }
-        }
+        bindResult.binder.addCellDequeueBlock(cellType: cellType, sections: sections)
 
-        // Observe the models for updates, updating the binder's 'next model' models and view models arrays when they
-        // update.
         models
             .asDriver(onErrorJustReturn: [:])
             .asObservable()
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [Base.S: [NM]]) in
-                guard let binder = binder else { return }
-                
                 var viewModels: [Base.S: [Identifiable]] = [:]
                 for (s, m) in models {
                     viewModels[s] = m.map(mapToViewModel)
                 }
-                TableViewInitialMutliSectionBinder<Base.S>.updateNextCellsForAllSections(binder: binder, models: models, viewModels: viewModels)
+                binder?.updateCellModels(models, viewModels: viewModels, sections: sections)
             }).disposed(by: bindResult.binder.disposeBag)
         
-        return TableViewModelViewModelMultiSectionBinder<NC, Base.S, NM>(binder: bindResult.binder,
-            sections: bindResult.sections, mapToViewModel: mapToViewModel, isForAllSections: bindResult.isForAllSections)
+        return TableViewModelViewModelMultiSectionBinder<NC, Base.S, NM>(
+            binder: bindResult.binder, sections: sections, mapToViewModel: mapToViewModel)
     }
     
     /**
@@ -92,28 +72,18 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
         guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
+        let sections = bindResult.sections
         
-        // Add a dequeue block for the sections being bound, or stored as the 'all sections' dequeue block if we're
-        // binding 'all sections' in this chain.
-        if bindResult.isForAllSections {
-            TableViewInitialSingleSectionBinder<Base.S>.addDequeueBlock(cellType: cellType, binder: bindResult.binder, section: nil, isForAllSections: bindResult.isForAllSections)
-        } else {
-            for section in bindResult.sections {
-                TableViewInitialSingleSectionBinder<Base.S>.addDequeueBlock(cellType: cellType, binder: bindResult.binder, section: section, isForAllSections: bindResult.isForAllSections)
-            }
-        }
+        bindResult.binder.addCellDequeueBlock(cellType: cellType, sections: sections)
         
-        // Observe the models for updates, updating the binder's 'next model' models array when they update.
         models
             .asDriver(onErrorJustReturn: [:])
             .asObservable()
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [Base.S: [NM]]) in
-                guard let binder = binder else { return }
-                TableViewInitialMutliSectionBinder<Base.S>.updateNextCellsForAllSections(binder: binder, models: models, viewModels: nil)
+                binder?.updateCellModels(models, viewModels: nil, sections: sections)
             }).disposed(by: bindResult.binder.disposeBag)
         
-        return TableViewModelMultiSectionBinder<NC, Base.S, NM>(
-            binder: bindResult.binder, sections: bindResult.sections, isForAllSections: bindResult.isForAllSections)
+        return TableViewModelMultiSectionBinder<NC, Base.S, NM>(binder: bindResult.binder, sections: sections)
     }
 }
 
@@ -127,27 +97,15 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         guard let bindResult = self.base as? BaseTableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
+        let sections = bindResult.sections
         
-        // Add a dequeue block for the sections being bound, or stored as the 'all sections' dequeue block if we're
-        // binding 'all sections' in this chain.
-        if bindResult.isForAllSections {
-            BaseTableViewSingleSectionBinder<Base.C, Base.S>.addHeaderFooterDequeueBlock(
-                type: headerType, binder: bindResult.binder, section: nil, isHeader: true, isForAllSections: bindResult.isForAllSections)
-        } else {
-            for section in bindResult.sections {
-                BaseTableViewSingleSectionBinder<Base.C, Base.S>.addHeaderFooterDequeueBlock(
-                    type: headerType, binder: bindResult.binder, section: section, isHeader: true, isForAllSections: bindResult.isForAllSections)
-            }
-        }
+        bindResult.binder.addHeaderDequeueBlock(headerType: headerType, sections: sections)
         
-        // Observe the view models for updates, updating the binder's 'next model' view models when they update.
         viewModels
             .asDriver(onErrorJustReturn: [:])
             .asObservable()
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [Base.S: H.ViewModel]) in
-                guard let binder = binder else { return }
-                BaseTableViewMutliSectionBinder<Base.C, Base.S>.updateNextHeaderFooterModelsForAllSections(
-                    binder: binder, titles: nil, viewModels: viewModels, isHeader: true)
+                binder?.updateHeaderViewModels(viewModels, sections: sections)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return self.base
@@ -157,18 +115,17 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
      Bind the given observable titles to the section's header.
      */
     @discardableResult
-    public func headerTitles(_ titles: Observable<[Base.S: String]>) -> Base {
+    public func headerTitles(_ titles: Observable<[Base.S: String?]>) -> Base {
         guard let bindResult = self.base as? BaseTableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
+        let sections = bindResult.sections
         
         titles
             .asDriver(onErrorJustReturn: [:])
             .asObservable()
-            .subscribe(onNext: { [weak binder = bindResult.binder] (titles: [Base.S: String]) in
-                guard let binder = binder else { return }
-                BaseTableViewMutliSectionBinder<Base.C, Base.S>.updateNextHeaderFooterModelsForAllSections(
-                    binder: binder, titles: titles, viewModels: nil, isHeader: true)
+            .subscribe(onNext: { [weak binder = bindResult.binder] (titles: [Base.S: String?]) in
+                binder?.updateHeaderTitles(titles, sections: sections)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return self.base
@@ -183,26 +140,15 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         guard let bindResult = self.base as? BaseTableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
-
-        // Add a dequeue block for the sections being bound, or stored as the 'all sections' dequeue block if we're
-        // binding 'all sections' in this chain.
-        if bindResult.isForAllSections {
-            BaseTableViewSingleSectionBinder<Base.C, Base.S>.addHeaderFooterDequeueBlock(
-                type: footerType, binder: bindResult.binder, section: nil, isHeader: false, isForAllSections: bindResult.isForAllSections)
-        } else {
-            for section in bindResult.sections {
-                BaseTableViewSingleSectionBinder<Base.C, Base.S>.addHeaderFooterDequeueBlock(
-                    type: footerType, binder: bindResult.binder, section: section, isHeader: false, isForAllSections: bindResult.isForAllSections)
-            }
-        }
+        let sections = bindResult.sections
+        
+        bindResult.binder.addFooterDequeueBlock(footerType: footerType, sections: sections)
         
         viewModels
             .asDriver(onErrorJustReturn: [:])
             .asObservable()
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [Base.S: F.ViewModel]) in
-                guard let binder = binder else { return }
-                BaseTableViewMutliSectionBinder<Base.C, Base.S>.updateNextHeaderFooterModelsForAllSections(
-                    binder: binder, titles: nil, viewModels: viewModels, isHeader: false)
+                binder?.updateFooterViewModels(viewModels, sections: sections)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return self.base
@@ -212,26 +158,18 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
      Bind the given observable title to the section's footer.
     */
     @discardableResult
-    public func footerTitles(_ titles: [Base.S: Observable<String?>]) -> Base {
+    public func footerTitles(_ titles: Observable<[Base.S: String?]>) -> Base {
         guard let bindResult = self.base as? BaseTableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
+        let sections = bindResult.sections
         
-        for section in bindResult.sections {
-            guard bindResult.sections.contains(section) else {
-                assertionFailure("Call to 'footerTitles(_:)' included an Observable for the section '\(section)', when the binding chain was started for the following sections: \(bindResult.sections). This is unsupported.")
-                continue
-            }
-            guard let title = titles[section] else { continue }
-            
-            title
-                .asDriver(onErrorJustReturn: nil)
-                .asObservable()
-                .distinctUntilChanged()
-                .subscribe(onNext: { [weak binder = bindResult.binder] (title: String?) in
-                    binder?.nextDataModel.sectionFooterTitles[section] = title
-                }).disposed(by: bindResult.binder.disposeBag)
-        }
+        titles
+            .asDriver(onErrorJustReturn: [:])
+            .asObservable()
+            .subscribe(onNext: { [weak binder = bindResult.binder] (titles: [Base.S: String?]) in
+                binder?.updateFooterTitles(titles, sections: sections)
+            }).disposed(by: bindResult.binder.disposeBag)
         
         return self.base
     }

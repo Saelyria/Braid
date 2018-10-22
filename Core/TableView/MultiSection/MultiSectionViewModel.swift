@@ -1,13 +1,10 @@
 import UIKit
 
 public class TableViewViewModelMultiSectionBinder<C: UITableViewCell & ViewModelBindable, S: TableViewSection>: BaseTableViewMutliSectionBinder<C, S>, TableViewMutliSectionBinderProtocol {
-    internal var sectionBindResults: [S: TableViewViewModelSingleSectionBinder<C, S>] = [:]
 
     public func createUpdateCallback() -> ([S: [C.ViewModel]]) -> Void {
-        return { (viewModels: [S: [C.ViewModel]]) in
-            for (section, sectionModels) in viewModels {
-                self.binder.nextDataModel.sectionCellViewModels[section] = sectionModels
-            }
+        return { [weak binder = self.binder, sections = self.sections] (viewModels: [S: [C.ViewModel]]) in
+            binder?.updateCellModels(nil, viewModels: viewModels, sections: sections)
         }
     }
     

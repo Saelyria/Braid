@@ -13,8 +13,8 @@ public class TableViewViewModelSingleSectionBinder<C: UITableViewCell & ViewMode
      will update the displayed cells in the section to match the given array.
      */
     public func createUpdateCallback() -> (_ viewModels: [C.ViewModel]) -> Void {
-        return { (viewModels: [C.ViewModel]) in
-            self.binder.nextDataModel.sectionCellViewModels[self.section] = viewModels
+        return { [weak binder = self.binder, section = self.section] (viewModels: [C.ViewModel]) in
+            binder?.updateCellModels(nil, viewModels: [section: viewModels], sections: [section])
         }
     }
     

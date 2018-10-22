@@ -160,26 +160,26 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     var estimatedCellHeightBlock: CellHeightBlock?
     
     // Blocks to call to dequeue a header in a section.
-    private(set) var sectionHeaderDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
+    var sectionHeaderDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
     // Blocks to call to get the height for a section header.
     var sectionHeaderHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
     // Blocks to call to get the estimated height for a section header.
     var sectionHeaderEstimatedHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
     // A block to call to dequeue a header in an unspecified section.
-    private(set) var headerDequeueBlock: HeaderFooterDequeueBlock?
+    var headerDequeueBlock: HeaderFooterDequeueBlock?
     // A block to call to get the height for a section header in an unspecified section.
     var headerHeightBlock: HeaderFooterHeightBlock?
     // A block to call to get the estimated height for a section header in an unspecified section.
     var headerEstimatedHeightBlock: HeaderFooterHeightBlock?
     
     // Blocks to call to dequeue a footer in a section.
-    private(set) var sectionFooterDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
+    var sectionFooterDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
     // Blocks to call to get the height for a section footer.
     var sectionFooterHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
     // Blocks to call to get the estimated height for a section footer.
     var sectionFooterEstimatedHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
     // A block to call to dequeue a footer in an unspecified section.
-    private(set) var footerDequeueBlock: HeaderFooterDequeueBlock?
+    var footerDequeueBlock: HeaderFooterDequeueBlock?
     // A block to call to get the height for a section footer in an unspecified section.
     var footerHeightBlock: HeaderFooterHeightBlock?
     // A block to call to get the estimated height for a section footer in an unspecified section.
@@ -295,7 +295,8 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
             fatalError("The given 'sections' array to begin a binding chain was empty.")
         }
         self.nextDataModel.uniquelyBoundSections.append(contentsOf: sections)
-        return TableViewInitialMutliSectionBinder<S>(binder: self, sections: sections, isForAllSections: false)
+        
+        return TableViewInitialMutliSectionBinder<S>(binder: self, sections: sections)
     }
     
     /**
@@ -316,7 +317,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
-        return TableViewInitialMutliSectionBinder<S>(binder: self, sections: [], isForAllSections: true)
+        return TableViewInitialMutliSectionBinder<S>(binder: self, sections: nil)
     }
     
     /**

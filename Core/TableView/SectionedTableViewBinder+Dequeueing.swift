@@ -13,11 +13,20 @@ internal extension SectionedTableViewBinder {
         sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
         `onSections` methods on the binder).
      */
-    func addCellDequeueBlock<C: UITableViewCell & ViewModelBindable & ReuseIdentifiable>(
-        cellType: C.Type,
-        sections: [S]?)
-    {
+    func addCellDequeueBlock<C>(cellType: C.Type, sections: [S]?)
+    where C: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
+        let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = self] (section, tableView, indexPath) in
+            if var cell = binder?.tableView.dequeueReusableCell(withIdentifier: C.reuseIdentifier, for: indexPath) as? C,
+            let viewModel = (binder?.currentDataModel.sectionCellViewModels[section] as? [C.ViewModel])?[indexPath.row] {
+                cell.viewModel = viewModel
+                binder?.sectionCellDequeuedCallbacks[section]?(indexPath.row, cell)
+                return cell
+            }
+            assertionFailure("ERROR: Didn't return the right cell type - something went awry!")
+            return UITableViewCell()
+        }
         
+        self.addDequeueBlock(cellDequeueBlock, sections: sections)
     }
     
     /**
@@ -29,11 +38,17 @@ internal extension SectionedTableViewBinder {
      sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
      `onSections` methods on the binder).
      */
-    func addCellDequeueBlock<C: UITableViewCell & ReuseIdentifiable>(
-        cellType: C.Type,
-        sections: [S]?)
-    {
+    func addCellDequeueBlock<C: UITableViewCell & ReuseIdentifiable>(cellType: C.Type, sections: [S]?) {
+        let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = self] (section, tableView, indexPath) in
+            if let cell = binder?.tableView.dequeueReusableCell(withIdentifier: C.reuseIdentifier, for: indexPath) as? C {
+                binder?.sectionCellDequeuedCallbacks[section]?(indexPath.row, cell)
+                return cell
+            }
+            assertionFailure("ERROR: Didn't return the right cell type - something went awry!")
+            return UITableViewCell()
+        }
         
+        self.addDequeueBlock(cellDequeueBlock, sections: sections)
     }
     
     /**
@@ -70,6 +85,21 @@ internal extension SectionedTableViewBinder {
 }
 
 private extension SectionedTableViewBinder {
+    func addDequeueBlock(_ cellDequeueBlock: @escaping CellDequeueBlock<S>, sections: [S]?) {
+        // Go over the parameters we were given and put the dequeue block in the right place on the binder
+        if let sections = sections {
+            for section in sections {
+                if self.sectionCellDequeueBlocks[section] != nil {
+                    assertionFailure("Section already has a cell type bound to it - re-binding not supported.")
+                    return
+                }
+                self.sectionCellDequeueBlocks[section] = cellDequeueBlock
+            }
+        } else {
+            self.cellDequeueBlock = cellDequeueBlock
+        }
+    }
+    
     func addHeaderOrFooterDequeueBlock<H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable>(
         type: H.Type,
         isHeader: Bool,

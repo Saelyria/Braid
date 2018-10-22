@@ -66,7 +66,7 @@ internal extension SectionedTableViewBinder {
         sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
         `onSections` methods on the binder).
      */
-    func updateHeaderTitles(_ titles: [S: String], sections: [S]?) {
+    func updateHeaderTitles(_ titles: [S: String?], sections: [S]?) {
         self.updateHeaderOrFooterTitlesOrViewModels(titles: titles, viewModels: nil, isHeader: true, sections: sections)
     }
     
@@ -79,7 +79,7 @@ internal extension SectionedTableViewBinder {
         sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
         `onSections` methods on the binder).
      */
-    func updateHeaderViewModels(_ viewModels: [S: Identifiable], sections: [S]?) {
+    func updateHeaderViewModels(_ viewModels: [S: Identifiable?], sections: [S]?) {
         self.updateHeaderOrFooterTitlesOrViewModels(titles: nil, viewModels: viewModels, isHeader: true, sections: sections)
     }
     
@@ -92,7 +92,7 @@ internal extension SectionedTableViewBinder {
         sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
         `onSections` methods on the binder).
      */
-    func updateFooterTitles(_ titles: [S: String], sections: [S]?) {
+    func updateFooterTitles(_ titles: [S: String?], sections: [S]?) {
         self.updateHeaderOrFooterTitlesOrViewModels(titles: titles, viewModels: nil, isHeader: false, sections: sections)
     }
     
@@ -105,15 +105,15 @@ internal extension SectionedTableViewBinder {
         sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
         `onSections` methods on the binder).
      */
-    func updateFooterViewModels(_ viewModels: [S: Identifiable], sections: [S]?) {
+    func updateFooterViewModels(_ viewModels: [S: Identifiable?], sections: [S]?) {
         self.updateHeaderOrFooterTitlesOrViewModels(titles: nil, viewModels: viewModels, isHeader: false, sections: sections)
     }
 }
 
 private extension SectionedTableViewBinder {
     func updateHeaderOrFooterTitlesOrViewModels(
-        titles: [S: String]?,
-        viewModels: [S: Identifiable]?,
+        titles: [S: String?]?,
+        viewModels: [S: Identifiable?]?,
         isHeader: Bool,
         sections: [S]?)
     {
@@ -122,15 +122,15 @@ private extension SectionedTableViewBinder {
             for section in sections {
                 if isHeader {
                     if let titles = titles {
-                        self.nextDataModel.sectionHeaderTitles[section] = titles[section]
+                        self.nextDataModel.sectionHeaderTitles[section] = titles[section] ?? nil
                     } else if let viewModels = viewModels {
-                        self.nextDataModel.sectionHeaderViewModels[section] = viewModels[section]
+                        self.nextDataModel.sectionHeaderViewModels[section] = viewModels[section] ?? nil
                     }
                 } else {
                     if let titles = titles {
-                        self.nextDataModel.sectionFooterTitles[section] = titles[section]
+                        self.nextDataModel.sectionFooterTitles[section] = titles[section] ?? nil
                     } else if let viewModels = viewModels {
-                        self.nextDataModel.sectionFooterViewModels[section] = viewModels[section]
+                        self.nextDataModel.sectionFooterViewModels[section] = viewModels[section] ?? nil
                     }
                 }
             }
@@ -153,7 +153,7 @@ private extension SectionedTableViewBinder {
                     sectionsToIterate.subtract(self.nextDataModel.uniquelyBoundSections)
                     for section in sectionsToIterate {
                         guard self.nextDataModel.uniquelyBoundSections.contains(section) == false else { continue }
-                        self.nextDataModel.sectionHeaderTitles[section] = titles[section]
+                        self.nextDataModel.sectionHeaderTitles[section] = titles[section] ?? nil
                     }
                 } else if let viewModels = viewModels {
                     // create a set of sections to update by adding sections already with view models to the ones being
@@ -163,7 +163,7 @@ private extension SectionedTableViewBinder {
                     sectionsToIterate.subtract(self.nextDataModel.uniquelyBoundSections)
                     for section in sectionsToIterate {
                         guard self.nextDataModel.uniquelyBoundSections.contains(section) == false else { continue }
-                        self.nextDataModel.sectionHeaderViewModels[section] = viewModels[section]
+                        self.nextDataModel.sectionHeaderViewModels[section] = viewModels[section] ?? nil
                     }
                 }
             } else {
@@ -175,7 +175,7 @@ private extension SectionedTableViewBinder {
                     sectionsToIterate.subtract(self.nextDataModel.uniquelyBoundSections)
                     for section in sectionsToIterate {
                         guard self.nextDataModel.uniquelyBoundSections.contains(section) == false else { continue }
-                        self.nextDataModel.sectionFooterTitles[section] = titles[section]
+                        self.nextDataModel.sectionFooterTitles[section] = titles[section] ?? nil
                     }
                 } else if let viewModels = viewModels {
                     // create a set of sections to update by adding sections already with titles to the ones being
@@ -185,7 +185,7 @@ private extension SectionedTableViewBinder {
                     sectionsToIterate.subtract(self.nextDataModel.uniquelyBoundSections)
                     for section in sectionsToIterate {
                         guard self.nextDataModel.uniquelyBoundSections.contains(section) == false else { continue }
-                        self.nextDataModel.sectionFooterViewModels[section] = viewModels[section]
+                        self.nextDataModel.sectionFooterViewModels[section] = viewModels[section] ?? nil
                     }
                 }
             }

@@ -18,8 +18,8 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTable
     @discardableResult
     public func bind<NC>(cellType: NC.Type, viewModels: [NC.ViewModel]) -> TableViewViewModelSingleSectionBinder<NC, S>
     where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
-        TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: self.section, isForAllSections: false)
-        self.binder.nextDataModel.sectionCellViewModels[self.section] = viewModels
+        self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
+        self.binder.updateCellModels(nil, viewModels: [self.section: viewModels], sections: [self.section])
         
         return TableViewViewModelSingleSectionBinder<NC, S>(binder: self.binder, section: self.section)
     }
@@ -41,11 +41,9 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTable
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [NM], mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
     -> TableViewModelViewModelSingleSectionBinder<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Identifiable {
-        TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: self.section, isForAllSections: false)
-        
-        self.binder.nextDataModel.sectionCellModels[self.section] = models
-        self.binder.nextDataModel.sectionCellViewModels[self.section] = models.map(mapToViewModel)
-        
+        self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
+        self.binder.updateCellModels([self.section: models], viewModels: [self.section: models.map(mapToViewModel)], sections: [self.section])
+
         return TableViewModelViewModelSingleSectionBinder<NC, S, NM>(binder: self.binder, section: self.section, mapToViewModel: mapToViewModel)
     }
     
@@ -68,71 +66,9 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTable
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [NM]) -> TableViewModelSingleSectionBinder<NC, S, NM>
     where NC: UITableViewCell & ReuseIdentifiable, NM: Identifiable {
-        TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: self.section, isForAllSections: false)
-        self.binder.nextDataModel.sectionCellModels[self.section] = models
+        self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
+        self.binder.updateCellModels([self.section: models], viewModels: nil, sections: [self.section])
         
         return TableViewModelSingleSectionBinder<NC, S, NM>(binder: self.binder, section: self.section)
     }
 }
-
-internal extension TableViewInitialSingleSectionBinder {
-    /**
-     Adds a 'cell dequeue block' to the given binder to dequeue cells of the given type that use view models. If this
-     block is being setup 'for all sections' (i.e. as a result of the `onAllSections` method), we save the dequeue block
-     to the binder's 'all sections cell dequeue block'; otherwise, we expect to be given a section to save it in the
-     binder's dictionary under.
-    */
-    internal static func addDequeueBlock<NC>(cellType: NC.Type, binder: SectionedTableViewBinder<S>, section: S?, isForAllSections: Bool)
-    where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
-        if let section = section, binder.sectionCellDequeueBlocks[section] != nil && !isForAllSections {
-            assertionFailure("Section already has a cell type bound to it - re-binding not supported.")
-            return
-        }
-        
-        let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = binder] (section, tableView, indexPath) in
-            if var cell = binder?.tableView.dequeueReusableCell(withIdentifier: NC.reuseIdentifier, for: indexPath) as? NC,
-            let viewModel = (binder?.currentDataModel.sectionCellViewModels[section] as? [NC.ViewModel])?[indexPath.row] {
-                cell.viewModel = viewModel
-                binder?.sectionCellDequeuedCallbacks[section]?(indexPath.row, cell)
-                return cell
-            }
-            assertionFailure("ERROR: Didn't return the right cell type - something went awry!")
-            return UITableViewCell()
-        }
-        if isForAllSections {
-            binder.cellDequeueBlock = cellDequeueBlock
-        } else if let section = section {
-            binder.sectionCellDequeueBlocks[section] = cellDequeueBlock
-        }
-    }
-    
-    /**
-     Adds a 'cell dequeue block' to the given binder to dequeue cells of the given type that use models. If this
-     block is being setup 'for all sections' (i.e. as a result of the `onAllSections` method), we save the dequeue block
-     to the binder's 'all sections cell dequeue block'; otherwise, we expect to be given a section to save it in the
-     binder's dictionary under.
-     */
-    internal static func addDequeueBlock<NC>(cellType: NC.Type, binder: SectionedTableViewBinder<S>, section: S?, isForAllSections: Bool)
-    where NC: UITableViewCell & ReuseIdentifiable {
-        if let section = section, binder.sectionCellDequeueBlocks[section] != nil && !isForAllSections {
-            assertionFailure("Section already has a cell type bound to it - re-binding not supported.")
-            return
-        }
-        
-        let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = binder] (section, tableView, indexPath) in
-            if let section = binder?.displayedSections[indexPath.section],
-            let cell = binder?.tableView.dequeueReusableCell(withIdentifier: NC.reuseIdentifier, for: indexPath) as? NC {
-                binder?.sectionCellDequeuedCallbacks[section]?(indexPath.row, cell)
-                return cell
-            }
-            assertionFailure("ERROR: Didn't return the right cell type - something went awry!")
-            return UITableViewCell()
-        }
-        if isForAllSections {
-            binder.cellDequeueBlock = cellDequeueBlock
-        } else if let section = section {
-            binder.sectionCellDequeueBlocks[section] = cellDequeueBlock
-        }
-    }
-}
-
