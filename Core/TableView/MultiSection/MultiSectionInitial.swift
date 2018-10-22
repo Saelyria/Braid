@@ -20,20 +20,22 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
     @discardableResult
     public func bind<NC>(cellType: NC.Type, viewModels: [S: [NC.ViewModel]])
     -> TableViewViewModelMultiSectionBinder<NC, S> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
-        for section in self.sections {
-            TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: section)
-            // if we're not binding for all sections, go ahead and write to the next model. Otherwise, there are checks
-            // that need to be done with the `updateNextModelForAllSections` method.
-            if !self.isForAllSections {
-                self.binder.nextDataModel.sectionCellViewModels[section] = viewModels[section]
-            }
-        }
+//        // if we're not binding for all sections, go ahead and write to the next model. Otherwise, there are checks
+//        // that need to be done with the `updateNextModelForAllSections` method.
+//        if self.isForAllSections {
+//            TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: nil, isForAllSections: true)
+//            TableViewInitialMutliSectionBinder<S>.updateNextCellsForAllSections(binder: self.binder, models: nil, viewModels: viewModels)
+//        } else {
+//            for section in self.sections {
+//                TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: section, isForAllSections: false)
+//                self.binder.nextDataModel.sectionCellViewModels[section] = viewModels[section]
+//            }
+//        }
         
-        if self.isForAllSections {
-            TableViewInitialMutliSectionBinder<S>.updateNextModelForAllSections(binder: self.binder, models: nil, viewModels: viewModels)
-        }
+        self.binder.addCellDequeueBlock(cellType: cellType, sections: self.sections)
+        self.binder.updateCellModels(nil, viewModels: viewModels, sections: self.sections)
         
-        return TableViewViewModelMultiSectionBinder<NC, S>(binder: self.binder, sections: self.sections, isForAllSections: self.isForAllSections)
+        return TableViewViewModelMultiSectionBinder<NC, S>(binder: self.binder, sections: self.sections)
     }
     
     /**
@@ -56,27 +58,36 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [S: [NM]], mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
     -> TableViewModelViewModelMultiSectionBinder<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Identifiable {
-        for section in self.sections {
-            TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: section)
-            // if we're not binding for all sections, go ahead and write to the next model. Otherwise, there are checks
-            // that need to be done with the `updateNextModelForAllSections` method.
-            if !self.isForAllSections {
-                let sectionModels: [NM]? = models[section]
-                let sectionViewModels: [NC.ViewModel]? = sectionModels?.map(mapToViewModel)
-                self.binder.nextDataModel.sectionCellModels[section] = sectionModels
-                self.binder.nextDataModel.sectionCellViewModels[section] = sectionViewModels
-            }
-        }
+//        // if we're not binding for all sections, go ahead and write to the next model. Otherwise, there are checks
+//        // that need to be done with the `updateNextModelForAllSections` method.
+//        if self.isForAllSections {
+//            TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: nil, isForAllSections: true)
+//
+//            var viewModels: [S: [Identifiable]] = [:]
+//            for (s, m) in models {
+//                viewModels[s] = m.map(mapToViewModel)
+//            }
+//            TableViewInitialMutliSectionBinder<S>.updateNextCellsForAllSections(binder: self.binder, models: models, viewModels: viewModels)
+//        } else {
+//            for section in self.sections {
+//                TableViewInitialSingleSectionBinder<S>.addDequeueBlock(
+//                    cellType: cellType, binder: self.binder, section: section, isForAllSections: self.isForAllSections)
+//
+//                let sectionModels: [NM]? = models[section]
+//                let sectionViewModels: [NC.ViewModel]? = sectionModels?.map(mapToViewModel)
+//                self.binder.nextDataModel.sectionCellModels[section] = sectionModels
+//                self.binder.nextDataModel.sectionCellViewModels[section] = sectionViewModels
+//            }
+//        }
         
-        if self.isForAllSections {
-            var viewModels: [S: [Identifiable]] = [:]
-            for (s, m) in models {
-                viewModels[s] = m.map(mapToViewModel)
-            }
-            TableViewInitialMutliSectionBinder<S>.updateNextModelForAllSections(binder: self.binder, models: models, viewModels: viewModels)
+        self.binder.addCellDequeueBlock(cellType: cellType, sections: self.sections)
+        var viewModels: [S: [Identifiable]] = [:]
+        for (s, m) in models {
+            viewModels[s] = m.map(mapToViewModel)
         }
+        self.binder.updateCellModels(models, viewModels: viewModels, sections: self.sections)
         
-        return TableViewModelViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections, mapToViewModel: mapToViewModel, isForAllSections: self.isForAllSections)
+        return TableViewModelViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections, mapToViewModel: mapToViewModel)
     }
     
     /**
@@ -96,59 +107,67 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [S: [NM]]) -> TableViewModelMultiSectionBinder<NC, S, NM>
     where NC: UITableViewCell & ReuseIdentifiable, NM: Identifiable {
-        for section in self.sections {
-            TableViewInitialSingleSectionBinder<S>.addDequeueBlock(cellType: cellType, binder: self.binder, section: section)
-            // if we're not binding for all sections, go ahead and write to the next model. Otherwise, there are checks
-            // that need to be done with the `updateNextModelForAllSections` method.
-            if !self.isForAllSections {
-                let sectionModels: [NM]? = models[section]
-                self.binder.nextDataModel.sectionCellModels[section] = sectionModels
-            }
-        }
+        self.binder.addCellDequeueBlock(cellType: cellType, sections: self.sections)
+        self.binder.updateCellModels(models, viewModels: nil, sections: self.sections)
         
-        if self.isForAllSections {
-            TableViewInitialMutliSectionBinder<S>.updateNextModelForAllSections(binder: self.binder, models: models, viewModels: nil)
-        }
+//        // if we're not binding for all sections, go ahead and write to the next model. Otherwise, there are checks
+//        // that need to be done with the `updateNextModelForAllSections` method.
+//        if self.isForAllSections {
+//            TableViewInitialSingleSectionBinder<S>.addDequeueBlock(
+//                cellType: cellType, binder: self.binder, section: nil, isForAllSections: self.isForAllSections)
+//            TableViewInitialMutliSectionBinder<S>.updateNextCellsForAllSections(binder: self.binder, models: models, viewModels: nil)
+//        } else {
+//            for section in self.sections {
+//                TableViewInitialSingleSectionBinder<S>.addDequeueBlock(
+//                    cellType: cellType, binder: self.binder, section: section, isForAllSections: self.isForAllSections)
+//                self.binder.nextDataModel.sectionCellModels[section] = models[section]
+//            }
+//        }
         
-        return TableViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections, isForAllSections: self.isForAllSections)
-    }
-    
-    // Internal function used by all the 'initial section cell binding' methods. This method checks against the
-    // 'uniquely bound sections' array if this multi-section binder is binding 'for all sections' to ensure that it
-    // doesn't overwrite anything. It's given arrays of models, view models, and/or a mapping function to populate the
-    // binder's next data model.
-    static func updateNextModelForAllSections(binder: SectionedTableViewBinder<S>, models: [S: [Identifiable]]?, viewModels: [S: [Identifiable]]?) {
-        // We assume that the view models given in the dictionary are meant to be the state of the table if we're
-        // binding all sections (i.e. any sections not in the dictionary are to have their 'view models' data array
-        // emptied). However, we don't want to empty the arrays for sections that were bound 'uniquely' (i.e. with the
-        // 'onSection' or 'onSections' methods), as they have unique data or cell types that should not be overwritten
-        // by an 'onAllSections' data refresh.
-        for section in binder.currentDataModel.sectionCellModels.keys {
-            if binder.nextDataModel.uniquelyBoundSections.contains(section) == true {
-                continue
-            } else {
-                binder.nextDataModel.sectionCellModels = [:]
-                binder.nextDataModel.sectionCellViewModels = [:]
-            }
-        }
-        
-        // Get the sections that are attempting to be bound from the dictionary keys
-        var givenSections: [S] = []
-        if let modelSections = models?.keys {
-            givenSections = Array(modelSections)
-        } else if let viewModelSections = viewModels?.keys {
-            givenSections = Array(viewModelSections)
-        }
-        
-        // Now, ensure we only overwrite the data for sections that were not uniquely bound by name.
-        let sectionsNotUniquelyBound: Set<S> = Set(givenSections).subtracting(binder.nextDataModel.uniquelyBoundSections)
-        for section in sectionsNotUniquelyBound {
-            if let models = models {
-                binder.nextDataModel.sectionCellModels[section] = models[section]
-            }
-            if let viewModels = viewModels {
-                binder.nextDataModel.sectionCellViewModels[section] = viewModels[section]
-            }
-        }
+        return TableViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections)
     }
 }
+
+/*
+ When 'multi section binders' are created to bind data/handlers as a result of the `onAllSections` method, we need to
+ make sure they don't overwrite data added to the data model from 'section binders' that were created from the more
+ specific `onSection` or `onSections` methods. So, whenever 'multi section binders' go to update data, they need to
+ check their 'isForAllSections' property and call these methods to do the work of updating the data to make sure
+ overwriting doesn't happen.
+ */
+//internal extension TableViewInitialMutliSectionBinder {
+//    static func updateNextCellsForAllSections(binder: SectionedTableViewBinder<S>, models: [S: [Identifiable]]?, viewModels: [S: [Identifiable]]?) {
+//        // We assume that the view models given in the dictionary are meant to be the state of the table if we're
+//        // binding all sections (i.e. any sections not in the dictionary are to have their 'view models' data array
+//        // emptied). However, we don't want to empty the arrays for sections that were bound 'uniquely' (i.e. with the
+//        // 'onSection' or 'onSections' methods), as they have unique data or cell types that should not be overwritten
+//        // by an 'onAllSections' data refresh.
+//        for section in binder.currentDataModel.sectionCellModels.keys {
+//            if binder.nextDataModel.uniquelyBoundSections.contains(section) == true {
+//                continue
+//            } else {
+//                binder.nextDataModel.sectionCellModels[section] = nil
+//                binder.nextDataModel.sectionCellViewModels[section] = nil
+//            }
+//        }
+//
+//        // Get the sections that are attempting to be bound from the dictionary keys
+//        var givenSections: [S] = []
+//        if let modelSections = models?.keys {
+//            givenSections = Array(modelSections)
+//        } else if let viewModelSections = viewModels?.keys {
+//            givenSections = Array(viewModelSections)
+//        }
+//
+//        // Now, ensure we only overwrite the data for sections that were not uniquely bound by name.
+//        let sectionsNotUniquelyBound: Set<S> = Set(givenSections).subtracting(binder.nextDataModel.uniquelyBoundSections)
+//        for section in sectionsNotUniquelyBound {
+//            if let models = models {
+//                binder.nextDataModel.sectionCellModels[section] = models[section]
+//            }
+//            if let viewModels = viewModels {
+//                binder.nextDataModel.sectionCellViewModels[section] = viewModels[section]
+//            }
+//        }
+//    }
+//}

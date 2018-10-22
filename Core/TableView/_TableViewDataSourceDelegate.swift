@@ -59,7 +59,7 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection, EstimatedHeigh
         let section = self.binder.displayedSections[indexPath.section]
         guard let dequeueBlock = self.binder.sectionCellDequeueBlocks[section] else { return UITableViewCell() }
 
-        let cell = dequeueBlock(tableView, indexPath)
+        let cell = dequeueBlock(section, tableView, indexPath)
         return cell
     }
     

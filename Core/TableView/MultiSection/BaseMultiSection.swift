@@ -11,14 +11,11 @@ public protocol TableViewInitialMutliSectionBinderProtocol: TableViewMutliSectio
 
 public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection> {
     internal let binder: SectionedTableViewBinder<S>
-    internal let sections: [S]
-    internal let isForAllSections: Bool
-    internal var baseSectionBindResults: [S: BaseTableViewSingleSectionBinder<C, S>] = [:]
+    internal let sections: [S]?
     
-    internal init(binder: SectionedTableViewBinder<S>, sections: [S], isForAllSections: Bool) {
+    internal init(binder: SectionedTableViewBinder<S>, sections: [S]?) {
         self.binder = binder
         self.sections = sections
-        self.isForAllSections = isForAllSections
     }
     
     /**
@@ -38,12 +35,9 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
     @discardableResult
     public func bind<H>(headerType: H.Type, viewModels: [S: H.ViewModel]) -> BaseTableViewMutliSectionBinder<C, S>
     where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
-        for section in self.sections {
-            if viewModels[section] != nil {
-                BaseTableViewSingleSectionBinder<C, S>.addHeaderFooterDequeueBlock(type: headerType, binder: self.binder, section: section, isHeader: true)
-            }
-            self.binder.nextDataModel.sectionHeaderViewModels[section] = viewModels[section]
-        }
+        self.binder.addHeaderDequeueBlock(headerType: headerType, forSections: self.sections)
+        self.binder.updateHeaderViewModels(viewModels: viewModels, sections: self.sections)
+
         return self
     }
     
@@ -62,9 +56,8 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func headerTitles(_ titles: [S: String]) -> BaseTableViewMutliSectionBinder<C, S> {
-        for section in self.sections {
-            self.binder.nextDataModel.sectionHeaderTitles[section] = titles[section]
-        }
+        self.binder.updateHeaderTitles(titles: titles, sections: self.sections)
+
         return self
     }
     
@@ -85,10 +78,9 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
     @discardableResult
     public func bind<F>(footerType: F.Type, viewModels: [S: F.ViewModel]) -> BaseTableViewMutliSectionBinder<C, S>
     where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
-        for section in self.sections {
-            BaseTableViewSingleSectionBinder<C, S>.addHeaderFooterDequeueBlock(type: footerType, binder: self.binder, section: section, isHeader: false)
-            self.binder.nextDataModel.sectionFooterViewModels[section] = viewModels[section]
-        }
+        self.binder.addFooterDequeueBlock(footerType: footerType, forSections: self.sections)
+        self.binder.updateFooterViewModels(viewModels: viewModels, sections: self.sections)
+
         return self
     }
     
@@ -107,9 +99,8 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func footerTitles(_ titles: [S: String]) -> BaseTableViewMutliSectionBinder<C, S> {
-        for section in self.sections {
-            self.binder.nextDataModel.sectionFooterTitles[section] = titles[section]
-        }
+        self.binder.updateFooterTitles(titles: titles, sections: self.sections)
+        
         return self
     }
     
@@ -130,15 +121,21 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C) -> Void) -> BaseTableViewMutliSectionBinder<C, S> {
-        for section in self.sections {
-            self.binder.sectionCellDequeuedCallbacks[section] = { (row: Int, cell: UITableViewCell) in
-                guard let cell = cell as? C else {
-                    assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
-                    return
+        if self.isForAllSections {
+            // TODO: this
+//            self.binder.cellDequeueBlock =
+        } else {
+            for section in self.sections {
+                self.binder.sectionCellDequeuedCallbacks[section] = { (row: Int, cell: UITableViewCell) in
+                    guard let cell = cell as? C else {
+                        assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
+                        return
+                    }
+                    handler(section, row, cell)
                 }
-                handler(section, row, cell)
             }
         }
+        
         return self
     }
     
@@ -158,15 +155,21 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C) -> Void) -> BaseTableViewMutliSectionBinder<C, S> {
-        for section in self.sections {
-            self.binder.sectionCellTappedCallbacks[section] = { (row, tappedCell) in
-                guard let tappedCell = tappedCell as? C else {
-                    assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
-                    return
+        if self.isForAllSections {
+            // TODO: this
+//            self.binder.cellTappedCallback =
+        } else {
+            for section in self.sections {
+                self.binder.sectionCellTappedCallbacks[section] = { (row, tappedCell) in
+                    guard let tappedCell = tappedCell as? C else {
+                        assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
+                        return
+                    }
+                    handler(section, row, tappedCell)
                 }
-                handler(section, row, tappedCell)
             }
         }
+        
         return self
     }
     
@@ -184,11 +187,16 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func cellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
-        for section in self.sections {
-            self.binder.sectionCellHeightBlocks[section] = { (row: Int) in
-                return handler(section, row)
+        if self.isForAllSections {
+            // TODO: this
+        } else {
+            for section in self.sections {
+                self.binder.sectionCellHeightBlocks[section] = { (row: Int) in
+                    return handler(section, row)
+                }
             }
         }
+        
         return self
     }
     
@@ -206,9 +214,13 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func estimatedCellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
-        for section in self.sections {
-            self.binder.sectionEstimatedCellHeightBlocks[section] = { (row: Int) in
-                return handler(section, row)
+        if self.isForAllSections {
+            // TODO: this
+        } else {
+            for section in self.sections {
+                self.binder.sectionEstimatedCellHeightBlocks[section] = { (row: Int) in
+                    return handler(section, row)
+                }
             }
         }
         return self
@@ -224,11 +236,16 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func headerHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
-        for section in self.sections {
-            self.binder.sectionHeaderHeightBlocks[section] = {
-                return handler(section)
+        if self.isForAllSections {
+            // TODO: this
+        } else {
+            for section in self.sections {
+                self.binder.sectionHeaderHeightBlocks[section] = {
+                    return handler(section)
+                }
             }
         }
+        
         return self
     }
     
@@ -287,3 +304,64 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
     }
 }
 
+/*
+ When 'multi section binders' are created to bind data/handlers as a result of the `onAllSections` method, we need to
+ make sure they don't overwrite data added to the data model from 'section binders' that were created from the more
+ specific `onSection` or `onSections` methods. So, whenever 'multi section binders' go to update data, they need to
+ check their 'isForAllSections' property and call these methods to do the work of updating the data to make sure
+ overwriting doesn't happen.
+*/
+//extension BaseTableViewMutliSectionBinder {
+//    static func updateNextHeaderFooterModelsForAllSections(binder: SectionedTableViewBinder<S>, titles: [S: String]?, viewModels: [S: Identifiable]?, isHeader: Bool) {
+//        // We assume that the view models given in the dictionary are meant to be the state of the table if we're
+//        // binding all sections (i.e. any sections not in the dictionary are to have their 'view models' data array
+//        // emptied). However, we don't want to empty the arrays for sections that were bound 'uniquely' (i.e. with the
+//        // 'onSection' or 'onSections' methods), as they have unique data or cell types that should not be overwritten
+//        // by an 'onAllSections' data refresh.
+//        for section in binder.currentDataModel.sectionCellModels.keys {
+//            if binder.nextDataModel.uniquelyBoundSections.contains(section) == true {
+//                continue
+//            } else {
+//                if isHeader {
+//                    if titles != nil {
+//                        binder.nextDataModel.sectionHeaderTitles[section] =  nil
+//                    } else {
+//                        binder.nextDataModel.sectionHeaderViewModels[section] = nil
+//                    }
+//                } else {
+//                    if titles != nil {
+//                        binder.nextDataModel.sectionFooterTitles[section] = nil
+//                    } else {
+//                        binder.nextDataModel.sectionFooterViewModels[section] = nil
+//                    }
+//                }
+//            }
+//        }
+//
+//        // Get the sections that are attempting to be bound from the dictionary keys
+//        var givenSections: [S] = []
+//        if let titleSections = titles?.keys {
+//            givenSections = Array(titleSections)
+//        } else if let viewModelSections = viewModels?.keys {
+//            givenSections = Array(viewModelSections)
+//        }
+//
+//        // Now, ensure we only overwrite the data for sections that were not uniquely bound by name.
+//        let sectionsNotUniquelyBound: Set<S> = Set(givenSections).subtracting(binder.nextDataModel.uniquelyBoundSections)
+//        for section in sectionsNotUniquelyBound {
+//            if isHeader {
+//                if let titles = titles {
+//                    binder.nextDataModel.sectionHeaderTitles[section] = titles[section]
+//                } else if let viewModels = viewModels {
+//                    binder.nextDataModel.sectionHeaderViewModels[section] = viewModels[section]
+//                }
+//            } else {
+//                if let titles = titles {
+//                    binder.nextDataModel.sectionFooterTitles[section] = titles[section]
+//                } else if let viewModels = viewModels {
+//                    binder.nextDataModel.sectionFooterViewModels[section] = viewModels[section]
+//                }
+//            }
+//        }
+//    }
+//}

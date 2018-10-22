@@ -37,9 +37,9 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
     @discardableResult
     public func bind<H>(headerType: H.Type, viewModel: H.ViewModel) -> BaseTableViewSingleSectionBinder<C, S>
     where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
-        BaseTableViewSingleSectionBinder.addHeaderFooterDequeueBlock(type: headerType, binder: self.binder,
-                                                                     section: self.section, isHeader: true)
-        self.binder.nextDataModel.sectionHeaderViewModels[self.section] = viewModel
+        self.binder.addHeaderOrFooterDequeueBlock(type: headerType, isHeader: true, sections: [self.section])
+        self.binder.updateHeaderOrFooterTitlesOrViewModels(
+            titles: nil, viewModels: [self.section: viewModel], isHeader: true, sections: [self.section])
         
         return self
     }
@@ -55,7 +55,9 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      */
     @discardableResult
     public func headerTitle(_ title: String) -> BaseTableViewSingleSectionBinder<C, S> {
-        self.binder.nextDataModel.sectionHeaderTitles[self.section] = title
+        self.binder.updateHeaderOrFooterTitlesOrViewModels(
+            titles: [self.section: title], viewModels: nil, isHeader: true, sections: [self.section])
+        
         return self
     }
     
@@ -72,9 +74,10 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
     @discardableResult
     public func bind<F>(footerType: F.Type, viewModel: F.ViewModel) -> BaseTableViewSingleSectionBinder<C, S>
     where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
-        BaseTableViewSingleSectionBinder.addHeaderFooterDequeueBlock(type: footerType, binder: self.binder,
-                                                                     section: self.section, isHeader: false)
-        self.binder.nextDataModel.sectionFooterViewModels[self.section] = viewModel
+        self.binder.addFooterDequeueBlock(footerType: footerType, forSections: [self.section])
+        self.binder.updateHeaderOrFooterTitlesOrViewModels(
+            titles: nil, viewModels: [self.section: viewModel], isHeader: false, sections: [self.section])
+
         return self
     }
     
@@ -89,7 +92,8 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      */
     @discardableResult
     public func footerTitle(_ title: String) -> BaseTableViewSingleSectionBinder<C, S> {
-        self.binder.nextDataModel.sectionFooterTitles[self.section] = title
+        self.binder.updateHeaderOrFooterTitlesOrViewModels(
+            titles: [self.section: title], viewModels: nil, isHeader: false, sections: [self.section])
         return self
     }
     
@@ -225,41 +229,3 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
         return self
     }
 }
-
-
-// Internal extension with functions for the common setup of 'dequeue blocks' on the binder
-internal extension BaseTableViewSingleSectionBinder {
-    internal static func addHeaderFooterDequeueBlock<H, S: TableViewSection>(type: H.Type, binder: SectionedTableViewBinder<S>,
-    section: S, isHeader: Bool) where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
-        if isHeader && binder.sectionHeaderDequeueBlocks[section] != nil {
-            print("WARNING: Section already has a header type bound to it - re-binding not supported.")
-            return
-        } else if !isHeader && binder.sectionFooterDequeueBlocks[section] != nil {
-            print("WARNING: Section already has a footer type bound to it - re-binding not supported.")
-            return
-        }
-        
-        let dequeueBlock: HeaderFooterDequeueBlock = { [weak binder = binder] (tableView, sectionInt) in
-            guard let section = binder?.displayedSections[sectionInt],
-            var view = tableView.dequeueReusableHeaderFooterView(withIdentifier: H.reuseIdentifier) as? H else {
-                return nil
-            }
-            
-            if isHeader, let viewModel = binder?.currentDataModel.sectionHeaderViewModels[section] as? H.ViewModel {
-                view.viewModel = viewModel
-                return view
-            } else if !isHeader, let viewModel = binder?.currentDataModel.sectionFooterViewModels[section] as? H.ViewModel {
-                view.viewModel = viewModel
-                return view
-            }
-            
-            return nil
-        }
-        if isHeader {
-            binder.sectionHeaderDequeueBlocks[section] = dequeueBlock
-        } else {
-            binder.sectionFooterDequeueBlocks[section] = dequeueBlock
-        }
-    }
-}
-

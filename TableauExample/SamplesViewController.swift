@@ -37,7 +37,7 @@ class SamplesViewController: UIViewController {
                 case 0:
                     self.navigationController?.pushViewController(AccountsViewController(), animated: true)
                 case 1:
-                    self.navigationController?.pushViewController(AccountsViewController(), animated: true)
+                    self.navigationController?.pushViewController(ArtistsViewController(), animated: true)
                 default:
                     break
                 }

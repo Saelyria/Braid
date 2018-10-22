@@ -17,7 +17,8 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
-        TableViewInitialSingleSectionBinder<Base.S>.addDequeueBlock(cellType: cellType, binder: bindResult.binder, section: bindResult.section)
+        TableViewInitialSingleSectionBinder<Base.S>.addDequeueBlock(
+            cellType: cellType, binder: bindResult.binder, section: bindResult.section, isForAllSections: false)
         
         let section = bindResult.section
         viewModels
@@ -45,7 +46,8 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
-        TableViewInitialSingleSectionBinder<Base.S>.addDequeueBlock(cellType: cellType, binder: bindResult.binder, section: bindResult.section)
+        TableViewInitialSingleSectionBinder<Base.S>.addDequeueBlock(
+            cellType: cellType, binder: bindResult.binder, section: bindResult.section, isForAllSections: false)
         
         let section = bindResult.section
         models
@@ -74,7 +76,8 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
-        TableViewInitialSingleSectionBinder<Base.S>.addDequeueBlock(cellType: cellType, binder: bindResult.binder, section: bindResult.section)
+        TableViewInitialSingleSectionBinder<Base.S>.addDequeueBlock(
+            cellType: cellType, binder: bindResult.binder, section: bindResult.section, isForAllSections: false)
         
         let section = bindResult.section
         models
@@ -102,7 +105,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         }
         
         BaseTableViewSingleSectionBinder<Base.C, Base.S>.addHeaderFooterDequeueBlock(
-            type: headerType, binder: bindResult.binder, section: bindResult.section, isHeader: true)
+            type: headerType, binder: bindResult.binder, section: bindResult.section, isHeader: true, isForAllSections: false)
 
         let section = bindResult.section
         viewModel
@@ -151,7 +154,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         }
         
         BaseTableViewSingleSectionBinder<Base.C, Base.S>.addHeaderFooterDequeueBlock(
-            type: footerType, binder: bindResult.binder, section: bindResult.section, isHeader: false)
+            type: footerType, binder: bindResult.binder, section: bindResult.section, isHeader: false, isForAllSections: false)
         
         let section = bindResult.section
         viewModel

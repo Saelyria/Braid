@@ -141,42 +141,64 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
 
 #if RX_TABLEAU
     let disposeBag = DisposeBag()
-    let displayedSectionsSubject = BehaviorSubject<[S]>(value: [])    
+    let displayedSectionsSubject = BehaviorSubject<[S]>(value: [])
 #endif
 
     private var tableViewDataSourceDelegate: (UITableViewDataSource & UITableViewDelegate)?
     
     // Blocks to call to dequeue a cell in a section.
-    var sectionCellDequeueBlocks: [S: CellDequeueBlock] = [:]
+    var sectionCellDequeueBlocks: [S: CellDequeueBlock<S>] = [:]
     // Blocks to call to get the height for a cell in a section.
     var sectionCellHeightBlocks: [S: CellHeightBlock] = [:]
     // Blocks to call to get the estimated height for a cell in a section.
     var sectionEstimatedCellHeightBlocks: [S: CellHeightBlock] = [:]
+    // A block to call to dequeue a cell in for an unspecified section.
+    var cellDequeueBlock: CellDequeueBlock<S>?
+    // A block to call to get the height for a cell in an unspecified section.
+    var cellHeightBlock: CellHeightBlock?
+    // A block to call to get the estimated height for a cell in an unspecified section.
+    var estimatedCellHeightBlock: CellHeightBlock?
     
     // Blocks to call to dequeue a header in a section.
-    var sectionHeaderDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
+    private(set) var sectionHeaderDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
     // Blocks to call to get the height for a section header.
     var sectionHeaderHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
     // Blocks to call to get the estimated height for a section header.
     var sectionHeaderEstimatedHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
+    // A block to call to dequeue a header in an unspecified section.
+    private(set) var headerDequeueBlock: HeaderFooterDequeueBlock?
+    // A block to call to get the height for a section header in an unspecified section.
+    var headerHeightBlock: HeaderFooterHeightBlock?
+    // A block to call to get the estimated height for a section header in an unspecified section.
+    var headerEstimatedHeightBlock: HeaderFooterHeightBlock?
     
     // Blocks to call to dequeue a footer in a section.
-    var sectionFooterDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
+    private(set) var sectionFooterDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
     // Blocks to call to get the height for a section footer.
     var sectionFooterHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
     // Blocks to call to get the estimated height for a section footer.
     var sectionFooterEstimatedHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
+    // A block to call to dequeue a footer in an unspecified section.
+    private(set) var footerDequeueBlock: HeaderFooterDequeueBlock?
+    // A block to call to get the height for a section footer in an unspecified section.
+    var footerHeightBlock: HeaderFooterHeightBlock?
+    // A block to call to get the estimated height for a section footer in an unspecified section.
+    var footerEstimatedHeightBlock: HeaderFooterHeightBlock?
     
     // Blocks to call when a cell is tapped in a section.
     var sectionCellTappedCallbacks: [S: CellTapCallback] = [:]
     // Callback blocks to call when a cell is dequeued in a section.
     var sectionCellDequeuedCallbacks: [S: CellDequeueCallback] = [:]
+    // A block to call when a cell is tapped in an unspecified section.
+    var cellTappedCallback: CellTapCallback?
+    // A callback block to call when a cell is dequeued in an unspecified section.
+    var cellDequeuedCallback: CellDequeueCallback?
     
     // The data model currently shown by the table view.
     private(set) var currentDataModel = TableViewDataModel<S>()
     // The next data model to be shown by the table view. When this model's properties are updated, the binder will
     // queue appropriate animations on the table view to be done on the next render frame.
-    var nextDataModel = TableViewDataModel<S>()
+    private(set) var nextDataModel = TableViewDataModel<S>()
     
     private var hasRefreshQueued: Bool = false
     
@@ -398,7 +420,7 @@ public enum _SingleSection: TableViewSection, CaseIterable {
     case table
 }
 
-typealias CellDequeueBlock = (UITableView, IndexPath) -> UITableViewCell
+typealias CellDequeueBlock<S: TableViewSection> = (S, UITableView, IndexPath) -> UITableViewCell
 typealias HeaderFooterDequeueBlock = (UITableView, Int) -> UITableViewHeaderFooterView?
 typealias CellTapCallback = (Int, UITableViewCell) -> Void
 typealias CellDequeueCallback = (Int, UITableViewCell) -> Void
