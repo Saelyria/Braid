@@ -186,13 +186,13 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     var footerEstimatedHeightBlock: HeaderFooterHeightBlock?
     
     // Blocks to call when a cell is tapped in a section.
-    var sectionCellTappedCallbacks: [S: CellTapCallback] = [:]
+    var sectionCellTappedCallbacks: [S: CellTapCallback<S>] = [:]
     // Callback blocks to call when a cell is dequeued in a section.
-    var sectionCellDequeuedCallbacks: [S: CellDequeueCallback] = [:]
+    var sectionCellDequeuedCallbacks: [S: CellDequeueCallback<S>] = [:]
     // A block to call when a cell is tapped in an unspecified section.
-    var cellTappedCallback: CellTapCallback?
+    var cellTappedCallback: CellTapCallback<S>?
     // A callback block to call when a cell is dequeued in an unspecified section.
-    var cellDequeuedCallback: CellDequeueCallback?
+    var cellDequeuedCallback: CellDequeueCallback<S>?
     
     // The data model currently shown by the table view.
     private(set) var currentDataModel = TableViewDataModel<S>()
@@ -423,7 +423,7 @@ public enum _SingleSection: TableViewSection, CaseIterable {
 
 typealias CellDequeueBlock<S: TableViewSection> = (S, UITableView, IndexPath) -> UITableViewCell
 typealias HeaderFooterDequeueBlock = (UITableView, Int) -> UITableViewHeaderFooterView?
-typealias CellTapCallback = (Int, UITableViewCell) -> Void
-typealias CellDequeueCallback = (Int, UITableViewCell) -> Void
+typealias CellTapCallback<S: TableViewSection> = (S, Int, UITableViewCell) -> Void
+typealias CellDequeueCallback<S: TableViewSection> = (S, Int, UITableViewCell) -> Void
 typealias CellHeightBlock = (Int) -> CGFloat
 typealias HeaderFooterHeightBlock = () -> CGFloat

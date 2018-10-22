@@ -108,7 +108,7 @@ class _TableViewDataSourceDelegate<SectionEnum: TableViewSection, EstimatedHeigh
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let section = self.binder.displayedSections[indexPath.section]
         guard let cell = tableView.cellForRow(at: indexPath) else { return }
-        self.binder.sectionCellTappedCallbacks[section]?(indexPath.row, cell)
+        self.binder.sectionCellTappedCallbacks[section]?(section, indexPath.row, cell)
     }
 }
 

@@ -46,7 +46,7 @@ where C: UITableViewCell & ViewModelBindable {
     @discardableResult
     public func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C, _ model: M) -> Void) -> TableViewModelViewModelSingleSectionBinder<C, S, M> {
         let section = self.section
-        let tappedHandler: CellTapCallback = {  [weak binder = self.binder] (row, cell) in
+        let tappedHandler: CellTapCallback<S> = {  [weak binder = self.binder] (_, row, cell) in
             guard let cell = cell as? C, let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
                 assertionFailure("ERROR: Cell or model wasn't the right type; something went awry!")
                 return
@@ -75,7 +75,7 @@ where C: UITableViewCell & ViewModelBindable {
     @discardableResult
     public func onCellDequeue(_ handler: @escaping (_ row: Int, _ dequeuedCell: C, _ model: M) -> Void) -> TableViewModelViewModelSingleSectionBinder<C, S, M> {
         let section = self.section
-        let dequeueCallback: CellDequeueCallback = { [weak binder = self.binder] row, cell in
+        let dequeueCallback: CellDequeueCallback<S> = { [weak binder = self.binder] (_, row, cell) in
             guard let cell = cell as? C, let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
                 assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
                 return

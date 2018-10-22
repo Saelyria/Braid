@@ -111,7 +111,7 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      */
     @discardableResult
     public func onCellDequeue(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void) -> BaseTableViewSingleSectionBinder<C, S> {
-        let dequeueCallback: CellDequeueCallback = { row, cell in
+        let dequeueCallback: CellDequeueCallback<S> = { (_, row, cell) in
             guard let cell = cell as? C else {
                 assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
                 return
@@ -137,7 +137,7 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      */
     @discardableResult
     public func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C) -> Void) -> BaseTableViewSingleSectionBinder<C, S> {
-        let tappedHandler: CellTapCallback = { row, cell in
+        let tappedHandler: CellTapCallback<S> = { (_, row, cell) in
             guard let cell = cell as? C else {
                 assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
                 return
