@@ -69,7 +69,8 @@ class AccountsViewController: UIViewController {
         // with it. We only need one cell in this section, so our `viewModels` array is just a single string.
         self.binder.onSection(.message)
             .bind(cellType: CenterLabelTableViewCell.self, viewModels: [
-                "This is a sample view controller demonstrating how to use an enum for the cases in a table view. Tap the 'Refresh' button to cycle through different combinations."])
+                "Open a new savings account today and receive 3.10% for the first three months!"
+            ])
         
         // Bind the 'checking', 'savings', and 'other' sections. When we bind multiple sections, we provide an
         // Observable dictionary for the models/view models where the key is each section being bound and the value is
@@ -128,7 +129,7 @@ class AccountsViewController: UIViewController {
     }
 }
 
-fileprivate extension Observable where Element == [Account] {
+private extension Observable where Element == [Account] {
     typealias Section = AccountsViewController.Section
     
     func flatMapToSectionDict() -> Observable<[Section: [Account]]> {
@@ -145,7 +146,7 @@ fileprivate extension Observable where Element == [Account] {
     }
 }
 
-fileprivate extension Account.AccountType {
+private extension Account.AccountType {
     var correspondingTableSection: AccountsViewController.Section {
         switch self {
         case .checking: return .checking
@@ -155,7 +156,9 @@ fileprivate extension Account.AccountType {
     }
 }
 
-fileprivate extension Account {
+extension Account: Identifiable {
+    var id: String { return self.accountNumber }
+    
     func asTitleDetailCellViewModel() -> TitleDetailTableViewCell.ViewModel {
         return TitleDetailTableViewCell.ViewModel(
             id: self.accountNumber,

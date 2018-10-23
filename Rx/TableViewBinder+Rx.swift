@@ -11,6 +11,12 @@ public extension Reactive where Base: SectionedTableViewBinderProtocol {
     public var displayedSections: ControlProperty<[Base.S]> {
         guard let binder = self.base as? SectionedTableViewBinder<Base.S> else { fatalError("Base wasn't the right type") }
         
-        return ControlProperty(values: binder.displayedSectionsSubject.asObservable(), valueSink: binder.displayedSectionsSubject)
+        let source: Observable<[Base.S]> = binder.displayedSectionsSubject.asObservable()
+        
+        let bindingObserver = Binder(binder) { (binder, displayedSections: [Base.S]) in
+            binder.displayedSections = displayedSections
+        }
+        
+        return ControlProperty(values: source, valueSink: bindingObserver)
     }
 }
