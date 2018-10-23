@@ -60,6 +60,7 @@ public class TableViewBinder {
     
     /// Starts binding on the table.
     public func onTable() -> TableViewInitialSingleSectionBinder<_SingleSection> {
+        self._sectionBinder.nextDataModel.uniquelyBoundSections.append(.table)
         return TableViewInitialSingleSectionBinder<_SingleSection>(binder: self._sectionBinder, section: .table)
     }
     

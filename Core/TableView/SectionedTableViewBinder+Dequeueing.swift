@@ -20,6 +20,7 @@ internal extension SectionedTableViewBinder {
             let viewModel = (binder?.currentDataModel.sectionCellViewModels[section] as? [C.ViewModel])?[indexPath.row] {
                 cell.viewModel = viewModel
                 binder?.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
+                binder?.cellDequeuedCallback?(section, indexPath.row, cell)
                 return cell
             }
             assertionFailure("ERROR: Didn't return the right cell type - something went awry!")
@@ -42,6 +43,7 @@ internal extension SectionedTableViewBinder {
         let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = self] (section, tableView, indexPath) in
             if let cell = binder?.tableView.dequeueReusableCell(withIdentifier: C.reuseIdentifier, for: indexPath) as? C {
                 binder?.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
+                binder?.cellDequeuedCallback?(section, indexPath.row, cell)
                 return cell
             }
             assertionFailure("ERROR: Didn't return the right cell type - something went awry!")
