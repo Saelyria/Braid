@@ -29,6 +29,7 @@
 		93C36A4D20DDD90C006B7ECF /* TableViewBinder+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C36A4C20DDD90C006B7ECF /* TableViewBinder+Rx.swift */; };
 		AB577BBA217D5BEB00CD2363 /* SectionedTableViewBinder+Updating.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BB9217D5BEB00CD2363 /* SectionedTableViewBinder+Updating.swift */; };
 		AB577BBC217E75B600CD2363 /* SectionedTableViewBinder+Dequeueing.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BBB217E75B600CD2363 /* SectionedTableViewBinder+Dequeueing.swift */; };
+		AB577BC0217FE9CC00CD2363 /* TableViewBindingHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BBF217FE9CC00CD2363 /* TableViewBindingHandlers.swift */; };
 		ABB9635521714B6600519963 /* TableViewDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB9635421714B6600519963 /* TableViewDataModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -57,6 +58,7 @@
 		93C36A4C20DDD90C006B7ECF /* TableViewBinder+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TableViewBinder+Rx.swift"; sourceTree = "<group>"; };
 		AB577BB9217D5BEB00CD2363 /* SectionedTableViewBinder+Updating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SectionedTableViewBinder+Updating.swift"; sourceTree = "<group>"; };
 		AB577BBB217E75B600CD2363 /* SectionedTableViewBinder+Dequeueing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SectionedTableViewBinder+Dequeueing.swift"; sourceTree = "<group>"; };
+		AB577BBF217FE9CC00CD2363 /* TableViewBindingHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewBindingHandlers.swift; sourceTree = "<group>"; };
 		ABB9635421714B6600519963 /* TableViewDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewDataModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -151,6 +153,7 @@
 				93BF737420CDA232000F0FB0 /* SectionedTableViewBinder.swift */,
 				9381334020B6EC5600CBF8F6 /* _TableViewDataSourceDelegate.swift */,
 				ABB9635421714B6600519963 /* TableViewDataModel.swift */,
+				AB577BBF217FE9CC00CD2363 /* TableViewBindingHandlers.swift */,
 				AB577BB9217D5BEB00CD2363 /* SectionedTableViewBinder+Updating.swift */,
 				AB577BBB217E75B600CD2363 /* SectionedTableViewBinder+Dequeueing.swift */,
 				9360CCB620E5E1B400DF8886 /* SingleSection */,
@@ -257,6 +260,7 @@
 				9381334520B6EC5600CBF8F6 /* ViewModelBindable.swift in Sources */,
 				AB577BBC217E75B600CD2363 /* SectionedTableViewBinder+Dequeueing.swift in Sources */,
 				9360CCB920E5E37700DF8886 /* SingleSectionModelViewModel.swift in Sources */,
+				AB577BC0217FE9CC00CD2363 /* TableViewBindingHandlers.swift in Sources */,
 				93BF737520CDA232000F0FB0 /* SectionedTableViewBinder.swift in Sources */,
 				93BF737920D3E654000F0FB0 /* MultiSectionInitial.swift in Sources */,
 				9312CD3120EC4E31007B2A76 /* MultiSectionModelViewModel.swift in Sources */,

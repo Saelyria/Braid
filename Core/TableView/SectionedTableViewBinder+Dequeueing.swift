@@ -19,8 +19,8 @@ internal extension SectionedTableViewBinder {
             if var cell = binder?.tableView.dequeueReusableCell(withIdentifier: C.reuseIdentifier, for: indexPath) as? C,
             let viewModel = (binder?.currentDataModel.sectionCellViewModels[section] as? [C.ViewModel])?[indexPath.row] {
                 cell.viewModel = viewModel
-                binder?.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
-                binder?.cellDequeuedCallback?(section, indexPath.row, cell)
+                binder?.handlers.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
+                binder?.handlers.dynamicSectionsCellDequeuedCallback?(section, indexPath.row, cell)
                 return cell
             }
             assertionFailure("ERROR: Didn't return the right cell type - something went awry!")
@@ -42,8 +42,8 @@ internal extension SectionedTableViewBinder {
     func addCellDequeueBlock<C: UITableViewCell & ReuseIdentifiable>(cellType: C.Type, sections: [S]?) {
         let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = self] (section, tableView, indexPath) in
             if let cell = binder?.tableView.dequeueReusableCell(withIdentifier: C.reuseIdentifier, for: indexPath) as? C {
-                binder?.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
-                binder?.cellDequeuedCallback?(section, indexPath.row, cell)
+                binder?.handlers.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
+                binder?.handlers.dynamicSectionsCellDequeuedCallback?(section, indexPath.row, cell)
                 return cell
             }
             assertionFailure("ERROR: Didn't return the right cell type - something went awry!")
@@ -91,14 +91,14 @@ private extension SectionedTableViewBinder {
         // Go over the parameters we were given and put the dequeue block in the right place on the binder
         if let sections = sections {
             for section in sections {
-                if self.sectionCellDequeueBlocks[section] != nil {
+                if self.handlers.sectionCellDequeueBlocks[section] != nil {
                     assertionFailure("Section already has a cell type bound to it - re-binding not supported.")
                     return
                 }
-                self.sectionCellDequeueBlocks[section] = cellDequeueBlock
+                self.handlers.sectionCellDequeueBlocks[section] = cellDequeueBlock
             }
         } else {
-            self.cellDequeueBlock = cellDequeueBlock
+            self.handlers.dynamicSectionCellDequeueBlock = cellDequeueBlock
         }
     }
     
@@ -108,10 +108,9 @@ private extension SectionedTableViewBinder {
         sections: [S]?)
     {
         // Create the dequeue block
-        let dequeueBlock: HeaderFooterDequeueBlock = { [weak binder = self] (tableView, sectionInt) in
-            guard let section = binder?.displayedSections[sectionInt],
-                var view = tableView.dequeueReusableHeaderFooterView(withIdentifier: H.reuseIdentifier) as? H else {
-                    return nil
+        let dequeueBlock: HeaderFooterDequeueBlock<S> = { [weak binder = self] (section, tableView) in
+            guard var view = tableView.dequeueReusableHeaderFooterView(withIdentifier: H.reuseIdentifier) as? H else {
+                return nil
             }
             
             if isHeader, let viewModel = binder?.currentDataModel.sectionHeaderViewModels[section] as? H.ViewModel {
@@ -129,26 +128,26 @@ private extension SectionedTableViewBinder {
         if isHeader {
             if let sections = sections {
                 for section in sections {
-                    if self.sectionHeaderDequeueBlocks[section] != nil {
+                    if self.handlers.sectionHeaderDequeueBlocks[section] != nil {
                         print("WARNING: Section already has a header type bound to it - re-binding not supported.")
                         return
                     }
-                    self.sectionHeaderDequeueBlocks[section] = dequeueBlock
+                    self.handlers.sectionHeaderDequeueBlocks[section] = dequeueBlock
                 }
             } else {
-                self.headerDequeueBlock = dequeueBlock
+                self.handlers.dynamicSectionsHeaderDequeueBlock = dequeueBlock
             }
         } else {
             if let sections = sections {
                 for section in sections {
-                    if self.sectionFooterDequeueBlocks[section] != nil {
+                    if self.handlers.sectionFooterDequeueBlocks[section] != nil {
                         print("WARNING: Section already has a footer type bound to it - re-binding not supported.")
                         return
                     }
-                    self.sectionFooterDequeueBlocks[section] = dequeueBlock
+                    self.handlers.sectionFooterDequeueBlocks[section] = dequeueBlock
                 }
             } else {
-                self.footerDequeueBlock = dequeueBlock
+                self.handlers.dynamicSectionsFooterDequeueBlock = dequeueBlock
             }
         }
     }

@@ -119,7 +119,7 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
             handler(row, cell)
         }
         
-        self.binder.sectionCellDequeuedCallbacks[self.section] = dequeueCallback
+        self.binder.handlers.sectionCellDequeuedCallbacks[self.section] = dequeueCallback
         return self
     }
     
@@ -145,7 +145,7 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
             handler(row, cell)
         }
         
-        self.binder.sectionCellTappedCallbacks[section] = tappedHandler
+        self.binder.handlers.sectionCellTappedCallbacks[self.section] = tappedHandler
         return self
     }
     
@@ -161,7 +161,9 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      */
     @discardableResult
     public func cellHeight(_ handler: @escaping (_ row: Int) -> CGFloat) -> BaseTableViewSingleSectionBinder<C, S> {
-        self.binder.sectionCellHeightBlocks[section] = handler
+        self.binder.handlers.sectionCellHeightBlocks[self.section] = { (_, row: Int) in
+            return handler(row)
+        }
         return self
     }
     
@@ -177,7 +179,9 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      */
     @discardableResult
     public func estimatedCellHeight(_ handler: @escaping (_ row: Int) -> CGFloat) -> BaseTableViewSingleSectionBinder<C, S> {
-        self.binder.sectionEstimatedCellHeightBlocks[section] = handler
+        self.binder.handlers.sectionEstimatedCellHeightBlocks[self.section] = { (_, row: Int) in
+            return handler(row)
+        }
         return self
     }
     
@@ -189,7 +193,9 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      */
     @discardableResult
     public func headerHeight(_ handler: @escaping () -> CGFloat) -> BaseTableViewSingleSectionBinder<C, S> {
-        self.binder.sectionHeaderHeightBlocks[section] = handler
+        self.binder.handlers.sectionHeaderHeightBlocks[section] = { (_) in
+            return handler()
+        }
         return self
     }
     
@@ -201,7 +207,9 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      */
     @discardableResult
     public func estimatedHeaderHeight(_ handler: @escaping () -> CGFloat) -> BaseTableViewSingleSectionBinder<C, S> {
-        self.binder.sectionHeaderEstimatedHeightBlocks[section] = handler
+        self.binder.handlers.sectionHeaderEstimatedHeightBlocks[section] = { (_) in
+            return handler()
+        }
         return self
     }
     
@@ -213,7 +221,9 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      */
     @discardableResult
     public func footerHeight(_ handler: @escaping () -> CGFloat) -> BaseTableViewSingleSectionBinder<C, S> {
-        self.binder.sectionFooterHeightBlocks[section] = handler
+        self.binder.handlers.sectionFooterHeightBlocks[section] = { (_) in
+            return handler()
+        }
         return self
     }
     
@@ -225,7 +235,9 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      */
     @discardableResult
     public func estimatedFooterHeight(_ handler: @escaping () -> CGFloat) -> BaseTableViewSingleSectionBinder<C, S> {
-        self.binder.sectionFooterEstimatedHeightBlocks[section] = handler
+        self.binder.handlers.sectionFooterEstimatedHeightBlocks[section] = { (_) in
+            return handler()
+        }
         return self
     }
 }

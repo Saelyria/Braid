@@ -121,20 +121,21 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C) -> Void) -> BaseTableViewMutliSectionBinder<C, S> {
-//        if self.isForAllSections {
-//            // TODO: this
-////            self.binder.cellDequeueBlock =
-//        } else {
-//            for section in self.sections {
-//                self.binder.sectionCellDequeuedCallbacks[section] = { (row: Int, cell: UITableViewCell) in
-//                    guard let cell = cell as? C else {
-//                        assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
-//                        return
-//                    }
-//                    handler(section, row, cell)
-//                }
-//            }
-//        }
+        let callback: CellDequeueCallback<S> = { (section: S, row: Int, cell: UITableViewCell) in
+            guard let cell = cell as? C else {
+                assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
+                return
+            }
+            handler(section, row, cell)
+        }
+        
+        if let sections = self.sections {
+            for section in sections {
+                self.binder.handlers.sectionCellDequeuedCallbacks[section] = callback
+            }
+        } else {
+            self.binder.handlers.dynamicSectionsCellDequeuedCallback = callback
+        }
         
         return self
     }
@@ -155,20 +156,21 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C) -> Void) -> BaseTableViewMutliSectionBinder<C, S> {
-//        if self.isForAllSections {
-//            // TODO: this
-////            self.binder.cellTappedCallback =
-//        } else {
-//            for section in self.sections {
-//                self.binder.sectionCellTappedCallbacks[section] = { (row, tappedCell) in
-//                    guard let tappedCell = tappedCell as? C else {
-//                        assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
-//                        return
-//                    }
-//                    handler(section, row, tappedCell)
-//                }
-//            }
-//        }
+        let callback: CellTapCallback<S> = { (section: S, row: Int, tappedCell: UITableViewCell) in
+            guard let tappedCell = tappedCell as? C else {
+                assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
+                return
+            }
+            handler(section, row, tappedCell)
+        }
+        
+        if let sections = self.sections {
+            for section in sections {
+                self.binder.handlers.sectionCellTappedCallbacks[section] = callback
+            }
+        } else {
+            self.binder.handlers.dynamicSectionsCellTappedCallback = callback
+        }
         
         return self
     }
@@ -187,15 +189,13 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func cellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
-//        if self.isForAllSections {
-//            // TODO: this
-//        } else {
-//            for section in self.sections {
-//                self.binder.sectionCellHeightBlocks[section] = { (row: Int) in
-//                    return handler(section, row)
-//                }
-//            }
-//        }
+        if let sections = self.sections {
+            for section in sections {
+                self.binder.handlers.sectionCellHeightBlocks[section] = handler
+            }
+        } else {
+            self.binder.handlers.dynamicSectionsCellHeightBlock = handler
+        }
         
         return self
     }
@@ -214,15 +214,14 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func estimatedCellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
-//        if self.isForAllSections {
-//            // TODO: this
-//        } else {
-//            for section in self.sections {
-//                self.binder.sectionEstimatedCellHeightBlocks[section] = { (row: Int) in
-//                    return handler(section, row)
-//                }
-//            }
-//        }
+        if let sections = self.sections {
+            for section in sections {
+                self.binder.handlers.sectionEstimatedCellHeightBlocks[section] = handler
+            }
+        } else {
+            self.binder.handlers.dynamicSectionsEstimatedCellHeightBlock = handler
+        }
+
         return self
     }
     
@@ -236,15 +235,13 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func headerHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
-//        if self.isForAllSections {
-//            // TODO: this
-//        } else {
-//            for section in self.sections {
-//                self.binder.sectionHeaderHeightBlocks[section] = {
-//                    return handler(section)
-//                }
-//            }
-//        }
+        if let sections = self.sections {
+            for section in sections {
+                self.binder.handlers.sectionHeaderHeightBlocks[section] = handler
+            }
+        } else {
+            self.binder.handlers.dynamicSectionsHeaderHeightBlock = handler
+        }
         
         return self
     }
@@ -259,11 +256,14 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func estimatedHeaderHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
-//        for section in self.sections {
-//            self.binder.sectionHeaderEstimatedHeightBlocks[section] = {
-//                return handler(section)
-//            }
-//        }
+        if let sections = self.sections {
+            for section in sections {
+                self.binder.handlers.sectionHeaderEstimatedHeightBlocks[section] = handler
+            }
+        } else {
+            self.binder.handlers.dynamicSectionsHeaderEstimatedHeightBlock = handler
+        }
+        
         return self
     }
     
@@ -277,11 +277,14 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func footerHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
-//        for section in self.sections {
-//            self.binder.sectionFooterHeightBlocks[section] = {
-//                return handler(section)
-//            }
-//        }
+        if let sections = self.sections {
+            for section in sections {
+                self.binder.handlers.sectionFooterHeightBlocks[section] = handler
+            }
+        } else {
+            self.binder.handlers.dynamicSectionsFooterHeightBlock = handler
+        }
+        
         return self
     }
     
@@ -295,11 +298,14 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func estimatedFooterHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
-//        for section in self.sections {
-//            self.binder.sectionFooterEstimatedHeightBlocks[section] = {
-//                return handler(section)
-//            }
-//        }
+        if let sections = self.sections {
+            for section in sections {
+                self.binder.handlers.sectionFooterEstimatedHeightBlocks[section] = handler
+            }
+        } else {
+            self.binder.handlers.dynamicSectionsFooterEstimatedHeightBlock = handler
+        }
+        
         return self
     }
 }

@@ -1,7 +1,23 @@
 import RxSwift
 
-struct Artist {
+struct Artist: Hashable {
     let name: String
+    
+    /// The first letter of the artist, accounting for articles.
+    var firstLetter: String {
+        let nameNoArticle: String
+        if self.name.lowercased().starts(with: "the ") {
+            nameNoArticle = String(self.name.dropFirst(4))
+        } else if self.name.lowercased().starts(with: "a ") {
+            nameNoArticle = String(self.name.dropFirst(2))
+        } else if self.name.lowercased().starts(with: "an ") {
+            nameNoArticle = String(self.name.dropFirst(3))
+        } else {
+            nameNoArticle = self.name
+        }
+        
+        return String(nameNoArticle.first!)
+    }
 }
 
 class MusicLibraryService {
@@ -85,8 +101,8 @@ class MusicLibraryService {
                     let i = Int.random(in: 0..<self.allArtists.count)
                     artists.append(self.allArtists[i])
                 }
-                
-                observer.onNext(artists)
+                let artistsSet = Set<Artist>(artists)
+                observer.onNext(Array(artistsSet))
                 observer.onCompleted()
             }
             

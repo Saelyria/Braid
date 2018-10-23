@@ -54,7 +54,7 @@ where C: UITableViewCell & ViewModelBindable {
             handler(row, cell, model)
         }
         
-        self.binder.sectionCellTappedCallbacks[section] = tappedHandler
+        self.binder.handlers.sectionCellTappedCallbacks[section] = tappedHandler
         return self
     }
     
@@ -83,7 +83,7 @@ where C: UITableViewCell & ViewModelBindable {
             handler(row, cell, model)
         }
         
-        self.binder.sectionCellDequeuedCallbacks[section] = dequeueCallback
+        self.binder.handlers.sectionCellDequeuedCallbacks[section] = dequeueCallback
         
         return self
     }

@@ -30,10 +30,10 @@ public class TableViewModelViewModelMultiSectionBinder<C: UITableViewCell & View
         
         if let sections = self.sections {
             for section in sections {
-                self.binder.sectionCellTappedCallbacks[section] = tappedHandler
+                self.binder.handlers.sectionCellTappedCallbacks[section] = tappedHandler
             }
         } else {
-            self.binder.cellTappedCallback = tappedHandler
+            self.binder.handlers.dynamicSectionsCellTappedCallback = tappedHandler
         }
 
         return self
@@ -51,10 +51,10 @@ public class TableViewModelViewModelMultiSectionBinder<C: UITableViewCell & View
         
         if let sections = self.sections {
             for section in sections {
-                self.binder.sectionCellDequeuedCallbacks[section] = dequeueCallback
+                self.binder.handlers.sectionCellDequeuedCallbacks[section] = dequeueCallback
             }
         } else {
-            self.binder.cellDequeuedCallback = dequeueCallback
+            self.binder.handlers.dynamicSectionsCellDequeuedCallback = dequeueCallback
         }
 
         return self

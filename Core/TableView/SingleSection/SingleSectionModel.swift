@@ -44,7 +44,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
             handler(row, cell, model)
         }
         
-        self.binder.sectionCellTappedCallbacks[section] = tappedHandler
+        self.binder.handlers.sectionCellTappedCallbacks[section] = tappedHandler
         return self
     }
     
@@ -73,7 +73,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
             handler(row, cell, model)
         }
         
-        self.binder.sectionCellDequeuedCallbacks[section] = dequeueCallback
+        self.binder.handlers.sectionCellDequeuedCallbacks[section] = dequeueCallback
         
         return self
     }

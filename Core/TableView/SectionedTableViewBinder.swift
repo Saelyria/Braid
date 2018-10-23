@@ -147,53 +147,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
 
     private var tableViewDataSourceDelegate: (UITableViewDataSource & UITableViewDelegate)?
     
-    // Blocks to call to dequeue a cell in a section.
-    var sectionCellDequeueBlocks: [S: CellDequeueBlock<S>] = [:]
-    // Blocks to call to get the height for a cell in a section.
-    var sectionCellHeightBlocks: [S: CellHeightBlock] = [:]
-    // Blocks to call to get the estimated height for a cell in a section.
-    var sectionEstimatedCellHeightBlocks: [S: CellHeightBlock] = [:]
-    // A block to call to dequeue a cell in for an unspecified section.
-    var cellDequeueBlock: CellDequeueBlock<S>?
-    // A block to call to get the height for a cell in an unspecified section.
-    var cellHeightBlock: CellHeightBlock?
-    // A block to call to get the estimated height for a cell in an unspecified section.
-    var estimatedCellHeightBlock: CellHeightBlock?
-    
-    // Blocks to call to dequeue a header in a section.
-    var sectionHeaderDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
-    // Blocks to call to get the height for a section header.
-    var sectionHeaderHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
-    // Blocks to call to get the estimated height for a section header.
-    var sectionHeaderEstimatedHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
-    // A block to call to dequeue a header in an unspecified section.
-    var headerDequeueBlock: HeaderFooterDequeueBlock?
-    // A block to call to get the height for a section header in an unspecified section.
-    var headerHeightBlock: HeaderFooterHeightBlock?
-    // A block to call to get the estimated height for a section header in an unspecified section.
-    var headerEstimatedHeightBlock: HeaderFooterHeightBlock?
-    
-    // Blocks to call to dequeue a footer in a section.
-    var sectionFooterDequeueBlocks: [S: HeaderFooterDequeueBlock] = [:]
-    // Blocks to call to get the height for a section footer.
-    var sectionFooterHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
-    // Blocks to call to get the estimated height for a section footer.
-    var sectionFooterEstimatedHeightBlocks: [S: HeaderFooterHeightBlock] = [:]
-    // A block to call to dequeue a footer in an unspecified section.
-    var footerDequeueBlock: HeaderFooterDequeueBlock?
-    // A block to call to get the height for a section footer in an unspecified section.
-    var footerHeightBlock: HeaderFooterHeightBlock?
-    // A block to call to get the estimated height for a section footer in an unspecified section.
-    var footerEstimatedHeightBlock: HeaderFooterHeightBlock?
-    
-    // Blocks to call when a cell is tapped in a section.
-    var sectionCellTappedCallbacks: [S: CellTapCallback<S>] = [:]
-    // Callback blocks to call when a cell is dequeued in a section.
-    var sectionCellDequeuedCallbacks: [S: CellDequeueCallback<S>] = [:]
-    // A block to call when a cell is tapped in an unspecified section.
-    var cellTappedCallback: CellTapCallback<S>?
-    // A callback block to call when a cell is dequeued in an unspecified section.
-    var cellDequeuedCallback: CellDequeueCallback<S>?
+    private(set) var handlers = TableViewBindingHandlers<S>()
     
     // The data model currently shown by the table view.
     private(set) var currentDataModel = TableViewDataModel<S>()
@@ -259,14 +213,13 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     }
 
     /**
-     Begins a binding chain whose handlers are used to provide information for the given section.
+     Begins a binding chain whose handlers are used to provide data and respond to events for the given section.
      
-     This method is used to begin a binding chain. It does so by returning a 'section binder' - an object that exposes
-     methods like `bind(cellType:models:)` or `onTapped(_:)` - that will, using the section given to this method, bind
-     various handlers to events involving the section. This method must be called before the binder's `finish` method
-     is called, and a reference to the given 'section binder' object should not be kept.
+     This method must be called before the binder's `finish` method is called, and a reference to the given 'section
+     binder' object should not be kept.
      
      - parameter section: The section to begin binding handlers to.
+     
      - returns: A 'section binder' object used to begin binding handlers to the given section.
      */
     public func onSection(_ section: S) -> TableViewInitialSingleSectionBinder<S> {
@@ -278,15 +231,14 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     }
     
     /**
-     Begins a binding chain whose handlers are used to provide information for the given sections.
-     
-     This method is used to begin a binding chain. It does so by returning a 'section binder' - an object that exposes
-     methods like `bind(cellType:models:)` or `onTapped(_:)` - that will, using the sections given to this method, bind
-     various handlers to events involving the sections. This method must be called before the binder's `finish` method
-     is called, and a reference to the given 'section binder' object should not be kept.
+     Begins a binding chain whose handlers are used to provide data and respond to events for the given sections.
+
+     This method must be called before the binder's `finish` method is called, and a reference to the given 'section
+     binder' object should not be kept.
      
      - parameter section: An array of sections to begin binding common handlers to.
-     - returns: A 'mulit-section binder' object used to begin binding handlers to the given sections.
+     
+     - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
      */
     public func onSections(_ sections: [S]) -> TableViewInitialMutliSectionBinder<S> {
         guard !self.hasFinishedBinding else {
@@ -300,25 +252,60 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         return TableViewInitialMutliSectionBinder<S>(binder: self, sections: sections)
     }
     
+
     /**
-     Begins a binding chain whose handlers are used to provide information for all current and future sections on the
-     table.
+     Begins a binding chain to add simple data or callback handlers for any bound sections on the table.
      
-     This method is used to begin a binding chain. It does so by returning a 'section binder' - an object that exposes
-     methods like `bind(cellType:models:)` or `onTapped(_:)` - that will bind various handlers to events involving all
-     sections on the table. This method must be called before the binder's `finish` method is called, and a reference to
-     the given 'section binder' object should not be kept.
+     Binding chains started with this method cannot perform the core data binding for sections (like binding cells or
+     section titles that are unique to certain sections). Instead, chains started by this method are used to add
+     handlers that will be called for events in any section on the table, like 'on tapped'.
      
-     Note that this method can be used together with more specialized calls for specific sections with the binder's
-     `onSections(_:)` and `onSection(_:)` methods. If these more specialized methods are called, data provided from
-     those binding chains will be used instead of the data provided by this method, effectively acting as an 'override'
-     for the specialized sections.
+     - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
     */
-    public func onAllSections() -> TableViewInitialMutliSectionBinder<S> {
+    public func onAnySection() -> TableViewInitialMutliSectionBinder<S> {
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
         return TableViewInitialMutliSectionBinder<S>(binder: self, sections: nil)
+    }
+    
+    /**
+     Begins a binding chain whose handlers are used to provide information for all current and future sections on the
+     table not bound uniquely.
+     
+     For sections the binder is setup with that were not 'uniquely' bound with the `onSection(_:)` or `onSections(_:)`
+     methods, it will fall back on the data provided by this method to build them. This method is generally used when
+     your sections are not necessarily known at compile-time (e.g. your sections are given to your table in a network
+     respone).
+     
+     This method shares functionality with the `onAllOtherSections` method - the different naming allows you to more
+     expressively describe your table binding according to your usage.
+     
+     - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
+     */
+    public func onDynamicSections() -> TableViewInitialMutliSectionBinder<S> {
+        guard !self.hasFinishedBinding else {
+            fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
+        }
+        return TableViewInitialMutliSectionBinder<S>(binder: self, sections: nil)
+    }
+    
+    /**
+     Begins a binding chain whose handlers are used to provide information for all current and future sections on the
+     table not bound uniquely.
+     
+     For sections the binder is setup with that were not 'uniquely' bound with the `onSection(_:)` or `onSections(_:)`
+     methods, it will fall back on the data provided by this method to build them. This method is generally used when
+     your sections are not necessarily known at compile-time (e.g. your sections are given to your table in a network
+     respone).
+     
+     This method shares functionality with the `onDynamicSections` method - the different naming allows you to more
+     expressively describe your table binding according to your usage.
+     
+     - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
+     */
+    public func onAllOtherSections() -> TableViewInitialMutliSectionBinder<S> {
+        return self.onDynamicSections()
     }
     
     /**
@@ -400,10 +387,3 @@ extension SectionedTableViewBinder: TableViewDataModelDelegate {
 public enum _SingleSection: TableViewSection, CaseIterable {
     case table
 }
-
-typealias CellDequeueBlock<S: TableViewSection> = (S, UITableView, IndexPath) -> UITableViewCell
-typealias HeaderFooterDequeueBlock = (UITableView, Int) -> UITableViewHeaderFooterView?
-typealias CellTapCallback<S: TableViewSection> = (S, Int, UITableViewCell) -> Void
-typealias CellDequeueCallback<S: TableViewSection> = (S, Int, UITableViewCell) -> Void
-typealias CellHeightBlock = (Int) -> CGFloat
-typealias HeaderFooterHeightBlock = () -> CGFloat
