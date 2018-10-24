@@ -2,47 +2,61 @@ import UIKit
 
 /**
  A throwaway object created when a table view binder's `onSections(_:)` method is called. This object declares a number
- of methodss that take a binding handler and give it to the original table view binder to store for callback.
+ of methods that take a binding handler and give it to the original table view binder to store for callback.
  */
 public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSection, M: Identifiable>: BaseTableViewMutliSectionBinder<C, S>, TableViewMutliSectionBinderProtocol {
-    internal var sectionBindResults: [S: TableViewModelSingleSectionBinder<C, S, M>] = [:]
-    
+    /**
+     Returns a closure that can be called to update the models for the cells for the sections.
+     
+     This closure is retrieved at the end of the binding sequence and stored somewhere useful. Whenever the underlying
+     data the table view is displaying is updated, call this closure with the new models and the table view binder will
+     update the displayed cells in its sections to match the given arrays.
+     */
     public func createUpdateCallback() -> ([S: [M]]) -> Void {
-        return { (models: [S: [M]]) in
-            for (section, sectionModels) in models {
-                self.binder.nextDataModel.sectionCellModels[section] = sectionModels
-            }
+        return { [weak binder = self.binder, sections = self.sections] (models: [S: [M]]) in
+            binder?.updateCellModels(models, viewModels: nil, sections: sections)
         }
     }
     
     @discardableResult
     public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C, _ model: M) -> Void) -> TableViewModelMultiSectionBinder<C, S, M> {
-        for section in self.sections {
-            let tappedHandler: CellTapCallback = {  [weak binder = self.binder] (row, cell) in
-                guard let cell = cell as? C, let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
-                    assertionFailure("ERROR: Cell or model wasn't the right type; something went awry!")
-                    return
-                }
-                handler(section, row, cell, model)
+        let tappedHandler: CellTapCallback<S> = {  [weak binder = self.binder] (section, row, cell) in
+            guard let cell = cell as? C, let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
+                assertionFailure("ERROR: Cell or model wasn't the right type; something went awry!")
+                return
             }
-            self.binder.sectionCellTappedCallbacks[section] = tappedHandler
+            handler(section, row, cell, model)
         }
+        
+        if let sections = self.sections {
+            for section in sections {
+                self.binder.handlers.sectionCellTappedCallbacks[section] = tappedHandler
+            }
+        } else {
+            self.binder.handlers.dynamicSectionsCellTappedCallback = tappedHandler
+        }
+
         return self
     }
     
     @discardableResult
     public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C, _ model: M) -> Void) -> TableViewModelMultiSectionBinder<C, S, M> {
-        for section in self.sections {
-            let dequeueCallback: CellDequeueCallback = { [weak binder = self.binder] row, cell in
-                guard let cell = cell as? C, let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
-                    assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
-                    return
-                }
-                handler(section, row, cell, model)
+        let dequeueCallback: CellDequeueCallback<S> = { [weak binder = self.binder] (section, row, cell) in
+            guard let cell = cell as? C, let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
+                assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
+                return
             }
-            
-            self.binder.sectionCellDequeuedCallbacks[section] = dequeueCallback
+            handler(section, row, cell, model)
         }
+        
+        if let sections = self.sections {
+            for section in sections {
+                self.binder.handlers.sectionCellDequeuedCallbacks[section] = dequeueCallback
+            }
+        } else {
+            self.binder.handlers.dynamicSectionsCellDequeuedCallback = dequeueCallback
+        }
+
         return self
     }
     

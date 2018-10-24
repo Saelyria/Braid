@@ -1,5 +1,20 @@
 import RxSwift
 
+struct Account {
+    enum AccountType {
+        case checking
+        case savings
+        case investing
+        case creditCard
+    }
+    
+    let accountName: String
+    let accountNumber: String
+    let balance: Double
+    let type: AccountType    
+}
+
+
 class AccountsService {
     static let shared = AccountsService()
     

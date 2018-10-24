@@ -43,6 +43,10 @@ internal class TableViewDataModel<S: TableViewSection> {
         }
     }
     
+    // The sections that were bound uniquely with either the `onSection` or `onSections` methods. This is used to
+    // ensure that updates to data bound with `onAllSections` does not overwrite data for these sections.
+    var uniquelyBoundSections: [S] = []
+    
     // The displayed section on the table view.
     var displayedSections: [S] = [] {
         didSet { self.delegate?.dataModelDidChange() }
@@ -80,6 +84,7 @@ internal class TableViewDataModel<S: TableViewSection> {
     init() { }
     
     init(from other: TableViewDataModel<S>) {
+        self.uniquelyBoundSections = other.uniquelyBoundSections
         self.displayedSections = other.displayedSections
         self.sectionCellViewModels = other.sectionCellViewModels
         self.sectionCellModels = other.sectionCellModels
@@ -97,5 +102,27 @@ internal class TableViewDataModel<S: TableViewSection> {
 
     func diff(from other: TableViewDataModel<S>) -> NestedExtendedDiff {
         return self.asSectionModels().nestedExtendedDiff(to: other.asSectionModels(), isEqualElement: { $0.id == $1.id })
+    }
+}
+
+internal class DataModel<S: TableViewSection> {
+    // The displayed section on the table view.
+    var displayedSections: [S] = [] {
+        didSet { self.delegate?.dataModelDidChange() }
+    }
+    
+    var sectionModels: [((S) -> Bool, [Any])] = [] {
+        didSet { self.delegate?.dataModelDidChange() }
+    }
+    
+    weak var delegate: TableViewDataModelDelegate?
+    
+    func models(forSection section: S) -> [Any] {
+        for (modelsAreForSection, sectionModels) in self.sectionModels {
+            if modelsAreForSection(section) {
+                return sectionModels
+            }
+        }
+        return []
     }
 }

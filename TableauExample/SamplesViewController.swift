@@ -1,7 +1,7 @@
 import UIKit
 import Tableau
 
-class HomeViewController: UIViewController {
+class SamplesViewController: UIViewController {
     private var tableView: UITableView!
     private var binder: TableViewBinder!
     
@@ -37,7 +37,7 @@ class HomeViewController: UIViewController {
                 case 0:
                     self.navigationController?.pushViewController(AccountsViewController(), animated: true)
                 case 1:
-                    self.navigationController?.pushViewController(AccountsViewController(), animated: true)
+                    self.navigationController?.pushViewController(ArtistsViewController(), animated: true)
                 default:
                     break
                 }

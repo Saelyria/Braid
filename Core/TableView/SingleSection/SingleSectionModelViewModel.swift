@@ -21,9 +21,9 @@ where C: UITableViewCell & ViewModelBindable {
      update the displayed cells in the section to match the given array.
     */
     public func createUpdateCallback() -> ([M]) -> Void {
-        return { (models: [M]) in
-            self.binder.nextDataModel.sectionCellModels[self.section] = models
-            self.binder.nextDataModel.sectionCellViewModels[self.section] = models.map(self.mapToViewModelFunc)
+        return { [weak binder = self.binder, section = self.section, mapToViewModel = self.mapToViewModelFunc] (models: [M]) in
+            binder?.nextDataModel.sectionCellModels[section] = models
+            binder?.nextDataModel.sectionCellViewModels[section] = models.map(mapToViewModel)
         }
     }
     
@@ -36,6 +36,7 @@ where C: UITableViewCell & ViewModelBindable {
      
      Note that this `onTapped` variation with the raw model object is only available if the
      `bind(cellType:models:mapToViewModelsWith:)` method was used to bind the cell type to the section.
+     
      - parameter handler: The closure to be called whenever a cell is tapped in the bound section.
      - parameter row: The row of the cell that was tapped.
      - parameter tappedCell: The cell that was tapped.
@@ -45,7 +46,7 @@ where C: UITableViewCell & ViewModelBindable {
     @discardableResult
     public func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C, _ model: M) -> Void) -> TableViewModelViewModelSingleSectionBinder<C, S, M> {
         let section = self.section
-        let tappedHandler: CellTapCallback = {  [weak binder = self.binder] (row, cell) in
+        let tappedHandler: CellTapCallback<S> = {  [weak binder = self.binder] (_, row, cell) in
             guard let cell = cell as? C, let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
                 assertionFailure("ERROR: Cell or model wasn't the right type; something went awry!")
                 return
@@ -53,7 +54,7 @@ where C: UITableViewCell & ViewModelBindable {
             handler(row, cell, model)
         }
         
-        self.binder.sectionCellTappedCallbacks[section] = tappedHandler
+        self.binder.handlers.sectionCellTappedCallbacks[section] = tappedHandler
         return self
     }
     
@@ -64,6 +65,7 @@ where C: UITableViewCell & ViewModelBindable {
      model object that the cell was dequeued to represent. The cell will be cast to the cell type bound to the section
      if this method is called in a chain after the `bind(cellType:viewModels:mapToViewModelsWith)` method. This method
      can be used to perform any additional configuration of the cell.
+     
      - parameter handler: The closure to be called whenever a cell is dequeued in the bound section.
      - parameter row: The row of the cell that was dequeued.
      - parameter dequeuedCell: The cell that was dequeued that can now be configured.
@@ -73,7 +75,7 @@ where C: UITableViewCell & ViewModelBindable {
     @discardableResult
     public func onCellDequeue(_ handler: @escaping (_ row: Int, _ dequeuedCell: C, _ model: M) -> Void) -> TableViewModelViewModelSingleSectionBinder<C, S, M> {
         let section = self.section
-        let dequeueCallback: CellDequeueCallback = { [weak binder = self.binder] row, cell in
+        let dequeueCallback: CellDequeueCallback<S> = { [weak binder = self.binder] (_, row, cell) in
             guard let cell = cell as? C, let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
                 assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
                 return
@@ -81,7 +83,7 @@ where C: UITableViewCell & ViewModelBindable {
             handler(row, cell, model)
         }
         
-        self.binder.sectionCellDequeuedCallbacks[section] = dequeueCallback
+        self.binder.handlers.sectionCellDequeuedCallbacks[section] = dequeueCallback
         
         return self
     }

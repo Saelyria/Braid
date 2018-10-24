@@ -1,13 +1,16 @@
 import UIKit
 
 public class TableViewViewModelMultiSectionBinder<C: UITableViewCell & ViewModelBindable, S: TableViewSection>: BaseTableViewMutliSectionBinder<C, S>, TableViewMutliSectionBinderProtocol {
-    internal var sectionBindResults: [S: TableViewViewModelSingleSectionBinder<C, S>] = [:]
-
+    /**
+     Returns a closure that can be called to update the view models for the cells for the sections.
+     
+     This closure is retrieved at the end of the binding sequence and stored somewhere useful. Whenever the underlying
+     data the table view is displaying is updated, call this closure with the new view models and the table view binder
+     will update the displayed cells in its sections to match the given arrays.
+     */
     public func createUpdateCallback() -> ([S: [C.ViewModel]]) -> Void {
-        return { (viewModels: [S: [C.ViewModel]]) in
-            for (section, sectionModels) in viewModels {
-                self.binder.nextDataModel.sectionCellViewModels[section] = sectionModels
-            }
+        return { [weak binder = self.binder, sections = self.sections] (viewModels: [S: [C.ViewModel]]) in
+            binder?.updateCellModels(nil, viewModels: viewModels, sections: sections)
         }
     }
     
