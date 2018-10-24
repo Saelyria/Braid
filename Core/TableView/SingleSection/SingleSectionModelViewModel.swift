@@ -21,9 +21,9 @@ where C: UITableViewCell & ViewModelBindable {
      update the displayed cells in the section to match the given array.
     */
     public func createUpdateCallback() -> ([M]) -> Void {
-        return { (models: [M]) in
-            self.binder.nextDataModel.sectionCellModels[self.section] = models
-            self.binder.nextDataModel.sectionCellViewModels[self.section] = models.map(self.mapToViewModelFunc)
+        return { [weak binder = self.binder, section = self.section, mapToViewModel = self.mapToViewModelFunc] (models: [M]) in
+            binder?.nextDataModel.sectionCellModels[section] = models
+            binder?.nextDataModel.sectionCellViewModels[section] = models.map(mapToViewModel)
         }
     }
     

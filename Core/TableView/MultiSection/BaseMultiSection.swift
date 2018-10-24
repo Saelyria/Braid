@@ -6,7 +6,7 @@ public protocol TableViewMutliSectionBinderProtocol {
     associatedtype S: TableViewSection
 }
 
-// Need this second protocol so Reactive extension methods for binding celltype are only on 'inital' binders
+// Need this second protocol so Reactive extension methods for binding celltype are only on 'initial' binders
 public protocol TableViewInitialMutliSectionBinderProtocol: TableViewMutliSectionBinderProtocol { }
 
 public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection> {
