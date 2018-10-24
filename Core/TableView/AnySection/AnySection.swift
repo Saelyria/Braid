@@ -8,12 +8,10 @@ class AnySectionBinder<S: TableViewSection> {
     }
     
     /**
-     Adds a handler to be called whenever a cell is dequeued in one of the declared sections.
+     Adds a handler to be called whenever a cell is dequeued in any section.
      
-     The given handler is called whenever a cell in one of the sections being bound is dequeued, passing in the row and
-     the dequeued cell. The cell will be safely cast to the cell type bound to the section if this method is called in a
-     chain after the `bind(cellType:viewModels:)` method. This method can be used to perform any additional
-     configuration of the cell.
+     The given handler is called whenever a cell in any section on the table is dequeued, passing in the section, row,
+     and the dequeued cell.
      
      - parameter handler: The closure to be called whenever a cell is dequeued in one of the bound sections.
      - parameter section: The section in which a cell was dequeued.
@@ -30,11 +28,10 @@ class AnySectionBinder<S: TableViewSection> {
     }
     
     /**
-     Adds a handler to be called whenever a cell in one of the declared sections is tapped.
+     Adds a handler to be called whenever a cell in any section is tapped.
      
-     The given handler is called whenever a cell in one of the sections being bound  is tapped, passing in the row and
-     cell that was tapped. The cell will be safely cast to the cell type bound to the section if this method is called
-     in a chain after the `bind(cellType:viewModels:)` method.
+     The given handler is called whenever a cell in any section is tapped, passing in the section, row, and cell that
+     was tapped.
      
      - parameter handler: The closure to be called whenever a cell is tapped in the bound section.
      - parameter section: The section in which a cell was tapped.
@@ -51,7 +48,7 @@ class AnySectionBinder<S: TableViewSection> {
     }
     
     /**
-     Adds a handler to provide the cell height for cells in the declared sections.
+     Adds a handler to provide the cell height for any section.
      
      The given handler is called whenever the section reloads for each visible row, passing in the row the handler
      should provide the height for.
