@@ -23,8 +23,8 @@ class SamplesViewController: UIViewController {
         super.viewDidLoad()
         self.title = "Samples"
         
-        self.tableView = UITableView(frame: self.view.frame, style: .plain)
-        self.tableView.tableFooterView = UIView()
+        self.tableView = UITableView(frame: self.view.frame, style: .grouped)
+//        self.tableView.tableFooterView = UIView()
         self.view.addSubview(self.tableView)
         self.tableView.register(TitleDetailTableViewCell.self)
         

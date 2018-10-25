@@ -7,11 +7,11 @@ import RxSwift
 /**
  A protocol describing an enum whose cases or a struct whose instances correspond to sections in a table view.
 */
-public protocol TableViewSection: Hashable, Identifiable { }
+public protocol TableViewSection: Hashable { }
 
 public extension TableViewSection {
-    public var id: String {
-        return String(self.hashValue)
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.hashValue == rhs.hashValue
     }
 }
 

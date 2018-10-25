@@ -1,5 +1,8 @@
 import RxSwift
 
+/**
+ A model object containing info on a user's account.
+ */
 struct Account {
     enum AccountType {
         case checking
@@ -14,7 +17,9 @@ struct Account {
     let type: AccountType    
 }
 
-
+/**
+ An object that makes mock network requests to fetch a list of accounts for a user.
+ */
 class AccountsService {
     static let shared = AccountsService()
     

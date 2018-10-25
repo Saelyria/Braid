@@ -53,6 +53,20 @@ internal extension SectionedTableViewBinder {
         self.addDequeueBlock(cellDequeueBlock, sections: sections)
     }
     
+    func addCellDequeueBlock(cellProvider: @escaping (_ row: Int) -> UITableViewCell, sections: [S]?) {
+        let cellDequeueBlock: CellDequeueBlock<S> = { (_, _, indexPath) in
+            return cellProvider(indexPath.row)
+        }
+        self.addDequeueBlock(cellDequeueBlock, sections: sections)
+    }
+    
+    func addCellDequeueBlock(cellProvider: @escaping (_ section: S, _ row: Int) -> UITableViewCell, sections: [S]?) {
+        let cellDequeueBlock: CellDequeueBlock<S> = { (section, _, indexPath) in
+            return cellProvider(section, indexPath.row)
+        }
+        self.addDequeueBlock(cellDequeueBlock, sections: sections)
+    }
+    
     /**
      Adds a dequeueing block to the binder for a view model-bindable header for the given sections or 'any section'.
      

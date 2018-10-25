@@ -12,6 +12,11 @@ internal extension SectionedTableViewBinder {
         `onSections` methods on the binder).
      */
     func updateCellModels(_ models: [S: [Identifiable]]?, viewModels: [S: [Identifiable]]?, sections: [S]?) {
+        guard !(models == nil && viewModels == nil) else {
+            assertionFailure("Neither models nor view models were given to update with - something went awry!")
+            return
+        }
+        
         // If we were given the sections to update, simply iterate over the given sections to update them.
         if let sections = sections {
             for section in sections {
@@ -55,6 +60,10 @@ internal extension SectionedTableViewBinder {
                 }
             }
         }
+    }
+    
+    func updateNumberOfCells(_ numCells: [S: Int], sections: [S]?) {
+        
     }
     
     /**

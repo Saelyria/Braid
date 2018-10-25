@@ -11,27 +11,27 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="TitleDetailTableViewCell" rowHeight="63" id="ALP-h0-3WG" customClass="TitleDetailTableViewCell" customModule="TableauExample" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="375" height="63"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="TitleDetailTableViewCell" rowHeight="80" id="ALP-h0-3WG" customClass="TitleDetailTableViewCell" customModule="TableauExample" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="80"/>
             <autoresizingMask key="autoresizingMask"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ALP-h0-3WG" id="rFV-LB-fNf">
-                <rect key="frame" x="0.0" y="0.0" width="375" height="62.5"/>
+                <rect key="frame" x="0.0" y="0.0" width="375" height="79.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="25p-bV-OmZ" userLabel="Title">
-                        <rect key="frame" x="16" y="11" width="280.5" height="20.5"/>
+                        <rect key="frame" x="16" y="21" width="280.5" height="20.5"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="300" verticalCompressionResistancePriority="749" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EtH-tT-JMM" userLabel="Subtitle">
-                        <rect key="frame" x="16" y="36.5" width="280.5" height="15.5"/>
+                        <rect key="frame" x="16" y="46.5" width="280.5" height="12.5"/>
                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                         <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="500" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="35a-fQ-gLE" userLabel="Detail">
-                        <rect key="frame" x="306.5" y="22.5" width="37.5" height="18"/>
+                        <rect key="frame" x="306.5" y="31" width="37.5" height="18"/>
                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                         <color key="textColor" red="1" green="0.62352941179999999" blue="0.25882352939999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <nil key="highlightedColor"/>
@@ -44,9 +44,9 @@
                     <constraint firstAttribute="trailingMargin" secondItem="35a-fQ-gLE" secondAttribute="trailing" constant="15" id="G7S-0l-ME4"/>
                     <constraint firstItem="25p-bV-OmZ" firstAttribute="leading" secondItem="rFV-LB-fNf" secondAttribute="leadingMargin" id="MZN-6F-HcC"/>
                     <constraint firstItem="35a-fQ-gLE" firstAttribute="centerY" secondItem="rFV-LB-fNf" secondAttribute="centerY" id="OVk-hD-p3i"/>
-                    <constraint firstItem="25p-bV-OmZ" firstAttribute="top" secondItem="rFV-LB-fNf" secondAttribute="topMargin" id="PVG-Mr-A9U"/>
+                    <constraint firstItem="25p-bV-OmZ" firstAttribute="top" secondItem="rFV-LB-fNf" secondAttribute="topMargin" constant="10" id="PVG-Mr-A9U"/>
                     <constraint firstItem="EtH-tT-JMM" firstAttribute="top" secondItem="25p-bV-OmZ" secondAttribute="bottom" constant="5" id="c9J-fW-GKx"/>
-                    <constraint firstItem="EtH-tT-JMM" firstAttribute="bottom" secondItem="rFV-LB-fNf" secondAttribute="bottomMargin" id="x7E-W2-LwA"/>
+                    <constraint firstItem="EtH-tT-JMM" firstAttribute="bottom" secondItem="rFV-LB-fNf" secondAttribute="bottomMargin" constant="-10" id="x7E-W2-LwA"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
@@ -54,7 +54,7 @@
                 <outlet property="subtitleLabel" destination="EtH-tT-JMM" id="wNq-ul-g66"/>
                 <outlet property="titleLabel" destination="25p-bV-OmZ" id="BWN-gw-UeL"/>
             </connections>
-            <point key="canvasLocation" x="-123.5" y="71.5"/>
+            <point key="canvasLocation" x="-124" y="78.260869565217391"/>
         </tableViewCell>
     </objects>
 </document>

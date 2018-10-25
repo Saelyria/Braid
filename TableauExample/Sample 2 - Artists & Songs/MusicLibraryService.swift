@@ -1,5 +1,8 @@
 import RxSwift
 
+/**
+ A model object containing information about a musical artist.
+ */
 struct Artist: Hashable {
     let name: String
     
@@ -20,6 +23,9 @@ struct Artist: Hashable {
     }
 }
 
+/**
+ An object that makes mock network requests to fetch a list of artists for a user.
+ */
 class MusicLibraryService {
     static let shared = MusicLibraryService()
     

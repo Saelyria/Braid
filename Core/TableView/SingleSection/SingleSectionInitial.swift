@@ -5,7 +5,10 @@ import UIKit
  the user can declare which way they want cells for the section to be created - from an array of the cell's view models,
  an array of arbitrary models, or from an array of arbitrary models mapped to view models with a given function.
  */
-public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTableViewSingleSectionBinder<UITableViewCell, S>, TableViewInitialSingleSectionBinderProtocol {
+public class TableViewInitialSingleSectionBinder<S: TableViewSection>:
+    BaseTableViewSingleSectionBinder<UITableViewCell, S>,
+    TableViewInitialSingleSectionBinderProtocol
+{
     public typealias C = UITableViewCell
     
     /**
@@ -17,7 +20,8 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTable
      */
     @discardableResult
     public func bind<NC>(cellType: NC.Type, viewModels: [NC.ViewModel]) -> TableViewViewModelSingleSectionBinder<NC, S>
-    where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+    {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
         self.binder.updateCellModels(nil, viewModels: [self.section: viewModels], sections: [self.section])
         
@@ -39,12 +43,19 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTable
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind<NC, NM>(cellType: NC.Type, models: [NM], mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-    -> TableViewModelViewModelSingleSectionBinder<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Identifiable {
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: [NM],
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        -> TableViewModelViewModelSingleSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Identifiable
+    {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
-        self.binder.updateCellModels([self.section: models], viewModels: [self.section: models.map(mapToViewModel)], sections: [self.section])
+        let viewModels = [self.section: models.map(mapToViewModel)]
+        self.binder.updateCellModels([self.section: models], viewModels: viewModels, sections: [self.section])
 
-        return TableViewModelViewModelSingleSectionBinder<NC, S, NM>(binder: self.binder, section: self.section, mapToViewModel: mapToViewModel)
+        return TableViewModelViewModelSingleSectionBinder<NC, S, NM>(
+            binder: self.binder, section: self.section, mapToViewModel: mapToViewModel)
     }
     
     /**
@@ -70,5 +81,30 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>: BaseTable
         self.binder.updateCellModels([self.section: models], viewModels: nil, sections: [self.section])
         
         return TableViewModelSingleSectionBinder<NC, S, NM>(binder: self.binder, section: self.section)
+    }
+    
+    /**
+     Bind a custom handler that will provide table view cells for the section, along with the number of cells to create.
+     
+     Use this method if you want full manual control over cell dequeueing. You might decide to use this method if you
+     use different cell types in the same section, cells in the section are not necessarily backed by a data model type,
+     or you have particularly complex use cases.
+     
+     - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter row: The row in the section the closure should provide a cell for.
+     - parameter numberOfCells: The number of cells to create for the section using the provided closure.
+     
+     - returns: A section binder to continue the binding chain with.
+    */
+    @discardableResult
+    public func bind(
+        cellProvider: @escaping (_ row: Int) -> UITableViewCell,
+        numberOfCells: Int)
+        -> TableViewProviderSingleSectionBinder<S>
+    {
+        self.binder.addCellDequeueBlock(cellProvider: cellProvider, sections: [self.section])
+        self.binder.updateNumberOfCells([self.section: numberOfCells], sections: [self.section])
+        
+        return TableViewProviderSingleSectionBinder<S>(binder: self.binder, section: self.section)
     }
 }

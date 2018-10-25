@@ -20,6 +20,7 @@
 		AB577BA2217655DD00CD2363 /* ArtistsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BA1217655DD00CD2363 /* ArtistsViewController.swift */; };
 		AB577BAA2179665400CD2363 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BA92179665400CD2363 /* HomeViewController.swift */; };
 		AB577BAC2179838B00CD2363 /* MusicLibraryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BAB2179838B00CD2363 /* MusicLibraryService.swift */; };
+		AB577BC52181105500CD2363 /* HomeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BC42181105500CD2363 /* HomeService.swift */; };
 		AB86C3BF2141718C00FA4945 /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +54,7 @@
 		AB577BA1217655DD00CD2363 /* ArtistsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistsViewController.swift; sourceTree = "<group>"; };
 		AB577BA92179665400CD2363 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		AB577BAB2179838B00CD2363 /* MusicLibraryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicLibraryService.swift; sourceTree = "<group>"; };
+		AB577BC42181105500CD2363 /* HomeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeService.swift; sourceTree = "<group>"; };
 		AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
 		B5FEBC5088F0D7E30632BBD0 /* Pods_TableauExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TableauExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -153,6 +155,7 @@
 			isa = PBXGroup;
 			children = (
 				AB577BA92179665400CD2363 /* HomeViewController.swift */,
+				AB577BC42181105500CD2363 /* HomeService.swift */,
 			);
 			path = "Sample 3 - Dynamic Home Page";
 			sourceTree = "<group>";
@@ -292,6 +295,7 @@
 				9381335120B6EE2A00CBF8F6 /* TItleDetailTableViewCell.swift in Sources */,
 				AB577BAA2179665400CD2363 /* HomeViewController.swift in Sources */,
 				AB577B9C21759F6C00CD2363 /* AccountService.swift in Sources */,
+				AB577BC52181105500CD2363 /* HomeService.swift in Sources */,
 				AB577B9F2175A6EE00CD2363 /* CenterLabelTableViewCell.swift in Sources */,
 				93C36A4820DAFF97006B7ECF /* SamplesViewController.swift in Sources */,
 			);

@@ -24,10 +24,10 @@ The easiest one of those three to understand is the 'data source/delegate' objec
 class type is `_TableViewDataSourceDelegate`. That's pretty much it.
 
 ## The 'table data model'
-This object is the collection of view models/models/title strings/etc. that represents a 'data state' of a table view. Its properties are a serires of
-dictionaries and arrays that stores the data the table view displays. Table data models are used to create with the Differ library that Tableau 
-has as a CocoaPods dependency to animate changes in data on the table view. The concrete class for this object type is the 
-`TableViewDataModel`.
+
+This object is the collection of view models/models/title strings/etc. that represents a 'data state' of a table view. Its properties are a series of
+dictionaries and arrays that stores the data the table view displays. Table data models are used with the Differ library that Tableau has as a 
+CocoaPods dependency to animate changes in data on the table view. The concrete class for this object type is the  `TableViewDataModel`.
 
 ## The 'table binder'
 
@@ -49,7 +49,7 @@ a property. The sectioned table binder that it stores has its `S` generic type s
 
 ## The 'section binders'
 
-These are the most complicated objects. In a binding chain, there are at least two of these objects created (depending on the  complexity of 
+These are the most complicated objects. In a binding chain, there are at least two of these objects created (depending on the complexity of 
 the binding, and especially if you're binding multiple sections at once), with the first one being the return value of the 'table binder's 
 `onSection` method and its variants. Each time you add a function call onto the binding chain, one of these objects is returned (either newly 
 created or they return themselves) so you can continue the chain using one of its methods. All of the main binding methods - 
@@ -72,7 +72,9 @@ model' variant does not have an `M` generic type. These generic types are used i
 type safety.
 
 Each of these 'single section' binders has a 'multi section' equivalent. These ones are used if the `onSections` method of the table binder is 
-used instead of the singular `onSection`. They work in basically the same way.
+used instead of the singular `onSection`. They work in basically the same way. There is also the `AnySectionBinder`, which is largely the
+same as the various mutli-section binders, but does not expose functions to bind cell types, custom header/footer view types or header/footer 
+titles.
 
 ## RxSwift integration
 
