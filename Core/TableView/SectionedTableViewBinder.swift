@@ -287,6 +287,9 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
+        guard self.nextDataModel.sectionNumberOfCells.isEmpty else {
+            fatalError("`onAllOtherSections` and/or `onDynamicSections` can only be called once - re-binding is not supported.")
+        }
         return TableViewInitialMutliSectionBinder<S>(binder: self, sections: nil)
     }
     

@@ -78,4 +78,31 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
 
         return TableViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections)
     }
+    
+    /**
+     Bind a custom handler that will provide table view cells for the declared sections, along with the number of cells
+     to create.
+     
+     Use this method if you want full manual control over cell dequeueing. You might decide to use this method if you
+     use different cell types in the same section, cells in the section are not necessarily backed by a data model type,
+     or you have particularly complex use cases.
+     
+     - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter section: The section the closure should provide a cell for.
+     - parameter row: The row in the section the closure should provide a cell for.
+     - parameter numberOfCells: The number of cells to create for each section using the provided closure.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind(
+        cellProvider: @escaping (_ section: S, _ row: Int) -> UITableViewCell,
+        numberOfCells: [S: Int])
+        -> TableViewProviderMultiSectionBinder<S>
+    {
+        self.binder.addCellDequeueBlock(cellProvider: cellProvider, sections: self.sections)
+        self.binder.updateNumberOfCells(numberOfCells, sections: self.sections)
+        
+        return TableViewProviderMultiSectionBinder<S>(binder: self.binder, sections: self.sections)
+    }
 }

@@ -5,7 +5,7 @@ import UIKit
  of methods that take a binding handler and give it to the original table view binder to store for callback.
  */
 public class TableViewProviderMultiSectionBinder<S: TableViewSection>: BaseTableViewMutliSectionBinder<UITableViewCell, S>, TableViewMutliSectionBinderProtocol {
-    typealias C = UITableViewCell
+    public typealias C = UITableViewCell
     
     /**
      Returns a closure that can be called to update the models for the cells for the sections.
@@ -15,8 +15,8 @@ public class TableViewProviderMultiSectionBinder<S: TableViewSection>: BaseTable
      update the displayed cells in its sections to match the given arrays.
      */
     public func createUpdateCallback() -> (_ numberOfCells: [S: Int]) -> Void {
-        return { [weak binder = self.binder, section = self.section] (numCells: [S: Int]) in
-            binder?.updateNumberOfCells(numCells, sections: self.sections)
+        return { [weak binder = self.binder, sections = self.sections] (numCells: [S: Int]) in
+            binder?.updateNumberOfCells(numCells, sections: sections)
         }
     }
     

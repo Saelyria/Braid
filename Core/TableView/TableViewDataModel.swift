@@ -60,6 +60,7 @@ internal class TableViewDataModel<S: TableViewSection> {
     var sectionCellModels: [S: [Identifiable]] = [:] {
         didSet { self.delegate?.dataModelDidChange() }
     }
+    // The number of cells to create for a section when the user manages dequeueing themselves.
     var sectionNumberOfCells: [S: Int] = [:] {
         didSet { self.delegate?.dataModelDidChange() }
     }

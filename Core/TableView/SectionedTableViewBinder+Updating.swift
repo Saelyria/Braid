@@ -12,58 +12,20 @@ internal extension SectionedTableViewBinder {
         `onSections` methods on the binder).
      */
     func updateCellModels(_ models: [S: [Identifiable]]?, viewModels: [S: [Identifiable]]?, sections: [S]?) {
-        guard !(models == nil && viewModels == nil) else {
-            assertionFailure("Neither models nor view models were given to update with - something went awry!")
-            return
-        }
-        
-        // If we were given the sections to update, simply iterate over the given sections to update them.
-        if let sections = sections {
-            for section in sections {
-                if let models = models {
-                    self.nextDataModel.sectionCellModels[section] = models[section]
-                }
-                if let viewModels = viewModels {
-                    self.nextDataModel.sectionCellViewModels[section] = viewModels[section]
-                }
-            }
-        } else {
-            /*
-             If we're binding for 'any section' (i.e. the 'sections' array was nil), we assume that the models/VMs array
-             dict given is the 'state of the table' for any section not explicitly bound with the 'onSection' or
-             'onSections' methods. So, if a models/VMs array isn't included for a section in the titles/VMs dict, that
-             section doesn't have any cells.
-             
-             Because explicitly bound sections have priority, we don't want to overwrite the models/VMs for a section
-             that wasn given if that section *was* bound uniquely by name.
-             */
-            if let models = models {
-                // create a set of sections to update by adding sections already with models to the ones being added,
-                // then subtract the sections that were 'uniquely' bound
-                var sectionsToIterate = Set<S>(self.nextDataModel.sectionCellModels.keys)
-                sectionsToIterate.formUnion(models.keys)
-                sectionsToIterate.subtract(self.nextDataModel.uniquelyBoundSections)
-                for section in sectionsToIterate {
-                    guard self.nextDataModel.uniquelyBoundSections.contains(section) == false else { continue }
-                    self.nextDataModel.sectionCellModels[section] = models[section]
-                }
-            }
-            if let viewModels = viewModels {
-                // create a set of sections to update by adding sections already with view models to the ones being
-                // added, then subtract the sections that were 'uniquely' bound
-                var sectionsToIterate = Set<S>(self.nextDataModel.sectionCellViewModels.keys)
-                sectionsToIterate.formUnion(viewModels.keys)
-                sectionsToIterate.subtract(self.nextDataModel.uniquelyBoundSections)
-                for section in sectionsToIterate {
-                    guard self.nextDataModel.uniquelyBoundSections.contains(section) == false else { continue }
-                    self.nextDataModel.sectionCellViewModels[section] = viewModels[section]
-                }
-            }
-        }
+        self.updateCellModelsOrViewModelsOrNumCells(models: models, viewModels: viewModels, numCells: nil, sections: sections)
     }
     
+    /**
+     Updates the number of manually created cells for either the given sections or 'any section'.
+     
+     - parameter numCells: The number of cells (organized by section in a dictionary) to update to.
+     - parameter sections: The sections the titles are for. Single- or multi-section binders should pass in their
+        'section(s)' property for this argument. If this parameter is nil, the data is assumed to be for the 'any
+        sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
+        `onSections` methods on the binder).
+     */
     func updateNumberOfCells(_ numCells: [S: Int], sections: [S]?) {
-        
+        self.updateCellModelsOrViewModelsOrNumCells(models: nil, viewModels: nil, numCells: numCells, sections: sections)
     }
     
     /**
@@ -120,6 +82,76 @@ internal extension SectionedTableViewBinder {
 }
 
 private extension SectionedTableViewBinder {
+    func updateCellModelsOrViewModelsOrNumCells(
+        models: [S: [Identifiable]]?,
+        viewModels: [S: [Identifiable]]?,
+        numCells: [S: Int]?,
+        sections: [S]?)
+    {
+        guard !(models == nil && viewModels == nil && numCells == nil) else {
+            assertionFailure("No models, view models, nor number of cells were given to update with - something went awry!")
+            return
+        }
+        
+        // If we were given the sections to update, simply iterate over the given sections to update them.
+        if let sections = sections {
+            for section in sections {
+                if let models = models {
+                    self.nextDataModel.sectionCellModels[section] = models[section]
+                }
+                if let viewModels = viewModels {
+                    self.nextDataModel.sectionCellViewModels[section] = viewModels[section]
+                }
+                if let numCells = numCells {
+                    self.nextDataModel.sectionNumberOfCells[section] = numCells[section]
+                }
+            }
+        } else {
+            /*
+             If we're binding for 'any section' (i.e. the 'sections' array was nil), we assume that the models/VMs array
+             dict given is the 'state of the table' for any section not explicitly bound with the 'onSection' or
+             'onSections' methods. So, if a models/VMs array isn't included for a section in the titles/VMs dict, that
+             section doesn't have any cells.
+             
+             Because explicitly bound sections have priority, we don't want to overwrite the models/VMs for a section
+             that wasn given if that section *was* bound uniquely by name.
+             */
+            if let models = models {
+                // create a set of sections to update by adding sections that already have data to the ones being added,
+                // then subtract the sections that were 'uniquely' bound
+                var sectionsToIterate = Set<S>(self.nextDataModel.sectionCellModels.keys)
+                sectionsToIterate.formUnion(models.keys)
+                sectionsToIterate.subtract(self.nextDataModel.uniquelyBoundSections)
+                for section in sectionsToIterate {
+                    guard self.nextDataModel.uniquelyBoundSections.contains(section) == false else { continue }
+                    self.nextDataModel.sectionCellModels[section] = models[section]
+                }
+            }
+            if let viewModels = viewModels {
+                // create a set of sections to update by adding sections already with view models to the ones being
+                // added, then subtract the sections that were 'uniquely' bound
+                var sectionsToIterate = Set<S>(self.nextDataModel.sectionCellViewModels.keys)
+                sectionsToIterate.formUnion(viewModels.keys)
+                sectionsToIterate.subtract(self.nextDataModel.uniquelyBoundSections)
+                for section in sectionsToIterate {
+                    guard self.nextDataModel.uniquelyBoundSections.contains(section) == false else { continue }
+                    self.nextDataModel.sectionCellViewModels[section] = viewModels[section]
+                }
+            }
+            if let numCells = numCells {
+                // create a set of sections to update by adding sections already with view models to the ones being
+                // added, then subtract the sections that were 'uniquely' bound
+                var sectionsToIterate = Set<S>(self.nextDataModel.sectionNumberOfCells.keys)
+                sectionsToIterate.formUnion(numCells.keys)
+                sectionsToIterate.subtract(self.nextDataModel.uniquelyBoundSections)
+                for section in sectionsToIterate {
+                    guard self.nextDataModel.uniquelyBoundSections.contains(section) == false else { continue }
+                    self.nextDataModel.sectionNumberOfCells[section] = numCells[section]
+                }
+            }
+        }
+    }
+    
     func updateHeaderOrFooterTitlesOrViewModels(
         titles: [S: String?]?,
         viewModels: [S: Identifiable?]?,
