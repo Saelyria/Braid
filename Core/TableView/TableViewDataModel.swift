@@ -60,6 +60,9 @@ internal class TableViewDataModel<S: TableViewSection> {
     var sectionCellModels: [S: [Identifiable]] = [:] {
         didSet { self.delegate?.dataModelDidChange() }
     }
+    var sectionNumberOfCells: [S: Int] = [:] {
+        didSet { self.delegate?.dataModelDidChange() }
+    }
 
     // The view models for the headers for a section.
     var sectionHeaderViewModels: [S: Identifiable] = [:] {

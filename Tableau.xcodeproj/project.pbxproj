@@ -32,6 +32,7 @@
 		AB577BC0217FE9CC00CD2363 /* TableViewBindingHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BBF217FE9CC00CD2363 /* TableViewBindingHandlers.swift */; };
 		AB577BC3217FED4F00CD2363 /* AnySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BC2217FED4F00CD2363 /* AnySection.swift */; };
 		AB577BC72181291800CD2363 /* SingleSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BC62181291800CD2363 /* SingleSectionProvider.swift */; };
+		AB577BC92182BFB200CD2363 /* MultiSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BC82182BFB200CD2363 /* MultiSectionProvider.swift */; };
 		ABB9635521714B6600519963 /* TableViewDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB9635421714B6600519963 /* TableViewDataModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -63,6 +64,7 @@
 		AB577BBF217FE9CC00CD2363 /* TableViewBindingHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewBindingHandlers.swift; sourceTree = "<group>"; };
 		AB577BC2217FED4F00CD2363 /* AnySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnySection.swift; sourceTree = "<group>"; };
 		AB577BC62181291800CD2363 /* SingleSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleSectionProvider.swift; sourceTree = "<group>"; };
+		AB577BC82182BFB200CD2363 /* MultiSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiSectionProvider.swift; sourceTree = "<group>"; };
 		ABB9635421714B6600519963 /* TableViewDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewDataModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -97,6 +99,7 @@
 				9360CCBA20E6EC6200DF8886 /* MultiSectionViewModel.swift */,
 				9378E76920D72D180039849F /* MultiSectionModel.swift */,
 				9312CD3020EC4E31007B2A76 /* MultiSectionModelViewModel.swift */,
+				AB577BC82182BFB200CD2363 /* MultiSectionProvider.swift */,
 				9312CD3620EDBBF4007B2A76 /* BaseMultiSection.swift */,
 			);
 			path = MultiSection;
@@ -272,6 +275,7 @@
 				9381334420B6EC5600CBF8F6 /* ReuseIdentifiable.swift in Sources */,
 				AB577BC3217FED4F00CD2363 /* AnySection.swift in Sources */,
 				93C36A4620D9D4E4006B7ECF /* MultiSection+Rx.swift in Sources */,
+				AB577BC92182BFB200CD2363 /* MultiSectionProvider.swift in Sources */,
 				9381334520B6EC5600CBF8F6 /* ViewModelBindable.swift in Sources */,
 				AB577BBC217E75B600CD2363 /* SectionedTableViewBinder+Dequeueing.swift in Sources */,
 				9360CCB920E5E37700DF8886 /* SingleSectionModelViewModel.swift in Sources */,
