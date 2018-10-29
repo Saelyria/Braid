@@ -45,9 +45,9 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
     */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [S: [NM]], mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-    -> TableViewModelViewModelMultiSectionBinder<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Identifiable {
+    -> TableViewModelViewModelMultiSectionBinder<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: CollectionIdentifiable {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: self.sections)
-        var viewModels: [S: [Identifiable]] = [:]
+        var viewModels: [S: [CollectionIdentifiable]] = [:]
         for (s, m) in models {
             viewModels[s] = m.map(mapToViewModel)
         }
@@ -72,7 +72,7 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
     */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [S: [NM]]) -> TableViewModelMultiSectionBinder<NC, S, NM>
-    where NC: UITableViewCell & ReuseIdentifiable, NM: Identifiable {
+    where NC: UITableViewCell & ReuseIdentifiable, NM: CollectionIdentifiable {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: self.sections)
         self.binder.updateCellModels(models, viewModels: nil, sections: self.sections)
 
@@ -98,7 +98,7 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind<NM: Identifiable>(
+    public func bind<NM: CollectionIdentifiable>(
         cellProvider: @escaping (_ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [S: [NM]])
         -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>

@@ -11,7 +11,7 @@ internal extension SectionedTableViewBinder {
         sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
         `onSections` methods on the binder).
      */
-    func updateCellModels(_ models: [S: [Identifiable]]?, viewModels: [S: [Identifiable]]?, sections: [S]?) {
+    func updateCellModels(_ models: [S: [CollectionIdentifiable]]?, viewModels: [S: [CollectionIdentifiable]]?, sections: [S]?) {
         self.updateCellModelsOrViewModelsOrNumCells(models: models, viewModels: viewModels, numCells: nil, sections: sections)
     }
     
@@ -50,7 +50,7 @@ internal extension SectionedTableViewBinder {
         sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
         `onSections` methods on the binder).
      */
-    func updateHeaderViewModels(_ viewModels: [S: Identifiable?], sections: [S]?) {
+    func updateHeaderViewModels(_ viewModels: [S: CollectionIdentifiable?], sections: [S]?) {
         self.updateHeaderOrFooterTitlesOrViewModels(titles: nil, viewModels: viewModels, isHeader: true, sections: sections)
     }
     
@@ -76,15 +76,15 @@ internal extension SectionedTableViewBinder {
         sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
         `onSections` methods on the binder).
      */
-    func updateFooterViewModels(_ viewModels: [S: Identifiable?], sections: [S]?) {
+    func updateFooterViewModels(_ viewModels: [S: CollectionIdentifiable?], sections: [S]?) {
         self.updateHeaderOrFooterTitlesOrViewModels(titles: nil, viewModels: viewModels, isHeader: false, sections: sections)
     }
 }
 
 private extension SectionedTableViewBinder {
     func updateCellModelsOrViewModelsOrNumCells(
-        models: [S: [Identifiable]]?,
-        viewModels: [S: [Identifiable]]?,
+        models: [S: [CollectionIdentifiable]]?,
+        viewModels: [S: [CollectionIdentifiable]]?,
         numCells: [S: Int]?,
         sections: [S]?)
     {
@@ -154,7 +154,7 @@ private extension SectionedTableViewBinder {
     
     func updateHeaderOrFooterTitlesOrViewModels(
         titles: [S: String?]?,
-        viewModels: [S: Identifiable?]?,
+        viewModels: [S: CollectionIdentifiable?]?,
         isHeader: Bool,
         sections: [S]?)
     {

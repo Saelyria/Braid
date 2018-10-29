@@ -15,7 +15,7 @@ public extension TableViewSection {
     }
 }
 
-public extension TableViewSection where Self: Identifiable {
+public extension TableViewSection where Self: CollectionIdentifiable {
     public var hashValue: Int {
         return self.id.hashValue
     }
@@ -156,10 +156,10 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     private(set) var handlers = TableViewBindingHandlers<S>()
     
     // The data model currently shown by the table view.
-    private(set) var currentDataModel = TableViewDataModel<S>()
+    private(set) var currentDataModel = AnimatableTableViewDataModel<S>()
     // The next data model to be shown by the table view. When this model's properties are updated, the binder will
     // queue appropriate animations on the table view to be done on the next render frame.
-    private(set) var nextDataModel = TableViewDataModel<S>()
+    private(set) var nextDataModel = AnimatableTableViewDataModel<S>()
     
     private var hasRefreshQueued: Bool = false
     
@@ -257,7 +257,6 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         
         return TableViewInitialMutliSectionBinder<S>(binder: self, sections: sections)
     }
-    
 
     /**
      Begins a binding chain to add simple data or callback handlers for any bound sections on the table.
@@ -268,11 +267,11 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      
      - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
     */
-    public func onAnySection() -> TableViewInitialMutliSectionBinder<S> {
+    public func onAnySection() -> AnySectionBinder<S> {
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
-        return TableViewInitialMutliSectionBinder<S>(binder: self, sections: nil)
+        return AnySectionBinder<S>(binder: self)
     }
     
     /**
@@ -337,7 +336,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     private func createNextDataModel() {
         self.currentDataModel = self.nextDataModel
         self.currentDataModel.delegate = nil
-        self.nextDataModel = TableViewDataModel<S>(from: self.currentDataModel)
+        self.nextDataModel = AnimatableTableViewDataModel<S>(from: self.currentDataModel)
         self.nextDataModel.delegate = self
     }
 }

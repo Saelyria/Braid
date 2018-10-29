@@ -108,7 +108,7 @@ class ArtistsViewController: UIViewController {
     }
 }
 
-extension Artist: Identifiable {
+extension Artist: CollectionIdentifiable {
     var id: String { return self.name }
     
     /// Maps the 'artist' into a view model for a 'title detail cell'

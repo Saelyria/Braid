@@ -48,7 +48,7 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>:
         models: [NM],
         mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelViewModelSingleSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Identifiable
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: CollectionIdentifiable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
         let viewModels = [self.section: models.map(mapToViewModel)]
@@ -76,7 +76,7 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>:
      */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [NM]) -> TableViewModelSingleSectionBinder<NC, S, NM>
-    where NC: UITableViewCell & ReuseIdentifiable, NM: Identifiable {
+    where NC: UITableViewCell & ReuseIdentifiable, NM: CollectionIdentifiable {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
         self.binder.updateCellModels([self.section: models], viewModels: nil, sections: [self.section])
         

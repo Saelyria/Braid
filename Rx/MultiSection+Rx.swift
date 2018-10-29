@@ -33,7 +33,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
      */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: Observable<[Base.S: [NM]]>, mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-    -> TableViewModelViewModelMultiSectionBinder<NC, Base.S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Identifiable {
+    -> TableViewModelViewModelMultiSectionBinder<NC, Base.S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: CollectionIdentifiable {
         guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
@@ -45,7 +45,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
             .asDriver(onErrorJustReturn: [:])
             .asObservable()
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [Base.S: [NM]]) in
-                var viewModels: [Base.S: [Identifiable]] = [:]
+                var viewModels: [Base.S: [CollectionIdentifiable]] = [:]
                 for (s, m) in models {
                     viewModels[s] = m.map(mapToViewModel)
                 }
@@ -105,7 +105,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind<NM: Identifiable>(
+    public func bind<NM: CollectionIdentifiable>(
         cellProvider: @escaping (_ section: Base.S, _ row: Int, _ model: NM) -> UITableViewCell,
         models: Observable<[Base.S: [NM]]>)
         -> TableViewModelMultiSectionBinder<UITableViewCell, Base.S, NM>
@@ -132,7 +132,6 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
         
         return TableViewModelMultiSectionBinder<UITableViewCell, Base.S, NM>(binder: bindResult.binder, sections: sections)
     }
-
     
     /**
      Bind a custom handler that will provide table view cells for the declared sections, along with the number of cells

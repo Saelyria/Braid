@@ -1,6 +1,6 @@
 import UIKit
 
-class AnySectionBinder<S: TableViewSection> {
+public class AnySectionBinder<S: TableViewSection> {
     internal let binder: SectionedTableViewBinder<S>
     
     internal init(binder: SectionedTableViewBinder<S>) {
@@ -110,7 +110,7 @@ class AnySectionBinder<S: TableViewSection> {
      */
     @discardableResult
     public func estimatedHeaderHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> AnySectionBinder<S> {
-        self.binder.handlers.anySectionEstimatedHeaderHeightBlock = handler
+        self.binder.handlers.anySectionHeaderEstimatedHeightBlock = handler
         
         return self
     }
@@ -140,7 +140,7 @@ class AnySectionBinder<S: TableViewSection> {
      */
     @discardableResult
     public func estimatedFooterHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> AnySectionBinder<S> {
-        self.binder.handlers.anySectionEstimatedFooterHeightBlock = handler
+        self.binder.handlers.anySectionFooterEstimatedHeightBlock = handler
         
         return self
     }

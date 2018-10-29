@@ -2,7 +2,7 @@ import Tableau
 import RxCocoa
 
 class HomeViewController: UIViewController {
-    struct Section: TableViewSection, Identifiable {
+    struct Section: TableViewSection, CollectionIdentifiable {
         let id: String
         let title: String?
         let footer: String?
@@ -17,7 +17,7 @@ class HomeViewController: UIViewController {
     private var tableView: UITableView!
     private var binder: SectionedTableViewBinder<Section>!
     
-    private let sectionCellModels = BehaviorRelay<[Section: [Identifiable]]>(value: [:])
+    private let sectionCellModels = BehaviorRelay<[Section: [CollectionIdentifiable]]>(value: [:])
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,7 +40,7 @@ class HomeViewController: UIViewController {
             .bind(cellType: CenterLabelTableViewCell.self, viewModels: ["<Brand Name>. Shopping made easier."])
         
         self.binder.onAllOtherSections()
-            .rx.bind(cellProvider: { [unowned self] (section: Section, row: Int, model: Identifiable) in
+            .rx.bind(cellProvider: { [unowned self] (section: Section, row: Int, model: CollectionIdentifiable) in
                 if let viewModel = model as? TitleDetailTableViewCell.ViewModel {
                     let cell = self.tableView.dequeue(TitleDetailTableViewCell.self)
                     cell.viewModel = viewModel
@@ -56,7 +56,7 @@ class HomeViewController: UIViewController {
 }
 
 private extension HomePageSection {
-    func asSectionModel() -> (HomeViewController.Section, [Identifiable]) {
+    func asSectionModel() -> (HomeViewController.Section, [CollectionIdentifiable]) {
         let section = HomeViewController.Section(
             id: self.title,
             title: self.title,
@@ -66,7 +66,7 @@ private extension HomePageSection {
 }
 
 private extension HomePageSection.ModelType {
-    func asCellModels() -> [Identifiable] {
+    func asCellModels() -> [CollectionIdentifiable] {
         switch self {
         case .stores(let stores):
             let titleDetailVMs = stores.map { (store: Store) in

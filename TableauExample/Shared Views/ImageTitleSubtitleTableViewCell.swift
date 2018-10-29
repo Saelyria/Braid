@@ -1,7 +1,7 @@
 import Tableau
 
 class ImageTitleSubtitleTableViewCell: UITableViewCell, ReuseIdentifiable, ViewModelBindable {
-    struct ViewModel: Identifiable {
+    struct ViewModel: CollectionIdentifiable {
         let id: String
     }
     

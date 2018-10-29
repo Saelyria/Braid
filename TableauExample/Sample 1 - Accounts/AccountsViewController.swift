@@ -156,7 +156,7 @@ private extension Account.AccountType {
     }
 }
 
-extension Account: Identifiable {
+extension Account: CollectionIdentifiable {
     var id: String { return self.accountNumber }
     
     func asTitleDetailCellViewModel() -> TitleDetailTableViewCell.ViewModel {

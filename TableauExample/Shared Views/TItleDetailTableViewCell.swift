@@ -9,7 +9,7 @@ import RxSwift
  it can register it to the table view.
  */
 final class TitleDetailTableViewCell: UITableViewCell, ReuseIdentifiable, ViewModelBindable, UINibInitable {
-    struct ViewModel: Identifiable {
+    struct ViewModel: CollectionIdentifiable {
         // View models for cells must provide an `id` property. Tableau uses this property to track movement of a cell
         // in the table when it calculates diffs, so it must be unique to each view model.
         let id: String
