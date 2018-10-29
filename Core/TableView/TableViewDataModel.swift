@@ -1,85 +1,47 @@
 import Differ
 
-public protocol Identifiable {
-    var id: String { get }
-}
-
-extension String: Identifiable {
-    public var id: String { return self }
-}
-
 internal protocol TableViewDataModelDelegate: AnyObject {
     func dataModelDidChange()
 }
 
-/**
- An object representing the data state of a table view.
- */
 internal class TableViewDataModel<S: TableViewSection> {
-    internal struct SectionModel: Equatable, Collection {
-        typealias Index = Int
-        
-        let section: S
-        let items: [Identifiable]
-        
-        var startIndex: Int {
-            return items.startIndex
-        }
-        
-        var endIndex: Int {
-            return items.endIndex
-        }
-        
-        subscript(i: Int) -> Identifiable {
-            return items[i]
-        }
-        
-        func index(after i: Int) -> Int {
-            return items.index(after: i)
-        }
-        
-        static func == (lhs: SectionModel, rhs: SectionModel) -> Bool {
-            return lhs.section == rhs.section
-        }
-    }
+    weak var delegate: TableViewDataModelDelegate?
     
     // The sections that were bound uniquely with either the `onSection` or `onSections` methods. This is used to
     // ensure that updates to data bound with `onAllSections` does not overwrite data for these sections.
     var uniquelyBoundSections: [S] = []
-    
     // The displayed section on the table view.
     var displayedSections: [S] = [] {
         didSet { self.delegate?.dataModelDidChange() }
     }
-    
-    // The view models for the cells for a section.
-    var sectionCellViewModels: [S: [Identifiable]] = [:] {
-        didSet { self.delegate?.dataModelDidChange() }
-    }
-    // The raw models for the cells for a section.
-    var sectionCellModels: [S: [Identifiable]] = [:] {
-        didSet { self.delegate?.dataModelDidChange() }
-    }
-
-    // The view models for the headers for a section.
-    var sectionHeaderViewModels: [S: Identifiable] = [:] {
-        didSet { self.delegate?.dataModelDidChange() }
-    }
-    // Titles for the headers for a section.
-    var sectionHeaderTitles: [S: String] = [:] {
-        didSet { self.delegate?.dataModelDidChange() }
-    }
-
-    // The view models for the footers for a section.
-    var sectionFooterViewModels: [S: Identifiable] = [:] {
+    // The number of cells to create for a section when the user manages dequeueing themselves.
+    var sectionNumberOfCells: [S: Int] = [:] {
         didSet { self.delegate?.dataModelDidChange() }
     }
     // Titles for the footers for a section.
     var sectionFooterTitles: [S: String] = [:] {
         didSet { self.delegate?.dataModelDidChange() }
     }
-    
-    weak var delegate: TableViewDataModelDelegate?
+    // Titles for the headers for a section.
+    var sectionHeaderTitles: [S: String] = [:] {
+        didSet { self.delegate?.dataModelDidChange() }
+    }
+    // The view models for the cells for a section.
+    var sectionCellViewModels: [S: [Any]] = [:] {
+        didSet { self.delegate?.dataModelDidChange() }
+    }
+    // The raw models for the cells for a section.
+    var sectionCellModels: [S: [Any]] = [:] {
+        didSet { self.delegate?.dataModelDidChange() }
+    }
+    // The view models for the headers for a section.
+    var sectionHeaderViewModels: [S: Any] = [:] {
+        didSet { self.delegate?.dataModelDidChange() }
+    }
+    // The view models for the footers for a section.
+    var sectionFooterViewModels: [S: Any] = [:] {
+        didSet { self.delegate?.dataModelDidChange() }
+    }
     
     init() { }
     
@@ -93,36 +55,66 @@ internal class TableViewDataModel<S: TableViewSection> {
         self.sectionFooterViewModels = other.sectionFooterViewModels
         self.sectionFooterTitles = other.sectionFooterTitles
     }
-    
-    func asSectionModels() -> [SectionModel] {
-        return self.displayedSections.map { (section) -> SectionModel in
-            return SectionModel(section: section, items: self.sectionCellViewModels[section] ?? self.sectionCellModels[section] ?? [])
-        }
-    }
-
-    func diff(from other: TableViewDataModel<S>) -> NestedExtendedDiff {
-        return self.asSectionModels().nestedExtendedDiff(to: other.asSectionModels(), isEqualElement: { $0.id == $1.id })
-    }
 }
 
-internal class DataModel<S: TableViewSection> {
-    // The displayed section on the table view.
-    var displayedSections: [S] = [] {
-        didSet { self.delegate?.dataModelDidChange() }
-    }
-    
-    var sectionModels: [((S) -> Bool, [Any])] = [] {
-        didSet { self.delegate?.dataModelDidChange() }
-    }
-    
-    weak var delegate: TableViewDataModelDelegate?
-    
-    func models(forSection section: S) -> [Any] {
-        for (modelsAreForSection, sectionModels) in self.sectionModels {
-            if modelsAreForSection(section) {
-                return sectionModels
-            }
+extension TableViewDataModel {
+    internal struct DiffableSectionModel: Equatable, Collection {
+        typealias Index = Int
+        
+        let section: S
+        let items: [CollectionIdentifiable]
+        
+        var startIndex: Int {
+            return items.startIndex
         }
-        return []
+        
+        var endIndex: Int {
+            return items.endIndex
+        }
+        
+        subscript(i: Int) -> CollectionIdentifiable {
+            return items[i]
+        }
+        
+        func index(after i: Int) -> Int {
+            return items.index(after: i)
+        }
+        
+        static func == (lhs: DiffableSectionModel, rhs: DiffableSectionModel) -> Bool {
+            return lhs.section == rhs.section
+        }
+    }
+    
+    /**
+     Maps the data model to an array of diffable section models that can be used with Differ to animate changes on the
+     table view. Returns nil if the data is not diffable (i.e. one or more of its data arrays did not contain models
+     that conformed to `CollectionIdentifiable`).
+     */
+    func asDiffableSectionModels() -> [DiffableSectionModel]? {
+        return try? self.displayedSections.map { (section) throws -> DiffableSectionModel in
+            var _identifiableItems: [CollectionIdentifiable]?
+            if let identifiableVMs = self.sectionCellViewModels as? [S: [CollectionIdentifiable]] {
+                _identifiableItems = identifiableVMs[section]
+            } else if let identifiableMs = self.sectionCellModels as? [S: [CollectionIdentifiable]] {
+                _identifiableItems = identifiableMs[section]
+            } else if self.sectionCellViewModels.isEmpty && self.sectionCellModels.isEmpty {
+                _identifiableItems = []
+            }
+            guard let identifiableItems = _identifiableItems else { throw NSError(domain: "", code: 0, userInfo: nil) }
+            
+            return DiffableSectionModel(section: section, items: identifiableItems)
+        }
+    }
+    
+    /**
+     Creates a Differ 'nested extended diff' object from this data model and the 'other' given model. Returns nil if the
+     data is not diffable (i.e. one or more of its data arrays did not contain  models that conformed to
+     `CollectionIdentifiable`).
+     */
+    func diff(from other: TableViewDataModel<S>) -> NestedExtendedDiff? {
+        guard let selfSectionModels = self.asDiffableSectionModels(), let otherSectionModels = other.asDiffableSectionModels() else {
+            return nil
+        }
+        return selfSectionModels.nestedExtendedDiff(to: otherSectionModels, isEqualElement: { $0.id == $1.id })
     }
 }

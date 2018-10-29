@@ -12,11 +12,9 @@ import RxCocoa
  section.
  */
 class ArtistsViewController: UIViewController {
-    // The struct section model. To use a struct, it must declare an `id` property (as part of `Identifiable`
-    // conformance) so the  binder can track section insertion/deletion/movement.
+    // The struct section model.
     struct Section: TableViewSection {
-        let id: String
-        let title: String?
+        let title: String
     }
     
     private let tableView = UITableView()
@@ -110,7 +108,7 @@ class ArtistsViewController: UIViewController {
     }
 }
 
-extension Artist: Identifiable {
+extension Artist: CollectionIdentifiable {
     var id: String { return self.name }
     
     /// Maps the 'artist' into a view model for a 'title detail cell'
@@ -133,7 +131,7 @@ private extension Observable where Element == [Artist] {
         return self.flatMap { (artists: [Artist]) -> Observable<[Section: [Artist]]> in
             var artistsForSections: [Section: [Artist]] = [:]
             for artist in artists {
-                let section = Section(id: artist.firstLetter.capitalized, title: artist.firstLetter.capitalized)
+                let section = Section(title: artist.firstLetter.capitalized)
                 if artistsForSections[section] == nil {
                     artistsForSections[section] = []
                 }
@@ -153,7 +151,7 @@ private extension Observable where Element == [ArtistsViewController.Section: [A
     func flatMapToDisplayedSections() -> Observable<[ArtistsViewController.Section]> {
         return self.flatMap { dict -> Observable<[ArtistsViewController.Section]> in
             // sort sections in alphabetical order
-            let sections = Array(dict.keys).sorted(by: { $0.id < $1.id })
+            let sections = Array(dict.keys).sorted(by: { $0.title < $1.title })
             return Observable<[ArtistsViewController.Section]>.just(sections)
         }
     }

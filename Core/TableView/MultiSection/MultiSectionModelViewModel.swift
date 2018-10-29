@@ -1,6 +1,6 @@
 import UIKit
 
-public class TableViewModelViewModelMultiSectionBinder<C: UITableViewCell & ViewModelBindable, S: TableViewSection, M: Identifiable>: BaseTableViewMutliSectionBinder<C, S>, TableViewMutliSectionBinderProtocol {
+public class TableViewModelViewModelMultiSectionBinder<C: UITableViewCell & ViewModelBindable, S: TableViewSection, M>: BaseTableViewMutliSectionBinder<C, S>, TableViewMutliSectionBinderProtocol {
     private let mapToViewModelFunc: (M) -> C.ViewModel
     
     init(binder: SectionedTableViewBinder<S>, sections: [S]?, mapToViewModel: @escaping (M) -> C.ViewModel) {
@@ -17,7 +17,7 @@ public class TableViewModelViewModelMultiSectionBinder<C: UITableViewCell & View
     */
     public func createUpdateCallback() -> ([S: [M]]) -> Void {
         return { [weak binder = self.binder, sections = self.sections, mapToViewModel = self.mapToViewModelFunc] (models: [S: [M]]) in
-            var viewModels: [S: [Identifiable]] = [:]
+            var viewModels: [S: [Any]] = [:]
             for (s, m) in models {
                 viewModels[s] = m.map(mapToViewModel)
             }

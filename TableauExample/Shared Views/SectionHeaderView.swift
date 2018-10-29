@@ -5,7 +5,7 @@ import Tableau
  An example of how a custom table header/footer view would be implemented for use with Tableau.
  */
 class SectionHeaderView: UITableViewHeaderFooterView, ReuseIdentifiable, ViewModelBindable {
-    struct ViewModel: Identifiable {
+    struct ViewModel: CollectionIdentifiable {
         let title: String
         var id: String { return self.title }
     }

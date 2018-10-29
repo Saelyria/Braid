@@ -7,11 +7,14 @@ import Tableau
  Nib file.
  */
 final class CenterLabelTableViewCell: UITableViewCell, ViewModelBindable, ReuseIdentifiable {
-    typealias ViewModel = String
+    struct ViewModel: CollectionIdentifiable {
+        let text: String
+        var id: String { return self.text }
+    }
     
     var viewModel: CenterLabelTableViewCell.ViewModel? {
         didSet {
-            self.centerLabel.text = self.viewModel
+            self.centerLabel.text = self.viewModel?.text
         }
     }
     

@@ -31,6 +31,10 @@
 		AB577BBC217E75B600CD2363 /* SectionedTableViewBinder+Dequeueing.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BBB217E75B600CD2363 /* SectionedTableViewBinder+Dequeueing.swift */; };
 		AB577BC0217FE9CC00CD2363 /* TableViewBindingHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BBF217FE9CC00CD2363 /* TableViewBindingHandlers.swift */; };
 		AB577BC3217FED4F00CD2363 /* AnySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BC2217FED4F00CD2363 /* AnySection.swift */; };
+		AB577BC72181291800CD2363 /* SingleSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BC62181291800CD2363 /* SingleSectionProvider.swift */; };
+		AB577BC92182BFB200CD2363 /* MultiSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BC82182BFB200CD2363 /* MultiSectionProvider.swift */; };
+		AB577BD82187A66E00CD2363 /* CollectionIdentifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BD72187A66E00CD2363 /* CollectionIdentifiable.swift */; };
+		AB577BDA2187B63200CD2363 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BD92187B63200CD2363 /* DataModel.swift */; };
 		ABB9635521714B6600519963 /* TableViewDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB9635421714B6600519963 /* TableViewDataModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -61,6 +65,10 @@
 		AB577BBB217E75B600CD2363 /* SectionedTableViewBinder+Dequeueing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SectionedTableViewBinder+Dequeueing.swift"; sourceTree = "<group>"; };
 		AB577BBF217FE9CC00CD2363 /* TableViewBindingHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewBindingHandlers.swift; sourceTree = "<group>"; };
 		AB577BC2217FED4F00CD2363 /* AnySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnySection.swift; sourceTree = "<group>"; };
+		AB577BC62181291800CD2363 /* SingleSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleSectionProvider.swift; sourceTree = "<group>"; };
+		AB577BC82182BFB200CD2363 /* MultiSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiSectionProvider.swift; sourceTree = "<group>"; };
+		AB577BD72187A66E00CD2363 /* CollectionIdentifiable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionIdentifiable.swift; sourceTree = "<group>"; };
+		AB577BD92187B63200CD2363 /* DataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
 		ABB9635421714B6600519963 /* TableViewDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewDataModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -82,6 +90,7 @@
 				9360CCB420E5D5D200DF8886 /* SingleSectionViewModel.swift */,
 				9312CD3220EC4E53007B2A76 /* SingleSectionModel.swift */,
 				9360CCB820E5E37700DF8886 /* SingleSectionModelViewModel.swift */,
+				AB577BC62181291800CD2363 /* SingleSectionProvider.swift */,
 				9312CD3420EDBA3B007B2A76 /* BaseSingleSection.swift */,
 			);
 			path = SingleSection;
@@ -94,6 +103,7 @@
 				9360CCBA20E6EC6200DF8886 /* MultiSectionViewModel.swift */,
 				9378E76920D72D180039849F /* MultiSectionModel.swift */,
 				9312CD3020EC4E31007B2A76 /* MultiSectionModelViewModel.swift */,
+				AB577BC82182BFB200CD2363 /* MultiSectionProvider.swift */,
 				9312CD3620EDBBF4007B2A76 /* BaseMultiSection.swift */,
 			);
 			path = MultiSection;
@@ -145,6 +155,7 @@
 				9381333C20B6EC5600CBF8F6 /* ViewModelBindable.swift */,
 				9381333D20B6EC5600CBF8F6 /* UINibInitable.swift */,
 				9381333E20B6EC5600CBF8F6 /* UITableView+Registering.swift */,
+				AB577BD72187A66E00CD2363 /* CollectionIdentifiable.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -158,6 +169,7 @@
 				AB577BBF217FE9CC00CD2363 /* TableViewBindingHandlers.swift */,
 				AB577BB9217D5BEB00CD2363 /* SectionedTableViewBinder+Updating.swift */,
 				AB577BBB217E75B600CD2363 /* SectionedTableViewBinder+Dequeueing.swift */,
+				AB577BD92187B63200CD2363 /* DataModel.swift */,
 				9360CCB620E5E1B400DF8886 /* SingleSection */,
 				9360CCB720E5E1CA00DF8886 /* MultiSection */,
 				AB577BC1217FED4000CD2363 /* AnySection */,
@@ -260,6 +272,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9312CD3720EDBBF4007B2A76 /* BaseMultiSection.swift in Sources */,
+				AB577BD82187A66E00CD2363 /* CollectionIdentifiable.swift in Sources */,
 				9381334820B6EC5600CBF8F6 /* _TableViewDataSourceDelegate.swift in Sources */,
 				AB577BBA217D5BEB00CD2363 /* SectionedTableViewBinder+Updating.swift in Sources */,
 				ABB9635521714B6600519963 /* TableViewDataModel.swift in Sources */,
@@ -269,14 +282,17 @@
 				9381334420B6EC5600CBF8F6 /* ReuseIdentifiable.swift in Sources */,
 				AB577BC3217FED4F00CD2363 /* AnySection.swift in Sources */,
 				93C36A4620D9D4E4006B7ECF /* MultiSection+Rx.swift in Sources */,
+				AB577BC92182BFB200CD2363 /* MultiSectionProvider.swift in Sources */,
 				9381334520B6EC5600CBF8F6 /* ViewModelBindable.swift in Sources */,
 				AB577BBC217E75B600CD2363 /* SectionedTableViewBinder+Dequeueing.swift in Sources */,
 				9360CCB920E5E37700DF8886 /* SingleSectionModelViewModel.swift in Sources */,
 				AB577BC0217FE9CC00CD2363 /* TableViewBindingHandlers.swift in Sources */,
 				93BF737520CDA232000F0FB0 /* SectionedTableViewBinder.swift in Sources */,
 				93BF737920D3E654000F0FB0 /* MultiSectionInitial.swift in Sources */,
+				AB577BC72181291800CD2363 /* SingleSectionProvider.swift in Sources */,
 				9312CD3120EC4E31007B2A76 /* MultiSectionModelViewModel.swift in Sources */,
 				9360CCB520E5D5D200DF8886 /* SingleSectionViewModel.swift in Sources */,
+				AB577BDA2187B63200CD2363 /* DataModel.swift in Sources */,
 				9381334720B6EC5600CBF8F6 /* UITableView+Registering.swift in Sources */,
 				9378E76820D71D530039849F /* SingleSection+Rx.swift in Sources */,
 				93BF737720CF229B000F0FB0 /* SingleSectionInitial.swift in Sources */,

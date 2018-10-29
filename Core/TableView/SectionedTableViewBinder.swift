@@ -7,11 +7,17 @@ import RxSwift
 /**
  A protocol describing an enum whose cases or a struct whose instances correspond to sections in a table view.
 */
-public protocol TableViewSection: Hashable, Identifiable { }
+public protocol TableViewSection: Hashable { }
 
 public extension TableViewSection {
-    public var id: String {
-        return String(self.hashValue)
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.hashValue == rhs.hashValue
+    }
+}
+
+public extension TableViewSection where Self: CollectionIdentifiable {
+    public var hashValue: Int {
+        return self.id.hashValue
     }
 }
 
@@ -251,7 +257,6 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         
         return TableViewInitialMutliSectionBinder<S>(binder: self, sections: sections)
     }
-    
 
     /**
      Begins a binding chain to add simple data or callback handlers for any bound sections on the table.
@@ -262,11 +267,11 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      
      - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
     */
-    public func onAnySection() -> TableViewInitialMutliSectionBinder<S> {
+    public func onAnySection() -> AnySectionBinder<S> {
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
-        return TableViewInitialMutliSectionBinder<S>(binder: self, sections: nil)
+        return AnySectionBinder<S>(binder: self)
     }
     
     /**
@@ -363,20 +368,27 @@ extension SectionedTableViewBinder: TableViewDataModelDelegate {
         
         self.hasRefreshQueued = true
         DispatchQueue.main.async {
-            let current = self.currentDataModel.asSectionModels()
-            let next = self.nextDataModel.asSectionModels()
-            
-            self.createNextDataModel()
-            
-            self.tableView.animateRowAndSectionChanges(
-                oldData: current,
-                newData: next,
-                isEqualSection: { $0.section == $1.section },
-                isEqualElement: { $0.id == $1.id },
-                rowDeletionAnimation: self.rowDeletionAnimation,
-                rowInsertionAnimation: self.rowInsertionAnimation,
-                sectionDeletionAnimation: self.sectionDeletionAnimation,
-                sectionInsertionAnimation: self.sectionInsertionAnimation)
+            // If we were able to create 'diffable section models' from the data models (i.e. the cell models or view
+            // models conformed to 'CollectionIdentifiable'), then animate the changes.
+            if let current = self.currentDataModel.asDiffableSectionModels(),
+            let next = self.nextDataModel.asDiffableSectionModels() {
+                self.createNextDataModel()
+                
+                self.tableView.animateRowAndSectionChanges(
+                    oldData: current,
+                    newData: next,
+                    isEqualSection: { $0.section == $1.section },
+                    isEqualElement: { $0.id == $1.id },
+                    rowDeletionAnimation: self.rowDeletionAnimation,
+                    rowInsertionAnimation: self.rowInsertionAnimation,
+                    sectionDeletionAnimation: self.sectionDeletionAnimation,
+                    sectionInsertionAnimation: self.sectionInsertionAnimation)
+            }
+            // otherwise, just do a plain table view reload.
+            else {
+                self.createNextDataModel()
+                self.tableView.reloadData()
+            }
             
             self.hasRefreshQueued = false
         }

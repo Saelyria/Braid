@@ -93,5 +93,5 @@ class TableViewBindingHandlers<S: TableViewSection> {
     // A fallback block to call when a cell is tapped whose section wasn't given a unique block.
     var anySectionCellTappedCallback: CellTapCallback<S>?
     // A fallback block to call when a cell is dequeued whose section wasn't given a unique block.
-    var anySectionCellDequeuedCallback: CellDequeueBlock<S>?
+    var anySectionCellDequeuedCallback: CellDequeueCallback<S>?
 }

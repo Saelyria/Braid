@@ -50,9 +50,24 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
             return models.count
         } else if let viewModels = self.binder.currentDataModel.sectionCellViewModels[section] {
             return viewModels.count
+        } else if let numCells = self.binder.currentDataModel.sectionNumberOfCells[section] {
+            return numCells
         } else {
             return 0
         }
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let section = self.binder.currentDataModel.displayedSections[indexPath.section]
+        
+        // We can't fall back to the 'all sections' cell dequeue block - might expect a different cell type.
+        let _dequeueBlock = (sectionWasUniquelyBound(section)) ?
+            self.binder.handlers.sectionCellDequeueBlocks[section] :
+            self.binder.handlers.dynamicSectionCellDequeueBlock
+        guard let dequeueBlock = _dequeueBlock else { return UITableViewCell() }
+        
+        let cell = dequeueBlock(section, tableView, indexPath)
+        return cell
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -77,19 +92,6 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
             return nil
         }
         return self.binder.currentDataModel.sectionFooterTitles[section]
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let section = self.binder.currentDataModel.displayedSections[indexPath.section]
-        
-        // We can't fall back to the 'all sections' cell dequeue block - might expect a different cell type.
-        let _dequeueBlock = (sectionWasUniquelyBound(section)) ?
-            self.binder.handlers.sectionCellDequeueBlocks[section] :
-            self.binder.handlers.dynamicSectionCellDequeueBlock
-        guard let dequeueBlock = _dequeueBlock else { return UITableViewCell() }
-
-        let cell = dequeueBlock(section, tableView, indexPath)
-        return cell
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection sectionInt: Int) -> UIView? {

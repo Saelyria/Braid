@@ -11,6 +11,7 @@ At the bare minimum, here's what a super simple, static, section-less table view
 var models: [MyModel] = ...
 
 let binder = TableViewBinder(tableView: self.tableView)
+
 binder.onTable()
     .bind(cellType: MyCell.self, models: models)
     .onCellDequeue { (row: Int, cell: MyCell, model: MyModel) in
@@ -35,6 +36,7 @@ enum Section: TableViewSection {
 }
 
 let binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
+
 binder.onSection(.firstSection)
     .bind(cellType: MyCell.self, models: [...])
     ...
@@ -135,7 +137,7 @@ binder.onSection(.investing)
         // go to an 'account details' view controller with the account
     }
     
-binder.onAllSections()
+binder.onAnySection()
     .onTapped { (section: Section, row: Int, cell: UITableViewCell)
         // analytics stuff
     }

@@ -9,7 +9,7 @@ import Foundation
  */
 public protocol ViewModelBindable {
     /// The type that this object's view model must be.
-    associatedtype ViewModel: Identifiable
+    associatedtype ViewModel
     
     /// The view model supplied to the `ViewModelBindable` instance.
     var viewModel: ViewModel? { get set }

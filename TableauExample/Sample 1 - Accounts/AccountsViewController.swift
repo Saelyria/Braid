@@ -69,7 +69,7 @@ class AccountsViewController: UIViewController {
         // with it. We only need one cell in this section, so our `viewModels` array is just a single string.
         self.binder.onSection(.message)
             .bind(cellType: CenterLabelTableViewCell.self, viewModels: [
-                "Open a new savings account today and receive 3.10% for the first three months!"
+                CenterLabelTableViewCell.ViewModel(text: "Open a new savings account today and receive 3.10% for the first three months!")
             ])
         
         // Bind the 'checking', 'savings', and 'other' sections. When we bind multiple sections, we provide an
@@ -156,7 +156,7 @@ private extension Account.AccountType {
     }
 }
 
-extension Account: Identifiable {
+extension Account: CollectionIdentifiable {
     var id: String { return self.accountNumber }
     
     func asTitleDetailCellViewModel() -> TitleDetailTableViewCell.ViewModel {
