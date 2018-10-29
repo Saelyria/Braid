@@ -45,9 +45,9 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
     */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [S: [NM]], mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-    -> TableViewModelViewModelMultiSectionBinder<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: CollectionIdentifiable {
+    -> TableViewModelViewModelMultiSectionBinder<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: self.sections)
-        var viewModels: [S: [CollectionIdentifiable]] = [:]
+        var viewModels: [S: [Any]] = [:]
         for (s, m) in models {
             viewModels[s] = m.map(mapToViewModel)
         }

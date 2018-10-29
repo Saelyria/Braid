@@ -37,21 +37,23 @@ class HomeViewController: UIViewController {
         self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self, displayedSections: [banner])
         
         self.binder.onSection(banner)
-            .bind(cellType: CenterLabelTableViewCell.self, viewModels: ["<Brand Name>. Shopping made easier."])
+            .bind(cellType: CenterLabelTableViewCell.self, viewModels: [
+                CenterLabelTableViewCell.ViewModel(text: "<Brand Name>. Shopping made easier.")
+            ])
         
-        self.binder.onAllOtherSections()
-            .rx.bind(cellProvider: { [unowned self] (section: Section, row: Int, model: CollectionIdentifiable) in
-                if let viewModel = model as? TitleDetailTableViewCell.ViewModel {
-                    let cell = self.tableView.dequeue(TitleDetailTableViewCell.self)
-                    cell.viewModel = viewModel
-                    return cell
-                } else if let viewModel = model as? ImageTitleSubtitleTableViewCell.ViewModel {
-                    let cell = self.tableView.dequeue(ImageTitleSubtitleTableViewCell.self)
-                    cell.viewModel = viewModel
-                    return cell
-                }
-                return UITableViewCell()
-            }, models: self.sectionCellModels.asObservable())
+//        self.binder.onAllOtherSections()
+//            .rx.bind(cellProvider: { [unowned self] (section: Section, row: Int, model: CollectionIdentifiable) in
+//                if let viewModel = model as? TitleDetailTableViewCell.ViewModel {
+//                    let cell = self.tableView.dequeue(TitleDetailTableViewCell.self)
+//                    cell.viewModel = viewModel
+//                    return cell
+//                } else if let viewModel = model as? ImageTitleSubtitleTableViewCell.ViewModel {
+//                    let cell = self.tableView.dequeue(ImageTitleSubtitleTableViewCell.self)
+//                    cell.viewModel = viewModel
+//                    return cell
+//                }
+//                return UITableViewCell()
+//            }, models: self.sectionCellModels.asObservable())
     }
 }
 

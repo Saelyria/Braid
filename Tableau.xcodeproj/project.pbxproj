@@ -33,6 +33,8 @@
 		AB577BC3217FED4F00CD2363 /* AnySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BC2217FED4F00CD2363 /* AnySection.swift */; };
 		AB577BC72181291800CD2363 /* SingleSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BC62181291800CD2363 /* SingleSectionProvider.swift */; };
 		AB577BC92182BFB200CD2363 /* MultiSectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BC82182BFB200CD2363 /* MultiSectionProvider.swift */; };
+		AB577BD82187A66E00CD2363 /* CollectionIdentifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BD72187A66E00CD2363 /* CollectionIdentifiable.swift */; };
+		AB577BDA2187B63200CD2363 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BD92187B63200CD2363 /* DataModel.swift */; };
 		ABB9635521714B6600519963 /* TableViewDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB9635421714B6600519963 /* TableViewDataModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -65,6 +67,8 @@
 		AB577BC2217FED4F00CD2363 /* AnySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnySection.swift; sourceTree = "<group>"; };
 		AB577BC62181291800CD2363 /* SingleSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleSectionProvider.swift; sourceTree = "<group>"; };
 		AB577BC82182BFB200CD2363 /* MultiSectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiSectionProvider.swift; sourceTree = "<group>"; };
+		AB577BD72187A66E00CD2363 /* CollectionIdentifiable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionIdentifiable.swift; sourceTree = "<group>"; };
+		AB577BD92187B63200CD2363 /* DataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
 		ABB9635421714B6600519963 /* TableViewDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewDataModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -151,6 +155,7 @@
 				9381333C20B6EC5600CBF8F6 /* ViewModelBindable.swift */,
 				9381333D20B6EC5600CBF8F6 /* UINibInitable.swift */,
 				9381333E20B6EC5600CBF8F6 /* UITableView+Registering.swift */,
+				AB577BD72187A66E00CD2363 /* CollectionIdentifiable.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -164,6 +169,7 @@
 				AB577BBF217FE9CC00CD2363 /* TableViewBindingHandlers.swift */,
 				AB577BB9217D5BEB00CD2363 /* SectionedTableViewBinder+Updating.swift */,
 				AB577BBB217E75B600CD2363 /* SectionedTableViewBinder+Dequeueing.swift */,
+				AB577BD92187B63200CD2363 /* DataModel.swift */,
 				9360CCB620E5E1B400DF8886 /* SingleSection */,
 				9360CCB720E5E1CA00DF8886 /* MultiSection */,
 				AB577BC1217FED4000CD2363 /* AnySection */,
@@ -266,6 +272,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9312CD3720EDBBF4007B2A76 /* BaseMultiSection.swift in Sources */,
+				AB577BD82187A66E00CD2363 /* CollectionIdentifiable.swift in Sources */,
 				9381334820B6EC5600CBF8F6 /* _TableViewDataSourceDelegate.swift in Sources */,
 				AB577BBA217D5BEB00CD2363 /* SectionedTableViewBinder+Updating.swift in Sources */,
 				ABB9635521714B6600519963 /* TableViewDataModel.swift in Sources */,
@@ -285,6 +292,7 @@
 				AB577BC72181291800CD2363 /* SingleSectionProvider.swift in Sources */,
 				9312CD3120EC4E31007B2A76 /* MultiSectionModelViewModel.swift in Sources */,
 				9360CCB520E5D5D200DF8886 /* SingleSectionViewModel.swift in Sources */,
+				AB577BDA2187B63200CD2363 /* DataModel.swift in Sources */,
 				9381334720B6EC5600CBF8F6 /* UITableView+Registering.swift in Sources */,
 				9378E76820D71D530039849F /* SingleSection+Rx.swift in Sources */,
 				93BF737720CF229B000F0FB0 /* SingleSectionInitial.swift in Sources */,

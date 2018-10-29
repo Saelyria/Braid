@@ -156,10 +156,10 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     private(set) var handlers = TableViewBindingHandlers<S>()
     
     // The data model currently shown by the table view.
-    private(set) var currentDataModel = AnimatableTableViewDataModel<S>()
+    private(set) var currentDataModel = TableViewDataModel<S>()
     // The next data model to be shown by the table view. When this model's properties are updated, the binder will
     // queue appropriate animations on the table view to be done on the next render frame.
-    private(set) var nextDataModel = AnimatableTableViewDataModel<S>()
+    private(set) var nextDataModel = TableViewDataModel<S>()
     
     private var hasRefreshQueued: Bool = false
     
@@ -292,9 +292,6 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
-        guard self.nextDataModel.sectionNumberOfCells.isEmpty else {
-            fatalError("`onAllOtherSections` and/or `onDynamicSections` can only be called once - re-binding is not supported.")
-        }
         return TableViewInitialMutliSectionBinder<S>(binder: self, sections: nil)
     }
     
@@ -336,7 +333,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     private func createNextDataModel() {
         self.currentDataModel = self.nextDataModel
         self.currentDataModel.delegate = nil
-        self.nextDataModel = AnimatableTableViewDataModel<S>(from: self.currentDataModel)
+        self.nextDataModel = TableViewDataModel<S>(from: self.currentDataModel)
         self.nextDataModel.delegate = self
     }
 }
@@ -371,20 +368,27 @@ extension SectionedTableViewBinder: TableViewDataModelDelegate {
         
         self.hasRefreshQueued = true
         DispatchQueue.main.async {
-            let current = self.currentDataModel.asSectionModels()
-            let next = self.nextDataModel.asSectionModels()
-            
-            self.createNextDataModel()
-            
-            self.tableView.animateRowAndSectionChanges(
-                oldData: current,
-                newData: next,
-                isEqualSection: { $0.section == $1.section },
-                isEqualElement: { $0.id == $1.id },
-                rowDeletionAnimation: self.rowDeletionAnimation,
-                rowInsertionAnimation: self.rowInsertionAnimation,
-                sectionDeletionAnimation: self.sectionDeletionAnimation,
-                sectionInsertionAnimation: self.sectionInsertionAnimation)
+            // If we were able to create 'diffable section models' from the data models (i.e. the cell models or view
+            // models conformed to 'CollectionIdentifiable'), then animate the changes.
+            if let current = self.currentDataModel.asDiffableSectionModels(),
+            let next = self.nextDataModel.asDiffableSectionModels() {
+                self.createNextDataModel()
+                
+                self.tableView.animateRowAndSectionChanges(
+                    oldData: current,
+                    newData: next,
+                    isEqualSection: { $0.section == $1.section },
+                    isEqualElement: { $0.id == $1.id },
+                    rowDeletionAnimation: self.rowDeletionAnimation,
+                    rowInsertionAnimation: self.rowInsertionAnimation,
+                    sectionDeletionAnimation: self.sectionDeletionAnimation,
+                    sectionInsertionAnimation: self.sectionInsertionAnimation)
+            }
+            // otherwise, just do a plain table view reload.
+            else {
+                self.createNextDataModel()
+                self.tableView.reloadData()
+            }
             
             self.hasRefreshQueued = false
         }

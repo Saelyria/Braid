@@ -33,7 +33,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
      */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: Observable<[Base.S: [NM]]>, mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-    -> TableViewModelViewModelMultiSectionBinder<NC, Base.S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: CollectionIdentifiable {
+    -> TableViewModelViewModelMultiSectionBinder<NC, Base.S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
         guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
@@ -45,7 +45,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
             .asDriver(onErrorJustReturn: [:])
             .asObservable()
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [Base.S: [NM]]) in
-                var viewModels: [Base.S: [CollectionIdentifiable]] = [:]
+                var viewModels: [Base.S: [Any]] = [:]
                 for (s, m) in models {
                     viewModels[s] = m.map(mapToViewModel)
                 }
