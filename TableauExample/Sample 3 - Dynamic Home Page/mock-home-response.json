@@ -1,0 +1,38 @@
+[
+    {
+        "title": "Recommended for you",
+        "type": "products",
+        "models": [
+            {
+                "title": "Bernie Bott's Every Flavour Beans",
+                "price": "8.99",
+                "unit": "ea",
+                "imageUrl": "<image url>"
+            },
+            {
+                "title": "Blue Bantha Milk",
+                "subtitle": "5.99",
+                "unit": "litre",
+                "imageUrl": "<image url>"
+            },
+        ],
+        "footerText": "See more",
+        "footerRoute": "<some kind of link for routing in the app>"
+    },
+    {
+        "title": "Stores near you",
+        "type": "stores",
+        "models": [
+            {
+                "title": "Bathurst & Queen",
+                "detail": "2.3 km",
+            },
+            {
+                "title": "Granville & Dunsmuir",
+                "detail": "7.8 km"
+            }
+        ],
+        "footerText": "See all",
+        "footerRoute": "<some kind of link for routing in the app>"
+    }
+]

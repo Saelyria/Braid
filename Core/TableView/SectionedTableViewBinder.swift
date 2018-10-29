@@ -15,6 +15,12 @@ public extension TableViewSection {
     }
 }
 
+public extension TableViewSection where Self: Identifiable {
+    public var hashValue: Int {
+        return self.id.hashValue
+    }
+}
+
 /**
  An object that dequeues and binds data to cells in sections for a given table view.
  

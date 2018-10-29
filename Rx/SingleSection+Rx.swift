@@ -87,6 +87,42 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
         
         return TableViewModelViewModelSingleSectionBinder<NC, Base.S, NM>(binder: bindResult.binder, section: bindResult.section, mapToViewModel: mapToViewModel)
     }
+    
+    /**
+     Bind a custom handler that will provide table view cells for the section, along with the number of cells to create.
+     
+     Use this method if you want full manual control over cell dequeueing. You might decide to use this method if you
+     use different cell types in the same section, cells in the section are not necessarily backed by a data model type,
+     or you have particularly complex use cases.
+     
+     - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter row: The row in the section the closure should provide a cell for.
+     - parameter numberOfCells: The number of cells to create for the section using the provided closure.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind(
+        cellProvider: @escaping (_ row: Int) -> UITableViewCell,
+        numberOfCells: Observable<Int>)
+        -> TableViewProviderSingleSectionBinder<Base.S>
+    {
+        guard let bindResult = self.base as? TableViewInitialSingleSectionBinder<Base.S> else {
+            fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
+        }
+        let section = bindResult.section
+        
+        bindResult.binder.addCellDequeueBlock(cellProvider: cellProvider, sections: [section])
+        
+        numberOfCells
+            .asDriver(onErrorJustReturn: 0)
+            .asObservable()
+            .subscribe(onNext: { [weak binder = bindResult.binder] (numCells: Int) in
+                binder?.updateNumberOfCells([section: numCells], sections: [section])
+            }).disposed(by: bindResult.binder.disposeBag)
+        
+        return TableViewProviderSingleSectionBinder<Base.S>(binder: bindResult.binder, section: section)
+    }
 }
 
 public extension Reactive where Base: TableViewSingleSectionBinderProtocol {

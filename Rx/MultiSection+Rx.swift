@@ -85,6 +85,93 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
         
         return TableViewModelMultiSectionBinder<NC, Base.S, NM>(binder: bindResult.binder, sections: sections)
     }
+    
+    /**
+     Bind a custom handler that will provide table view cells for the declared sections, created according to the given
+     models.
+     
+     Use this method if you want more manual control over cell dequeueing. You might decide to use this method if you
+     use different cell types in the same section, the cell type is not known at compile-time, or you have some other
+     particularly complex use cases.
+     
+     - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter section: The section the closure should provide a cell for.
+     - parameter row: The row in the section the closure should provide a cell for.
+     - parameter model: The model the cell is dequeued for.
+     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
+     the section. This dictionary does not need to contain a models array for each section being bound - sections not
+     present in the dictionary have no cells dequeued for them.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<NM: Identifiable>(
+        cellProvider: @escaping (_ section: Base.S, _ row: Int, _ model: NM) -> UITableViewCell,
+        models: Observable<[Base.S: [NM]]>)
+        -> TableViewModelMultiSectionBinder<UITableViewCell, Base.S, NM>
+    {
+        guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
+            fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
+        }
+        let sections = bindResult.sections
+
+        let _cellProvider = { [weak binder = bindResult.binder] (_ section: Base.S, _ row: Int) -> UITableViewCell in
+            guard let models = binder?.currentDataModel.sectionCellModels[section] as? [NM] else {
+                fatalError("Model type wasn't as expected, something went awry!")
+            }
+            return cellProvider(section, row, models[row])
+        }
+        bindResult.binder.addCellDequeueBlock(cellProvider: _cellProvider, sections: sections)
+        
+        models
+            .asDriver(onErrorJustReturn: [:])
+            .asObservable()
+            .subscribe(onNext: { [weak binder = bindResult.binder] (models: [Base.S: [NM]]) in
+                binder?.updateCellModels(models, viewModels: nil, sections: sections)
+            }).disposed(by: bindResult.binder.disposeBag)
+        
+        return TableViewModelMultiSectionBinder<UITableViewCell, Base.S, NM>(binder: bindResult.binder, sections: sections)
+    }
+
+    
+    /**
+     Bind a custom handler that will provide table view cells for the declared sections, along with the number of cells
+     to create.
+     
+     Use this method if you want full manual control over cell dequeueing. You might decide to use this method if you
+     use different cell types in the same section, cells in the section are not necessarily backed by a data model type,
+     or you have particularly complex use cases.
+     
+     - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter section: The section the closure should provide a cell for.
+     - parameter row: The row in the section the closure should provide a cell for.
+     - parameter numberOfCells: The number of cells to create for each section using the provided closure.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind(
+        cellProvider: @escaping (_ section: Base.S, _ row: Int) -> UITableViewCell,
+        numberOfCells: Observable<[Base.S: Int]>)
+        -> TableViewProviderMultiSectionBinder<Base.S>
+    {
+        guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
+            fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
+        }
+        let sections = bindResult.sections
+        
+        bindResult.binder.addCellDequeueBlock(cellProvider: cellProvider, sections: sections)
+        
+        numberOfCells
+            .asDriver(onErrorJustReturn: [:])
+            .asObservable()
+            .subscribe(onNext: { [weak binder = bindResult.binder] (numCells: [Base.S: Int]) in
+                binder?.updateNumberOfCells(numCells, sections: sections)
+            }).disposed(by: bindResult.binder.disposeBag)
+        
+        
+        return TableViewProviderMultiSectionBinder<Base.S>(binder: bindResult.binder, sections: sections)
+    }
 }
 
 public extension Reactive where Base: TableViewMutliSectionBinderProtocol {

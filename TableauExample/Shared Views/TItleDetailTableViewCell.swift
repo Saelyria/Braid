@@ -14,8 +14,8 @@ final class TitleDetailTableViewCell: UITableViewCell, ReuseIdentifiable, ViewMo
         // in the table when it calculates diffs, so it must be unique to each view model.
         let id: String
         let title: String
-        let subtitle: String
-        let detail: String
+        let subtitle: String?
+        let detail: String?
         let accessoryType: UITableViewCell.AccessoryType
     }
     
