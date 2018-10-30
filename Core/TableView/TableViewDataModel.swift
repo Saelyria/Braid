@@ -115,6 +115,6 @@ extension TableViewDataModel {
         guard let selfSectionModels = self.asDiffableSectionModels(), let otherSectionModels = other.asDiffableSectionModels() else {
             return nil
         }
-        return selfSectionModels.nestedExtendedDiff(to: otherSectionModels, isEqualElement: { $0.id == $1.id })
+        return selfSectionModels.nestedExtendedDiff(to: otherSectionModels, isEqualElement: { $0.collectionId == $1.collectionId })
     }
 }

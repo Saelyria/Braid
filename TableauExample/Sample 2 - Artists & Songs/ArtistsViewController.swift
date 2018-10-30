@@ -109,12 +109,12 @@ class ArtistsViewController: UIViewController {
 }
 
 extension Artist: CollectionIdentifiable {
-    var id: String { return self.name }
+    var collectionId: String { return self.name }
     
     /// Maps the 'artist' into a view model for a 'title detail cell'
     func asTitleDetailCellViewModel() -> TitleDetailTableViewCell.ViewModel {
         return TitleDetailTableViewCell.ViewModel(
-            id: self.name,
+            collectionId: self.name,
             title: self.name,
             subtitle: "",
             detail: "",

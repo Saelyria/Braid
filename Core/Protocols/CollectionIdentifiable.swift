@@ -15,5 +15,5 @@ import Foundation
  model have changed).
  */
 public protocol CollectionIdentifiable {
-    var id: String { get }
+    var collectionId: String { get }
 }

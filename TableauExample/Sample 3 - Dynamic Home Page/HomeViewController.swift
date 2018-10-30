@@ -3,7 +3,7 @@ import RxCocoa
 
 class HomeViewController: UIViewController {
     struct Section: TableViewSection, CollectionIdentifiable {
-        let id: String
+        let collectionId: String
         let title: String?
         let footer: String?
     }
@@ -32,7 +32,7 @@ class HomeViewController: UIViewController {
         self.tableView.register(TitleDetailTableViewCell.self)
         self.tableView.register(ImageTitleSubtitleTableViewCell.self)
         
-        let banner = Section(id: "banner", title: nil, footer: nil)
+        let banner = Section(collectionId: "banner", title: nil, footer: nil)
         
         self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self, displayedSections: [banner])
         
@@ -60,7 +60,7 @@ class HomeViewController: UIViewController {
 private extension HomePageSection {
     func asSectionModel() -> (HomeViewController.Section, [CollectionIdentifiable]) {
         let section = HomeViewController.Section(
-            id: self.title,
+            collectionId: self.title,
             title: self.title,
             footer: self.footer)
         return (section, self.modelType.asCellModels())
@@ -73,13 +73,13 @@ private extension HomePageSection.ModelType {
         case .stores(let stores):
             let titleDetailVMs = stores.map { (store: Store) in
                 return TitleDetailTableViewCell.ViewModel(
-                    id: store.location, title: store.location, subtitle: nil, detail: store.distance, accessoryType: .disclosureIndicator)
+                    collectionId: store.location, title: store.location, subtitle: nil, detail: store.distance, accessoryType: .disclosureIndicator)
             }
             return titleDetailVMs
         case .products(let products):
             let imageTitleViewModels = products.map { (product: Product) in
                 return ImageTitleSubtitleTableViewCell.ViewModel(
-                    id: product.title)
+                    collectionId: product.title)
             }
             return imageTitleViewModels
         }

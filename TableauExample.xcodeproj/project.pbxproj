@@ -66,6 +66,7 @@
 		AB577BD12183D7F200CD2363 /* Product.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Product.swift; sourceTree = "<group>"; };
 		AB577BD32183D8C200CD2363 /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		AB577BD52184DC6F00CD2363 /* ImageTitleSubtitleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageTitleSubtitleTableViewCell.swift; sourceTree = "<group>"; };
+		AB577BDB2187CC2100CD2363 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
 		B5FEBC5088F0D7E30632BBD0 /* Pods_TableauExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TableauExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -112,6 +113,7 @@
 		938132D620B6463000CBF8F6 /* TableauExample */ = {
 			isa = PBXGroup;
 			children = (
+				AB577BDB2187CC2100CD2363 /* README.md */,
 				938132D720B6463000CBF8F6 /* AppDelegate.swift */,
 				93C36A4720DAFF97006B7ECF /* SamplesViewController.swift */,
 				AB577B98217596AF00CD2363 /* Sample 1 - Accounts */,

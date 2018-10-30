@@ -9,10 +9,12 @@ import RxSwift
  it can register it to the table view.
  */
 final class TitleDetailTableViewCell: UITableViewCell, ReuseIdentifiable, ViewModelBindable, UINibInitable {
+    /// The 'view model' for cells of this type. This view model conforms to `CollectionIdentifiable` so table binders
+    /// can generate diffs for these cells (i.e. track insertions, deletions, and moves, and animate them on the table).
     struct ViewModel: CollectionIdentifiable {
         // View models for cells must provide an `id` property. Tableau uses this property to track movement of a cell
         // in the table when it calculates diffs, so it must be unique to each view model.
-        let id: String
+        let collectionId: String
         let title: String
         let subtitle: String?
         let detail: String?

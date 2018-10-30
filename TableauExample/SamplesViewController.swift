@@ -7,13 +7,13 @@ class SamplesViewController: UIViewController {
     
     private var rows: [TitleDetailTableViewCell.ViewModel] = [
         TitleDetailTableViewCell.ViewModel(
-            id: "1",
+            collectionId: "1",
             title: "Sample 1 - Accounts",
             subtitle: "A mock 'accounts' view like you might find in a banking app. This view controller demonstrates hot reloading of sections and rows using RxSwift.",
             detail: "",
             accessoryType: .disclosureIndicator),
         TitleDetailTableViewCell.ViewModel(
-            id: "2",
+            collectionId: "2",
             title: "Sample 2 - Artists & Songs",
             subtitle: "A mock 'artists' view like you might find in a music app. This view controller demonstrates how to use a struct to represent sections instead of an enum for cases where you don't know the sections at compile-time, like when section data is provided via a network response.",
             detail: "",
@@ -24,7 +24,6 @@ class SamplesViewController: UIViewController {
         self.title = "Samples"
         
         self.tableView = UITableView(frame: self.view.frame, style: .grouped)
-//        self.tableView.tableFooterView = UIView()
         self.view.addSubview(self.tableView)
         self.tableView.register(TitleDetailTableViewCell.self)
         

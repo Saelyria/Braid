@@ -17,7 +17,7 @@ public extension TableViewSection {
 
 public extension TableViewSection where Self: CollectionIdentifiable {
     public var hashValue: Int {
-        return self.id.hashValue
+        return self.collectionId.hashValue
     }
 }
 
@@ -378,7 +378,7 @@ extension SectionedTableViewBinder: TableViewDataModelDelegate {
                     oldData: current,
                     newData: next,
                     isEqualSection: { $0.section == $1.section },
-                    isEqualElement: { $0.id == $1.id },
+                    isEqualElement: { $0.collectionId == $1.collectionId },
                     rowDeletionAnimation: self.rowDeletionAnimation,
                     rowInsertionAnimation: self.rowInsertionAnimation,
                     sectionDeletionAnimation: self.sectionDeletionAnimation,

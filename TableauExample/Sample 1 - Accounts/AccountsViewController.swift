@@ -3,20 +3,9 @@ import Tableau
 import RxSwift
 import RxCocoa
 
-/**
- This view controller demonstrates how to use a `TableViewSection` enum to bind a section table view. It's a mock
- 'accounts' view controller like you might find in a banking app, where sections on the table view are different types
- of accounts - checking, savings, etc.
- 
- The data shown by the table are instances of the `Account` model object, which are 'fetched from the server' by the
- `AccountsService` object. It uses the `CenterLabelTableViewCell`, `TitleDetailTableViewCell`, and `SectionHeaderView`
- objects to display its data. Whenever the 'Refresh' button is tapped in the view's nav bar, it starts a new 'fetch',
- which will fill the table with different data, demonstrating Tableau's ability to auto-animate changes. This view
- controller uses RxSwift to do much of its work.
- */
 class AccountsViewController: UIViewController {
-    // An enum corresponding to the sections able to be shown on the table view.
-    enum Section: Int, TableViewSection, CaseIterable {
+    // 1.
+    enum Section: Int, TableViewSection {
         case message
         case checking
         case savings
@@ -25,11 +14,10 @@ class AccountsViewController: UIViewController {
 
     private let spinner = UIActivityIndicatorView(activityIndicatorStyle: .gray)
     private var tableView: UITableView!
-    // A reference to binders must be kept for binding to work.
+    // 2.
     private var binder: SectionedTableViewBinder<Section>!
     
-    // This is effectively the 'data source' for the table view. This property is observed by the binder, which will
-    // update the data for its sections based on the dictionary returned from this.
+    // 3.
     private let accountsForSections = BehaviorRelay<[Section: [Account]]>(value: [:])
     
     private let disposeBag = DisposeBag()
@@ -157,11 +145,11 @@ private extension Account.AccountType {
 }
 
 extension Account: CollectionIdentifiable {
-    var id: String { return self.accountNumber }
+    var collectionId: String { return self.accountNumber }
     
     func asTitleDetailCellViewModel() -> TitleDetailTableViewCell.ViewModel {
         return TitleDetailTableViewCell.ViewModel(
-            id: self.accountNumber,
+            collectionId: self.accountNumber,
             title: self.accountName,
             subtitle: self.accountNumber,
             detail: "$\(self.balance)",
