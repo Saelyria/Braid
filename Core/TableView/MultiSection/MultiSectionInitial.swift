@@ -98,7 +98,7 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind<NM: CollectionIdentifiable>(
+    public func bind<NM>(
         cellProvider: @escaping (_ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [S: [NM]])
         -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
