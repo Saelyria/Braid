@@ -26,21 +26,7 @@ class AccountsViewController: UIViewController {
         super.viewDidLoad()
         self.title = "Accounts"
         
-        self.setupTableView()
-        self.setupOtherViews()
-        
-        // after we finish binding our table view, fetch the accounts 'from a server'
-        self.spinner.startAnimating()
-        AccountsService.shared.getAccounts()
-            .flatMapToSectionDict()
-            .subscribe(onNext: { [unowned self] accounts in
-                self.refresh(with: accounts)
-            }).disposed(by: self.disposeBag)
-    }
-    
-    private func setupTableView() {
-        // Create and setup table view. Tableau provides convenient `register()` methods for `UITableViewCell` and
-        // `UITableHeaderFooterView` subclasses for registering the cells/views.
+        // 4.
         self.tableView = UITableView(frame: self.view.frame, style: .grouped)
         self.tableView.register(CenterLabelTableViewCell.self)
         self.tableView.register(SectionHeaderView.self)
@@ -48,26 +34,28 @@ class AccountsViewController: UIViewController {
         self.view.addSubview(self.tableView)
         self.tableView.frame = self.view.frame
         
-        // Create the table view binder, starting off with only the 'message' section shown. The other sections will be
-        // shown on the table once the mock 'accounts' request completes.
+        // 5.
         self.binder = SectionedTableViewBinder(
             tableView: self.tableView, sectionedBy: Section.self, displayedSections: [.message])
         
-        // Bind the static 'message' section. Because this section's content doesn't update, we don't have to use Rx
-        // with it. We only need one cell in this section, so our `viewModels` array is just a single string.
+        // 6.
         self.binder.onSection(.message)
             .bind(cellType: CenterLabelTableViewCell.self, viewModels: [
                 CenterLabelTableViewCell.ViewModel(text: "Open a new savings account today and receive 3.10% for the first three months!")
-            ])
+                ])
         
-        // Bind the 'checking', 'savings', and 'other' sections. When we bind multiple sections, we provide an
-        // Observable dictionary for the models/view models where the key is each section being bound and the value is
-        // the models for that section. 'TitleDetailTableViewCell' is view model compatible, so we also provide a 'map
-        // to view model' function that the binder uses to turn our 'Account' arrays into cell view model objects.
+        // 7.
         self.binder.onSections([.checking, .savings, .other])
             .rx.bind(cellType: TitleDetailTableViewCell.self,
                      models: self.accountsForSections.asObservable(),
                      mapToViewModelsWith: { (account: Account) in return account.asTitleDetailCellViewModel() })
+            // 8.
+            .onTapped { [unowned self] (_, _, _, account: Account) in
+                let detailVC = UIViewController()
+                self.navigationController?.pushViewController(detailVC, animated: true)
+            }
+        
+        self.binder.onSections([.checking, .savings, .other])
             // Next, we bind a custom header class and a dictionary of view models for it just like for cells.
             .bind(headerType: SectionHeaderView.self, viewModels: [
                 .checking: SectionHeaderView.ViewModel(title: "CHECKING"),
@@ -81,6 +69,16 @@ class AccountsViewController: UIViewController {
         
         // Make sure to call the binder's 'finish' method once everything is bound.
         self.binder.finish()
+        
+        self.setupOtherViews()
+        
+        // after we finish binding our table view, fetch the accounts 'from a server'
+        self.spinner.startAnimating()
+        AccountsService.shared.getAccounts()
+            .flatMapToSectionDict()
+            .subscribe(onNext: { [unowned self] accounts in
+                self.refresh(with: accounts)
+            }).disposed(by: self.disposeBag)
     }
     
     private func setupOtherViews() {
