@@ -55,19 +55,17 @@ class AccountsViewController: UIViewController {
                 self.navigationController?.pushViewController(detailVC, animated: true)
             }
         
+        // 9.
         self.binder.onSections([.checking, .savings, .other])
-            // Next, we bind a custom header class and a dictionary of view models for it just like for cells.
             .bind(headerType: SectionHeaderView.self, viewModels: [
                 .checking: SectionHeaderView.ViewModel(title: "CHECKING"),
                 .savings: SectionHeaderView.ViewModel(title: "SAVINGS"),
                 .other: SectionHeaderView.ViewModel(title: "OTHER")])
-            // For footers, we'll just use the default footer view. Note that for the dictionaries we provide for cells,
-            // headers, and footers, we only need to provide data for the sections we care about - we only want a footer
-            // for the 'other' section, so we only need to include that section in the dictionary.
+            // 10.
             .footerTitles([
                 .other: "This section includes your investing and credit card accounts."])
         
-        // Make sure to call the binder's 'finish' method once everything is bound.
+        // 11.
         self.binder.finish()
         
         self.setupOtherViews()

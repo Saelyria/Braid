@@ -19,7 +19,8 @@ framework is highly recommended before continuing.
 2. A reference to the 'table view binder' object must be kept for the lifecycle of the view controller. This object keeps the RxSwift subscriptions
     live, and holds references to the data displayed on the table view. Generally, this should just be a property on your view controller.
     
-3. The observable object that we will bind to the binder in various ways that it will pull its cell data from.
+3. The observable object that we will bind to the binder in various ways that it will pull its cell data from. Events from this behaviour relay are
+    emitted whenever the 'Refresh' button is tapped and the mock network request gives us a new array of `Account` objects.
 
 4. Here, we instantiate the actual `UITableView` object, and register the cells we're going to use with it. Tableau provides convienient 
     `register` methods on table views for cells that conform to `ReuseIdentifiable` that registers the cell with the reuse identifier given by 
@@ -33,7 +34,8 @@ framework is highly recommended before continuing.
     instances. `CenterLabelTableViewCell` is `ViewModelBindable`, so we choose to instantiate these cells with the array of given 'view
     models'. The table binder will create one cell for each view model in this array for this section. This method requires that the array given to
     the `viewModels` argument be an array of the cell's `ViewModel` associated type. For more information on using view models, check out 
-    the documentation on  `ViewModelBindable`.
+    the documentation on  `ViewModelBindable`. We only want one cell in this section with the 'open a new account' call-to-action, so we 
+    supply an array with one view model with that text.
     
     Note also that this section's cell type is not bound using the `rx` extension on the binder. This data never changes, so we don't need to use
     RxSwift to update it. The next binding chain, however, will use RxSwift, to allow us to easily update the data for its sections later.
@@ -45,8 +47,9 @@ framework is highly recommended before continuing.
     represents so we can show a view controller with details for that account. Tableau lets us do with by associating a generic 'model' type to 
     our cells using the `bind(cellType:models:mapToViewModelsWith:)` method.
     
-    In this chain, we associate `Account` instances to the cells by passing an observable array of `Account` objects to the `models` argument.
-    We'd still like our cells to be setup with view models so we don't need to include an `onDequeue` call on our chain, so we also supply a
+    In this chain, we associate `Account` instances to the cells by passing an observable dictionary of `Account` objects to the `models` 
+    argument. The keys on this dictionary are `Section` instances, with the values being arrays of models that the cells are dequeued for. We'd 
+    still like our cells to be setup with view models so we don't need to include an `onDequeue` call on our chain, so we also supply a
     closure that will map a given account into a `TitleDetailTableViewCell.ViewModel`. Setting up the chain with this method means
     that whenever the `self.accountsForSections` observable fires, the binder will map the resulting dictionary of `Accounts` arrays into
     view models for the cells in the appropriate sections.
@@ -57,3 +60,17 @@ framework is highly recommended before continuing.
     This is very easy with Tableau - since we're calling this `onTapped` method after the cell binding method where we gave the cell and generic
     'model' types, we can also also have this method be passed in the instance of the generic 'model 'type (in this case, the `Account` instance) 
     that the tapped cell was representing. Much better than using the index path to look through an 'accounts' array.
+    
+9. Now we're going to setup the headers and footers on these three sections. We don't need to start a new binding chain with the
+    `onSections` call here - we could just append the `bind(headerType:viewModels)` method to the last one after the `onTapped` 
+    method - but, just for the sake of dividing up the binding into logical chunks/to show that it's possible, we'll just do it on another chain.
+    Here, we're going to use a custom 'header/footer view' type - `SectionHeaderView`. This view type is `ViewModelBindable` as well, so
+    we similarly pass in a dictionary of view model objects (organized by `Section`).
+    
+10. On the same binding chain, we set up the footers. We'll just use the default iOS footers where we just provide a string - on a binder, this is
+    done with the `footerTitles` method, which gets passed in a dictionary where the keys are `Section`s and the values are strings. Only 
+    the `other` section has footer text, so that's the only entry we'll put in the dictionary.
+    
+11. With that, our table is bound and ready to go. When we finish our binding, we need to make sure we call the `finish` method on the 
+    binder. The binder uses this method to setup a standin 'data source/delegate' object for the table view with the appropriate methods added
+    to it according to the data/handlers given to the binder and call the first `reloadData()` on the table view.
