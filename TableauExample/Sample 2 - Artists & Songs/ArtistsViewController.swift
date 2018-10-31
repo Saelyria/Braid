@@ -52,18 +52,13 @@ class ArtistsViewController: UIViewController {
         self.view.addSubview(self.tableView)
         self.tableView.frame = self.view.frame
         self.tableView.tableFooterView = UIView()
+        self.tableView.sectionFooterHeight = 0.0
         self.tableView.register(TitleDetailTableViewCell.self)
         
-        self.binder = SectionedTableViewBinder<Section>(tableView: self.tableView, sectionedBy: Section.self, displayedSections: [])
+        let sectionOrderingFunc: ([Section]) -> [Section] = { $0.sorted(by: { $0.title < $1.title })}
+        self.binder = SectionedTableViewBinder<Section>(tableView: self.tableView, sectionedBy: Section.self,
+            sectionDisplayBehavior: .hidesSectionsWithNoCellData(orderingWith: sectionOrderingFunc))
 
-        // Create an observable for the section titles, mapped from our 'artists for sections' subject
-        let headerTitles = self.artistsForSections
-            .asObservable()
-            .map { (artistsForSections: [Section: [Artist]]) -> [Section: String?] in
-                var titles: [Section: String?] = [:]
-                artistsForSections.forEach { titles[$0.key] = $0.key.title }
-                return titles
-        }
         // When we don't know the sections at compile time like this, we use the `onDynamicSections` method of the binder.
         // This method binds the data in the binding chain to any current or future sections on the table. It's bound
         // in basically the same way - passing in observable models mapped with a given function.
@@ -71,18 +66,14 @@ class ArtistsViewController: UIViewController {
             .rx.bind(cellType: TitleDetailTableViewCell.self,
                      models: self.artistsForSections.asObservable(),
                      mapToViewModelsWith: { (artist: Artist) in return artist.asTitleDetailCellViewModel() })
-            .rx.headerTitles(headerTitles)
-            .footerHeight { _ in 0.0 }
+            .rx.headerTitles(self.artistsForSections.asObservable()
+                .map { (artistsForSections: [Section: [Artist]]) -> [Section: String?] in
+                    var titles: [Section: String?] = [:]
+                    artistsForSections.forEach { titles[$0.key] = $0.key.title }
+                    return titles
+                })
         
         self.binder.finish()
-        
-        // Map the 'artists for sections' observable into the displayed sections, bound to the 'displayed sections'
-        // control property on the binder.
-        self.artistsForSections
-            .asObservable()
-            .flatMapToDisplayedSections()
-            .bind(to: self.binder.rx.displayedSections)
-            .disposed(by: self.disposeBag)
     }
     
     private func setupOtherViews() {
@@ -141,18 +132,6 @@ private extension Observable where Element == [Artist] {
                 artistsForSections[section] = artists.sorted(by: { $0.name < $1.name })
             }
             return Observable<[Section: [Artist]]>.just(artistsForSections)
-        }
-    }
-}
-
-private extension Observable where Element == [ArtistsViewController.Section: [Artist]] {
-    /// Flat maps an observable dictionary of artists sorted into sections into an array of sections in alphabetical
-    /// order, containing all sections to be shown according to the dictionary.
-    func flatMapToDisplayedSections() -> Observable<[ArtistsViewController.Section]> {
-        return self.flatMap { dict -> Observable<[ArtistsViewController.Section]> in
-            // sort sections in alphabetical order
-            let sections = Array(dict.keys).sorted(by: { $0.title < $1.title })
-            return Observable<[ArtistsViewController.Section]>.just(sections)
         }
     }
 }

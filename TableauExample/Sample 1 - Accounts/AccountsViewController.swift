@@ -35,8 +35,8 @@ class AccountsViewController: UIViewController {
         self.tableView.frame = self.view.frame
         
         // 5.
-        self.binder = SectionedTableViewBinder(
-            tableView: self.tableView, sectionedBy: Section.self, displayedSections: [.message])
+        self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
+        self.binder.displayedSections = [.message]
         
         // 6.
         self.binder.onSection(.message)

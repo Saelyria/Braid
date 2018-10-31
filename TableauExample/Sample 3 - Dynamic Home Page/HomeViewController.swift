@@ -34,7 +34,8 @@ class HomeViewController: UIViewController {
         
         let banner = Section(collectionId: "banner", title: nil, footer: nil)
         
-        self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self, displayedSections: [banner])
+        self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
+        self.binder.displayedSections = [banner]
         
         self.binder.onSection(banner)
             .bind(cellType: CenterLabelTableViewCell.self, viewModels: [

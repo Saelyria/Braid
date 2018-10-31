@@ -61,7 +61,8 @@ public class TableViewBinder {
      Instantiate a new table view binder for the given table view.
      */
     public required init(tableView: UITableView) {
-        self._sectionBinder = SectionedTableViewBinder(tableView: tableView, sectionedBy: _SingleSection.self, displayedSections: [.table])
+        self._sectionBinder = SectionedTableViewBinder(tableView: tableView, sectionedBy: _SingleSection.self)
+        self._sectionBinder.displayedSections = [.table]
     }
     
     /// Starts binding on the table.
@@ -117,25 +118,50 @@ binder.onSection(.one)
  ```
  
  `UITableViewCell`s need to conform to a few different protocols (whose conformance can be as simple as declaring
- conformance) to be compatible with a data binder. Specifically, they must at least conform to `ReuseIdentifiable` and
- `ViewModelBindable`, and should conform to `UINibInitable` if they are meant to be created from a Nib.
+ conformance) to be compatible with a data binder. Specifically, they must at least conform to `ReuseIdentifiable`, and
+ should conform to `UINibInitable` if they are meant to be created from a Nib.
  */
 public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBinderProtocol {
+    /// A behaviour detailing how sections on the managed table view are displayed in terms of order and visibility.
+    public enum SectionDisplayBehavior {
+        /// The table binder will automatically hide sections when there are no cell items for it regardless of whether
+        /// a header/footer is bound for the section. The associated value for this behavior is a function that, given
+        /// the array of sections the binder has calculated will be shown, returns these sections in the correct order.
+        case hidesSectionsWithNoCellData(orderingWith: ([S]) -> [S])
+        /// The table binder will automatically hide sections when there are no cell and no header/footer items for it.
+        /// This behavior means that a section will still be shown if it has a header or footer, even when it has no
+        /// cells to show. The associated value for this behavior is a function that, given the array of sections the
+        /// binder has calculated will be shown, returns these sections in the correct order.
+        case hidesSectionsWithNoData(orderingWith: ([S]) -> [S])
+        /// The table binder will only display sections manually set in its `displayedSections` property, in the order
+        /// they appear in.
+        case manuallyManageSections
+    }
+    
     /// The table view's displayed sections. This array can be changed or reordered at any time to dynamically update
     /// the displayed sections on the table view. Setting this property queues a table view animation.
-    public var displayedSections: [S] = [] {
-        didSet {
+    public var displayedSections: [S] {
+        get {
+            return self.currentDataModel.displayedSections
+        }
+        set {
+            switch self.sectionDisplayBehavior {
+            case .manuallyManageSections: break
+            default:
+                print("WARNING: This table binder was setup to manage section visibility based on its data - ignoring attempt to set the 'displayedSections'.")
+                return
+            }
 #if RX_TABLEAU
             self.displayedSectionsSubject.onNext(self.displayedSections)
 #endif
-            self.nextDataModel.displayedSections = self.displayedSections
+            self.nextDataModel.displayedSections = newValue
         }
     }
     
     /// Whether this binder has had its binding completed by having its `finish()` method called.
     public private(set) var hasFinishedBinding: Bool = false
     /// The table view this binder performs binding for.
-    public private(set) var tableView: UITableView!
+    public let tableView: UITableView
     
     /// The animation the binder will use to animate row deletions. The default value is `automatic`.
     public var rowDeletionAnimation: UITableView.RowAnimation = .automatic
@@ -145,7 +171,10 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     public var sectionDeletionAnimation: UITableView.RowAnimation = .automatic
     /// The animation the binder will use to animate section insertions. The default value is `automatic`.
     public var sectionInsertionAnimation: UITableView.RowAnimation = .automatic
-
+    
+    /// A value indicating how this table view binder manages the visibility of sections bound to it.
+    public let sectionDisplayBehavior: SectionDisplayBehavior
+    
 #if RX_TABLEAU
     let disposeBag = DisposeBag()
     let displayedSectionsSubject = BehaviorSubject<[S]>(value: [])
@@ -170,15 +199,13 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      - parameter tableView: The `UITableView` that this binder manages.
      - parameter sectionModel: The enum whose cases or struct whose instances uniquely identify sections on the table
         view. This type must conform to the `TableViewSection` protocol.
-     - parameter displayedSections: The sections to initially display on the table view when it is first shown.
+     - parameter sectionDisplayBehavior: An enum indicating how the binder should manage the order and visibility of
+        sections. This defaults to `manuallyManageSections`, meaning the binder's `displayedSections` property must be
+        set to determine the visibility and order of sections.
     */
-    public init(tableView: UITableView, sectionedBy sectionModel: S.Type, displayedSections: [S]) {
+    public init(tableView: UITableView, sectionedBy sectionModel: S.Type, sectionDisplayBehavior: SectionDisplayBehavior = .manuallyManageSections) {
         self.tableView = tableView
-        self.displayedSections = displayedSections
-        self.nextDataModel.displayedSections = displayedSections
-#if RX_TABLEAU
-        self.displayedSectionsSubject.onNext(self.displayedSections)
-#endif
+        self.sectionDisplayBehavior = sectionDisplayBehavior
     }
     
     /**
@@ -338,24 +365,6 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     }
 }
 
-public extension SectionedTableViewBinder where S: CaseIterable {
-    /**
-     Create a new table view binder to manage the given table view whose sections are described by cases of the given
-     enum. The table view will initially display all sections of the table view included in the given enum type.
-     
-     - parameter tableView: The `UITableView` that this binder manages.
-     - parameter sectionModel: The enum whose cases uniquely identify sections on the table view. This enum must conform
-        to the `TableViewSection` protocol.
-     */
-    public convenience init(tableView: UITableView, sectionedBy sectionEnum: S.Type) {
-        var sections: [S] = []
-        for `case` in S.allCases {
-            sections.append(`case`)
-        }
-        self.init(tableView: tableView, sectionedBy: sectionEnum, displayedSections: sections)
-    }
-}
-
 extension SectionedTableViewBinder: TableViewDataModelDelegate {
     /*
      The binder is set as the delegate on its 'next' data model. When this next model receives a data update, this
@@ -365,9 +374,20 @@ extension SectionedTableViewBinder: TableViewDataModelDelegate {
     */
     func dataModelDidChange() {
         guard self.hasFinishedBinding, !self.hasRefreshQueued else { return }
-        
         self.hasRefreshQueued = true
+        
         DispatchQueue.main.async {
+            // Hide sections without data according to the assigned 'section display behaviour'.
+            switch self.sectionDisplayBehavior {
+            case .hidesSectionsWithNoCellData(let orderFunc):
+                let sections = Array(self.nextDataModel.sectionsWithCellData)
+                self.nextDataModel.displayedSections = orderFunc(sections)
+            case .hidesSectionsWithNoData(let orderFunc):
+                let sections = Array(self.nextDataModel.sectionsWithData)
+                self.nextDataModel.displayedSections = orderFunc(sections)
+            default: break
+            }
+            
             // If we were able to create 'diffable section models' from the data models (i.e. the cell models or view
             // models conformed to 'CollectionIdentifiable'), then animate the changes.
             if let current = self.currentDataModel.asDiffableSectionModels(),

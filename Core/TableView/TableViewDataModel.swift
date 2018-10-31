@@ -43,6 +43,23 @@ internal class TableViewDataModel<S: TableViewSection> {
         didSet { self.delegate?.dataModelDidChange() }
     }
     
+    // Returns a set containing all sections that have cell data bound.
+    var sectionsWithCellData: Set<S> {
+        let numCells = Set(self.sectionNumberOfCells.filter { $0.value > 0 }.keys)
+        let models = self.sectionCellModels.filter { !$0.value.isEmpty }.keys
+        let viewModels = self.sectionCellViewModels.filter { !$0.value.isEmpty }.keys
+        return numCells.union(models).union(viewModels)
+    }
+    
+    // Returns a set of sections that have any kind of data in them (cells, headers, or footers).
+    var sectionsWithData: Set<S> {
+        let headerModels = self.sectionHeaderViewModels.keys
+        let footerModels = self.sectionFooterViewModels.keys
+        let headerTitles = self.sectionHeaderTitles.keys
+        let footerTitles = self.sectionFooterTitles.keys
+        return self.sectionsWithCellData.union(headerModels).union(footerModels).union(headerTitles).union(footerTitles)
+    }
+    
     init() { }
     
     init(from other: TableViewDataModel<S>) {
