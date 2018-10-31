@@ -347,6 +347,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      after which point no further binding can be done on the table with the binder's `onSection` methods.
     */
     public func finish() {
+        self.applyDisplayedSectionBehavior()
         self.hasFinishedBinding = true
         
         self.tableViewDataSourceDelegate = _TableViewDataSourceDelegate(binder: self)
@@ -363,6 +364,19 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         self.nextDataModel = TableViewDataModel<S>(from: self.currentDataModel)
         self.nextDataModel.delegate = self
     }
+    
+    // Set section visibility/order according to the assigned 'section display behaviour' on the 'next data model'.
+    private func applyDisplayedSectionBehavior() {
+        switch self.sectionDisplayBehavior {
+        case .hidesSectionsWithNoCellData(let orderFunc):
+            let sections = Array(self.nextDataModel.sectionsWithCellData)
+            self.nextDataModel.displayedSections = orderFunc(sections)
+        case .hidesSectionsWithNoData(let orderFunc):
+            let sections = Array(self.nextDataModel.sectionsWithData)
+            self.nextDataModel.displayedSections = orderFunc(sections)
+        default: break
+        }
+    }
 }
 
 extension SectionedTableViewBinder: TableViewDataModelDelegate {
@@ -377,16 +391,7 @@ extension SectionedTableViewBinder: TableViewDataModelDelegate {
         self.hasRefreshQueued = true
         
         DispatchQueue.main.async {
-            // Hide sections without data according to the assigned 'section display behaviour'.
-            switch self.sectionDisplayBehavior {
-            case .hidesSectionsWithNoCellData(let orderFunc):
-                let sections = Array(self.nextDataModel.sectionsWithCellData)
-                self.nextDataModel.displayedSections = orderFunc(sections)
-            case .hidesSectionsWithNoData(let orderFunc):
-                let sections = Array(self.nextDataModel.sectionsWithData)
-                self.nextDataModel.displayedSections = orderFunc(sections)
-            default: break
-            }
+            self.applyDisplayedSectionBehavior()
             
             // If we were able to create 'diffable section models' from the data models (i.e. the cell models or view
             // models conformed to 'CollectionIdentifiable'), then animate the changes.

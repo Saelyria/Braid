@@ -14,7 +14,8 @@ framework is highly recommended before continuing.
 
 ## Walkthrough
 
-1. This is the enum whose cases describe the sections in the table view. This enum must conform to the `TableViewSection` protocol.
+1. This is the enum whose cases describe the sections in the table view. This enum must conform to the `TableViewSection` protocol. We
+    made the raw value of this section enum `Int`, which we will use later to organize the order of the sections.
 
 2. A reference to the 'table view binder' object must be kept for the lifecycle of the view controller. This object keeps the RxSwift subscriptions
     live, and holds references to the data displayed on the table view. Generally, this should just be a property on your view controller.
@@ -27,8 +28,10 @@ framework is highly recommended before continuing.
     conformance to this protocol. If the cell conforms to `UINibInitable`,  then this method will register the cell's nib instead of the class.
     
 5. Here we instantiate the 'binder' object. The init method is given the table view it will perform the binding on along with the enum type we 
-    want the table's sections to be described by. Finally, we give an array of the sections we want the table to initially display - we will update
-    the 'displayed properties' later after our mock network request finishes and we know what accounts to show.
+    want the table's sections to be described by. Finally, we give the binder a behaviour for how we want it to handle the visibility and order of
+    the sections. Here, we tell the binder to hide sections that have no cell data (models, view models, etc.), and to order the sections that it 
+    does show with the given function. The function we give it is passed in an array of all sections the binder will display, and must return the
+    array sorted however we want the order to be. We'll use the raw integer value of the enums for the order.
     
 6. Here, we perform our first 'binding chain'. We declare that on the 'message' section, we want its cells to be `CenterLabelTableViewCell`
     instances. `CenterLabelTableViewCell` is `ViewModelBindable`, so we choose to instantiate these cells with the array of given 'view
@@ -74,3 +77,6 @@ framework is highly recommended before continuing.
 11. With that, our table is bound and ready to go. When we finish our binding, we need to make sure we call the `finish` method on the 
     binder. The binder uses this method to setup a standin 'data source/delegate' object for the table view with the appropriate methods added
     to it according to the data/handlers given to the binder and call the first `reloadData()` on the table view.
+
+The rest of the sample is business as usual - hiding/showing a spinner in the observable sequence to refresh accounts, setting up the 
+'Refresh' button in the navigation bar, then some convenience extensions at the end of the file for easily mapping different types around.

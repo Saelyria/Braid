@@ -14,6 +14,7 @@ class AccountsViewController: UIViewController {
 
     private let spinner = UIActivityIndicatorView(activityIndicatorStyle: .gray)
     private var tableView: UITableView!
+    
     // 2.
     private var binder: SectionedTableViewBinder<Section>!
     
@@ -35,14 +36,17 @@ class AccountsViewController: UIViewController {
         self.tableView.frame = self.view.frame
         
         // 5.
-        self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
-        self.binder.displayedSections = [.message]
+        let sectionOrderingFunc: ([Section]) -> [Section] = { $0.sorted(by: { $0.rawValue < $1.rawValue })}
+        self.binder = SectionedTableViewBinder(
+            tableView: self.tableView,
+            sectionedBy: Section.self,
+            sectionDisplayBehavior: .hidesSectionsWithNoCellData(orderingWith: sectionOrderingFunc))
         
         // 6.
         self.binder.onSection(.message)
             .bind(cellType: CenterLabelTableViewCell.self, viewModels: [
                 CenterLabelTableViewCell.ViewModel(text: "Open a new savings account today and receive 3.10% for the first three months!")
-                ])
+            ])
         
         // 7.
         self.binder.onSections([.checking, .savings, .other])
@@ -50,8 +54,10 @@ class AccountsViewController: UIViewController {
                      models: self.accountsForSections.asObservable(),
                      mapToViewModelsWith: { (account: Account) in return account.asTitleDetailCellViewModel() })
             // 8.
-            .onTapped { [unowned self] (_, _, _, account: Account) in
-                let detailVC = UIViewController()
+            .onTapped { [unowned self] (_, _, cell: TitleDetailTableViewCell, account: Account) in
+                cell.setSelected(false, animated: true)
+                let detailVC = AccountDetailViewController()
+                detailVC.account = account
                 self.navigationController?.pushViewController(detailVC, animated: true)
             }
         
@@ -73,10 +79,13 @@ class AccountsViewController: UIViewController {
         // after we finish binding our table view, fetch the accounts 'from a server'
         self.spinner.startAnimating()
         AccountsService.shared.getAccounts()
+            .do(onNext: { [unowned self] _ in
+                self.spinner.stopAnimating()
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
+            })
             .flatMapToSectionDict()
-            .subscribe(onNext: { [unowned self] accounts in
-                self.refresh(with: accounts)
-            }).disposed(by: self.disposeBag)
+            .bind(to: self.accountsForSections)
+            .disposed(by: self.disposeBag)
     }
     
     private func setupOtherViews() {
@@ -92,24 +101,13 @@ class AccountsViewController: UIViewController {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
             })
             .flatMap { AccountsService.shared.getAccounts() }
-            .flatMapToSectionDict()
-            .subscribe(onNext: { [unowned self] accounts in
-                self.refresh(with: accounts)
+            .do(onNext: { [unowned self] _ in
+                self.spinner.stopAnimating()
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
             })
+            .flatMapToSectionDict()
+            .bind(to: self.accountsForSections)
             .disposed(by: self.disposeBag)
-    }
-    
-    private func refresh(with accounts: [Section: [Account]]) {
-        self.spinner.stopAnimating()
-        self.navigationItem.rightBarButtonItem?.isEnabled = true
-        
-        // With the dictionary returned, set the binder's `displayedSections` property and update the relay objects
-        // the binder was setup with for the sections' models arrays. The binder will batch all of these updates,
-        // calculate the diff, and animate the changes automatically.
-        var displayedSections: [Section] = [.message]
-        displayedSections.append(contentsOf: Array(accounts.keys))
-        self.binder.displayedSections = displayedSections.sorted(by: { $0.rawValue < $1.rawValue })
-        self.accountsForSections.accept(accounts)
     }
 }
 
@@ -140,9 +138,7 @@ private extension Account.AccountType {
     }
 }
 
-extension Account: CollectionIdentifiable {
-    var collectionId: String { return self.accountNumber }
-    
+private extension Account {
     func asTitleDetailCellViewModel() -> TitleDetailTableViewCell.ViewModel {
         return TitleDetailTableViewCell.ViewModel(
             collectionId: self.accountNumber,
