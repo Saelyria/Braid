@@ -28,12 +28,14 @@ framework is highly recommended before continuing.
     conformance to this protocol. If the cell conforms to `UINibInitable`,  then this method will register the cell's nib instead of the class.
     
 5. Here we instantiate the 'binder' object. The init method is given the table view it will perform the binding on along with the enum type we 
-    want the table's sections to be described by. Finally, we give the binder a behaviour for how we want it to handle the visibility and order of
-    the sections. Here, we tell the binder to hide sections that have no cell data (models, view models, etc.), and to order the sections that it 
-    does show with the given function. The function we give it is passed in an array of all sections the binder will display, and must return the
-    array sorted however we want the order to be. We'll use the raw integer value of the enums for the order.
+    want the table's sections to be described by. 
     
-6. Here, we perform our first 'binding chain'. We declare that on the 'message' section, we want its cells to be `CenterLabelTableViewCell`
+6. Here we give the binder a behaviour for how we want it to handle the visibility and order of the sections. We tell the binder to hide sections 
+    that have no cell data (models, view models, etc.), and to order the sections that it does show with the given function. The function we give 
+    it is passed in an array of all sections the binder will display, and must return the array sorted however we want the order to be. We'll use the
+    raw integer value of the enums for the order.
+    
+7. Here, we perform our first 'binding chain'. We declare that on the 'message' section, we want its cells to be `CenterLabelTableViewCell`
     instances. `CenterLabelTableViewCell` is `ViewModelBindable`, so we choose to instantiate these cells with the array of given 'view
     models'. The table binder will create one cell for each view model in this array for this section. This method requires that the array given to
     the `viewModels` argument be an array of the cell's `ViewModel` associated type. For more information on using view models, check out 
@@ -43,7 +45,7 @@ framework is highly recommended before continuing.
     Note also that this section's cell type is not bound using the `rx` extension on the binder. This data never changes, so we don't need to use
     RxSwift to update it. The next binding chain, however, will use RxSwift, to allow us to easily update the data for its sections later.
     
-7. Here, we perform the work for binding all the other sections -  'checking', 'savings', and 'other' - since their setup logic is the same. They
+8. Here, we perform the work for binding all the other sections -  'checking', 'savings', and 'other' - since their setup logic is the same. They
     all use the `TitleDetailTableViewCell` type for their cells. This cell type is also 'view model bindable', so we'd like to use view models 
     for its cells as well. However, we do something a little different than *just* using view models. The cells in these sections are meant to 
     visually display `Account` objects. Whenever cells in these sections are tapped, we want a reference to the `Account` object the cell 
@@ -57,24 +59,24 @@ framework is highly recommended before continuing.
     that whenever the `self.accountsForSections` observable fires, the binder will map the resulting dictionary of `Accounts` arrays into
     view models for the cells in the appropriate sections.
     
-8. After we setup the cell type and the observable 'data source' for the sections, we add an `onTapped` handler to the chain. Whenever a cell
+9. After we setup the cell type and the observable 'data source' for the sections, we add an `onTapped` handler to the chain. Whenever a cell
     in the 'checking', 'savings', or 'other' section is tapped, the handler  given to this method is passed in section, row, and cell that was 
     tapped. We ignore all these arguments, though, since what we're really interested in is the `Account` object that the tapped cell represented.
     This is very easy with Tableau - since we're calling this `onTapped` method after the cell binding method where we gave the cell and generic
     'model' types, we can also also have this method be passed in the instance of the generic 'model 'type (in this case, the `Account` instance) 
     that the tapped cell was representing. Much better than using the index path to look through an 'accounts' array.
     
-9. Now we're going to setup the headers and footers on these three sections. We don't need to start a new binding chain with the
+10. Now we're going to setup the headers and footers on these three sections. We don't need to start a new binding chain with the
     `onSections` call here - we could just append the `bind(headerType:viewModels)` method to the last one after the `onTapped` 
     method - but, just for the sake of dividing up the binding into logical chunks/to show that it's possible, we'll just do it on another chain.
     Here, we're going to use a custom 'header/footer view' type - `SectionHeaderView`. This view type is `ViewModelBindable` as well, so
     we similarly pass in a dictionary of view model objects (organized by `Section`).
     
-10. On the same binding chain, we set up the footers. We'll just use the default iOS footers where we just provide a string - on a binder, this is
+11. On the same binding chain, we set up the footers. We'll just use the default iOS footers where we just provide a string - on a binder, this is
     done with the `footerTitles` method, which gets passed in a dictionary where the keys are `Section`s and the values are strings. Only 
     the `other` section has footer text, so that's the only entry we'll put in the dictionary.
     
-11. With that, our table is bound and ready to go. When we finish our binding, we need to make sure we call the `finish` method on the 
+12. With that, our table is bound and ready to go. When we finish our binding, we need to make sure we call the `finish` method on the 
     binder. The binder uses this method to setup a standin 'data source/delegate' object for the table view with the appropriate methods added
     to it according to the data/handlers given to the binder and call the first `reloadData()` on the table view.
 

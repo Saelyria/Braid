@@ -173,7 +173,11 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     public var sectionInsertionAnimation: UITableView.RowAnimation = .automatic
     
     /// A value indicating how this table view binder manages the visibility of sections bound to it.
-    public let sectionDisplayBehavior: SectionDisplayBehavior
+    public var sectionDisplayBehavior: SectionDisplayBehavior {
+        didSet {
+            self.dataModelDidChange()
+        }
+    }
     
 #if RX_TABLEAU
     let disposeBag = DisposeBag()
@@ -315,7 +319,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      
      - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
      */
-    public func onDynamicSections() -> TableViewInitialMutliSectionBinder<S> {
+    public func onAllSections() -> TableViewInitialMutliSectionBinder<S> {
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
@@ -331,13 +335,13 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      your sections are not necessarily known at compile-time (e.g. your sections are given to your table in a network
      respone).
      
-     This method shares functionality with the `onDynamicSections` method - the different naming allows you to more
+     This method shares functionality with the `onAllSections` method - the different naming allows you to more
      expressively describe your table binding according to your usage.
      
      - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
      */
     public func onAllOtherSections() -> TableViewInitialMutliSectionBinder<S> {
-        return self.onDynamicSections()
+        return self.onAllSections()
     }
     
     /**

@@ -62,7 +62,7 @@ class ArtistsViewController: UIViewController {
         // When we don't know the sections at compile time like this, we use the `onDynamicSections` method of the binder.
         // This method binds the data in the binding chain to any current or future sections on the table. It's bound
         // in basically the same way - passing in observable models mapped with a given function.
-        self.binder.onDynamicSections()
+        self.binder.onAllSections()
             .rx.bind(cellType: TitleDetailTableViewCell.self,
                      models: self.artistsForSections.asObservable(),
                      mapToViewModelsWith: { (artist: Artist) in return artist.asTitleDetailCellViewModel() })

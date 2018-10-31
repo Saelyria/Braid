@@ -36,24 +36,26 @@ class AccountsViewController: UIViewController {
         self.tableView.frame = self.view.frame
         
         // 5.
-        let sectionOrderingFunc: ([Section]) -> [Section] = { $0.sorted(by: { $0.rawValue < $1.rawValue })}
-        self.binder = SectionedTableViewBinder(
-            tableView: self.tableView,
-            sectionedBy: Section.self,
-            sectionDisplayBehavior: .hidesSectionsWithNoCellData(orderingWith: sectionOrderingFunc))
+        self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
         
         // 6.
+        self.binder.sectionDisplayBehavior = .hidesSectionsWithNoCellData(orderingWith: { (unordered: [Section]) -> [Section] in
+            let ordered = unordered.sorted(by: { $0.rawValue < $1.rawValue })
+            return ordered
+        })
+        
+        // 7.
         self.binder.onSection(.message)
             .bind(cellType: CenterLabelTableViewCell.self, viewModels: [
                 CenterLabelTableViewCell.ViewModel(text: "Open a new savings account today and receive 3.10% for the first three months!")
             ])
         
-        // 7.
+        // 8.
         self.binder.onSections([.checking, .savings, .other])
             .rx.bind(cellType: TitleDetailTableViewCell.self,
                      models: self.accountsForSections.asObservable(),
                      mapToViewModelsWith: { (account: Account) in return account.asTitleDetailCellViewModel() })
-            // 8.
+            // 9.
             .onTapped { [unowned self] (_, _, cell: TitleDetailTableViewCell, account: Account) in
                 cell.setSelected(false, animated: true)
                 let detailVC = AccountDetailViewController()
@@ -61,17 +63,17 @@ class AccountsViewController: UIViewController {
                 self.navigationController?.pushViewController(detailVC, animated: true)
             }
         
-        // 9.
+        // 10.
         self.binder.onSections([.checking, .savings, .other])
             .bind(headerType: SectionHeaderView.self, viewModels: [
                 .checking: SectionHeaderView.ViewModel(title: "CHECKING"),
                 .savings: SectionHeaderView.ViewModel(title: "SAVINGS"),
                 .other: SectionHeaderView.ViewModel(title: "OTHER")])
-            // 10.
+            // 11.
             .footerTitles([
                 .other: "This section includes your investing and credit card accounts."])
         
-        // 11.
+        // 12.
         self.binder.finish()
         
         self.setupOtherViews()
