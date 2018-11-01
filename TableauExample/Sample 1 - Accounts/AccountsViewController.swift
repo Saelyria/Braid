@@ -5,11 +5,15 @@ import RxCocoa
 
 class AccountsViewController: UIViewController {
     // 1.
-    enum Section: Int, TableViewSection {
+    enum Section: Int, TableViewSection, Comparable {
         case message
         case checking
         case savings
         case other
+        
+        static func < (lhs: AccountsViewController.Section, rhs: AccountsViewController.Section) -> Bool {
+            return lhs.rawValue < rhs.rawValue
+        }
     }
 
     private let spinner = UIActivityIndicatorView(activityIndicatorStyle: .gray)
@@ -39,10 +43,7 @@ class AccountsViewController: UIViewController {
         self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
         
         // 6.
-        self.binder.sectionDisplayBehavior = .hidesSectionsWithNoCellData(orderingWith: { (unordered: [Section]) -> [Section] in
-            let ordered = unordered.sorted(by: { $0.rawValue < $1.rawValue })
-            return ordered
-        })
+        self.binder.sectionDisplayBehavior = .hidesSectionsWithNoCellData
         
         // 7.
         self.binder.onSection(.message)

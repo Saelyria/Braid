@@ -15,7 +15,8 @@ framework is highly recommended before continuing.
 ## Walkthrough
 
 1. This is the enum whose cases describe the sections in the table view. This enum must conform to the `TableViewSection` protocol. We
-    made the raw value of this section enum `Int`, which we will use later to organize the order of the sections.
+    made the raw value of this section enum `Int`, which we use to make the enum conform to `Comparable` to create a sorting order. Tableau
+    can use this conformance to `Comparable` to automatically sort our sections for us later.
 
 2. A reference to the 'table view binder' object must be kept for the lifecycle of the view controller. This object keeps the RxSwift subscriptions
     live, and holds references to the data displayed on the table view. Generally, this should just be a property on your view controller.
@@ -28,12 +29,19 @@ framework is highly recommended before continuing.
     conformance to this protocol. If the cell conforms to `UINibInitable`,  then this method will register the cell's nib instead of the class.
     
 5. Here we instantiate the 'binder' object. The init method is given the table view it will perform the binding on along with the enum type we 
-    want the table's sections to be described by. 
+    want the table's sections to be described by.
     
-6. Here we give the binder a behaviour for how we want it to handle the visibility and order of the sections. We tell the binder to hide sections 
-    that have no cell data (models, view models, etc.), and to order the sections that it does show with the given function. The function we give 
-    it is passed in an array of all sections the binder will display, and must return the array sorted however we want the order to be. We'll use the
-    raw integer value of the enums for the order.
+6. Here we assign the behaviour for how the binder will display and order table view sections. There are a couple different options for the 
+    section hiding behaviour we can assign it. Because our `Section` enum conformed to `Comparable`, we can simply provide 
+    `hidesSectionsWithNoCellData` and the binder will order sections by comparing them. If we wanted to have more fine-grained control 
+    (or our section enum didn't conform to `Comparable`), then we would give a function to `hidesSectionsWithNoCellData` that orders 
+    them. The other options we can give to the binder are `hidesSectionsWithNoData` (almost the same as 
+    `hidesSectionsWithNoCellData`, except the section will still be visible if it still has a header or footer) and `manuallyManaged`. This last
+    one gives us full control over what sections are shown when and in what order by manually setting the `displayedSections` property on 
+    the binder. This is more work than we need to do, so we'll just keep it as `hidesSectionsWithNoCellData`.
+    
+    Note that if we wanted to, we can also provide this behaviour in the init method to save a line of code, but for the sake of splitting up the 
+    walkthrough, we just assigned it to the property directly. This behaviour can be changed anytime.
     
 7. Here, we perform our first 'binding chain'. We declare that on the 'message' section, we want its cells to be `CenterLabelTableViewCell`
     instances. `CenterLabelTableViewCell` is `ViewModelBindable`, so we choose to instantiate these cells with the array of given 'view

@@ -123,19 +123,34 @@ binder.onSection(.one)
  */
 public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBinderProtocol {
     /// A behaviour detailing how sections on the managed table view are displayed in terms of order and visibility.
-    public enum SectionDisplayBehavior {
+    public struct SectionDisplayBehavior {
+        internal enum _Behavior {
+            case hidesSectionsWithNoCellData
+            case hidesSectionsWithNoData
+            case manuallyManaged
+        }
+        
         /// The table binder will automatically hide sections when there are no cell items for it regardless of whether
         /// a header/footer is bound for the section. The associated value for this behavior is a function that, given
         /// the array of sections the binder has calculated will be shown, returns these sections in the correct order.
-        case hidesSectionsWithNoCellData(orderingWith: ([S]) -> [S])
+        public static func hidesSectionsWithNoCellData(orderingWith: @escaping ([S]) -> [S]) -> SectionDisplayBehavior {
+            return SectionDisplayBehavior(behavior: .hidesSectionsWithNoCellData, orderingFunction: orderingWith)
+        }
         /// The table binder will automatically hide sections when there are no cell and no header/footer items for it.
         /// This behavior means that a section will still be shown if it has a header or footer, even when it has no
         /// cells to show. The associated value for this behavior is a function that, given the array of sections the
         /// binder has calculated will be shown, returns these sections in the correct order.
-        case hidesSectionsWithNoData(orderingWith: ([S]) -> [S])
+        public static func hidesSectionsWithNoData(orderingWith: @escaping ([S]) -> [S]) -> SectionDisplayBehavior {
+            return SectionDisplayBehavior(behavior: .hidesSectionsWithNoData, orderingFunction: orderingWith)
+        }
         /// The table binder will only display sections manually set in its `displayedSections` property, in the order
         /// they appear in.
-        case manuallyManageSections
+        public static var manuallyManaged: SectionDisplayBehavior {
+            return SectionDisplayBehavior(behavior: .manuallyManaged, orderingFunction: nil)
+        }
+        
+        internal let behavior: _Behavior
+        internal let orderingFunction: (([S]) -> [S])?
     }
     
     /// The table view's displayed sections. This array can be changed or reordered at any time to dynamically update
@@ -145,8 +160,8 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
             return self.currentDataModel.displayedSections
         }
         set {
-            switch self.sectionDisplayBehavior {
-            case .manuallyManageSections: break
+            switch self.sectionDisplayBehavior.behavior {
+            case .manuallyManaged: break
             default:
                 print("WARNING: This table binder was setup to manage section visibility based on its data - ignoring attempt to set the 'displayedSections'.")
                 return
@@ -207,7 +222,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         sections. This defaults to `manuallyManageSections`, meaning the binder's `displayedSections` property must be
         set to determine the visibility and order of sections.
     */
-    public init(tableView: UITableView, sectionedBy sectionModel: S.Type, sectionDisplayBehavior: SectionDisplayBehavior = .manuallyManageSections) {
+    public init(tableView: UITableView, sectionedBy sectionModel: S.Type, sectionDisplayBehavior: SectionDisplayBehavior = .manuallyManaged) {
         self.tableView = tableView
         self.sectionDisplayBehavior = sectionDisplayBehavior
     }
@@ -371,15 +386,46 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     
     // Set section visibility/order according to the assigned 'section display behaviour' on the 'next data model'.
     private func applyDisplayedSectionBehavior() {
-        switch self.sectionDisplayBehavior {
-        case .hidesSectionsWithNoCellData(let orderFunc):
+        switch self.sectionDisplayBehavior.behavior {
+        case .hidesSectionsWithNoCellData:
+            guard let orderingFunction = self.sectionDisplayBehavior.orderingFunction else {
+                fatalError("A 'hides sections with no cell data' behaviour had no ordering function - something went awry!")
+            }
             let sections = Array(self.nextDataModel.sectionsWithCellData)
-            self.nextDataModel.displayedSections = orderFunc(sections)
-        case .hidesSectionsWithNoData(let orderFunc):
+            self.nextDataModel.displayedSections = orderingFunction(sections)
+        case .hidesSectionsWithNoData:
+            guard let orderingFunction = self.sectionDisplayBehavior.orderingFunction else {
+                fatalError("A 'hides sections with no data' behaviour had no ordering function - something went awry!")
+            }
             let sections = Array(self.nextDataModel.sectionsWithData)
-            self.nextDataModel.displayedSections = orderFunc(sections)
+            self.nextDataModel.displayedSections = orderingFunction(sections)
         default: break
         }
+    }
+}
+
+public extension SectionedTableViewBinder.SectionDisplayBehavior where S: Comparable {
+    /**
+     The table binder will automatically hide sections when there are no cell items for it regardless of whether a
+     header/footer is bound for the section. The sections will be sorted according to their `Comparable` conformance.
+    */
+    public static var hidesSectionsWithNoCellData: SectionedTableViewBinder.SectionDisplayBehavior {
+        let orderingFunc = { (unordered: [S]) -> [S] in
+            return unordered.sorted()
+        }
+        return SectionedTableViewBinder.SectionDisplayBehavior(behavior: .hidesSectionsWithNoCellData, orderingFunction: orderingFunc)
+    }
+    
+    /**
+     The table binder will automatically hide sections when there are no cell and no header/footer items for it. This
+     behavior means that a section will still be shown if it has a header or footer, even when it has no cells to show.
+     The sections will be sorted according to their `Comparable` conformance.
+    */
+    public static var hidesSectionsWithNoData: SectionedTableViewBinder.SectionDisplayBehavior {
+        let orderingFunc = { (unordered: [S]) -> [S] in
+            return unordered.sorted()
+        }
+        return SectionedTableViewBinder.SectionDisplayBehavior(behavior: .hidesSectionsWithNoData, orderingFunction: orderingFunc)
     }
 }
 
