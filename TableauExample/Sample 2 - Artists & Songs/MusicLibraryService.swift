@@ -99,7 +99,7 @@ class MusicLibraryService {
         Artist(name: "System of a Down")
     ]
     
-    func getArtists() -> Observable<[Artist]> {
+    func getArtists() -> Observable<[String: [Artist]]> {
         return Observable.create({ observer in
             DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(1500)) {
                 var artists: [Artist] = []
@@ -107,8 +107,18 @@ class MusicLibraryService {
                     let i = Int.random(in: 0..<self.allArtists.count)
                     artists.append(self.allArtists[i])
                 }
-                let artistsSet = Set<Artist>(artists)
-                observer.onNext(Array(artistsSet))
+                artists = Array(Set<Artist>(artists))
+                
+                var artistsSorted: [String: [Artist]] = [:]
+                for artist in artists {
+                    let letter = artist.firstLetter.capitalized
+                    if artistsSorted[letter] == nil {
+                        artistsSorted[letter] = []
+                    }
+                    artistsSorted[letter]?.append(artist)
+                }
+                
+                observer.onNext(artistsSorted)
                 observer.onCompleted()
             }
             
