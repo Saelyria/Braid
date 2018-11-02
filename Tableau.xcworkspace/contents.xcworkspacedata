@@ -13,6 +13,13 @@
    <FileRef
       location = "container:ContributorQuickstart.md">
    </FileRef>
+   <Group
+      location = "group:Documentation"
+      name = "Documentation">
+      <FileRef
+         location = "group:GettingStarted.md">
+      </FileRef>
+   </Group>
    <FileRef
       location = "group:Tableau.xcodeproj">
    </FileRef>

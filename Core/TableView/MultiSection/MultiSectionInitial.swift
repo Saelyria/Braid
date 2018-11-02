@@ -72,7 +72,7 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
     */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: [S: [NM]]) -> TableViewModelMultiSectionBinder<NC, S, NM>
-    where NC: UITableViewCell & ReuseIdentifiable, NM: CollectionIdentifiable {
+    where NC: UITableViewCell & ReuseIdentifiable {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: self.sections)
         self.binder.updateCellModels(models, viewModels: nil, sections: self.sections)
 

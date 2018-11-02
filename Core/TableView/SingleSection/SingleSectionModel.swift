@@ -3,7 +3,7 @@ import UIKit
 /**
  A section binder for a section whose cells were setup to be dequeued with an array of an arbitrary 'model' type.
  */
-public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewSection, M: CollectionIdentifiable>: BaseTableViewSingleSectionBinder<C, S>, TableViewSingleSectionBinderProtocol {
+public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewSection, M>: BaseTableViewSingleSectionBinder<C, S>, TableViewSingleSectionBinderProtocol {
     /**
      Returns a closure that can be called to update the models for the cells for the section.
      
