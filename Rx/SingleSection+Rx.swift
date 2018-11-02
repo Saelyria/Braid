@@ -40,7 +40,7 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
     */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: Observable<[NM]>)
-    -> TableViewModelSingleSectionBinder<NC, Base.S, NM> where NC: UITableViewCell & ReuseIdentifiable, NM: CollectionIdentifiable {
+    -> TableViewModelSingleSectionBinder<NC, Base.S, NM> where NC: UITableViewCell & ReuseIdentifiable {
         guard let bindResult = self.base as? TableViewInitialSingleSectionBinder<Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
@@ -69,7 +69,7 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
      */
     @discardableResult
     public func bind<NC, NM>(cellType: NC.Type, models: Observable<[NM]>, mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-    -> TableViewModelViewModelSingleSectionBinder<NC, Base.S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: CollectionIdentifiable {
+    -> TableViewModelViewModelSingleSectionBinder<NC, Base.S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
         guard let bindResult = self.base as? TableViewInitialSingleSectionBinder<Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
@@ -86,6 +86,50 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
             }).disposed(by: bindResult.binder.disposeBag)
         
         return TableViewModelViewModelSingleSectionBinder<NC, Base.S, NM>(binder: bindResult.binder, section: bindResult.section, mapToViewModel: mapToViewModel)
+    }
+    
+    /**
+     Bind a custom handler that will provide table view cells for the declared section, created according to the given
+     models.
+     
+     Use this method if you want more manual control over cell dequeueing. You might decide to use this method if you
+     use different cell types in the same section, the cell type is not known at compile-time, or you have some other
+     particularly complex use cases.
+     
+     - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter row: The row in the section the closure should provide a cell for.
+     - parameter model: The model the cell is dequeued for.
+     - parameter models: The models objects to bind to the dequeued cells for this section.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<NM>(
+        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        models: Observable<[NM]>)
+        -> TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>
+    {
+        guard let bindResult = self.base as? TableViewInitialSingleSectionBinder<Base.S> else {
+            fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
+        }
+        let section = bindResult.section
+        
+        let _cellProvider = { [weak binder = bindResult.binder] (_ section: Base.S, _ row: Int) -> UITableViewCell in
+            guard let models = binder?.currentDataModel.sectionCellModels[section] as? [NM] else {
+                fatalError("Model type wasn't as expected, something went awry!")
+            }
+            return cellProvider(row, models[row])
+        }
+        bindResult.binder.addCellDequeueBlock(cellProvider: _cellProvider, sections: [section])
+        
+        models
+            .asDriver(onErrorJustReturn: [])
+            .asObservable()
+            .subscribe(onNext: { [weak binder = bindResult.binder] (models: [NM]) in
+                binder?.updateCellModels([section: models], viewModels: nil, sections: [section])
+            }).disposed(by: bindResult.binder.disposeBag)
+        
+        return TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>(binder: bindResult.binder, section: section)
     }
     
     /**

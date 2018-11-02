@@ -4,7 +4,7 @@ import UIKit
  A section binder for a section whose cells were setup to be dequeued with an array of an arbitrary 'model' type,
  mapped to the cell's 'view model' type with a given mapping function.
  */
-public class TableViewModelViewModelSingleSectionBinder<C, S: TableViewSection, M: CollectionIdentifiable>: BaseTableViewSingleSectionBinder<C, S>, TableViewSingleSectionBinderProtocol
+public class TableViewModelViewModelSingleSectionBinder<C, S: TableViewSection, M>: BaseTableViewSingleSectionBinder<C, S>, TableViewSingleSectionBinderProtocol
 where C: UITableViewCell & ViewModelBindable {    
     private let mapToViewModelFunc: (M) -> C.ViewModel
     

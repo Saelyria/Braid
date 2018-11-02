@@ -99,13 +99,13 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
      - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
-     the section. This dictionary does not need to contain a models array for each section being bound - sections not
-     present in the dictionary have no cells dequeued for them.
+        the section. This dictionary does not need to contain a models array for each section being bound - sections not
+        present in the dictionary have no cells dequeued for them.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind<NM: CollectionIdentifiable>(
+    public func bind<NM>(
         cellProvider: @escaping (_ section: Base.S, _ row: Int, _ model: NM) -> UITableViewCell,
         models: Observable<[Base.S: [NM]]>)
         -> TableViewModelMultiSectionBinder<UITableViewCell, Base.S, NM>

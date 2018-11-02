@@ -25,6 +25,7 @@
 		AB577BD22183D7F200CD2363 /* Product.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BD12183D7F200CD2363 /* Product.swift */; };
 		AB577BD42183D8C200CD2363 /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BD32183D8C200CD2363 /* Store.swift */; };
 		AB577BD62184DC6F00CD2363 /* ImageTitleSubtitleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BD52184DC6F00CD2363 /* ImageTitleSubtitleTableViewCell.swift */; };
+		AB577BDD2189769800CD2363 /* AccountDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BDC2189769800CD2363 /* AccountDetailViewController.swift */; };
 		AB86C3BF2141718C00FA4945 /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */; };
 /* End PBXBuildFile section */
 
@@ -66,6 +67,8 @@
 		AB577BD12183D7F200CD2363 /* Product.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Product.swift; sourceTree = "<group>"; };
 		AB577BD32183D8C200CD2363 /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		AB577BD52184DC6F00CD2363 /* ImageTitleSubtitleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageTitleSubtitleTableViewCell.swift; sourceTree = "<group>"; };
+		AB577BDB2187CC2100CD2363 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		AB577BDC2189769800CD2363 /* AccountDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDetailViewController.swift; sourceTree = "<group>"; };
 		AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
 		B5FEBC5088F0D7E30632BBD0 /* Pods_TableauExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TableauExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -112,6 +115,7 @@
 		938132D620B6463000CBF8F6 /* TableauExample */ = {
 			isa = PBXGroup;
 			children = (
+				AB577BDB2187CC2100CD2363 /* README.md */,
 				938132D720B6463000CBF8F6 /* AppDelegate.swift */,
 				93C36A4720DAFF97006B7ECF /* SamplesViewController.swift */,
 				AB577B98217596AF00CD2363 /* Sample 1 - Accounts */,
@@ -138,6 +142,7 @@
 			children = (
 				AB577BCE2183D64700CD2363 /* README.md */,
 				938132D920B6463000CBF8F6 /* AccountsViewController.swift */,
+				AB577BDC2189769800CD2363 /* AccountDetailViewController.swift */,
 				AB577B9B21759F6C00CD2363 /* AccountService.swift */,
 			);
 			path = "Sample 1 - Accounts";
@@ -312,6 +317,7 @@
 				938132D820B6463000CBF8F6 /* AppDelegate.swift in Sources */,
 				AB577BD62184DC6F00CD2363 /* ImageTitleSubtitleTableViewCell.swift in Sources */,
 				AB86C3BF2141718C00FA4945 /* SectionHeaderView.swift in Sources */,
+				AB577BDD2189769800CD2363 /* AccountDetailViewController.swift in Sources */,
 				9381335120B6EE2A00CBF8F6 /* TItleDetailTableViewCell.swift in Sources */,
 				AB577BAA2179665400CD2363 /* HomeViewController.swift in Sources */,
 				AB577BD42183D8C200CD2363 /* Store.swift in Sources */,

@@ -3,33 +3,26 @@ import Tableau
 import RxSwift
 import RxCocoa
 
-/**
- This view controller demonstrates how to use a `TableViewSection` enum to bind a section table view. It's a mock
- 'accounts' view controller like you might find in a banking app, where sections on the table view are different types
- of accounts - checking, savings, etc.
- 
- The data shown by the table are instances of the `Account` model object, which are 'fetched from the server' by the
- `AccountsService` object. It uses the `CenterLabelTableViewCell`, `TitleDetailTableViewCell`, and `SectionHeaderView`
- objects to display its data. Whenever the 'Refresh' button is tapped in the view's nav bar, it starts a new 'fetch',
- which will fill the table with different data, demonstrating Tableau's ability to auto-animate changes. This view
- controller uses RxSwift to do much of its work.
- */
 class AccountsViewController: UIViewController {
-    // An enum corresponding to the sections able to be shown on the table view.
-    enum Section: Int, TableViewSection, CaseIterable {
+    // 1.
+    enum Section: Int, TableViewSection, Comparable {
         case message
         case checking
         case savings
         case other
+        
+        static func < (lhs: AccountsViewController.Section, rhs: AccountsViewController.Section) -> Bool {
+            return lhs.rawValue < rhs.rawValue
+        }
     }
 
     private let spinner = UIActivityIndicatorView(activityIndicatorStyle: .gray)
     private var tableView: UITableView!
-    // A reference to binders must be kept for binding to work.
+    
+    // 2.
     private var binder: SectionedTableViewBinder<Section>!
     
-    // This is effectively the 'data source' for the table view. This property is observed by the binder, which will
-    // update the data for its sections based on the dictionary returned from this.
+    // 3.
     private let accountsForSections = BehaviorRelay<[Section: [Account]]>(value: [:])
     
     private let disposeBag = DisposeBag()
@@ -38,21 +31,7 @@ class AccountsViewController: UIViewController {
         super.viewDidLoad()
         self.title = "Accounts"
         
-        self.setupTableView()
-        self.setupOtherViews()
-        
-        // after we finish binding our table view, fetch the accounts 'from a server'
-        self.spinner.startAnimating()
-        AccountsService.shared.getAccounts()
-            .flatMapToSectionDict()
-            .subscribe(onNext: { [unowned self] accounts in
-                self.refresh(with: accounts)
-            }).disposed(by: self.disposeBag)
-    }
-    
-    private func setupTableView() {
-        // Create and setup table view. Tableau provides convenient `register()` methods for `UITableViewCell` and
-        // `UITableHeaderFooterView` subclasses for registering the cells/views.
+        // 4.
         self.tableView = UITableView(frame: self.view.frame, style: .grouped)
         self.tableView.register(CenterLabelTableViewCell.self)
         self.tableView.register(SectionHeaderView.self)
@@ -60,39 +39,56 @@ class AccountsViewController: UIViewController {
         self.view.addSubview(self.tableView)
         self.tableView.frame = self.view.frame
         
-        // Create the table view binder, starting off with only the 'message' section shown. The other sections will be
-        // shown on the table once the mock 'accounts' request completes.
-        self.binder = SectionedTableViewBinder(
-            tableView: self.tableView, sectionedBy: Section.self, displayedSections: [.message])
+        // 5.
+        self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
         
-        // Bind the static 'message' section. Because this section's content doesn't update, we don't have to use Rx
-        // with it. We only need one cell in this section, so our `viewModels` array is just a single string.
+        // 6.
+        self.binder.sectionDisplayBehavior = .hidesSectionsWithNoCellData
+        
+        // 7.
         self.binder.onSection(.message)
             .bind(cellType: CenterLabelTableViewCell.self, viewModels: [
                 CenterLabelTableViewCell.ViewModel(text: "Open a new savings account today and receive 3.10% for the first three months!")
             ])
         
-        // Bind the 'checking', 'savings', and 'other' sections. When we bind multiple sections, we provide an
-        // Observable dictionary for the models/view models where the key is each section being bound and the value is
-        // the models for that section. 'TitleDetailTableViewCell' is view model compatible, so we also provide a 'map
-        // to view model' function that the binder uses to turn our 'Account' arrays into cell view model objects.
+        // 8.
         self.binder.onSections([.checking, .savings, .other])
             .rx.bind(cellType: TitleDetailTableViewCell.self,
                      models: self.accountsForSections.asObservable(),
                      mapToViewModelsWith: { (account: Account) in return account.asTitleDetailCellViewModel() })
-            // Next, we bind a custom header class and a dictionary of view models for it just like for cells.
+            // 9.
+            .onTapped { [unowned self] (_, _, cell: TitleDetailTableViewCell, account: Account) in
+                cell.setSelected(false, animated: true)
+                let detailVC = AccountDetailViewController()
+                detailVC.account = account
+                self.navigationController?.pushViewController(detailVC, animated: true)
+            }
+        
+        // 10.
+        self.binder.onSections([.checking, .savings, .other])
             .bind(headerType: SectionHeaderView.self, viewModels: [
                 .checking: SectionHeaderView.ViewModel(title: "CHECKING"),
                 .savings: SectionHeaderView.ViewModel(title: "SAVINGS"),
                 .other: SectionHeaderView.ViewModel(title: "OTHER")])
-            // For footers, we'll just use the default footer view. Note that for the dictionaries we provide for cells,
-            // headers, and footers, we only need to provide data for the sections we care about - we only want a footer
-            // for the 'other' section, so we only need to include that section in the dictionary.
+            // 11.
             .footerTitles([
                 .other: "This section includes your investing and credit card accounts."])
         
-        // Make sure to call the binder's 'finish' method once everything is bound.
+        // 12.
         self.binder.finish()
+        
+        self.setupOtherViews()
+        
+        // after we finish binding our table view, fetch the accounts 'from a server'
+        self.spinner.startAnimating()
+        AccountsService.shared.getAccounts()
+            .do(onNext: { [unowned self] _ in
+                self.spinner.stopAnimating()
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
+            })
+            .flatMapToSectionDict()
+            .bind(to: self.accountsForSections)
+            .disposed(by: self.disposeBag)
     }
     
     private func setupOtherViews() {
@@ -108,24 +104,13 @@ class AccountsViewController: UIViewController {
                 self.navigationItem.rightBarButtonItem?.isEnabled = false
             })
             .flatMap { AccountsService.shared.getAccounts() }
-            .flatMapToSectionDict()
-            .subscribe(onNext: { [unowned self] accounts in
-                self.refresh(with: accounts)
+            .do(onNext: { [unowned self] _ in
+                self.spinner.stopAnimating()
+                self.navigationItem.rightBarButtonItem?.isEnabled = true
             })
+            .flatMapToSectionDict()
+            .bind(to: self.accountsForSections)
             .disposed(by: self.disposeBag)
-    }
-    
-    private func refresh(with accounts: [Section: [Account]]) {
-        self.spinner.stopAnimating()
-        self.navigationItem.rightBarButtonItem?.isEnabled = true
-        
-        // With the dictionary returned, set the binder's `displayedSections` property and update the relay objects
-        // the binder was setup with for the sections' models arrays. The binder will batch all of these updates,
-        // calculate the diff, and animate the changes automatically.
-        var displayedSections: [Section] = [.message]
-        displayedSections.append(contentsOf: Array(accounts.keys))
-        self.binder.displayedSections = displayedSections.sorted(by: { $0.rawValue < $1.rawValue })
-        self.accountsForSections.accept(accounts)
     }
 }
 
@@ -156,12 +141,10 @@ private extension Account.AccountType {
     }
 }
 
-extension Account: CollectionIdentifiable {
-    var id: String { return self.accountNumber }
-    
+private extension Account {
     func asTitleDetailCellViewModel() -> TitleDetailTableViewCell.ViewModel {
         return TitleDetailTableViewCell.ViewModel(
-            id: self.accountNumber,
+            collectionId: self.accountNumber,
             title: self.accountName,
             subtitle: self.accountNumber,
             detail: "$\(self.balance)",
