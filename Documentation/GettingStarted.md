@@ -43,7 +43,7 @@ class MyCustomTableViewCell: UITableViewCell, ReuseIdentifiable {
 }
 ```
 
-For demo purposes, we won't implement much on it - just pretend that we've setup the `titleLabel` in an `awakeFromNib` or in the `init`.  
+For demo purposes, we won't implement much on it - just pretend that we've setup the `titleLabel` in an `awakeFromNib` or in the `init`. 
 One key thing here is that we've made our cell conform to the protocol `ReuseIdentifiable`. This is a Tableau protocol with one 
 requirement: a static `reuseIdentifier` property that returns what reuse identifier to use for dequeueing instances of this cell. If we don't 
 explicitly provide this property, a default string of the class name is used. That's fine for our purposes.
@@ -155,11 +155,9 @@ binder.onSections([.friends, .undecided])
     .onCellDequeue { (section: Section, row: Int, cell: MyCustomTableViewCell, person: Person) in
         // setup cell
     }
-    .onTapped { (section: Section, row: Int, cell: EnemyTableViewCell, person: Person in
+    .onTapped { (section: Section, row: Int, cell: MyCustomTableViewCell, person: Person) in
         // go to a detail VC
-    }
-    
-binder.finish()
+    }    
 ```
 
 As you can see, when we deal with a sectioned binder, we start binding chains on a section (or sections together). Each binding chain applies
@@ -167,6 +165,17 @@ the handlers and data bound to it only to the sections it was started with. So, 
 used in the 'enemies' section, and the associated `onCellDequeue` and `onTapped` handlers are only called when cells are dequeued or
 tapped in this section. Likewise, with the next binding chain, the `MyTableViewCell` type is only used in the 'friends' and 'undecided' 
 sections, with its associated handlers only being called for cells in those sections. Neat, huh?
+
+The last thing we do with our sectioned binder is set a 'behaviour' for how it hides and orders sections. For simplicity (and because our data
+isn't dynamic), we'll just leave the default behaviour - 'manually managed'. This means to control which sections are displayed (and in what
+order), we just set the `displayedSections` property on the binder. We want all our sections displayed, so we'll just do this:
+
+```swift
+binder.displayedSections = [.friends, .enemies, .undecided]
+```
+
+When we get into dynamic data in other tutorials, we'll introduce the other 'section display behaviours' that let the binder hide sections for us
+automatically when they're empty. For now, we'll leave this, call the binder's `finish()` method, and we're good to go!
 
 With that, you should be pretty much up to speed to start playing around with Tableau. Other tutorials are available on the repo to get you 
 started with other features of Tableau, like updating data on your bound table views, setting up your models so it can be animated for changes,
