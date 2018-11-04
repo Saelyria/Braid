@@ -1,4 +1,4 @@
-# Contributor Quickstart Guide
+# How Tableau Works
 
 *Shameless foreword - this document is as much for myself to remember how everything works as for contributors.*
 

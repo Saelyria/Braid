@@ -10,14 +10,20 @@
    <FileRef
       location = "group:README.md">
    </FileRef>
-   <FileRef
-      location = "container:ContributorQuickstart.md">
-   </FileRef>
    <Group
       location = "group:Documentation"
       name = "Documentation">
       <FileRef
          location = "group:GettingStarted.md">
+      </FileRef>
+      <FileRef
+         location = "group:UpdatingData.md">
+      </FileRef>
+      <FileRef
+         location = "group:UsingViewModels.md">
+      </FileRef>
+      <FileRef
+         location = "container:/Users/aaronbosnjak/Developer/Tableau/Documentation/HowItWorks.md">
       </FileRef>
    </Group>
    <FileRef

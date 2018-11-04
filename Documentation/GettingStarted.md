@@ -60,8 +60,13 @@ This is the start of what's called a 'binding chain' in Tableau. Binding chains 
 This includes binding handlers for various events (e.g. when a cell is tapped or dequeued) as well as binding cell heights or headers or footers 
 to the table. New handlers are added to the chain by simply including them after the last item in the chain.
 
-Here, we'll want to add an 'on cell dequeue' handler to this chain be called whenever the binder dequeues a cell so we can set it up. This 
-handler will be passed in the cell and 'person' object the cell was dequeued for so we can set it up:
+Typically, we want to start our binding chains with one of the cell binding methods. Here, we've used the 'model' binding method, which takes
+as arguments the cell type we want to use and an array of 'model' objects (of any type we specify) that cells will be dequeued for. The main
+reason we prefer to call the cell binding method early in the chain is that this type information - the cell type and the 'model' type - are passed
+along the binding chain, and allow us to have cell and model instances safely cast to these types later, as we'll see in the next step.
+
+Next, we'll want to add an 'on cell dequeue' handler to this chain be called whenever the binder dequeues a cell so we can set it up. This 
+handler will be passed in the cell and 'person' object the cell was dequeued for.
 
 ```swift
 binder.onTable()
@@ -70,8 +75,13 @@ binder.onTable()
         cell.titleLabel.text = person.name
     }
 ```
-Cool. However, we also want to do some work (maybe show a 'person details' view controller) whenever a cell in our table is tapped. To do 
-that, we'd just add an 'on tapped' handler like this:
+Notice how the passed in `cell` and `person` objects are the type that we specified in the cell binding method. If we had added the
+`onCellDequeue` method to the chain before the `bind(cellType:models)` method, this type information wouldn't have been available,
+and the passed-in cell would have just been a `UITableViewCell` and we wouldn't have been able to have the `person` object passed in at
+all.
+
+Next, we also want to do some work (maybe show a 'person details' view controller) whenever a cell in our table is tapped. To do that, we'd 
+just add an 'on tapped' handler like this:
 
 ```swift
 binder.onTable()
@@ -83,6 +93,7 @@ binder.onTable()
         // show a 'details' VC with the given 'person' object
     }
 ```
+Same deal here with the `onTapped` handler - because it came after the cell binding method, it gets the same type safety allowance.
 
 As previously mentioned, there are a number of other handlers we can bind to add more information to our table, all of which are simply added
 to this function chain. 
@@ -120,22 +131,22 @@ Then we'll setup our data to give the binder. For this demo, we'll just make thr
 
 ```swift
 let friends = [
-    Person(name: "Asif", age: 27),
-    Person(name: "Joanne", age: 31)
+    Person(name: "Asif", age: 27), // gives me good deals at Bulk Barn
+    Person(name: "Joanne", age: 31) // brings delicious cupcakes to work
 ]
 let enemies = [
     Person(name: "Joseph", age: 22), // doesn't like chocolate
-    Person(name: "Sue", age: 42) // thinks 'Attack of the Clones' is the best SW movie
+    Person(name: "Sue", age: 42) // thinks 'Attack of the Clones' is the best Star Wars movie
 ]
 let undecided = [
-    Person(name: "Madeleine", age: 54),
-    Person(name: "Jorge", age: 19)
+    Person(name: "Madeleine", age: 54), // watches daytime television, but does like chocolate
+    Person(name: "Jorge", age: 19) // is kind of passive-aggressive, but has a cute dog
 ]
 ```
 
 Perfect. Now, we have two different cells we want to use - a normal cell for 'friends' and 'undecided', and a special cell type for cells in our 
 'enemy' section that draws a red 'X' over it. (we'll assume that these cell classes have been defined somewhere else and conform to
-`ReuseIdentifiable`). To do this, we'll bind sections specially, like this:
+`ReuseIdentifiable`). We'll setup the 'enemies' section first.
 
 ```swift
 binder.onSection(.enemies)
@@ -146,7 +157,13 @@ binder.onSection(.enemies)
     .onTapped { (row: Int, cell: EnemyTableViewCell, person: Person in
         // go to a detail VC
     }
-    
+```
+
+As you can see, when we deal with a sectioned binder, we don't have an `onTable` method to start binding chains - we start binding chains
+by passing in the section (in this case, a case of our `Section` enum) we want to bind the following information to. After that, it's basically the
+same story as with the section-less binding chain - bind a cell type, on 'on dequeue', and an 'on tapped'.
+
+```swift    
 binder.onSections([.friends, .undecided])
     .bind(cellType: MyTableViewCell.self, models: [
         .friends: friends,
@@ -167,8 +184,8 @@ tapped in this section. Likewise, with the next binding chain, the `MyTableViewC
 sections, with its associated handlers only being called for cells in those sections. Neat, huh?
 
 The last thing we do with our sectioned binder is set a 'behaviour' for how it hides and orders sections. For simplicity (and because our data
-isn't dynamic), we'll just leave the default behaviour - 'manually managed'. This means to control which sections are displayed (and in what
-order), we just set the `displayedSections` property on the binder. We want all our sections displayed, so we'll just do this:
+isn't dynamic), we'll just leave the default behaviour - 'manually managed'. This means in order to control which sections are displayed (and in 
+what order), we just set the `displayedSections` property on the binder. We want all our sections displayed, so we'll just do this:
 
 ```swift
 binder.displayedSections = [.friends, .enemies, .undecided]
@@ -181,5 +198,3 @@ With that, you should be pretty much up to speed to start playing around with Ta
 started with other features of Tableau, like updating data on your bound table views, setting up your models so it can be animated for changes,
 using dynamic sections, and others. If you'd prefer topoke around some working examples, there are working samples in the
 `TableauExample` Xcode project you can run to see the end result.
-
-Thanks for stopping by!
