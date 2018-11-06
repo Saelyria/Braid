@@ -4,18 +4,40 @@ import UIKit
  A section binder for a section whose cells were setup to be dequeued with an array of the cell type's 'view model'
  type.
  */
-public class TableViewViewModelSingleSectionBinder<C: UITableViewCell & ViewModelBindable, S: TableViewSection>: BaseTableViewSingleSectionBinder<C, S>, TableViewSingleSectionBinderProtocol {    
+public class TableViewViewModelSingleSectionBinder<C: UITableViewCell & ViewModelBindable, S: TableViewSection>: BaseTableViewSingleSectionBinder<C, S>, TableViewSingleSectionBinderProtocol {
     /**
-     Returns a closure that can be called to update the view models for the cells for the section.
+     Creates a cell view model update callback in the handler that can be used to update the view models for the
+     section being bound.
      
-     This closure is retrieved at the end of the binding sequence and stored somewhere useful. Whenever the underlying
-     data the table view is displaying is updated, call this closure with the new view models and the table view binder
-     will update the displayed cells in the section to match the given array.
-     */
-    public func createUpdateCallback() -> (_ viewModels: [C.ViewModel]) -> Void {
-        return { [weak binder = self.binder, section = self.section] (viewModels: [C.ViewModel]) in
+     This method is called with a handler that is passed in a closure that is used to update the view models for the
+     section being bound. It can be used anywhere in the binding chain after the cell is bound. This method's usage
+     generally looks something like this:
+     ```
+     let updateSomeSection: ([MyCellType.ViewModel]) -> Void
+     
+     binder.onSection(.someSection)
+        .bind(cellType: MyCellType.self, viewModels: [...])
+        .updateCells(with: { [unowned self] updateCallback in
+            self.updateSomeSection = updateCallback
+        })
+     ...
+     
+     let newViewModels: [MyCellType.ViewModel] = ...
+     updateSomeSection(newViewModels)
+     ```
+     
+     - parameter handler: A handler that is called immediately that is passed in an 'update callback' closure. This
+        closure can be called at any time after the binder's `finish` method is called to update the view models for the
+        section.
+     - parameter viewModels: The array of view models the cells in the section should be updated with.
+    */
+    @discardableResult
+    public func updateCells(with handler: ((_ viewModels: [C.ViewModel]) -> Void) -> Void) -> TableViewViewModelSingleSectionBinder<C, S> {
+        let updateCallback = { [weak binder = self.binder, section = self.section] (viewModels: [C.ViewModel]) -> Void in
             binder?.updateCellModels(nil, viewModels: [section: viewModels], sections: [section])
         }
+        handler(updateCallback)
+        return self
     }
     
     @discardableResult

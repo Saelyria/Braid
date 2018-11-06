@@ -5,16 +5,41 @@ import UIKit
  */
 public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewSection, M>: BaseTableViewSingleSectionBinder<C, S>, TableViewSingleSectionBinderProtocol {
     /**
-     Returns a closure that can be called to update the models for the cells for the section.
+     Creates a cell model update callback in the handler that can be used to update the models for the section being
+     bound.
      
-     This closure is retrieved at the end of the binding sequence and stored somewhere useful. Whenever the underlying
-     data the table view is displaying is updated, call this closure with the new models and the table view binder will
-     update the displayed cells in the section to match the given array.
-    */
-    public func createUpdateCallback() -> ([M]) -> Void {
-        return { [weak binder = self.binder, section = self.section] (models: [M]) in
+     This method is called with a handler that is passed in a closure that is used to update the models for the
+     section being bound. The passed-in 'update callback' closure should be stored somewhere useful to be called anytime
+     after the binder has finished binding. This method can be used anywhere in the binding chain after the cell is
+     bound.
+     
+     This method's usage generally looks something like this:
+     ```
+     let updateSomeSection: ([MyModel]) -> Void
+     
+     binder.onSection(.someSection)
+        .bind(cellType: MyCellType.self, models: [...])
+        .updateCells(with: { [unowned self] updateCallback in
+            self.updateSomeSection = updateCallback
+        })
+     ...
+     
+     let newModels: [MyModel] = ...
+     updateSomeSection(newModels)
+     ```
+     
+     - parameter handler: A handler that is called immediately that is passed in an 'update callback' closure. This
+        closure can be called at any time after the binder's `finish` method is called to update the models for the
+        section.
+     - parameter models: The array of models the cells in the section should be updated with.
+     */
+    @discardableResult
+    public func updateCells(with handler: ((_ models: [M]) -> Void) -> Void) -> TableViewModelSingleSectionBinder<C, S, M> {
+        let updateCallback = { [weak binder = self.binder, section = self.section] (models: [M]) -> Void in
             binder?.updateCellModels([section: models], viewModels: nil, sections: [section])
         }
+        handler(updateCallback)
+        return self
     }
     
     /**

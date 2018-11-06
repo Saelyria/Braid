@@ -28,6 +28,46 @@ where C: UITableViewCell & ViewModelBindable {
     }
     
     /**
+     Creates a cell view model update callback in the handler that can be used to update the models for the section
+     being bound.
+     
+     This method is called with a handler that is passed in a closure that is used to update the models for the
+     section being bound. The passed-in 'update callback' closure should be stored somewhere useful to be called anytime
+     after the binder has finished binding. This method can be used anywhere in the binding chain after the cell is
+     bound.
+     
+     This method's usage generally looks something like this:
+     ```
+     let updateSomeSection: ([MyModel]) -> Void
+     
+     binder.onSection(.someSection)
+        .bind(cellType: MyCellType.self, models: [...], mapToViewModelsWith: { ... })
+        .updateCells(with: { [unowned self] updateCallback in
+            self.updateSomeSection = updateCallback
+        })
+     ...
+     
+     let newModels: [MyModel] = ...
+     updateSomeSection(newModels)
+     ```
+     
+     - parameter handler: A handler that is called immediately that is passed in an 'update callback' closure. This
+        closure can be called at any time after the binder's `finish` method is called to update the models for the
+        section.
+     - parameter models: The array of models the cells in the section should be updated with. They will be mapped to
+        view models for the cells using the same function given in the cell binding method.
+     */
+    @discardableResult
+    public func updateCells(with handler: ((_ models: [M]) -> Void) -> Void) -> TableViewModelViewModelSingleSectionBinder<C, S, M> {
+        let updateCallback = { [weak binder = self.binder, section = self.section, mapToViewModel = self.mapToViewModelFunc] (models: [M]) -> Void in
+            let viewModels = models.map(mapToViewModel)
+            binder?.updateCellModels([section: models], viewModels: [section: viewModels], sections: [section])
+        }
+        handler(updateCallback)
+        return self
+    }
+    
+    /**
      Adds a handler to be called whenever a cell in the declared section is tapped.
      
      The handler is called whenever a cell in the section is tapped, passing in the row and cell that was tapped, along

@@ -151,6 +151,7 @@ Perfect. Now, we have two different cells we want to use - a normal cell for 'fr
 ```swift
 binder.onSection(.enemies)
     .bind(cellType: EnemyTableViewCell.self, models: enemies)
+    .headerTitle("ENEMIES")
     .onCellDequeue { (row: Int, cell: EnemyTableViewCell, person: Person) in
         // setup cell
     }
@@ -161,13 +162,21 @@ binder.onSection(.enemies)
 
 As you can see, when we deal with a sectioned binder, we don't have an `onTable` method to start binding chains - we start binding chains
 by passing in the section (in this case, a case of our `Section` enum) we want to bind the following information to. After that, it's basically the
-same story as with the section-less binding chain - bind a cell type, on 'on dequeue', and an 'on tapped'.
+same story as with the section-less binding chain - bind a cell type, on 'on dequeue', and an 'on tapped'. Here, we've also added the title for
+this section.
+
+Next, we'll setup the 'friends' and 'undecided' sections. They use a lot of the same logic and the same cell type, so we'll bind them together
+in one binding chain to spare a few lines.
 
 ```swift    
 binder.onSections([.friends, .undecided])
     .bind(cellType: MyTableViewCell.self, models: [
         .friends: friends,
         .undecided: undecided
+    ])
+    .headerTitles([
+        .friends: "FRIENDS",
+        .undecided: "NOT SURE YET"
     ])
     .onCellDequeue { (section: Section, row: Int, cell: MyCustomTableViewCell, person: Person) in
         // setup cell
@@ -177,11 +186,12 @@ binder.onSections([.friends, .undecided])
     }    
 ```
 
-As you can see, when we deal with a sectioned binder, we start binding chains on a section (or sections together). Each binding chain applies
-the handlers and data bound to it only to the sections it was started with. So, in the first binding chain, the `EnemyTableViewCell` is only
-used in the 'enemies' section, and the associated `onCellDequeue` and `onTapped` handlers are only called when cells are dequeued or
-tapped in this section. Likewise, with the next binding chain, the `MyTableViewCell` type is only used in the 'friends' and 'undecided' 
-sections, with its associated handlers only being called for cells in those sections. Neat, huh?
+As you can see, binding two sections at once is basically the same - the only difference is that for cell models, we pass in a dictionary where
+the key is a section and the value is an array of the models for that section. Each binding chain applies the handlers and data bound to it only 
+to the sections it was started with. So, in the first binding chain, the `EnemyTableViewCell` is only used in the 'enemies' section, and the
+associated `onCellDequeue` and `onTapped` handlers are only called when cells are dequeued or tapped in this section. Likewise, with the 
+next binding chain, the `MyTableViewCell` type is only used in the 'friends' and 'undecided' sections, with its associated handlers only being 
+called for cells in those sections. Neat, huh?
 
 The last thing we do with our sectioned binder is set a 'behaviour' for how it hides and orders sections. For simplicity (and because our data
 isn't dynamic), we'll just leave the default behaviour - 'manually managed'. This means in order to control which sections are displayed (and in 
@@ -196,5 +206,10 @@ automatically when they're empty. For now, we'll leave this, call the binder's `
 
 With that, you should be pretty much up to speed to start playing around with Tableau. Other tutorials are available on the repo to get you 
 started with other features of Tableau, like updating data on your bound table views, setting up your models so it can be animated for changes,
-using dynamic sections, and others. If you'd prefer topoke around some working examples, there are working samples in the
-`TableauExample` Xcode project you can run to see the end result.
+using dynamic sections, and others. 
+- [Updating data](UpdatingData.md)
+- [Using view models](UsingViewModels.md)
+- [How it works](HowItWorks.md)
+
+If you'd prefer to poke around some working examples, there are working samples in the `TableauExample` Xcode project you can run to see 
+the end result.
