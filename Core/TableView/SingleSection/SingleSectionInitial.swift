@@ -16,16 +16,31 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>:
      
      - parameter cellType: The class of the header to bind.
      - parameter viewModels: The view models to bind to the the dequeued cells for this section.
+     - parameter updateHandler: A closure called instantly that is passed in an 'update callback' closure that can be
+        used to update the view models for this section after binding. This passed-in 'update callback' should be
+        referenced somewhere useful to call later whenever the view models for the section need updated. This argument
+        can be left as nil if the section is never updated.
+     
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind<NC>(cellType: NC.Type, viewModels: [NC.ViewModel]) -> TableViewViewModelSingleSectionBinder<NC, S>
+    public func bind<NC>(
+        cellType: NC.Type,
+        viewModels: [NC.ViewModel],
+        updatedWith updateHandler: ((_ updateCallback: (_ newViewModels: [NC.ViewModel]) -> Void) -> Void)? = nil)
+        -> BaseTableViewSingleSectionBinder<NC, S>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
         self.binder.updateCellModels(nil, viewModels: [self.section: viewModels], sections: [self.section])
         
-        return TableViewViewModelSingleSectionBinder<NC, S>(binder: self.binder, section: self.section)
+        let updateCallback: ([NC.ViewModel]) -> Void
+        updateCallback = { [weak binder = self.binder, section = self.section] (viewModels) in
+            binder?.updateCellModels(nil, viewModels: [section: viewModels], sections: [section])
+        }
+        updateHandler?(updateCallback)
+        
+        return BaseTableViewSingleSectionBinder<NC, S>(binder: self.binder, section: self.section)
     }
     
     /**
@@ -40,22 +55,34 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>:
      - parameter models: The model objects to bind to the dequeued cells for this section.
      - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
         for the associated cell using the data from the model object.
+     - parameter updateHandler: A closure called instantly that is passed in an 'update callback' closure that can be
+        used to update the models/view models for this section after binding. This passed-in 'update callback' should be
+        referenced somewhere useful to call later whenever the models for the section need updated. This argument can be
+        left as nil if the section is never updated.
+     
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-        -> TableViewModelViewModelSingleSectionBinder<NC, S, NM>
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        updatedWith updateHandler: ((_ updateCallback: (_ newModels: [NM]) -> Void) -> Void)? = nil)
+        -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
         let viewModels = [self.section: models.map(mapToViewModel)]
         self.binder.updateCellModels([self.section: models], viewModels: viewModels, sections: [self.section])
+        
+        let updateCallback: ([NM]) -> Void
+        updateCallback = { [weak binder = self.binder, section = self.section, mapToViewModel] (models) in
+            let viewModels = models.map(mapToViewModel)
+            binder?.updateCellModels([section: models], viewModels: [section: viewModels], sections: [section])
+        }
+        updateHandler?(updateCallback)
 
-        return TableViewModelViewModelSingleSectionBinder<NC, S, NM>(
-            binder: self.binder, section: self.section, mapToViewModel: mapToViewModel)
+        return TableViewModelSingleSectionBinder<NC, S, NM>(binder: self.binder, section: self.section)
     }
     
     /**
@@ -72,13 +99,29 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>:
      
      - parameter cellType: The class of the header to bind.
      - parameter models: The models objects to bind to the dequeued cells for this section.
+     - parameter updateHandler: A closure called instantly that is passed in an 'update callback' closure that can be
+        used to update the models for this section after binding. This passed-in 'update callback' should be referenced
+        somewhere useful to call later whenever the models for the section need updated. This argument can be left as
+        nil if the section is never updated.
+     
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind<NC, NM>(cellType: NC.Type, models: [NM]) -> TableViewModelSingleSectionBinder<NC, S, NM>
-    where NC: UITableViewCell & ReuseIdentifiable {
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: [NM],
+        updatedWith updateHandler: ((_ updateCallback: (_ newModels: [NM]) -> Void) -> Void)? = nil)
+        -> TableViewModelSingleSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ReuseIdentifiable
+    {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
         self.binder.updateCellModels([self.section: models], viewModels: nil, sections: [self.section])
+        
+        let updateCallback: ([NM]) -> Void
+        updateCallback = { [weak binder = self.binder, section = self.section] (models) in
+            binder?.updateCellModels([section: models], viewModels: nil, sections: [section])
+        }
+        updateHandler?(updateCallback)
         
         return TableViewModelSingleSectionBinder<NC, S, NM>(binder: self.binder, section: self.section)
     }
@@ -95,13 +138,18 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>:
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
      - parameter models: The models objects to bind to the dequeued cells for this section.
+     - parameter updateHandler: A closure called instantly that is passed in an 'update callback' closure that can be
+        used to update the models for this section after binding. This passed-in 'update callback' should be referenced
+        somewhere useful to call later whenever the models for the section need updated. This argument can be left as
+        nil if the section is never updated.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind<NM>(
         cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
-        models: [NM])
+        models: [NM],
+        updatedWith updateCallbackHandler: ((_ updateCallback: (_ newModels: [NM]) -> Void) -> Void)? = nil)
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
     {
         let _cellProvider = { [weak binder = self.binder] (_ section: S, _ row: Int) -> UITableViewCell in
@@ -112,6 +160,12 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>:
         }
         self.binder.addCellDequeueBlock(cellProvider: _cellProvider, sections: [self.section])
         self.binder.updateCellModels([self.section: models], viewModels: nil, sections: [self.section])
+        
+        let updateCallback: ([NM]) -> Void
+        updateCallback = { [weak binder = self.binder, section = self.section] (models) in
+            binder?.updateCellModels([section: models], viewModels: nil, sections: [section])
+        }
+        updateCallbackHandler?(updateCallback)
         
         return TableViewModelSingleSectionBinder<UITableViewCell, S, NM>(binder: self.binder, section: self.section)
     }
@@ -126,18 +180,29 @@ public class TableViewInitialSingleSectionBinder<S: TableViewSection>:
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter numberOfCells: The number of cells to create for the section using the provided closure.
+     - parameter updateHandler: A closure called instantly that is passed in an 'update callback' closure that can be
+        used to update the number of cells for this section after binding. This passed-in 'update callback' should be
+        referenced somewhere useful to call later whenever the number of cells for the section need updated. This
+        argument can be left as nil if the section is never updated.
      
      - returns: A section binder to continue the binding chain with.
     */
     @discardableResult
     public func bind(
         cellProvider: @escaping (_ row: Int) -> UITableViewCell,
-        numberOfCells: Int)
-        -> TableViewProviderSingleSectionBinder<S>
+        numberOfCells: Int,
+        updatedWith updateHandler: ((_ updateCallback: (_ newNumCells: Int) -> Void) -> Void)? = nil)
+        -> BaseTableViewSingleSectionBinder<UITableViewCell, S>
     {
         self.binder.addCellDequeueBlock(cellProvider: cellProvider, sections: [self.section])
         self.binder.updateNumberOfCells([self.section: numberOfCells], sections: [self.section])
         
-        return TableViewProviderSingleSectionBinder<S>(binder: self.binder, section: self.section)
+        let updateCallback: (Int) -> Void
+        updateCallback = { [weak binder = self.binder, section = self.section] (numCells) in
+            binder?.updateNumberOfCells([section: numCells], sections: [section])
+        }
+        updateHandler?(updateCallback)
+        
+        return BaseTableViewSingleSectionBinder<UITableViewCell, S>(binder: self.binder, section: self.section)
     }
 }

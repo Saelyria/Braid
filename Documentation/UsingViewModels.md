@@ -21,8 +21,19 @@ class MyCell: UITableViewCell, ViewModelBindable {
     }
 }
 ```
-Your binding chain can then either be passed in an array of view models as seen in the previous example with the `.banner` section, or, if your 
-cells are based off of raw data models, you can pass a mapping function into the binding chain, like this:
+
+Your binding chain can then either be passed in an array of view models like this:
+
+```swift
+let viewModels: [MyCell.ViewModel] = ...
+
+binder.onSection(.someSection)
+    .bind(cellType: MyCell.self, viewModels: viewModels)
+    ...
+```
+
+Or, in the more likely scenario where your cells are based off of raw data models, you can pass a mapping function into the binding chain, like 
+this:
 
 ```swift
 let models: [MyModel] = ...
@@ -33,4 +44,8 @@ let modelToViewModel = { (model: MyModel) -> MyCell.ViewModel in
 binder.onSection(.someSection)
     .bind(cellType: MyCell.self, models: models, mapToViewModelBy: modelToViewModel)
 ```
-The binder will then take care of setting the `viewModel` property of your cells automatically - no `onCellDequeue` call required.
+
+The binder will then take care of setting the `viewModel` property of your cells automatically - no `onCellDequeue` call required. This mapping
+function is also stored by the binder to use later if the section's models are updated to map them to view models for the cells. The second
+method where you bind models also allows `model` instances to be given in various handlers like `onTapped` later in the chain, so is the
+more recommended of the two for cell binding for sections whose cells are used for representing data.

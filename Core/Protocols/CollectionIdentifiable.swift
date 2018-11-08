@@ -7,12 +7,12 @@ import Foundation
  deleted, or moved in the collections of data given to binder objects. This information is then used to create diffs
  that Tableau can then animate on table or collection views.
  
- The `id` property should uniquely identify an object, like a serial number on a product or license plate on a car, and
- should not change when the object is 'updated' (e.g. a car keeps the same license plate if its tires are changed or it
- is repainted). In other words, this `id` should identify an object's 'identity', not its 'equity'. Obeying this
- distinction allows Tableau to identify when a model has 'moved' in a dataset (it found its `id` in a position different
- than where it was before) versus when a model has 'updated' (its `id` is the same, just the other properties on the
- model have changed).
+ The `collectionId` property should uniquely identify an object, like a serial number on a product or license plate on
+ a car, and should not change when the object is 'updated' (e.g. a car keeps the same license plate if its tires are
+ changed or it is repainted). In other words, this id should identify an object's 'identity', not its 'equity'. Obeying
+ this distinction allows Tableau to identify when a model has 'moved' in a dataset (it found its `id` in a position
+ different than where it was before) versus when a model has 'updated' (its `collectionId` is the same, just the other
+ properties on the model have changed).
  */
 public protocol CollectionIdentifiable {
     var collectionId: String { get }

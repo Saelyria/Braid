@@ -21,7 +21,9 @@ public class AnySectionBinder<S: TableViewSection> {
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: UITableViewCell) -> Void) -> AnySectionBinder<S> {
+    public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: UITableViewCell) -> Void)
+        -> AnySectionBinder<S>
+    {
         self.binder.handlers.anySectionCellDequeuedCallback = handler
 
         return self
@@ -41,7 +43,9 @@ public class AnySectionBinder<S: TableViewSection> {
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: UITableViewCell) -> Void) -> AnySectionBinder<S> {
+    public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: UITableViewCell) -> Void)
+        -> AnySectionBinder<S>
+    {
         self.binder.handlers.anySectionCellTappedCallback = handler
         
         return self
@@ -144,5 +148,4 @@ public class AnySectionBinder<S: TableViewSection> {
         
         return self
     }
-
 }

@@ -131,16 +131,16 @@ Then we'll setup our data to give the binder. For this demo, we'll just make thr
 
 ```swift
 let friends = [
-    Person(name: "Asif", age: 27), // gives me good deals at Bulk Barn
-    Person(name: "Joanne", age: 31) // brings delicious cupcakes to work
+    Person(name: "Asif", age: 27), // brings delicious cupcakes to work
+    Person(name: "Joanne", age: 31) // gives me good deals at Bulk Barn
 ]
 let enemies = [
     Person(name: "Joseph", age: 22), // doesn't like chocolate
     Person(name: "Sue", age: 42) // thinks 'Attack of the Clones' is the best Star Wars movie
 ]
 let undecided = [
-    Person(name: "Madeleine", age: 54), // watches daytime television, but does like chocolate
-    Person(name: "Jorge", age: 19) // is kind of passive-aggressive, but has a cute dog
+    Person(name: "Madeleine", age: 54), // is kind of passive-aggressive, but has a cute dog
+    Person(name: "Jorge", age: 19) // loves daytime television, but does like chocolate
 ]
 ```
 
@@ -178,10 +178,10 @@ binder.onSections([.friends, .undecided])
         .friends: "FRIENDS",
         .undecided: "NOT SURE YET"
     ])
-    .onCellDequeue { (section: Section, row: Int, cell: MyCustomTableViewCell, person: Person) in
+    .onCellDequeue { (section: Section, row: Int, cell: MyTableViewCell, person: Person) in
         // setup cell
     }
-    .onTapped { (section: Section, row: Int, cell: MyCustomTableViewCell, person: Person) in
+    .onTapped { (section: Section, row: Int, cell: MyTableViewCell, person: Person) in
         // go to a detail VC
     }    
 ```

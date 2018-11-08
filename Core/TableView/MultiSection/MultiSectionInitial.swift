@@ -4,7 +4,9 @@ import UIKit
  A throwaway object created when a table view binder's `onSections(_:)` method is called. This object declares a number
  of methods that take a binding handler and give it to the original table view binder to store for callback.
  */
-public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableViewMutliSectionBinder<UITableViewCell, S>, TableViewInitialMutliSectionBinderProtocol {
+public class TableViewInitialMutliSectionBinder<S: TableViewSection>
+    : BaseTableViewMutliSectionBinder<UITableViewCell, S>, TableViewInitialMutliSectionBinderProtocol
+{
     public typealias C = UITableViewCell
     
     /**
@@ -14,16 +16,31 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
      - parameter viewModels: A dictionary where the key is a section and the value are the view models for the cells
         created for the section. This dictionary does not need to contain a view models array for each section being
         bound - sections not present in the dictionary have no cells dequeued for them.
+     - parameter updateHandler: A closure called instantly that is passed in an 'update callback' closure that can be
+        used to update the view models for these sections after binding. This passed-in 'update callback' should be
+        referenced somewhere useful to call later whenever the view models for these sections need updated. This
+        argument can be left as nil if the sections are never updated.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind<NC>(cellType: NC.Type, viewModels: [S: [NC.ViewModel]])
-    -> TableViewViewModelMultiSectionBinder<NC, S> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
+    public func bind<NC>(
+        cellType: NC.Type,
+        viewModels: [S: [NC.ViewModel]],
+        updatedWith updateHandler: ((_ updateCallback: (_ newViewModels: [S: [NC.ViewModel]]) -> Void) -> Void)? = nil)
+        -> BaseTableViewMutliSectionBinder<NC, S>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+    {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: self.sections)
         self.binder.updateCellModels(nil, viewModels: viewModels, sections: self.sections)
         
-        return TableViewViewModelMultiSectionBinder<NC, S>(binder: self.binder, sections: self.sections)
+        let updateCallback: ([S: [NC.ViewModel]]) -> Void
+        updateCallback = { [weak binder = self.binder, sections = self.sections] (viewModels) in
+            binder?.updateCellModels(nil, viewModels: viewModels, sections: sections)
+        }
+        updateHandler?(updateCallback)
+        
+        return BaseTableViewMutliSectionBinder<NC, S>(binder: self.binder, sections: self.sections)
     }
     
     /**
@@ -40,12 +57,22 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
         present in the dictionary have no cells dequeued for them.
      - parameter mapToViewModel: A function that, when given a model from a `models` array, will create a view model for
         the associated cell using the data from the model object.
+     - parameter updateHandler: A closure called instantly that is passed in an 'update callback' closure that can be
+        used to update the models for these sections after binding. This passed-in 'update callback' should be
+        referenced somewhere useful to call later whenever the models for these sections need updated. This argument can
+        be left as nil if the sections are never updated.
      
      - returns: A section binder to continue the binding chain with.
     */
     @discardableResult
-    public func bind<NC, NM>(cellType: NC.Type, models: [S: [NM]], mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-    -> TableViewModelViewModelMultiSectionBinder<NC, S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: [S: [NM]],
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        updatedWith updateHandler: ((_ updateCallback: (_ newViewModels: [S: [NM]]) -> Void) -> Void)? = nil)
+        -> TableViewModelMultiSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+    {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: self.sections)
         var viewModels: [S: [Any]] = [:]
         for (s, m) in models {
@@ -53,7 +80,17 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
         }
         self.binder.updateCellModels(models, viewModels: viewModels, sections: self.sections)
         
-        return TableViewModelViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections, mapToViewModel: mapToViewModel)
+        let updateCallback: ([S: [NM]]) -> Void
+        updateCallback = { [weak binder = self.binder, sections = self.sections, mapToViewModel] (models) in
+            var viewModels: [S: [Any]] = [:]
+            for (s, m) in models {
+                viewModels[s] = m.map(mapToViewModel)
+            }
+            binder?.updateCellModels(models, viewModels: viewModels, sections: sections)
+        }
+        updateHandler?(updateCallback)
+        
+        return TableViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections)
     }
     
     /**
@@ -67,14 +104,29 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
      - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
         the section. This dictionary does not need to contain a models array for each section being bound - sections not
         present in the dictionary have no cells dequeued for them.
+     - parameter updateHandler: A closure called instantly that is passed in an 'update callback' closure that can be
+        used to update the models for these sections after binding. This passed-in 'update callback' should be
+        referenced somewhere useful to call later whenever the models for these sections need updated. This argument can
+        be left as nil if the sections are never updated.
      
      - returns: A section binder to continue the binding chain with.
     */
     @discardableResult
-    public func bind<NC, NM>(cellType: NC.Type, models: [S: [NM]]) -> TableViewModelMultiSectionBinder<NC, S, NM>
-    where NC: UITableViewCell & ReuseIdentifiable {
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: [S: [NM]],
+        updatedWith updateHandler: ((_ updateCallback: (_ newModels: [S: [NM]]) -> Void) -> Void)? = nil)
+        -> TableViewModelMultiSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ReuseIdentifiable
+    {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: self.sections)
         self.binder.updateCellModels(models, viewModels: nil, sections: self.sections)
+        
+        let updateCallback: ([S: [NM]]) -> Void
+        updateCallback = { [weak binder = self.binder, sections = self.sections] (models) in
+            binder?.updateCellModels(models, viewModels: nil, sections: sections)
+        }
+        updateHandler?(updateCallback)
 
         return TableViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections)
     }
@@ -94,13 +146,18 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
      - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
         the section. This dictionary does not need to contain a models array for each section being bound - sections not
         present in the dictionary have no cells dequeued for them.
+     - parameter updateHandler: A closure called instantly that is passed in an 'update callback' closure that can be
+        used to update the models for these sections after binding. This passed-in 'update callback' should be
+        referenced somewhere useful to call later whenever the models for these sections need updated. This argument can
+        be left as nil if the sections are never updated.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind<NM>(
         cellProvider: @escaping (_ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
-        models: [S: [NM]])
+        models: [S: [NM]],
+        updatedWith updateHandler: ((_ updateCallback: (_ newModels: [S: [NM]]) -> Void) -> Void)? = nil)
         -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
     {
         let _cellProvider = { [weak binder = self.binder] (_ section: S, _ row: Int) -> UITableViewCell in
@@ -111,6 +168,12 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
         }
         self.binder.addCellDequeueBlock(cellProvider: _cellProvider, sections: self.sections)
         self.binder.updateCellModels(models, viewModels: nil, sections: self.sections)
+        
+        let updateCallback: ([S: [NM]]) -> Void
+        updateCallback = { [weak binder = self.binder, sections = self.sections] (models) in
+            binder?.updateCellModels(models, viewModels: nil, sections: sections)
+        }
+        updateHandler?(updateCallback)
 
         return TableViewModelMultiSectionBinder<UITableViewCell, S, NM>(binder: self.binder, sections: self.sections)
     }
@@ -127,18 +190,29 @@ public class TableViewInitialMutliSectionBinder<S: TableViewSection>: BaseTableV
      - parameter section: The section the closure should provide a cell for.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter numberOfCells: The number of cells to create for each section using the provided closure.
+     - parameter updateHandler: A closure called instantly that is passed in an 'update callback' closure that can be
+        used to update the number of cells for these sections after binding. This passed-in 'update callback' should be
+        referenced somewhere useful to call later whenever the number of cells for these sections need updated. This
+        argument can be left as nil if the sections are never updated.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind(
         cellProvider: @escaping (_ section: S, _ row: Int) -> UITableViewCell,
-        numberOfCells: [S: Int])
-        -> TableViewProviderMultiSectionBinder<S>
+        numberOfCells: [S: Int],
+        updatedWith updateHandler: ((_ updateCallback: (_ newViewModels: [S: Int]) -> Void) -> Void)? = nil)
+        -> BaseTableViewMutliSectionBinder<UITableViewCell, S>
     {
         self.binder.addCellDequeueBlock(cellProvider: cellProvider, sections: self.sections)
         self.binder.updateNumberOfCells(numberOfCells, sections: self.sections)
         
-        return TableViewProviderMultiSectionBinder<S>(binder: self.binder, sections: self.sections)
+        let updateCallback: ([S: Int]) -> Void
+        updateCallback = { [weak binder = self.binder, sections = self.sections] (numCells) in
+            binder?.updateNumberOfCells(numCells, sections: sections)
+        }
+        updateHandler?(updateCallback)
+        
+        return BaseTableViewMutliSectionBinder<UITableViewCell, S>(binder: self.binder, sections: self.sections)
     }
 }

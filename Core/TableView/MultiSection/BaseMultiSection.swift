@@ -34,7 +34,8 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func bind<H>(headerType: H.Type, viewModels: [S: H.ViewModel]) -> BaseTableViewMutliSectionBinder<C, S>
-    where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
+        where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+    {
         self.binder.addHeaderDequeueBlock(headerType: headerType, sections: self.sections)
         self.binder.updateHeaderViewModels(viewModels, sections: self.sections)
 
@@ -77,7 +78,8 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      */
     @discardableResult
     public func bind<F>(footerType: F.Type, viewModels: [S: F.ViewModel]) -> BaseTableViewMutliSectionBinder<C, S>
-    where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
+        where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+    {
         self.binder.addFooterDequeueBlock(footerType: footerType, sections: self.sections)
         self.binder.updateFooterViewModels(viewModels, sections: self.sections)
 
@@ -120,7 +122,9 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C) -> Void) -> BaseTableViewMutliSectionBinder<C, S> {
+    public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C) -> Void)
+        -> BaseTableViewMutliSectionBinder<C, S>
+    {
         let callback: CellDequeueCallback<S> = { (section: S, row: Int, cell: UITableViewCell) in
             guard let cell = cell as? C else {
                 assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
@@ -155,7 +159,9 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C) -> Void) -> BaseTableViewMutliSectionBinder<C, S> {
+    public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C) -> Void)
+        -> BaseTableViewMutliSectionBinder<C, S>
+    {
         let callback: CellTapCallback<S> = { (section: S, row: Int, tappedCell: UITableViewCell) in
             guard let tappedCell = tappedCell as? C else {
                 assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
@@ -188,7 +194,9 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func cellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
+    public func cellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat)
+        -> BaseTableViewMutliSectionBinder<C, S>
+    {
         if let sections = self.sections {
             for section in sections {
                 self.binder.handlers.sectionCellHeightBlocks[section] = handler
@@ -213,7 +221,9 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func estimatedCellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
+    public func estimatedCellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat)
+        -> BaseTableViewMutliSectionBinder<C, S>
+    {
         if let sections = self.sections {
             for section in sections {
                 self.binder.handlers.sectionEstimatedCellHeightBlocks[section] = handler
@@ -255,7 +265,9 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func estimatedHeaderHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
+    public func estimatedHeaderHeight(_ handler: @escaping (_ section: S) -> CGFloat)
+        -> BaseTableViewMutliSectionBinder<C, S>
+    {
         if let sections = self.sections {
             for section in sections {
                 self.binder.handlers.sectionHeaderEstimatedHeightBlocks[section] = handler
@@ -276,7 +288,9 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func footerHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
+    public func footerHeight(_ handler: @escaping (_ section: S) -> CGFloat)
+        -> BaseTableViewMutliSectionBinder<C, S>
+    {
         if let sections = self.sections {
             for section in sections {
                 self.binder.handlers.sectionFooterHeightBlocks[section] = handler
@@ -297,7 +311,9 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func estimatedFooterHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> BaseTableViewMutliSectionBinder<C, S> {
+    public func estimatedFooterHeight(_ handler: @escaping (_ section: S) -> CGFloat)
+        -> BaseTableViewMutliSectionBinder<C, S>
+    {
         if let sections = self.sections {
             for section in sections {
                 self.binder.handlers.sectionFooterEstimatedHeightBlocks[section] = handler

@@ -37,7 +37,8 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      */
     @discardableResult
     public func bind<H>(headerType: H.Type, viewModel: H.ViewModel) -> BaseTableViewSingleSectionBinder<C, S>
-    where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
+        where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+    {
         self.binder.addHeaderDequeueBlock(headerType: headerType, sections: [self.section])
         self.binder.updateHeaderViewModels([self.section: viewModel], sections: [self.section])
         
@@ -50,13 +51,13 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      This method will provide the given title as the title for the iOS native section headers. If you have bound a custom
      header type to the table view using the `bind(headerType:viewModel:)` method, this method will do nothing.
      
-     - parameter title: The title to use for the section's header.
+     - parameter headerTitle: The title to use for the section's header.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func headerTitle(_ title: String) -> BaseTableViewSingleSectionBinder<C, S> {
-        self.binder.updateHeaderTitles([self.section: title], sections: [self.section])
+    public func bind(headerTitle: String) -> BaseTableViewSingleSectionBinder<C, S> {
+        self.binder.updateHeaderTitles([self.section: headerTitle], sections: [self.section])
 
         return self
     }
@@ -74,7 +75,8 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      */
     @discardableResult
     public func bind<F>(footerType: F.Type, viewModel: F.ViewModel) -> BaseTableViewSingleSectionBinder<C, S>
-    where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
+        where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+    {
         self.binder.addFooterDequeueBlock(footerType: footerType, sections: [self.section])
         self.binder.updateFooterViewModels([self.section: viewModel], sections: [self.section])
         
@@ -87,12 +89,13 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      This method will provide the given title as the title for the iOS native section footers. If you have bound a custom
      footer type to the table view using the `bind(footerType:viewModel:)` method, this method will do nothing.
      
-     - parameter title: The title to use for the section's footer.
+     - parameter footerTitle: The title to use for the section's footer.
+     
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func footerTitle(_ title: String) -> BaseTableViewSingleSectionBinder<C, S> {
-        self.binder.updateFooterTitles([self.section: title], sections: [self.section])
+    public func bind(footerTitle: String) -> BaseTableViewSingleSectionBinder<C, S> {
+        self.binder.updateFooterTitles([self.section: footerTitle], sections: [self.section])
  
         return self
     }
@@ -107,10 +110,13 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      - parameter handler: The closure to be called whenever a cell is dequeued in the bound section.
      - parameter row: The row of the cell that was dequeued.
      - parameter dequeuedCell: The cell that was dequeued that can now be configured.
+     
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onCellDequeue(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void) -> BaseTableViewSingleSectionBinder<C, S> {
+    public func onCellDequeue(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void)
+        -> BaseTableViewSingleSectionBinder<C, S>
+    {
         let dequeueCallback: CellDequeueCallback<S> = { (_, row, cell) in
             guard let cell = cell as? C else {
                 assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
@@ -136,7 +142,9 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C) -> Void) -> BaseTableViewSingleSectionBinder<C, S> {
+    public func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C) -> Void)
+        -> BaseTableViewSingleSectionBinder<C, S>
+    {
         let tappedHandler: CellTapCallback<S> = { (_, row, cell) in
             guard let cell = cell as? C else {
                 assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
@@ -178,7 +186,9 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func estimatedCellHeight(_ handler: @escaping (_ row: Int) -> CGFloat) -> BaseTableViewSingleSectionBinder<C, S> {
+    public func estimatedCellHeight(_ handler: @escaping (_ row: Int) -> CGFloat)
+        -> BaseTableViewSingleSectionBinder<C, S>
+    {
         self.binder.handlers.sectionEstimatedCellHeightBlocks[self.section] = { (_, row: Int) in
             return handler(row)
         }

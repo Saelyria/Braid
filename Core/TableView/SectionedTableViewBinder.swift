@@ -222,7 +222,10 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         sections. This defaults to `manuallyManageSections`, meaning the binder's `displayedSections` property must be
         set to determine the visibility and order of sections.
     */
-    public init(tableView: UITableView, sectionedBy sectionModel: S.Type, sectionDisplayBehavior: SectionDisplayBehavior = .manuallyManaged) {
+    public init(tableView: UITableView,
+                sectionedBy sectionModel: S.Type,
+                sectionDisplayBehavior: SectionDisplayBehavior = .manuallyManaged)
+    {
         self.tableView = tableView
         self.sectionDisplayBehavior = sectionDisplayBehavior
     }
@@ -413,7 +416,8 @@ public extension SectionedTableViewBinder.SectionDisplayBehavior where S: Compar
         let orderingFunc = { (unordered: [S]) -> [S] in
             return unordered.sorted()
         }
-        return SectionedTableViewBinder.SectionDisplayBehavior(behavior: .hidesSectionsWithNoCellData, orderingFunction: orderingFunc)
+        return SectionedTableViewBinder.SectionDisplayBehavior(
+            behavior: .hidesSectionsWithNoCellData, orderingFunction: orderingFunc)
     }
     
     /**
@@ -425,7 +429,8 @@ public extension SectionedTableViewBinder.SectionDisplayBehavior where S: Compar
         let orderingFunc = { (unordered: [S]) -> [S] in
             return unordered.sorted()
         }
-        return SectionedTableViewBinder.SectionDisplayBehavior(behavior: .hidesSectionsWithNoData, orderingFunction: orderingFunc)
+        return SectionedTableViewBinder.SectionDisplayBehavior(
+            behavior: .hidesSectionsWithNoData, orderingFunction: orderingFunc)
     }
 }
 

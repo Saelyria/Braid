@@ -1,13 +1,11 @@
 # Tableau
 
-Tableau is a library for making your table and collection view setup routine smaller, more declarative, and more type safe that lets you switch 
-from the tired data source / delegate routine to a cleaner function chain that reads like a sentence. Tableau also includes support for RxSwift.
+Tableau is an RxSwift-compatible library for making your table and collection view setup routine smaller, more declarative, more type safe, and
+simply more fun that lets you switch from the tired data source / delegate routine to a cleaner function chain that reads like a sentence.
 
-Here's a sample of what a typical table view setup might look like:
+To give you a quick idea of some of the key features of the library, here's a contrived sample of what a table view setup can look like:
 
 ```swift
-// MyViewController.swift
-
 enum Section: TableViewSection {
     case first
     case second
@@ -17,7 +15,7 @@ enum Section: TableViewSection {
 }
 
 let firstSectionModels: Observable<[MyModel]> = ...
-let secondThirdSectionModels: Observable<[Section: MyModel]> = ...
+let secondThirdSectionModels: Observable<[Section: [MyModel]]> = ...
 
 let binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
 
@@ -44,18 +42,17 @@ binder.onAllOtherSections()
 binder.finish()
 ```
 
-Without reading through any docs, you can probably assume most of what's going on here just by reading it. Setting up your table view is 
-done in functional chains, and you declare the logic for your sections (what table view type they use, what models the cells are dequeued for,
-what's done when a cell is tapped, etc.) directly on the sections. Everything is type safe and you don't need to map rows to model array 
-indices. 
+This is much more legible and reads more like requirements you might get. Setting up your table view is done in functional chains where you
+declare the logic for your sections (what cell type they use, what models the cells are dequeued for, what's done when a cell is tapped, etc.) 
+directly on the sections. Everything is type safe and you don't need to map rows to model array indices. 
 
-Tableau scales easily with complexity, though, and supports more complex use cases that can't be described as easily as this example by
-allowing you to do things like use a struct instead of an enum for more dynamic section logic, ability to bind handlers to any section (known or
-unknown), and also allows much more manual control by allowing you to call cell binding with closures to dequeue cells yourself if needed, so 
-you should never be so limited by the library that you find yourself resorting to the regular UIKit 'data source / delegate' routine. 
+Tableau also scales easily with complexity. For more complex use cases that can't be described as easily as this example, it allows you to do
+things like use a struct instead of an enum for more dynamic section logic, ability to bind handlers to any section (known or unknown), and
+also allows much more manual control by allowing you to call cell binding with closures to dequeue cells yourself if needed, so you should
+never be so limited by the library that you find yourself resorting to the regular UIKit 'data source / delegate' routine. 
 
-Tableau has a number of other features:
-- Easily hot swap by changing the binder's `displayedSections` property
+Tableau has a number of other features as well:
+- Easily hot swap sections by changing the binder's `displayedSections` property
 - Easier cell registration and dequeuing using  `UINibInitable` and `ReuseIdentifiable` protocols
 - Type safe updating of cells in a section via callback closures created during binding
 - Automatic diffing and animation between updates to the table's underlying models
