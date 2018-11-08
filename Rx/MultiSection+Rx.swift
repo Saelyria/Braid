@@ -8,8 +8,12 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
      Bind the given cell type to the declared sections, creating them based on the view models from a given observable.
      */
     @discardableResult
-    public func bind<NC>(cellType: NC.Type, viewModels: Observable<[Base.S: [NC.ViewModel]]>) -> TableViewViewModelMultiSectionBinder<NC, Base.S>
-    where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
+    public func bind<NC>(
+        cellType: NC.Type,
+        viewModels: Observable<[Base.S: [NC.ViewModel]]>)
+        -> BaseTableViewMutliSectionBinder<NC, Base.S>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+    {
         guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
@@ -24,7 +28,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
                 binder?.updateCellModels(nil, viewModels: viewModels, sections: sections)
             }).disposed(by: bindResult.binder.disposeBag)
         
-        return TableViewViewModelMultiSectionBinder<NC, Base.S>(binder: bindResult.binder, sections: sections)
+        return BaseTableViewMutliSectionBinder<NC, Base.S>(binder: bindResult.binder, sections: sections)
     }
     
     /**
@@ -32,8 +36,13 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
      array of models mapped to view models by a given function.
      */
     @discardableResult
-    public func bind<NC, NM>(cellType: NC.Type, models: Observable<[Base.S: [NM]]>, mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
-    -> TableViewModelViewModelMultiSectionBinder<NC, Base.S, NM> where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable {
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: Observable<[Base.S: [NM]]>,
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        -> TableViewModelMultiSectionBinder<NC, Base.S, NM>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+    {
         guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
@@ -52,8 +61,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
                 binder?.updateCellModels(models, viewModels: viewModels, sections: sections)
             }).disposed(by: bindResult.binder.disposeBag)
         
-        return TableViewModelViewModelMultiSectionBinder<NC, Base.S, NM>(
-            binder: bindResult.binder, sections: sections, mapToViewModel: mapToViewModel)
+        return TableViewModelMultiSectionBinder<NC, Base.S, NM>(binder: bindResult.binder, sections: sections)
     }
     
     /**
@@ -152,7 +160,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
     public func bind(
         cellProvider: @escaping (_ section: Base.S, _ row: Int) -> UITableViewCell,
         numberOfCells: Observable<[Base.S: Int]>)
-        -> TableViewProviderMultiSectionBinder<Base.S>
+        -> BaseTableViewMutliSectionBinder<UITableViewCell, Base.S>
     {
         guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
@@ -169,7 +177,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
             }).disposed(by: bindResult.binder.disposeBag)
         
         
-        return TableViewProviderMultiSectionBinder<Base.S>(binder: bindResult.binder, sections: sections)
+        return BaseTableViewMutliSectionBinder<UITableViewCell, Base.S>(binder: bindResult.binder, sections: sections)
     }
 }
 

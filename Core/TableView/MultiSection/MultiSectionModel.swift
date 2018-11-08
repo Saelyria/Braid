@@ -56,32 +56,46 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     }
     
     @discardableResult
-    public override func bind<H>(headerType: H.Type, viewModels: [S: H.ViewModel])
+    public override func bind<H>(
+        headerType: H.Type,
+        viewModels: [S : H.ViewModel],
+        updatedWith updateHandler: ((([S : H.ViewModel]) -> Void) -> Void)?)
         -> TableViewModelMultiSectionBinder<C, S, M>
-        where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+        where H : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
     {
         super.bind(headerType: headerType, viewModels: viewModels)
         return self
     }
     
     @discardableResult
-    public override func headerTitles(_ titles: [S: String]) -> TableViewModelMultiSectionBinder<C, S, M> {
-        super.headerTitles(titles)
-        return self
-    }
-    
-    @discardableResult
-    public override func bind<F>(footerType: F.Type, viewModels: [S: F.ViewModel])
+    public override func bind(
+        headerTitles: [S : String],
+        updateWith updateHandler: ((([S : String]) -> Void) -> Void)?)
         -> TableViewModelMultiSectionBinder<C, S, M>
-        where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
-        super.bind(footerType: footerType, viewModels: viewModels)
+        super.bind(headerTitles: headerTitles, updateWith: updateHandler)
         return self
     }
     
     @discardableResult
-    public override func footerTitles(_ titles: [S: String]) -> TableViewModelMultiSectionBinder<C, S, M> {
-        super.footerTitles(titles)
+    public override func bind<F>(
+        footerType: F.Type,
+        viewModels: [S : F.ViewModel],
+        updatedWith updateHandler: ((([S : F.ViewModel]) -> Void) -> Void)?)
+        -> TableViewModelMultiSectionBinder<C, S, M>
+        where F : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
+    {
+        super.bind(footerType: footerType, viewModels: viewModels, updatedWith: updateHandler)
+        return self
+    }
+    
+    @discardableResult
+    public override func bind(
+        footerTitles: [S : String],
+        updateWith updateHandler: ((([S : String]) -> Void) -> Void)?)
+        -> TableViewModelMultiSectionBinder<C, S, M>
+    {
+        super.bind(footerTitles: footerTitles, updateWith: updateHandler)
         return self
     }
     

@@ -72,32 +72,46 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     @discardableResult
-    override public func bind<H>(headerType: H.Type, viewModel: H.ViewModel)
+    public override func bind<H>(
+        headerType: H.Type,
+        viewModel: H.ViewModel?,
+        updatedWith updateHandler: (((H.ViewModel?) -> Void) -> Void)?)
         -> TableViewModelSingleSectionBinder<C, S, M>
-        where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+        where H : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
     {
-        super.bind(headerType: headerType, viewModel: viewModel)
+        super.bind(headerType: headerType, viewModel: viewModel, updatedWith: updateHandler)
         return self
     }
     
     @discardableResult
-    public override func headerTitle(_ title: String) -> TableViewModelSingleSectionBinder<C, S, M> {
-        super.headerTitle(title)
-        return self
-    }
-    
-    @discardableResult
-    public override func bind<F>(footerType: F.Type, viewModel: F.ViewModel)
+    public override func bind(
+        headerTitle: String?,
+        updateWith updateHandler: (((String?) -> Void) -> Void)? = nil)
         -> TableViewModelSingleSectionBinder<C, S, M>
-        where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+    {
+        super.bind(headerTitle: headerTitle, updateWith: updateHandler)
+        return self
+    }
+    
+    @discardableResult
+    public override func bind<F>(
+        footerType: F.Type,
+        viewModel: F.ViewModel?,
+        updatedWith updateHandler: (((F.ViewModel?) -> Void) -> Void)?)
+        -> BaseTableViewSingleSectionBinder<C, S>
+        where F : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
     {
         super.bind(footerType: footerType, viewModel: viewModel)
         return self
     }
     
     @discardableResult
-    public override func footerTitle(_ title: String) -> TableViewModelSingleSectionBinder<C, S, M> {
-        super.footerTitle(title)
+    public override func bind(
+        footerTitle: String?,
+        updateWith updateHandler: (((String?) -> Void) -> Void)?)
+        -> BaseTableViewSingleSectionBinder<C, S>
+    {
+        super.bind(footerTitle: footerTitle, updateWith: updateHandler)
         return self
     }
     

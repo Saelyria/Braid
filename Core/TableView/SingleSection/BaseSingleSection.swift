@@ -36,11 +36,21 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind<H>(headerType: H.Type, viewModel: H.ViewModel) -> BaseTableViewSingleSectionBinder<C, S>
+    public func bind<H>(
+        headerType: H.Type,
+        viewModel: H.ViewModel?,
+        updatedWith updateHandler: ((_ updateCallback: (_ newViewModel: H.ViewModel?) -> Void) -> Void)? = nil)
+        -> BaseTableViewSingleSectionBinder<C, S>
         where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addHeaderDequeueBlock(headerType: headerType, sections: [self.section])
         self.binder.updateHeaderViewModels([self.section: viewModel], sections: [self.section])
+        
+        let updateCallback: (H.ViewModel?) -> Void
+        updateCallback = { [weak binder = self.binder, section = self.section] (viewModel) in
+            binder?.updateHeaderViewModels([section: viewModel], sections: [section])
+        }
+        updateHandler?(updateCallback)
         
         return self
     }
@@ -56,8 +66,18 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind(headerTitle: String) -> BaseTableViewSingleSectionBinder<C, S> {
+    public func bind(
+        headerTitle: String?,
+        updateWith updateHandler: ((_ updateCallback: (_ newTitle: String?) -> Void) -> Void)? = nil)
+        -> BaseTableViewSingleSectionBinder<C, S>
+    {
         self.binder.updateHeaderTitles([self.section: headerTitle], sections: [self.section])
+        
+        let updateCallback: (String?) -> Void
+        updateCallback = { [weak binder = self.binder, section = self.section] (title) in
+            binder?.updateHeaderTitles([section: title], sections: [section])
+        }
+        updateHandler?(updateCallback)
 
         return self
     }
@@ -74,11 +94,21 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind<F>(footerType: F.Type, viewModel: F.ViewModel) -> BaseTableViewSingleSectionBinder<C, S>
+    public func bind<F>(
+        footerType: F.Type,
+        viewModel: F.ViewModel?,
+        updatedWith updateHandler: ((_ updateCallback: (_ newViewModel: F.ViewModel?) -> Void) -> Void)? = nil)
+        -> BaseTableViewSingleSectionBinder<C, S>
         where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addFooterDequeueBlock(footerType: footerType, sections: [self.section])
         self.binder.updateFooterViewModels([self.section: viewModel], sections: [self.section])
+        
+        let updateCallback: (F.ViewModel?) -> Void
+        updateCallback = { [weak binder = self.binder, section = self.section] (viewModel) in
+            binder?.updateFooterViewModels([section: viewModel], sections: [section])
+        }
+        updateHandler?(updateCallback)
         
         return self
     }
@@ -94,8 +124,18 @@ public class BaseTableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSe
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind(footerTitle: String) -> BaseTableViewSingleSectionBinder<C, S> {
+    public func bind(
+        footerTitle: String?,
+        updateWith updateHandler: ((_ updateCallback: (_ newTitle: String?) -> Void) -> Void)? = nil)
+        -> BaseTableViewSingleSectionBinder<C, S>
+    {
         self.binder.updateFooterTitles([self.section: footerTitle], sections: [self.section])
+        
+        let updateCallback: (String?) -> Void
+        updateCallback = { [weak binder = self.binder, section = self.section] (title) in
+            binder?.updateFooterTitles([section: title], sections: [section])
+        }
+        updateHandler?(updateCallback)
  
         return self
     }

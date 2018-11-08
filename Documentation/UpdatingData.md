@@ -97,3 +97,7 @@ binder.onSection(.first)
               self?.updateFirstSectionTitle = updateCallback
           })
 ```
+
+Where possible, for projects with table views that have complex updating logic and many sections, use of RxSwift is recommended as it tends
+to be less error prone and is much less verbose/imperative than the non-RxSwift updating variant. The learning curve to get into reactive 
+programming is steep, but definitely worth it once requirements become more complex. 

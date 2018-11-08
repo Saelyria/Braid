@@ -29,15 +29,29 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
         header created for the section. This dictionary does not need to contain a view model for each section being
         bound - sections not present in the dictionary have no header view created for them. This view models dictionary
         should not contain entries for sections not declared as a part of the current binding chain.
+     - parameter updateHandler: A closure called instantly that is passed in an 'update callback' closure that can be
+        used to update the header view models for these sections after binding. This passed-in 'update callback' should
+        be referenced somewhere useful to call later whenever the header view models for these sections need updated.
+        This argument can be left as nil if the sections are never updated.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind<H>(headerType: H.Type, viewModels: [S: H.ViewModel]) -> BaseTableViewMutliSectionBinder<C, S>
+    public func bind<H>(
+        headerType: H.Type,
+        viewModels: [S: H.ViewModel],
+        updatedWith updateHandler: ((_ updateCallback: (_ newViewModels: [S: H.ViewModel]) -> Void) -> Void)? = nil)
+        -> BaseTableViewMutliSectionBinder<C, S>
         where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addHeaderDequeueBlock(headerType: headerType, sections: self.sections)
         self.binder.updateHeaderViewModels(viewModels, sections: self.sections)
+        
+        let updateCallback: ([S: H.ViewModel]) -> Void
+        updateCallback = { [weak binder = self.binder, sections = self.sections] (viewModels) in
+            binder?.updateHeaderViewModels(viewModels, sections: sections)
+        }
+        updateHandler?(updateCallback)
 
         return self
     }
@@ -52,12 +66,26 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
         dictionary does not need to contain a title for each section being bound - sections not present in the
         dictionary have no title assigned to them. This titles dictionary cannot contain entries for sections not
         declared as a part of the current binding chain.
+     - parameter updateHandler: A closure called instantly that is passed in an 'update callback' closure that can be
+        used to update the header titles for these sections after binding. This passed-in 'update callback' should be
+        referenced somewhere useful to call later whenever the header titles for these sections need updated. This
+        argument can be left as nil if the sections are never updated.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func headerTitles(_ titles: [S: String]) -> BaseTableViewMutliSectionBinder<C, S> {
-        self.binder.updateHeaderTitles(titles, sections: self.sections)
+    public func bind(
+        headerTitles: [S: String],
+        updateWith updateHandler: ((_ updateCallback: (_ newTitles: [S: String]) -> Void) -> Void)? = nil)
+        -> BaseTableViewMutliSectionBinder<C, S>
+    {
+        self.binder.updateHeaderTitles(headerTitles, sections: self.sections)
+        
+        let updateCallback: ([S: String]) -> Void
+        updateCallback = { [weak binder = self.binder, sections = self.sections] (titles) in
+            binder?.updateHeaderTitles(titles, sections: sections)
+        }
+        updateHandler?(updateCallback)
 
         return self
     }
@@ -77,11 +105,21 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind<F>(footerType: F.Type, viewModels: [S: F.ViewModel]) -> BaseTableViewMutliSectionBinder<C, S>
+    public func bind<F>(
+        footerType: F.Type,
+        viewModels: [S: F.ViewModel],
+        updatedWith updateHandler: ((_ updateCallback: (_ newViewModels: [S: F.ViewModel]) -> Void) -> Void)? = nil)
+        -> BaseTableViewMutliSectionBinder<C, S>
         where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addFooterDequeueBlock(footerType: footerType, sections: self.sections)
         self.binder.updateFooterViewModels(viewModels, sections: self.sections)
+        
+        let updateCallback: ([S: F.ViewModel]) -> Void
+        updateCallback = { [weak binder = self.binder, sections = self.sections] (viewModels) in
+            binder?.updateFooterViewModels(viewModels, sections: sections)
+        }
+        updateHandler?(updateCallback)
 
         return self
     }
@@ -100,8 +138,18 @@ public class BaseTableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSec
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func footerTitles(_ titles: [S: String]) -> BaseTableViewMutliSectionBinder<C, S> {
-        self.binder.updateFooterTitles(titles, sections: self.sections)
+    public func bind(
+        footerTitles: [S: String],
+        updateWith updateHandler: ((_ updateCallback: (_ newTitles: [S: String]) -> Void) -> Void)? = nil)
+        -> BaseTableViewMutliSectionBinder<C, S>
+    {
+        self.binder.updateFooterTitles(footerTitles, sections: self.sections)
+            
+        let updateCallback: ([S: String]) -> Void
+        updateCallback = { [weak binder = self.binder, sections = self.sections] (titles) in
+            binder?.updateFooterTitles(titles, sections: sections)
+        }
+        updateHandler?(updateCallback)
         
         return self
     }

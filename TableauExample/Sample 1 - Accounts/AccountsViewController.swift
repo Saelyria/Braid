@@ -71,7 +71,7 @@ class AccountsViewController: UIViewController {
                 .savings: SectionHeaderView.ViewModel(title: "SAVINGS"),
                 .other: SectionHeaderView.ViewModel(title: "OTHER")])
             // 11.
-            .footerTitles([
+            .bind(footerTitles: [
                 .other: "This section includes your investing and credit card accounts."])
         
         // 12.
