@@ -25,8 +25,7 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
         bindResult.binder.addCellDequeueBlock(cellType: cellType, sections: [section])
 
         viewModels
-            .asDriver(onErrorJustReturn: [])
-            .asObservable()
+            .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [NC.ViewModel]) in
                 binder?.updateCellModels(nil, viewModels: [section: viewModels], sections: [section])
             }).disposed(by: bindResult.binder.disposeBag)
@@ -57,8 +56,7 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
         bindResult.binder.addCellDequeueBlock(cellType: cellType, sections: [section])
         
         models
-            .asDriver(onErrorJustReturn: [])
-            .asObservable()
+            .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [NM]) in
                 binder?.updateCellModels([section: models], viewModels: nil, sections: [section])
             }).disposed(by: bindResult.binder.disposeBag)
@@ -91,8 +89,7 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
         bindResult.binder.addCellDequeueBlock(cellType: cellType, sections: [section])
         
         models
-            .asDriver(onErrorJustReturn: [])
-            .asObservable()
+            .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [NM]) in
                 let viewModels = models.map(mapToViewModel)
                 binder?.updateCellModels([section: models], viewModels: [section: viewModels], sections: [section])
@@ -136,8 +133,7 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
         bindResult.binder.addCellDequeueBlock(cellProvider: _cellProvider, sections: [section])
         
         models
-            .asDriver(onErrorJustReturn: [])
-            .asObservable()
+            .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [NM]) in
                 binder?.updateCellModels([section: models], viewModels: nil, sections: [section])
             }).disposed(by: bindResult.binder.disposeBag)
@@ -172,8 +168,7 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
         bindResult.binder.addCellDequeueBlock(cellProvider: cellProvider, sections: [section])
         
         numberOfCells
-            .asDriver(onErrorJustReturn: 0)
-            .asObservable()
+            .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (numCells: Int) in
                 binder?.updateNumberOfCells([section: numCells], sections: [section])
             }).disposed(by: bindResult.binder.disposeBag)
@@ -198,8 +193,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         bindResult.binder.addHeaderDequeueBlock(headerType: headerType, sections: [section])
         
         viewModel
-            .asDriver(onErrorJustReturn: nil)
-            .asObservable()
+            .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModel: H.ViewModel?) in
                 binder?.updateHeaderViewModels([section: viewModel], sections: [section])
             }).disposed(by: bindResult.binder.disposeBag)
@@ -211,15 +205,14 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      Bind the given observable title to the section's header.
      */
     @discardableResult
-    public func headerTitle(_ title: Observable<String?>) -> Base {
+    public func bind(headerTitle: Observable<String?>) -> Base {
         guard let bindResult = self.base as? BaseTableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
         let section = bindResult.section
-        title
-            .asDriver(onErrorJustReturn: nil)
-            .asObservable()
+        headerTitle
+            .subscribeOn(MainScheduler.instance)
             .distinctUntilChanged()
             .subscribe(onNext: { [weak binder = bindResult.binder] (title: String?) in
                 binder?.updateHeaderTitles([section: title], sections: [section])
@@ -246,8 +239,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         bindResult.binder.addFooterDequeueBlock(footerType: footerType, sections: [section])
         
         viewModel
-            .asDriver(onErrorJustReturn: nil)
-            .asObservable()
+            .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModel: F.ViewModel?) in
                 binder?.updateFooterViewModels([section: viewModel], sections: [section])
             }).disposed(by: bindResult.binder.disposeBag)
@@ -259,15 +251,14 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      Bind the given observable title to the section's footer.
      */
     @discardableResult
-    public func footerTitle(_ title: Observable<String?>) -> Base {
+    public func bind(footerTitle: Observable<String?>) -> Base {
         guard let bindResult = self.base as? BaseTableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
         let section = bindResult.section
-        title
-            .asDriver(onErrorJustReturn: nil)
-            .asObservable()
+        footerTitle
+            .subscribeOn(MainScheduler.instance)
             .distinctUntilChanged()
             .subscribe(onNext: { [weak binder = bindResult.binder] (title: String?) in
                 binder?.updateFooterTitles([section: title], sections: [section])

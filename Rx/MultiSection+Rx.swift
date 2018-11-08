@@ -22,8 +22,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
         bindResult.binder.addCellDequeueBlock(cellType: cellType, sections: sections)
         
         viewModels
-            .asDriver(onErrorJustReturn: [:])
-            .asObservable()
+            .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [Base.S: [NC.ViewModel]]) in
                 binder?.updateCellModels(nil, viewModels: viewModels, sections: sections)
             }).disposed(by: bindResult.binder.disposeBag)
@@ -51,8 +50,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
         bindResult.binder.addCellDequeueBlock(cellType: cellType, sections: sections)
 
         models
-            .asDriver(onErrorJustReturn: [:])
-            .asObservable()
+            .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [Base.S: [NM]]) in
                 var viewModels: [Base.S: [Any]] = [:]
                 for (s, m) in models {
@@ -75,8 +73,12 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
      given the model and the dequeued cell.
      */
     @discardableResult
-    public func bind<NC, NM>(cellType: NC.Type, models: Observable<[Base.S: [NM]]>)
-    -> TableViewModelMultiSectionBinder<NC, Base.S, NM> where NC: UITableViewCell & ReuseIdentifiable {
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: Observable<[Base.S: [NM]]>)
+        -> TableViewModelMultiSectionBinder<NC, Base.S, NM>
+        where NC: UITableViewCell & ReuseIdentifiable
+    {
         guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
@@ -85,8 +87,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
         bindResult.binder.addCellDequeueBlock(cellType: cellType, sections: sections)
         
         models
-            .asDriver(onErrorJustReturn: [:])
-            .asObservable()
+            .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [Base.S: [NM]]) in
                 binder?.updateCellModels(models, viewModels: nil, sections: sections)
             }).disposed(by: bindResult.binder.disposeBag)
@@ -132,8 +133,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
         bindResult.binder.addCellDequeueBlock(cellProvider: _cellProvider, sections: sections)
         
         models
-            .asDriver(onErrorJustReturn: [:])
-            .asObservable()
+            .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [Base.S: [NM]]) in
                 binder?.updateCellModels(models, viewModels: nil, sections: sections)
             }).disposed(by: bindResult.binder.disposeBag)
@@ -170,8 +170,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
         bindResult.binder.addCellDequeueBlock(cellProvider: cellProvider, sections: sections)
         
         numberOfCells
-            .asDriver(onErrorJustReturn: [:])
-            .asObservable()
+            .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (numCells: [Base.S: Int]) in
                 binder?.updateNumberOfCells(numCells, sections: sections)
             }).disposed(by: bindResult.binder.disposeBag)
@@ -186,8 +185,12 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
      Bind the given header type to the declared section with the given observable for their view models.
      */
     @discardableResult
-    public func bind<H>(headerType: H.Type, viewModels: Observable<[Base.S: H.ViewModel]>) -> Base
-    where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
+    public func bind<H>(
+        headerType: H.Type,
+        viewModels: Observable<[Base.S: H.ViewModel]>)
+        -> Base
+        where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+    {
         guard let bindResult = self.base as? BaseTableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
@@ -196,8 +199,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         bindResult.binder.addHeaderDequeueBlock(headerType: headerType, sections: sections)
         
         viewModels
-            .asDriver(onErrorJustReturn: [:])
-            .asObservable()
+            .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [Base.S: H.ViewModel]) in
                 binder?.updateHeaderViewModels(viewModels, sections: sections)
             }).disposed(by: bindResult.binder.disposeBag)
@@ -209,15 +211,14 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
      Bind the given observable titles to the section's header.
      */
     @discardableResult
-    public func headerTitles(_ titles: Observable<[Base.S: String?]>) -> Base {
+    public func bind(headerTitles: Observable<[Base.S: String?]>) -> Base {
         guard let bindResult = self.base as? BaseTableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
         
-        titles
-            .asDriver(onErrorJustReturn: [:])
-            .asObservable()
+        headerTitles
+            .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (titles: [Base.S: String?]) in
                 binder?.updateHeaderTitles(titles, sections: sections)
             }).disposed(by: bindResult.binder.disposeBag)
@@ -229,8 +230,12 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
      Bind the given footer type to the declared section with the given observable for its view model.
     */
     @discardableResult
-    public func bind<F>(footerType: F.Type, viewModels: Observable<[Base.S: F.ViewModel]>) -> Base
-    where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
+    public func bind<F>(
+        footerType: F.Type,
+        viewModels: Observable<[Base.S: F.ViewModel]>)
+        -> Base
+        where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+    {
         guard let bindResult = self.base as? BaseTableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
@@ -239,8 +244,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         bindResult.binder.addFooterDequeueBlock(footerType: footerType, sections: sections)
         
         viewModels
-            .asDriver(onErrorJustReturn: [:])
-            .asObservable()
+            .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [Base.S: F.ViewModel]) in
                 binder?.updateFooterViewModels(viewModels, sections: sections)
             }).disposed(by: bindResult.binder.disposeBag)
@@ -252,15 +256,14 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
      Bind the given observable title to the section's footer.
     */
     @discardableResult
-    public func footerTitles(_ titles: Observable<[Base.S: String?]>) -> Base {
+    public func bind(footerTitles: Observable<[Base.S: String?]>) -> Base {
         guard let bindResult = self.base as? BaseTableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
         
-        titles
-            .asDriver(onErrorJustReturn: [:])
-            .asObservable()
+        footerTitles
+            .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (titles: [Base.S: String?]) in
                 binder?.updateFooterTitles(titles, sections: sections)
             }).disposed(by: bindResult.binder.disposeBag)
