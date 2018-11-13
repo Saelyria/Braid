@@ -1,7 +1,5 @@
 # How Tableau Works
 
-*Shameless foreword - this document is as much for myself to remember how everything works as for contributors.*
-
 Hey! Whether you're looking to contribute or just want to know how Tableau works under the hood, this file's the right place to start. I like to 
 think the code is easy enough to understand on its own, but I'm sure there's a bunch of stuff there that's a little mucky. Diving into this code is 
 also a dive into some pretty tricky stuff about Swift's generics system, so if you're not already familiar with stuff like the `associatedtype` 

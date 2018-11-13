@@ -66,9 +66,10 @@ public class TableViewBinder {
     }
     
     /// Starts binding on the table.
-    public func onTable() -> TableViewInitialSingleSectionBinder<_SingleSection> {
+    public func onTable() -> TableViewSingleSectionBinder<UITableViewCell, _SingleSection> {
         self._sectionBinder.nextDataModel.uniquelyBoundSections.append(.table)
-        return TableViewInitialSingleSectionBinder<_SingleSection>(binder: self._sectionBinder, section: .table)
+        return TableViewSingleSectionBinder<UITableViewCell, _SingleSection>(
+            binder: self._sectionBinder, section: .table)
     }
     
     public func finish() {
@@ -277,12 +278,12 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      
      - returns: A 'section binder' object used to begin binding handlers to the given section.
      */
-    public func onSection(_ section: S) -> TableViewInitialSingleSectionBinder<S> {
+    public func onSection(_ section: S) -> TableViewSingleSectionBinder<UITableViewCell, S> {
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
         self.nextDataModel.uniquelyBoundSections.append(section)
-        return TableViewInitialSingleSectionBinder<S>(binder: self, section: section)
+        return TableViewSingleSectionBinder<UITableViewCell, S>(binder: self, section: section)
     }
     
     /**
@@ -295,7 +296,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      
      - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
      */
-    public func onSections(_ sections: [S]) -> TableViewInitialMutliSectionBinder<S> {
+    public func onSections(_ sections: [S]) -> TableViewMutliSectionBinder<UITableViewCell, S> {
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
@@ -304,7 +305,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         }
         self.nextDataModel.uniquelyBoundSections.append(contentsOf: sections)
         
-        return TableViewInitialMutliSectionBinder<S>(binder: self, sections: sections)
+        return TableViewMutliSectionBinder<UITableViewCell, S>(binder: self, sections: sections)
     }
 
     /**
@@ -337,11 +338,11 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      
      - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
      */
-    public func onAllSections() -> TableViewInitialMutliSectionBinder<S> {
+    public func onAllSections() -> TableViewMutliSectionBinder<UITableViewCell, S> {
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
-        return TableViewInitialMutliSectionBinder<S>(binder: self, sections: nil)
+        return TableViewMutliSectionBinder<UITableViewCell, S>(binder: self, sections: nil)
     }
     
     /**
@@ -358,7 +359,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      
      - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
      */
-    public func onAllOtherSections() -> TableViewInitialMutliSectionBinder<S> {
+    public func onAllOtherSections() -> TableViewMutliSectionBinder<UITableViewCell, S> {
         return self.onAllSections()
     }
     

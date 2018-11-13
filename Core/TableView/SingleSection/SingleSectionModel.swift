@@ -4,7 +4,7 @@ import UIKit
  A section binder for a section whose cells were setup to be dequeued with an array of an arbitrary 'model' type.
  */
 public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewSection, M>
-    : BaseTableViewSingleSectionBinder<C, S>, TableViewSingleSectionBinderProtocol
+    : TableViewSingleSectionBinder<C, S>, TableViewSingleSectionBinderProtocol
 {    
     /**
      Adds a handler to be called whenever a cell in the declared section is tapped.
@@ -98,7 +98,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         footerType: F.Type,
         viewModel: F.ViewModel?,
         updatedWith updateHandler: (((F.ViewModel?) -> Void) -> Void)?)
-        -> BaseTableViewSingleSectionBinder<C, S>
+        -> TableViewSingleSectionBinder<C, S>
         where F : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
     {
         super.bind(footerType: footerType, viewModel: viewModel)
@@ -109,7 +109,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     public override func bind(
         footerTitle: String?,
         updateWith updateHandler: (((String?) -> Void) -> Void)?)
-        -> BaseTableViewSingleSectionBinder<C, S>
+        -> TableViewSingleSectionBinder<C, S>
     {
         super.bind(footerTitle: footerTitle, updateWith: updateHandler)
         return self

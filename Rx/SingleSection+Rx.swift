@@ -1,9 +1,9 @@
 import UIKit
 import RxSwift
 
-extension BaseTableViewSingleSectionBinder: ReactiveCompatible { }
+extension TableViewSingleSectionBinder: ReactiveCompatible { }
 
-public extension Reactive where Base: TableViewInitialSingleSectionBinderProtocol {
+public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
     /**
      Bind the given cell type to the declared sections, creating them based on the view models from a given observable.
      
@@ -14,10 +14,10 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
     public func bind<NC>(
         cellType: NC.Type,
         viewModels: Observable<[NC.ViewModel]>)
-        -> BaseTableViewSingleSectionBinder<NC, Base.S>
+        -> TableViewSingleSectionBinder<NC, Base.S>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
-        guard let bindResult = self.base as? TableViewInitialSingleSectionBinder<Base.S> else {
+        guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let section = bindResult.section
@@ -30,7 +30,7 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
                 binder?.updateCellModels(nil, viewModels: [section: viewModels], sections: [section])
             }).disposed(by: bindResult.binder.disposeBag)
         
-        return BaseTableViewSingleSectionBinder<NC, Base.S>(binder: bindResult.binder, section: section)
+        return TableViewSingleSectionBinder<NC, Base.S>(binder: bindResult.binder, section: section)
     }
     
     /**
@@ -48,7 +48,7 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
         -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ReuseIdentifiable
     {
-        guard let bindResult = self.base as? TableViewInitialSingleSectionBinder<Base.S> else {
+        guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let section = bindResult.section
@@ -81,7 +81,7 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
         -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
-        guard let bindResult = self.base as? TableViewInitialSingleSectionBinder<Base.S> else {
+        guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let section = bindResult.section
@@ -119,7 +119,7 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
         models: Observable<[NM]>)
         -> TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>
     {
-        guard let bindResult = self.base as? TableViewInitialSingleSectionBinder<Base.S> else {
+        guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let section = bindResult.section
@@ -158,9 +158,9 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
     public func bind(
         cellProvider: @escaping (_ row: Int) -> UITableViewCell,
         numberOfCells: Observable<Int>)
-        -> BaseTableViewSingleSectionBinder<UITableViewCell, Base.S>
+        -> TableViewSingleSectionBinder<Base.C, Base.S>
     {
-        guard let bindResult = self.base as? TableViewInitialSingleSectionBinder<Base.S> else {
+        guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let section = bindResult.section
@@ -173,11 +173,11 @@ public extension Reactive where Base: TableViewInitialSingleSectionBinderProtoco
                 binder?.updateNumberOfCells([section: numCells], sections: [section])
             }).disposed(by: bindResult.binder.disposeBag)
         
-        return BaseTableViewSingleSectionBinder<UITableViewCell, Base.S>(binder: bindResult.binder, section: section)
+        return bindResult
     }
-}
+    
+    // MARK: -
 
-public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
     /**
      Bind the given header type to the declared section with the given observable for its view model.
      
@@ -185,7 +185,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
     @discardableResult
     public func bind<H>(headerType: H.Type, viewModel: Observable<H.ViewModel?>) -> Base
     where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
-        guard let bindResult = self.base as? BaseTableViewSingleSectionBinder<Base.C, Base.S> else {
+        guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let section = bindResult.section
@@ -206,7 +206,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      */
     @discardableResult
     public func bind(headerTitle: Observable<String?>) -> Base {
-        guard let bindResult = self.base as? BaseTableViewSingleSectionBinder<Base.C, Base.S> else {
+        guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
@@ -231,7 +231,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
     @discardableResult
     public func bind<F>(footerType: F.Type, viewModel: Observable<F.ViewModel?>) -> Base
     where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable {
-        guard let bindResult = self.base as? BaseTableViewSingleSectionBinder<Base.C, Base.S> else {
+        guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let section = bindResult.section
@@ -252,7 +252,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      */
     @discardableResult
     public func bind(footerTitle: Observable<String?>) -> Base {
-        guard let bindResult = self.base as? BaseTableViewSingleSectionBinder<Base.C, Base.S> else {
+        guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         

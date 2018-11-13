@@ -5,7 +5,7 @@ import UIKit
  of methods that take a binding handler and give it to the original table view binder to store for callback.
  */
 public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSection, M>
-    : BaseTableViewMutliSectionBinder<C, S>, TableViewMutliSectionBinderProtocol
+    : TableViewMutliSectionBinder<C, S>, TableViewMutliSectionBinderProtocol
 { 
     @discardableResult
     public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C, _ model: M) -> Void)

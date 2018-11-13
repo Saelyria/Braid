@@ -1,9 +1,9 @@
 import UIKit
 import RxSwift
 
-extension BaseTableViewMutliSectionBinder: ReactiveCompatible { }
+extension TableViewMutliSectionBinder: ReactiveCompatible { }
 
-public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol {
+public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
     /**
      Bind the given cell type to the declared sections, creating them based on the view models from a given observable.
      */
@@ -11,10 +11,10 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
     public func bind<NC>(
         cellType: NC.Type,
         viewModels: Observable<[Base.S: [NC.ViewModel]]>)
-        -> BaseTableViewMutliSectionBinder<NC, Base.S>
+        -> TableViewMutliSectionBinder<NC, Base.S>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
-        guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
+        guard let bindResult = self.base as? TableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
@@ -27,7 +27,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
                 binder?.updateCellModels(nil, viewModels: viewModels, sections: sections)
             }).disposed(by: bindResult.binder.disposeBag)
         
-        return BaseTableViewMutliSectionBinder<NC, Base.S>(binder: bindResult.binder, sections: sections)
+        return TableViewMutliSectionBinder<NC, Base.S>(binder: bindResult.binder, sections: sections)
     }
     
     /**
@@ -42,7 +42,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
         -> TableViewModelMultiSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
-        guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
+        guard let bindResult = self.base as? TableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
@@ -79,7 +79,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
         -> TableViewModelMultiSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ReuseIdentifiable
     {
-        guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
+        guard let bindResult = self.base as? TableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
@@ -119,7 +119,7 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
         models: Observable<[Base.S: [NM]]>)
         -> TableViewModelMultiSectionBinder<UITableViewCell, Base.S, NM>
     {
-        guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
+        guard let bindResult = self.base as? TableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
@@ -160,9 +160,9 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
     public func bind(
         cellProvider: @escaping (_ section: Base.S, _ row: Int) -> UITableViewCell,
         numberOfCells: Observable<[Base.S: Int]>)
-        -> BaseTableViewMutliSectionBinder<UITableViewCell, Base.S>
+        -> TableViewMutliSectionBinder<Base.C, Base.S>
     {
-        guard let bindResult = self.base as? TableViewInitialMutliSectionBinder<Base.S> else {
+        guard let bindResult = self.base as? TableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
@@ -176,11 +176,11 @@ public extension Reactive where Base: TableViewInitialMutliSectionBinderProtocol
             }).disposed(by: bindResult.binder.disposeBag)
         
         
-        return BaseTableViewMutliSectionBinder<UITableViewCell, Base.S>(binder: bindResult.binder, sections: sections)
+        return bindResult
     }
-}
+    
+    // MARK: -
 
-public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
     /**
      Bind the given header type to the declared section with the given observable for their view models.
      */
@@ -191,7 +191,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         -> Base
         where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
-        guard let bindResult = self.base as? BaseTableViewMutliSectionBinder<Base.C, Base.S> else {
+        guard let bindResult = self.base as? TableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
@@ -212,7 +212,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
      */
     @discardableResult
     public func bind(headerTitles: Observable<[Base.S: String?]>) -> Base {
-        guard let bindResult = self.base as? BaseTableViewMutliSectionBinder<Base.C, Base.S> else {
+        guard let bindResult = self.base as? TableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
@@ -236,7 +236,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         -> Base
         where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
-        guard let bindResult = self.base as? BaseTableViewMutliSectionBinder<Base.C, Base.S> else {
+        guard let bindResult = self.base as? TableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
@@ -257,7 +257,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
     */
     @discardableResult
     public func bind(footerTitles: Observable<[Base.S: String?]>) -> Base {
-        guard let bindResult = self.base as? BaseTableViewMutliSectionBinder<Base.C, Base.S> else {
+        guard let bindResult = self.base as? TableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections

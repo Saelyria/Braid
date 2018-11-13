@@ -23,9 +23,6 @@
          location = "group:UsingViewModels.md">
       </FileRef>
       <FileRef
-         location = "group:AnimatingUpdates.md">
-      </FileRef>
-      <FileRef
          location = "container:/Users/aaronbosnjak/Developer/Tableau/Documentation/HowItWorks.md">
       </FileRef>
       <FileRef
