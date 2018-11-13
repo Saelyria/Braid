@@ -41,10 +41,15 @@ converted to `Driver` to ensure the subscriptions are always executed on the mai
 
 ## Without RxSwift
 
-Bound tables can still be updated without RxSwift without too much hassle as well. Updating without RxSwift is done by passing in an
-additional closure to the `bind(cellType:)` method. This closure is passed in an 'update callback' closure that should be saved somewhere 
-useful (likely as a property on your view controller) that can be called anytime to update the models for the section(s) the chain involves. Here's
-an example of what that might look like:
+Bound tables can still be updated without RxSwift without too much hassle as well. Updating without RxSwift is done by passing a reference 
+to a closure that takes the model or view model type to the `bind(cellType:...)` methods. Typically, this will be a reference to a property 
+on your view controller. This reference is then set to a newly-created function that can be called to update the models or view models for the
+section(s).
+
+> If you haven't used reference pointers in Swift with `inout` arguments before, it'd be worth taking a quick pause here to read the 
+'In-Out Parameters' section in the [Swift docs related to functions](https://docs.swift.org/swift-book/LanguageGuide/Functions.html).
+
+Here's what that looks like:
 
 ```swift
 var updateFirstSection: ([MyModel]) -> Void
@@ -57,9 +62,7 @@ let thirdSectionModels: [MyModel] = ...
 binder.onSection(.first)
     .bind(cellType: MyCell.self, 
           models: firstSectionModels, 
-          updatedWith: { [weak self] updateCallback in
-              self?.updateFirstSectionModels = updateCallback
-          })
+          updatedBy: &updateFirstSection)
     .onCellDequeue { row, cell, model in
         ...
     }
@@ -69,9 +72,7 @@ binder.onSections([.second, .third])
           models: [
             .second: secondSectionModels,
             .third: thirdSectionModels],
-          updatedWith: { [weak self] updateCallback in
-              self?.updateSecondThirdSections = updateCallback
-          })
+          updatedBy: &updateSecondThirdSections)
     ...
 ```
 Then, when we want to update the sections, we simply call these closures with new models. The end result ends up reading a lot like a normal
@@ -97,7 +98,3 @@ binder.onSection(.first)
               self?.updateFirstSectionTitle = updateCallback
           })
 ```
-
-Where possible, for projects with table views that have complex updating logic and many sections, use of RxSwift is recommended as it tends
-to be less error prone and is much less verbose/imperative than the non-RxSwift updating variant. The learning curve to get into reactive 
-programming is steep, but definitely worth it once requirements become more complex. 

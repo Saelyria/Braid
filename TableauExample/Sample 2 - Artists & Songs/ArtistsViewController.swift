@@ -41,7 +41,7 @@ class ArtistsViewController: UIViewController {
                      models: self.artistsForSections.asObservable(),
                      mapToViewModelsWith: { (artist: Artist) in return artist.asTitleDetailCellViewModel() })
             // 5.
-            .rx.headerTitles(self.artistsForSections.asObservable()
+            .rx.bind(headerTitles: self.artistsForSections.asObservable()
                 .map { (artistsForSections: [Section: [Artist]]) -> [Section: String?] in
                     var titles: [Section: String?] = [:]
                     artistsForSections.forEach { titles[$0.key] = $0.key.title }
