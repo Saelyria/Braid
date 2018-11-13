@@ -1,10 +1,14 @@
 import UIKit
 
 /**
- A section binder for a section whose cells were setup to be dequeued with an array of an arbitrary 'model' type.
- */
+ An object used to continue a binding chain.
+ 
+ This is a throwaway object created when a table view binder's `onSection(_:)` method is called. This object declares a
+ number of methods that take a binding handler and give it to the original table view binder to store for callback. A
+ reference to this object should not be kept and should only be used in a binding chain.
+*/
 public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewSection, M>
-    : TableViewSingleSectionBinder<C, S>, TableViewSingleSectionBinderProtocol
+    : TableViewSingleSectionBinder<C, S>
 {    
     /**
      Adds a handler to be called whenever a cell in the declared section is tapped.

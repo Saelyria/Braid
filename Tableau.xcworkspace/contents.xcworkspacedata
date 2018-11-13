@@ -20,13 +20,16 @@
          location = "group:UpdatingData.md">
       </FileRef>
       <FileRef
+         location = "group:SectionDisplayBehaviour.md">
+      </FileRef>
+      <FileRef
          location = "group:UsingViewModels.md">
       </FileRef>
       <FileRef
-         location = "container:/Users/aaronbosnjak/Developer/Tableau/Documentation/HowItWorks.md">
+         location = "group:TipsTricksFAQ.md">
       </FileRef>
       <FileRef
-         location = "group:TipsTricksFAQ.md">
+         location = "container:/Users/aaronbosnjak/Developer/Tableau/Documentation/HowItWorks.md">
       </FileRef>
    </Group>
    <FileRef

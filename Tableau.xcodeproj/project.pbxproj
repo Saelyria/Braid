@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		9312CD3320EC4E54007B2A76 /* SingleSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9312CD3220EC4E53007B2A76 /* SingleSectionModel.swift */; };
-		9312CD3520EDBA3B007B2A76 /* BaseSingleSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9312CD3420EDBA3B007B2A76 /* BaseSingleSection.swift */; };
-		9312CD3720EDBBF4007B2A76 /* BaseMultiSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9312CD3620EDBBF4007B2A76 /* BaseMultiSection.swift */; };
+		9312CD3520EDBA3B007B2A76 /* SingleSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9312CD3420EDBA3B007B2A76 /* SingleSection.swift */; };
+		9312CD3720EDBBF4007B2A76 /* MultiSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9312CD3620EDBBF4007B2A76 /* MultiSection.swift */; };
 		9378E76820D71D530039849F /* SingleSection+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9378E76720D71D530039849F /* SingleSection+Rx.swift */; };
 		9378E76A20D72D180039849F /* MultiSectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9378E76920D72D180039849F /* MultiSectionModel.swift */; };
 		938132F820B6469F00CBF8F6 /* Tableau.h in Headers */ = {isa = PBXBuildFile; fileRef = 938132F620B6469F00CBF8F6 /* Tableau.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -23,16 +23,16 @@
 		93C36A4D20DDD90C006B7ECF /* TableViewBinder+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C36A4C20DDD90C006B7ECF /* TableViewBinder+Rx.swift */; };
 		AB577BBA217D5BEB00CD2363 /* SectionedTableViewBinder+Updating.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BB9217D5BEB00CD2363 /* SectionedTableViewBinder+Updating.swift */; };
 		AB577BBC217E75B600CD2363 /* SectionedTableViewBinder+Dequeueing.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BBB217E75B600CD2363 /* SectionedTableViewBinder+Dequeueing.swift */; };
-		AB577BC0217FE9CC00CD2363 /* TableViewBindingHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BBF217FE9CC00CD2363 /* TableViewBindingHandlers.swift */; };
+		AB577BC0217FE9CC00CD2363 /* _TableViewBindingHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BBF217FE9CC00CD2363 /* _TableViewBindingHandlers.swift */; };
 		AB577BC3217FED4F00CD2363 /* AnySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BC2217FED4F00CD2363 /* AnySection.swift */; };
 		AB577BD82187A66E00CD2363 /* CollectionIdentifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BD72187A66E00CD2363 /* CollectionIdentifiable.swift */; };
-		ABB9635521714B6600519963 /* TableViewDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB9635421714B6600519963 /* TableViewDataModel.swift */; };
+		ABB9635521714B6600519963 /* _TableViewDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB9635421714B6600519963 /* _TableViewDataModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		9312CD3220EC4E53007B2A76 /* SingleSectionModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SingleSectionModel.swift; sourceTree = "<group>"; };
-		9312CD3420EDBA3B007B2A76 /* BaseSingleSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseSingleSection.swift; sourceTree = "<group>"; };
-		9312CD3620EDBBF4007B2A76 /* BaseMultiSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseMultiSection.swift; sourceTree = "<group>"; };
+		9312CD3420EDBA3B007B2A76 /* SingleSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleSection.swift; sourceTree = "<group>"; };
+		9312CD3620EDBBF4007B2A76 /* MultiSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiSection.swift; sourceTree = "<group>"; };
 		9378E76720D71D530039849F /* SingleSection+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SingleSection+Rx.swift"; sourceTree = "<group>"; };
 		9378E76920D72D180039849F /* MultiSectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiSectionModel.swift; sourceTree = "<group>"; };
 		938132F320B6469F00CBF8F6 /* Tableau.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Tableau.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -48,10 +48,10 @@
 		93C36A4C20DDD90C006B7ECF /* TableViewBinder+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TableViewBinder+Rx.swift"; sourceTree = "<group>"; };
 		AB577BB9217D5BEB00CD2363 /* SectionedTableViewBinder+Updating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SectionedTableViewBinder+Updating.swift"; sourceTree = "<group>"; };
 		AB577BBB217E75B600CD2363 /* SectionedTableViewBinder+Dequeueing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SectionedTableViewBinder+Dequeueing.swift"; sourceTree = "<group>"; };
-		AB577BBF217FE9CC00CD2363 /* TableViewBindingHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewBindingHandlers.swift; sourceTree = "<group>"; };
+		AB577BBF217FE9CC00CD2363 /* _TableViewBindingHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _TableViewBindingHandlers.swift; sourceTree = "<group>"; };
 		AB577BC2217FED4F00CD2363 /* AnySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnySection.swift; sourceTree = "<group>"; };
 		AB577BD72187A66E00CD2363 /* CollectionIdentifiable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionIdentifiable.swift; sourceTree = "<group>"; };
-		ABB9635421714B6600519963 /* TableViewDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewDataModel.swift; sourceTree = "<group>"; };
+		ABB9635421714B6600519963 /* _TableViewDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _TableViewDataModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,7 +69,7 @@
 			isa = PBXGroup;
 			children = (
 				9312CD3220EC4E53007B2A76 /* SingleSectionModel.swift */,
-				9312CD3420EDBA3B007B2A76 /* BaseSingleSection.swift */,
+				9312CD3420EDBA3B007B2A76 /* SingleSection.swift */,
 			);
 			path = SingleSection;
 			sourceTree = "<group>";
@@ -78,7 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				9378E76920D72D180039849F /* MultiSectionModel.swift */,
-				9312CD3620EDBBF4007B2A76 /* BaseMultiSection.swift */,
+				9312CD3620EDBBF4007B2A76 /* MultiSection.swift */,
 			);
 			path = MultiSection;
 			sourceTree = "<group>";
@@ -139,8 +139,8 @@
 			children = (
 				93BF737420CDA232000F0FB0 /* SectionedTableViewBinder.swift */,
 				9381334020B6EC5600CBF8F6 /* _TableViewDataSourceDelegate.swift */,
-				ABB9635421714B6600519963 /* TableViewDataModel.swift */,
-				AB577BBF217FE9CC00CD2363 /* TableViewBindingHandlers.swift */,
+				ABB9635421714B6600519963 /* _TableViewDataModel.swift */,
+				AB577BBF217FE9CC00CD2363 /* _TableViewBindingHandlers.swift */,
 				AB577BB9217D5BEB00CD2363 /* SectionedTableViewBinder+Updating.swift */,
 				AB577BBB217E75B600CD2363 /* SectionedTableViewBinder+Dequeueing.swift */,
 				9360CCB620E5E1B400DF8886 /* SingleSection */,
@@ -244,11 +244,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9312CD3720EDBBF4007B2A76 /* BaseMultiSection.swift in Sources */,
+				9312CD3720EDBBF4007B2A76 /* MultiSection.swift in Sources */,
 				AB577BD82187A66E00CD2363 /* CollectionIdentifiable.swift in Sources */,
 				9381334820B6EC5600CBF8F6 /* _TableViewDataSourceDelegate.swift in Sources */,
 				AB577BBA217D5BEB00CD2363 /* SectionedTableViewBinder+Updating.swift in Sources */,
-				ABB9635521714B6600519963 /* TableViewDataModel.swift in Sources */,
+				ABB9635521714B6600519963 /* _TableViewDataModel.swift in Sources */,
 				9381334620B6EC5600CBF8F6 /* UINibInitable.swift in Sources */,
 				9378E76A20D72D180039849F /* MultiSectionModel.swift in Sources */,
 				9381334420B6EC5600CBF8F6 /* ReuseIdentifiable.swift in Sources */,
@@ -256,12 +256,12 @@
 				93C36A4620D9D4E4006B7ECF /* MultiSection+Rx.swift in Sources */,
 				9381334520B6EC5600CBF8F6 /* ViewModelBindable.swift in Sources */,
 				AB577BBC217E75B600CD2363 /* SectionedTableViewBinder+Dequeueing.swift in Sources */,
-				AB577BC0217FE9CC00CD2363 /* TableViewBindingHandlers.swift in Sources */,
+				AB577BC0217FE9CC00CD2363 /* _TableViewBindingHandlers.swift in Sources */,
 				93BF737520CDA232000F0FB0 /* SectionedTableViewBinder.swift in Sources */,
 				9381334720B6EC5600CBF8F6 /* UITableView+Registering.swift in Sources */,
 				9378E76820D71D530039849F /* SingleSection+Rx.swift in Sources */,
 				93C36A4D20DDD90C006B7ECF /* TableViewBinder+Rx.swift in Sources */,
-				9312CD3520EDBA3B007B2A76 /* BaseSingleSection.swift in Sources */,
+				9312CD3520EDBA3B007B2A76 /* SingleSection.swift in Sources */,
 				9312CD3320EC4E54007B2A76 /* SingleSectionModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

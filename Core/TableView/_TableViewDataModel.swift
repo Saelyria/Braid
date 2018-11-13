@@ -1,11 +1,11 @@
 import Differ
 
-internal protocol TableViewDataModelDelegate: AnyObject {
+internal protocol _TableViewDataModelDelegate: AnyObject {
     func dataModelDidChange()
 }
 
-internal class TableViewDataModel<S: TableViewSection> {
-    weak var delegate: TableViewDataModelDelegate?
+internal class _TableViewDataModel<S: TableViewSection> {
+    weak var delegate: _TableViewDataModelDelegate?
     
     // The sections that were bound uniquely with either the `onSection` or `onSections` methods. This is used to
     // ensure that updates to data bound with `onAllSections` does not overwrite data for these sections.
@@ -62,7 +62,7 @@ internal class TableViewDataModel<S: TableViewSection> {
     
     init() { }
     
-    init(from other: TableViewDataModel<S>) {
+    init(from other: _TableViewDataModel<S>) {
         self.uniquelyBoundSections = other.uniquelyBoundSections
         self.displayedSections = other.displayedSections
         self.sectionCellViewModels = other.sectionCellViewModels
@@ -74,7 +74,7 @@ internal class TableViewDataModel<S: TableViewSection> {
     }
 }
 
-extension TableViewDataModel {
+extension _TableViewDataModel {
     internal struct DiffableSectionModel: Equatable, Collection {
         typealias Index = Int
         
@@ -128,7 +128,7 @@ extension TableViewDataModel {
      data is not diffable (i.e. one or more of its data arrays did not contain  models that conformed to
      `CollectionIdentifiable`).
      */
-    func diff(from other: TableViewDataModel<S>) -> NestedExtendedDiff? {
+    func diff(from other: _TableViewDataModel<S>) -> NestedExtendedDiff? {
         guard let selfSectionModels = self.asDiffableSectionModels(), let otherSectionModels = other.asDiffableSectionModels() else {
             return nil
         }

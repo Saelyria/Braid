@@ -1,11 +1,14 @@
 import UIKit
 
 /**
- A throwaway object created when a table view binder's `onSections(_:)` method is called. This object declares a number
- of methods that take a binding handler and give it to the original table view binder to store for callback.
+ An object used to continue a binding chain.
+ 
+ This is a throwaway object created when a table view binder's `onSections(_:)` method is called. This object declares a
+ number of methods that take a binding handler and give it to the original table view binder to store for callback. A
+ reference to this object should not be kept and should only be used in a binding chain.
  */
 public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSection, M>
-    : TableViewMutliSectionBinder<C, S>, TableViewMutliSectionBinderProtocol
+    : TableViewMutliSectionBinder<C, S>
 { 
     @discardableResult
     public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C, _ model: M) -> Void)

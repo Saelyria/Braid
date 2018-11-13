@@ -208,7 +208,9 @@ With that, you should be pretty much up to speed to start playing around with Ta
 started with other features of Tableau, like updating data on your bound table views, setting up your models so it can be animated for changes,
 using dynamic sections, and others. 
 - [Updating data](UpdatingData.md)
+- [Hiding, showing, and ordering sections automatically](SectionDisplayBehaviour.md)
 - [Using view models](UsingViewModels.md)
+- [Tips, tricks, and FAQ](TipsTricksFAQ.md)
 - [How it works](HowItWorks.md)
 
 If you'd prefer to poke around some working examples, there are working samples in the `TableauExample` Xcode project you can run to see 

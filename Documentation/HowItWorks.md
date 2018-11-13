@@ -25,7 +25,7 @@ class type is `_TableViewDataSourceDelegate`. That's pretty much it.
 
 This object is the collection of view models/models/title strings/etc. that represents a 'data state' of a table view. Its properties are a series of
 dictionaries and arrays that stores the data the table view displays. Table data models are used with the Differ library that Tableau has as a 
-CocoaPods dependency to animate changes in data on the table view. The concrete class for this object type is the  `TableViewDataModel`.
+CocoaPods dependency to animate changes in data on the table view. The concrete class for this object type is the  `_TableViewDataModel`.
 
 ## The 'table binder'
 

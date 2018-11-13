@@ -37,15 +37,15 @@ public extension TableViewSection where Self: CollectionIdentifiable {
  Using a table view binder is done with chaining function calls. A typical setup would look something like this:
  
  ```
- var cellModels: Observable<[MyCellModel]>
+ var cellModels: [MyModel] = ...
  
  let binder = TableViewBinder(tableView: tableView)
  binder.onTable()
     .bind(cellType: MyCell.self, models: cellModels)
-    .onDequeue { [unowned self] (row: Int, cell: MyCell) in
+    .onCellDequeue { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
         // called when a cell in section `one` is dequeued
     }
-    .onTapped { [unowned self] (row: Int, cell: MyCell) in
+    .onTapped { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
         // called when a cell in section `one` is tapped
     }
  ```
@@ -104,15 +104,15 @@ public protocol SectionedTableViewBinderProtocol: AnyObject {
     case three
  }
  
- var cellModels: Observable<[MyCellModel]>
+ var cellModels: [MyModel] = ...
  
  let binder = RxSectionedTableViewBinder(tableView: tableView, sectionedBy: Section.self)
-binder.onSection(.one)
+ binder.onSection(.one)
     .bind(cellType: MyCell.self, models: cellModels)
-    .onDequeue { [unowned self] (row: Int, cell: MyCell) in
+    .onCellDequeue { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
         // called when a cell in section `one` is dequeued
     }
-    .onTapped { [unowned self] (row: Int, cell: MyCell) in
+    .onTapped { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
         // called when a cell in section `one` is tapped
     }
  binder.finish()
@@ -202,13 +202,13 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
 
     private var tableViewDataSourceDelegate: (UITableViewDataSource & UITableViewDelegate)?
     
-    private(set) var handlers = TableViewBindingHandlers<S>()
+    private(set) var handlers = _TableViewBindingHandlers<S>()
     
     // The data model currently shown by the table view.
-    private(set) var currentDataModel = TableViewDataModel<S>()
+    private(set) var currentDataModel = _TableViewDataModel<S>()
     // The next data model to be shown by the table view. When this model's properties are updated, the binder will
     // queue appropriate animations on the table view to be done on the next render frame.
-    private(set) var nextDataModel = TableViewDataModel<S>()
+    private(set) var nextDataModel = _TableViewDataModel<S>()
     
     private var hasRefreshQueued: Bool = false
     
@@ -384,7 +384,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     private func createNextDataModel() {
         self.currentDataModel = self.nextDataModel
         self.currentDataModel.delegate = nil
-        self.nextDataModel = TableViewDataModel<S>(from: self.currentDataModel)
+        self.nextDataModel = _TableViewDataModel<S>(from: self.currentDataModel)
         self.nextDataModel.delegate = self
     }
     
@@ -435,7 +435,7 @@ public extension SectionedTableViewBinder.SectionDisplayBehavior where S: Compar
     }
 }
 
-extension SectionedTableViewBinder: TableViewDataModelDelegate {
+extension SectionedTableViewBinder: _TableViewDataModelDelegate {
     /*
      The binder is set as the delegate on its 'next' data model. When this next model receives a data update, this
      method is called. The binder responds by queueing an update for the next render frame (using `DispatchQueue.async`)

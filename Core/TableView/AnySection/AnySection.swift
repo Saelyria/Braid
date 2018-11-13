@@ -1,5 +1,12 @@
 import UIKit
 
+/**
+ An object used to continue a binding chain.
+ 
+ This is a throwaway object created when a table view binder's `onAnySection()` method is called. This object declares a
+ number of methods that take a binding handler and give it to the original table view binder to store for callback. A
+ reference to this object should not be kept and should only be used in a binding chain.
+*/
 public class AnySectionBinder<S: TableViewSection> {
     internal let binder: SectionedTableViewBinder<S>
     

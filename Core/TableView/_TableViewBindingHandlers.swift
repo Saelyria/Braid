@@ -14,7 +14,7 @@ typealias CellHeightBlock<S: TableViewSection> = (S, Int) -> CGFloat
 typealias HeaderFooterHeightBlock<S: TableViewSection> = (S) -> CGFloat
 
 /// An object that stores the various handlers the binder uses.
-class TableViewBindingHandlers<S: TableViewSection> {
+class _TableViewBindingHandlers<S: TableViewSection> {
     // Cell handlers
     
     // Blocks to call to dequeue a cell in a section.
