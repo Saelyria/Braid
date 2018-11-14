@@ -8,7 +8,8 @@ property is set with one of three 'behaviours':
 This is the default behaviour of a binder. When using this behaviour, the binder will display the sections set to its `displayedSections`
 property in the order given. This `displayedSections` property can only be set if the binder's behaviour is set to 'manually managed' - an 
 attempt to set the property if this is not the behaviour will simply do nothing. This is the most versatile of the three options, allowing very 
-fine-grained control for complex section logic.
+fine-grained control for complex section logic. The sections in `displayedSections` property can be removed, inserted, or rearranged at any
+time, and changes will be animated if the models correctly conform to `CollectionIdentifiable`.
 
 ### 'Hides sections with no cell data' and 'Hides sections with no data'
 
@@ -44,7 +45,7 @@ The order sections are displayed in with these two behaviours is determined eith
 `Comparable` by the section. If your section enum/struct conforms to `Comparable`, these behaviours can be set on your binder just like this:
 
 ```swift
-enum Section: Comparable {
+enum Section: TableViewSection, Comparable {
     case first
     case second
     
@@ -56,9 +57,23 @@ enum Section: Comparable {
 binder.sectionDisplayBehaviour = .hidesSectionsWithNoCellData
 ```
 
-If the section enum/struct does not, you can set the display behaviour like this:
+If your enum is backed by a comparable raw value (e.g. `Int` or `String`), Tableau provides a default `<` comparison function based on its
+raw value as well. So, for example, a default implementation of `<` is provided that orders them based on the case order in this enum:
+
+```swift
+enum Section: Int, TableViewSection, Comparable {
+    case first
+    case second
+}
+```
+
+If the section enum/struct does not conform to `Comparable`, the display behaviour is set like this:
+
 ```swift
 binder.sectionDisplayBehaviour = .hidesSectionsWithNoCellData(orderedWith: { unorderedSections in
     return unorderedSections.sorted(by: { ... })
 })
 ```
+
+Where the behaviour assignment is also given a sorting function that is passed in the unordered sections that the binder has calculated are to
+be shown that should be returned sorted.

@@ -10,10 +10,6 @@ class AccountsViewController: UIViewController {
         case checking
         case savings
         case other
-        
-        static func < (lhs: AccountsViewController.Section, rhs: AccountsViewController.Section) -> Bool {
-            return lhs.rawValue < rhs.rawValue
-        }
     }
 
     private let spinner = UIActivityIndicatorView(activityIndicatorStyle: .gray)

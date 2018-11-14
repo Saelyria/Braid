@@ -21,6 +21,12 @@ public extension TableViewSection where Self: CollectionIdentifiable {
     }
 }
 
+public extension TableViewSection where Self: RawRepresentable, Self.RawValue: Comparable {
+    static func < (lhs: Self, rhs: Self) -> Bool {
+        return lhs.rawValue < rhs.rawValue
+    }
+}
+
 /**
  An object that dequeues and binds data to cells in sections for a given table view.
  

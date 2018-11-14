@@ -7,7 +7,7 @@ class ArtistsViewController: UIViewController {
     struct Section: TableViewSection, Comparable {
         let title: String
         
-        static func < (lhs: ArtistsViewController.Section, rhs: ArtistsViewController.Section) -> Bool {
+        static func < (lhs: Section, rhs: Section) -> Bool {
             return lhs.title < rhs.title
         }
     }
