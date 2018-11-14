@@ -31,16 +31,19 @@ class SamplesViewController: UIViewController {
         
         self.binder.onTable()
             .bind(cellType: TitleDetailTableViewCell.self, viewModels: self.rows)
-            .onTapped { (row, _) in
+            .onTapped { [unowned self] (row, cell) in
+                cell.setSelected(false, animated: true)
                 switch row {
                 case 0:
                     self.navigationController?.pushViewController(AccountsViewController(), animated: true)
                 case 1:
                     self.navigationController?.pushViewController(ArtistsViewController(), animated: true)
-                default:
-                    break
+                default: break
                 }
             }
+            .dimensions(
+                .cellHeight { _ in 300 },
+                .headerHeight { 50 })
         
         self.binder.finish()
     }

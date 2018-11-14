@@ -136,50 +136,10 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     @discardableResult
-    override public func cellHeight(_ handler: @escaping (_ row: Int) -> CGFloat)
+    override public func dimensions(_ dimensions: SingleSectionDimension<S>...)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
-        super.cellHeight(handler)
-        return self
-    }
-    
-    @discardableResult
-    override public func estimatedCellHeight(_ handler: @escaping (_ row: Int) -> CGFloat)
-        -> TableViewModelSingleSectionBinder<C, S, M>
-    {
-        super.estimatedCellHeight(handler)
-        return self
-    }
-    
-    @discardableResult
-    override public func footerHeight(_ handler: @escaping () -> CGFloat)
-        -> TableViewModelSingleSectionBinder<C, S, M>
-    {
-        super.footerHeight(handler)
-        return self
-    }
-    
-    @discardableResult
-    override public func estimatedFooterHeight(_ handler: @escaping () -> CGFloat)
-        -> TableViewModelSingleSectionBinder<C, S, M>
-    {
-        super.estimatedFooterHeight(handler)
-        return self
-    }
-    
-    @discardableResult
-    override public func headerHeight(_ handler: @escaping () -> CGFloat)
-        -> TableViewModelSingleSectionBinder<C, S, M>
-    {
-        super.headerHeight(handler)
-        return self
-    }
-    
-    @discardableResult
-    override public func estimatedHeaderHeight(_ handler: @escaping () -> CGFloat)
-        -> TableViewModelSingleSectionBinder<C, S, M>
-    {
-        super.estimatedHeaderHeight(handler)
+        self._dimensions(dimensions)
         return self
     }
 }

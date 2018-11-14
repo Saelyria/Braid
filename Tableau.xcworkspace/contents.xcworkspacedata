@@ -23,6 +23,9 @@
          location = "group:SectionDisplayBehaviour.md">
       </FileRef>
       <FileRef
+         location = "group:SettingHeights.md">
+      </FileRef>
+      <FileRef
          location = "group:UsingViewModels.md">
       </FileRef>
       <FileRef

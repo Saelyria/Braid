@@ -567,146 +567,39 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     }
     
     /**
-     Adds a handler to provide the cell height for cells in the declared sections.
+     Add handlers for various dimensions of cells for the sections being bound.
      
-     The given handler is called whenever the section reloads for each visible row, passing in the row the handler
-     should provide the height for.
+     This method is called with handlers that provide dimensions like cell or header heights and estimated heights. The
+     various handlers are made with the static functions on `MultiSectionDimension`. A typical dimension-binding call
+     looks something like this:
      
-     - parameter handler: The closure to be called that will return the height for cells in the section.
-     - parameter section: The section of the cell to provide the height for.
-     - parameter row: The row of the cell to provide the height for.
+     ```
+     binder.onSections(.first, .second)
+        .dimensions(
+            .cellHeight { UITableViewAutomaticDimension },
+            .estimatedCellHeight { section, row in
+                 switch section {
+                 case .first: return 120
+                 case .second: return 100
+                 }
+            },
+            .headerHeight { 50 })
+     ```
+     
+     - parameter dimensions: A variadic list of dimensions bound for the sections being bound. These 'dimension' objects
+        are returned from the various dimension-binding static functions on `MultiSectionDimension`.
      
      - returns: A section binder to continue the binding chain with.
-     */
+    */
     @discardableResult
-    public func cellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat)
-        -> TableViewMutliSectionBinder<C, S>
-    {
-        if let sections = self.sections {
-            for section in sections {
-                self.binder.handlers.sectionCellHeightBlocks[section] = handler
-            }
-        } else {
-            self.binder.handlers.dynamicSectionsCellHeightBlock = handler
-        }
-        
+    public func dimensions(_ dimensions: MultiSectionDimension<S>...) -> TableViewMutliSectionBinder<C, S> {
+        self._dimensions(dimensions)
         return self
     }
     
-    /**
-     Adds a handler to provide the estimated cell height for cells in the declared section.
-     
-     The given handler is called whenever the section reloads for each visible row, passing in the row the handler
-     should provide the estimated height for.
-     
-     - parameter handler: The closure to be called that will return the estimated height for cells in the section.
-     - parameter section: The section of the cell to provide the estimated height for.
-     - parameter row: The row of the cell to provide the estimated height for.
-     
-     - returns: A section binder to continue the binding chain with.
-     */
-    @discardableResult
-    public func estimatedCellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat)
-        -> TableViewMutliSectionBinder<C, S>
-    {
-        if let sections = self.sections {
-            for section in sections {
-                self.binder.handlers.sectionEstimatedCellHeightBlocks[section] = handler
-            }
-        } else {
-            self.binder.handlers.dynamicSectionsEstimatedCellHeightBlock = handler
+    internal func _dimensions(_ dimensions: [MultiSectionDimension<S>]) {
+        for dimension in dimensions {
+            dimension.bindingFunc(self.binder, self.sections)
         }
-
-        return self
-    }
-    
-    /**
-     Adds a callback handler to provide the height for section headers in the declared sections.
-     
-     - parameter handler: The closure to be called that will return the height for the section header.
-     - parameter section: The section of the header to provide the height for.
-     
-     - returns: A section binder to continue the binding chain with.
-     */
-    @discardableResult
-    public func headerHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> TableViewMutliSectionBinder<C, S> {
-        if let sections = self.sections {
-            for section in sections {
-                self.binder.handlers.sectionHeaderHeightBlocks[section] = handler
-            }
-        } else {
-            self.binder.handlers.dynamicSectionsHeaderHeightBlock = handler
-        }
-        
-        return self
-    }
-    
-    /**
-     Adds a callback handler to provide the estimated height for section headers in the declared sections.
-     
-     - parameter handler: The closure to be called that will return the estimated height for the section header.
-     - parameter section: The section of the header to provide the estimated height for.
-     
-     - returns: A section binder to continue the binding chain with.
-     */
-    @discardableResult
-    public func estimatedHeaderHeight(_ handler: @escaping (_ section: S) -> CGFloat)
-        -> TableViewMutliSectionBinder<C, S>
-    {
-        if let sections = self.sections {
-            for section in sections {
-                self.binder.handlers.sectionHeaderEstimatedHeightBlocks[section] = handler
-            }
-        } else {
-            self.binder.handlers.dynamicSectionsHeaderEstimatedHeightBlock = handler
-        }
-        
-        return self
-    }
-    
-    /**
-     Adds a callback handler to provide the height for section footers in the declared sections.
-     
-     - parameter handler: The closure to be called that will return the height for the section footer.
-     - parameter section: The section of the footer to provide the height for.
-     
-     - returns: A section binder to continue the binding chain with.
-     */
-    @discardableResult
-    public func footerHeight(_ handler: @escaping (_ section: S) -> CGFloat)
-        -> TableViewMutliSectionBinder<C, S>
-    {
-        if let sections = self.sections {
-            for section in sections {
-                self.binder.handlers.sectionFooterHeightBlocks[section] = handler
-            }
-        } else {
-            self.binder.handlers.dynamicSectionsFooterHeightBlock = handler
-        }
-        
-        return self
-    }
-    
-    /**
-     Adds a callback handler to provide the estimated height for section footers in the declared sections.
-     
-     - parameter handler: The closure to be called that will return the estimated height for the section footer.
-     - parameter section: The section of the footer to provide the estimated height for.
-     
-     - returns: A section binder to continue the binding chain with.
-     */
-    @discardableResult
-    public func estimatedFooterHeight(_ handler: @escaping (_ section: S) -> CGFloat)
-        -> TableViewMutliSectionBinder<C, S>
-    {
-        if let sections = self.sections {
-            for section in sections {
-                self.binder.handlers.sectionFooterEstimatedHeightBlocks[section] = handler
-            }
-        } else {
-            self.binder.handlers.dynamicSectionsFooterEstimatedHeightBlock = handler
-        }
-        
-        return self
     }
 }
