@@ -52,7 +52,7 @@ class AccountsViewController: UIViewController {
             ])
         
         // 8.
-        self.binder.onSections([.checking, .savings, .other])
+        self.binder.onSections(.checking, .savings, .other)
             .rx.bind(cellType: TitleDetailTableViewCell.self,
                      models: self.accountsForSections.asObservable(),
                      mapToViewModelsWith: { (account: Account) in return account.asTitleDetailCellViewModel() })
@@ -65,7 +65,7 @@ class AccountsViewController: UIViewController {
             }
         
         // 10.
-        self.binder.onSections([.checking, .savings, .other])
+        self.binder.onSections(.checking, .savings, .other)
             .bind(headerType: SectionHeaderView.self, viewModels: [
                 .checking: SectionHeaderView.ViewModel(title: "CHECKING"),
                 .savings: SectionHeaderView.ViewModel(title: "SAVINGS"),

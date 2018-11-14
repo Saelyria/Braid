@@ -79,21 +79,21 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     public override func bind<H>(
         headerType: H.Type,
         viewModel: H.ViewModel?,
-        updatedWith updateHandler: (((H.ViewModel?) -> Void) -> Void)?)
+        updatedBy callbackRef: inout (_ newViewModel: H.ViewModel?) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
         where H : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
     {
-        super.bind(headerType: headerType, viewModel: viewModel, updatedWith: updateHandler)
+        super.bind(headerType: headerType, viewModel: viewModel, updatedBy: &callbackRef)
         return self
     }
     
     @discardableResult
     public override func bind(
         headerTitle: String?,
-        updateWith updateHandler: (((String?) -> Void) -> Void)? = nil)
+        updatedBy callbackRef: inout (_ newTitle: String?) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
-        super.bind(headerTitle: headerTitle, updateWith: updateHandler)
+        super.bind(headerTitle: headerTitle, updatedBy: &callbackRef)
         return self
     }
     
@@ -101,21 +101,21 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     public override func bind<F>(
         footerType: F.Type,
         viewModel: F.ViewModel?,
-        updatedWith updateHandler: (((F.ViewModel?) -> Void) -> Void)?)
+        updatedBy callbackRef: inout (_ newViewModel: F.ViewModel?) -> Void)
         -> TableViewSingleSectionBinder<C, S>
         where F : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
     {
-        super.bind(footerType: footerType, viewModel: viewModel)
+        super.bind(footerType: footerType, viewModel: viewModel, updatedBy: &callbackRef)
         return self
     }
     
     @discardableResult
     public override func bind(
         footerTitle: String?,
-        updateWith updateHandler: (((String?) -> Void) -> Void)?)
+        updatedBy callbackRef: inout (_ newTitle: String?) -> Void)
         -> TableViewSingleSectionBinder<C, S>
     {
-        super.bind(footerTitle: footerTitle, updateWith: updateHandler)
+        super.bind(footerTitle: footerTitle, updatedBy: &callbackRef)
         return self
     }
     

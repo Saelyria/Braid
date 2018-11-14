@@ -53,8 +53,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter cellType: The class of the header to bind.
      - parameter viewModels: The view models to bind to the the dequeued cells for this section.
      - parameter callbackRef: A reference to a closure that is called with an array of new view models. A new 'update
-     callback' closure is created and assigned to this reference that can be used to update the view models for the
-     bound section after binding.
+        callback' closure is created and assigned to this reference that can be used to update the view models for the
+        bound section after binding.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -86,7 +86,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter cellType: The class of the header to bind.
      - parameter models: The model objects to bind to the dequeued cells for this section.
      - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
-     for the associated cell using the data from the model object.
+        for the associated cell using the data from the model object.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -116,11 +116,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter cellType: The class of the header to bind.
      - parameter models: The model objects to bind to the dequeued cells for this section.
      - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
-     for the associated cell using the data from the model object.
+        for the associated cell using the data from the model object.
      - parameter callbackRef: A reference to a closure that is called with an array of new models. A new 'update
-     callback' closure is created and assigned to this reference that can be used to update the models for the bound
-     section after binding. Models passed to this closure are mapped to view models using the supplied
-     `mapToViewModel` function.
+        callback' closure is created and assigned to this reference that can be used to update the models for the bound
+        section after binding. Models passed to this closure are mapped to view models using the supplied
+        `mapToViewModel` function.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -188,8 +188,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter cellType: The class of the header to bind.
      - parameter models: The models objects to bind to the dequeued cells for this section.
      - parameter callbackRef: A reference to a closure that is called with an array of new models. A new 'update
-     callback' closure is created and assigned to this reference that can be used to update the models for the bound
-     section after binding.
+        callback' closure is created and assigned to this reference that can be used to update the models for the bound
+        section after binding.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -256,8 +256,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter model: The model the cell is dequeued for.
      - parameter models: The models objects to bind to the dequeued cells for this section.
      - parameter callbackRef: A reference to a closure that is called with an array of new models. A new 'update
-     callback' closure is created and assigned to this reference that can be used to update the models for the bound
-     section after binding.
+        callback' closure is created and assigned to this reference that can be used to update the models for the bound
+        section after binding.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -313,8 +313,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter numberOfCells: The number of cells to create for the section using the provided closure.
      - parameter callbackRef: A reference to a closure that is called with an integer representing the number of cells
-     in the section. A new 'update callback' closure is created and assigned to this reference that can be used to
-     update the number of cells for the bound section after binding.
+        in the section. A new 'update callback' closure is created and assigned to this reference that can be used to
+        update the number of cells for the bound section after binding.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -350,28 +350,52 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     @discardableResult
     public func bind<H>(
         headerType: H.Type,
-        viewModel: H.ViewModel?,
-        updatedWith updateHandler: ((_ updateCallback: (_ newViewModel: H.ViewModel?) -> Void) -> Void)? = nil)
+        viewModel: H.ViewModel?)
         -> TableViewSingleSectionBinder<C, S>
         where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addHeaderDequeueBlock(headerType: headerType, sections: [self.section])
         self.binder.updateHeaderViewModels([self.section: viewModel], sections: [self.section])
         
+        return self
+    }
+    
+    /**
+     Binds the given header type to the declared section with the given view model.
+     
+     Use this method to use a custom `UITableViewHeaderFooterView` subclass for the section header with a table view
+     binder. The view must conform to `ViewModelBindable` and `ReuseIdentifiable` to be compatible.
+     
+     - parameter headerType: The class of the header to bind.
+     - parameter viewModel: The view model to bind to the section's header when it is dequeued.
+     - parameter callbackRef: A reference to a closure that is called with a new view model for the header in the
+        section. A new 'update callback' closure is created and assigned to this reference that can be used to
+        update the header view model for the bound section after binding.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<H>(
+        headerType: H.Type,
+        viewModel: H.ViewModel?,
+        updatedBy callbackRef: inout (_ newViewModel: H.ViewModel?) -> Void)
+        -> TableViewSingleSectionBinder<C, S>
+        where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+    {
         let updateCallback: (H.ViewModel?) -> Void
         updateCallback = { [weak binder = self.binder, section = self.section] (viewModel) in
             binder?.updateHeaderViewModels([section: viewModel], sections: [section])
         }
-        updateHandler?(updateCallback)
+        callbackRef = updateCallback
         
-        return self
+        return self.bind(headerType: headerType, viewModel: viewModel)
     }
     
     /**
      Binds the given title to the section's header.
      
-     This method will provide the given title as the title for the iOS native section headers. If you have bound a custom
-     header type to the table view using the `bind(headerType:viewModel:)` method, this method will do nothing.
+     This method will provide the given title as the title for the iOS native section headers. If you have bound a
+     custom header type to the table view using the `bind(headerType:viewModel:)` method, this method will do nothing.
      
      - parameter headerTitle: The title to use for the section's header.
      
@@ -379,19 +403,40 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func bind(
-        headerTitle: String?,
-        updateWith updateHandler: ((_ updateCallback: (_ newTitle: String?) -> Void) -> Void)? = nil)
+        headerTitle: String?)
         -> TableViewSingleSectionBinder<C, S>
     {
         self.binder.updateHeaderTitles([self.section: headerTitle], sections: [self.section])
         
+        return self
+    }
+    
+    /**
+     Binds the given title to the section's header.
+     
+     This method will provide the given title as the title for the iOS native section headers. If you have bound a
+     custom header type to the table view using the `bind(headerType:viewModel:)` method, this method will do nothing.
+     
+     - parameter headerTitle: The title to use for the section's header.
+     - parameter callbackRef: A reference to a closure that is called with a new title for the header in the section. A
+        new 'update callback' closure is created and assigned to this reference that can be used to update the header
+        title for the bound section after binding.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind(
+        headerTitle: String?,
+        updatedBy callbackRef: inout (_ newTitle: String?) -> Void)
+        -> TableViewSingleSectionBinder<C, S>
+    {
         let updateCallback: (String?) -> Void
         updateCallback = { [weak binder = self.binder, section = self.section] (title) in
             binder?.updateHeaderTitles([section: title], sections: [section])
         }
-        updateHandler?(updateCallback)
+        callbackRef = updateCallback
 
-        return self
+        return self.bind(headerTitle: headerTitle)
     }
     
     /**
@@ -408,28 +453,52 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     @discardableResult
     public func bind<F>(
         footerType: F.Type,
-        viewModel: F.ViewModel?,
-        updatedWith updateHandler: ((_ updateCallback: (_ newViewModel: F.ViewModel?) -> Void) -> Void)? = nil)
+        viewModel: F.ViewModel?)
         -> TableViewSingleSectionBinder<C, S>
         where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addFooterDequeueBlock(footerType: footerType, sections: [self.section])
         self.binder.updateFooterViewModels([self.section: viewModel], sections: [self.section])
         
+        return self
+    }
+    
+    /**
+     Binds the given footer type to the declared section with the given view model.
+     
+     Use this method to use a custom `UITableViewHeaderFooterView` subclass for the section footer with a table view
+     binder. The view must conform to `ViewModelBindable` and `ReuseIdentifiable` to be compatible.
+     
+     - parameter footerType: The class of the footer to bind.
+     - parameter viewModel: The view model to bind to the section's footer when it is dequeued.
+     - parameter callbackRef: A reference to a closure that is called with a new view model for the footer in the
+        section. A new 'update callback' closure is created and assigned to this reference that can be used to
+        update the footer view model for the bound section after binding.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<F>(
+        footerType: F.Type,
+        viewModel: F.ViewModel?,
+        updatedBy callbackRef: inout (_ newViewModel: F.ViewModel?) -> Void)
+        -> TableViewSingleSectionBinder<C, S>
+        where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+    {
         let updateCallback: (F.ViewModel?) -> Void
         updateCallback = { [weak binder = self.binder, section = self.section] (viewModel) in
             binder?.updateFooterViewModels([section: viewModel], sections: [section])
         }
-        updateHandler?(updateCallback)
+        callbackRef = updateCallback
         
-        return self
+        return self.bind(footerType: footerType, viewModel: viewModel)
     }
     
     /**
      Binds the given title to the section's footer.
      
-     This method will provide the given title as the title for the iOS native section footers. If you have bound a custom
-     footer type to the table view using the `bind(footerType:viewModel:)` method, this method will do nothing.
+     This method will provide the given title as the title for the iOS native section footers. If you have bound a
+     custom footer type to the table view using the `bind(footerType:viewModel:)` method, this method will do nothing.
      
      - parameter footerTitle: The title to use for the section's footer.
      
@@ -437,19 +506,40 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func bind(
-        footerTitle: String?,
-        updateWith updateHandler: ((_ updateCallback: (_ newTitle: String?) -> Void) -> Void)? = nil)
+        footerTitle: String?)
         -> TableViewSingleSectionBinder<C, S>
     {
         self.binder.updateFooterTitles([self.section: footerTitle], sections: [self.section])
         
+        return self
+    }
+    
+    /**
+     Binds the given title to the section's footer.
+     
+     This method will provide the given title as the title for the iOS native section footers. If you have bound a
+     custom footer type to the table view using the `bind(footerType:viewModel:)` method, this method will do nothing.
+     
+     - parameter footerTitle: The title to use for the section's footer.
+     - parameter callbackRef: A reference to a closure that is called with a new title for the footer in the section. A
+        new 'update callback' closure is created and assigned to this reference that can be used to update the footer
+        title for the bound section after binding.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind(
+        footerTitle: String?,
+        updatedBy callbackRef: inout (_ newTitle: String?) -> Void)
+        -> TableViewSingleSectionBinder<C, S>
+    {
         let updateCallback: (String?) -> Void
         updateCallback = { [weak binder = self.binder, section = self.section] (title) in
             binder?.updateFooterTitles([section: title], sections: [section])
         }
-        updateHandler?(updateCallback)
+        callbackRef = updateCallback
  
-        return self
+        return self.bind(footerTitle: footerTitle)
     }
     
     // MARK: -

@@ -296,7 +296,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      
      - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
      */
-    public func onSections(_ sections: [S]) -> TableViewMutliSectionBinder<UITableViewCell, S> {
+    public func onSections(_ sections: S...) -> TableViewMutliSectionBinder<UITableViewCell, S> {
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
