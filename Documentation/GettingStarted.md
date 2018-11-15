@@ -20,8 +20,8 @@ let tableView = UITableView()
 let binder = TableViewBinder(tableView: tableView)
 ```
 
-Easy. Table views are used to display arrays of data - for this example, lets make a custom 'person' type and an array of people we want the 
-table to show:
+Easy. Table views are generally used to display arrays of data - for this example, lets make a custom 'person' type and an array of people we
+want the table to show:
 
 ```swift
 struct Person {
@@ -31,11 +31,12 @@ struct Person {
 
 let people = [
     Person(name: "John", age: 32),
-    Person(name: "Mary", age: 45)
+    Person(name: "Mary", age: 45),
+    Person(name: "Mohammed", age: 16)
 ]
 ```
 
-Perfect. On our table, we want to display users with a custom cell type - here, we'll define a `MyCustomTableViewCell` cell type to use.  
+Perfect. On our table, we want to display people with a custom cell type - here, we'll define a `MyCustomTableViewCell` cell type to use.  
 
 ```swift
 class MyCustomTableViewCell: UITableViewCell, ReuseIdentifiable {
@@ -93,10 +94,12 @@ binder.onTable()
         // show a 'details' VC with the given 'person' object
     }
 ```
-Same deal here with the `onTapped` handler - because it came after the cell binding method, it gets the same type safety allowance.
+Same deal here with the `onTapped` handler - because it came after the cell binding method, it gets the same type safety allowance. There are
+a number of handers we can bind that can, when they're bound in a chain after the cell binding methods, be passed in model objects or have
+additional type safety that they wouldn't have when called earlier in the chain.
 
 As previously mentioned, there are a number of other handlers we can bind to add more information to our table, all of which are simply added
-to this function chain. 
+to this function chain.
 
 After we've finished binding handlers, we just call the `finish` method on the binder, then it'll update the table with the data we've provided.
 

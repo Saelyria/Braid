@@ -41,9 +41,6 @@ class SamplesViewController: UIViewController {
                 default: break
                 }
             }
-            .dimensions(
-                .cellHeight { _ in 300 },
-                .headerHeight { 50 })
         
         self.binder.finish()
     }

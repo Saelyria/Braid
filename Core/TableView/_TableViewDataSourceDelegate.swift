@@ -134,7 +134,6 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
             _heightBlock = self.binder.handlers.dynamicSectionsCellHeightBlock
         }
         guard let heightBlock = _heightBlock ?? self.binder.handlers.anySectionCellHeightBlock else {
-            assertionFailure("tableView:heightForRowAt: shouldn't be called if there was no height handler bound; 'responds(to:)' override didn't work")
             return tableView.rowHeight
         }
         return heightBlock(section, indexPath.row)
@@ -150,7 +149,6 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
             _heightBlock = self.binder.handlers.dynamicSectionsHeaderHeightBlock
         }
         guard let heightBlock = _heightBlock ?? self.binder.handlers.anySectionHeaderHeightBlock else {
-            assertionFailure("tableView:heightForHeaderInSection: shouldn't be called if there was no height handler bound; 'responds(to:)' override didn't work")
             return tableView.sectionHeaderHeight
         }
         
@@ -167,7 +165,6 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
             _heightBlock = self.binder.handlers.dynamicSectionsFooterHeightBlock
         }
         guard let heightBlock = _heightBlock ?? self.binder.handlers.anySectionFooterHeightBlock else {
-            assertionFailure("tableView:heightForFooterInSection: shouldn't be called if there was no height handler bound; 'responds(to:)' override didn't work")
             return tableView.sectionFooterHeight
         }
         
@@ -184,7 +181,6 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
             _heightBlock = self.binder.handlers.dynamicSectionsEstimatedCellHeightBlock
         }
         guard let heightBlock = _heightBlock ?? self.binder.handlers.anySectionEstimatedCellHeightBlock else {
-            assertionFailure("tableView:estimatedHeightForRowAt: shouldn't be called if there was no height handler bound; 'responds(to:)' override didn't work")
             return tableView.estimatedRowHeight
         }
         
@@ -201,7 +197,6 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
             _heightBlock = self.binder.handlers.dynamicSectionsHeaderEstimatedHeightBlock
         }
         guard let heightBlock = _heightBlock ?? self.binder.handlers.anySectionHeaderEstimatedHeightBlock else {
-            assertionFailure("tableView:estimatedHeightForHeaderInSection: shouldn't be called if there was no height handler bound; 'responds(to:)' override didn't work")
             return tableView.estimatedSectionHeaderHeight
         }
         
@@ -218,7 +213,6 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
             _heightBlock = self.binder.handlers.dynamicSectionsFooterEstimatedHeightBlock
         }
         guard let heightBlock = _heightBlock ?? self.binder.handlers.anySectionFooterEstimatedHeightBlock else {
-            assertionFailure("tableView:estimatedHeightForHeaderInSection: shouldn't be called if there was no height handler bound; 'responds(to:)' override didn't work")
             return tableView.estimatedSectionHeaderHeight
         }
         

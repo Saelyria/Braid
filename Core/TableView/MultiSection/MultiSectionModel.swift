@@ -119,50 +119,10 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     }
     
     @discardableResult
-    public override func cellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat)
+    public func dimensions(_ dimensions: MultiSectionModelDimension<S, M>...)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
-        super.cellHeight(handler)
-        return self
-    }
-    
-    @discardableResult
-    public override func estimatedCellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat)
-        -> TableViewModelMultiSectionBinder<C, S, M>
-    {
-        super.estimatedCellHeight(handler)
-        return self
-    }
-    
-    @discardableResult
-    public override func headerHeight(_ handler: @escaping (_ section: S) -> CGFloat)
-        -> TableViewModelMultiSectionBinder<C, S, M>
-    {
-        super.headerHeight(handler)
-        return self
-    }
-    
-    @discardableResult
-    public override func estimatedHeaderHeight(_ handler: @escaping (_ section: S) -> CGFloat)
-        -> TableViewModelMultiSectionBinder<C, S, M>
-    {
-        super.estimatedHeaderHeight(handler)
-        return self
-    }
-    
-    @discardableResult
-    public override func footerHeight(_ handler: @escaping (_ section: S) -> CGFloat)
-        -> TableViewModelMultiSectionBinder<C, S, M>
-    {
-        super.footerHeight(handler)
-        return self
-    }
-    
-    @discardableResult
-    public override func estimatedFooterHeight(_ handler: @escaping (_ section: S) -> CGFloat)
-        -> TableViewModelMultiSectionBinder<C, S, M>
-    {
-        super.estimatedFooterHeight(handler)
+        self._dimensions(dimensions)
         return self
     }
 }

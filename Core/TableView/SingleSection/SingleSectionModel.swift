@@ -136,7 +136,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     @discardableResult
-    override public func dimensions(_ dimensions: SingleSectionDimension<S>...)
+    public func dimensions(_ dimensions: SingleSectionModelDimension<S, M>...)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         self._dimensions(dimensions)
