@@ -18,6 +18,9 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
 {
     let binder: SectionedTableViewBinder<S>
     let section: S
+    var affectedSectionScope: SectionBindingScope<S> {
+        return .forNamedSections([self.section])
+    }
     
     init(binder: SectionedTableViewBinder<S>, section: S) {
         self.binder = binder
@@ -42,7 +45,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
-        self.binder.updateCellModels(nil, viewModels: [self.section: viewModels], sections: [self.section])
+        self.binder.updateCellModels(
+            nil, viewModels: [self.section: viewModels], affectedSections: self.affectedSectionScope)
         
         return TableViewSingleSectionBinder<NC, S>(binder: self.binder, section: self.section)
     }
@@ -66,9 +70,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<NC, S>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
+        let section = self.section
+        let scope = self.affectedSectionScope
         let updateCallback: ([NC.ViewModel]) -> Void
-        updateCallback = { [weak binder = self.binder, section = self.section] (viewModels) in
-            binder?.updateCellModels(nil, viewModels: [section: viewModels], sections: [section])
+        updateCallback = { [weak binder = self.binder] (viewModels) in
+            binder?.updateCellModels(nil, viewModels: [section: viewModels], affectedSections: scope)
         }
         callbackRef = updateCallback
         
@@ -100,7 +106,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
         let viewModels = [self.section: models.map(mapToViewModel)]
-        self.binder.updateCellModels([self.section: models], viewModels: viewModels, sections: [self.section])
+        self.binder.updateCellModels(
+            [self.section: models], viewModels: viewModels, affectedSections: self.affectedSectionScope)
         
         return TableViewModelSingleSectionBinder<NC, S, NM>(binder: self.binder, section: self.section)
     }
@@ -133,10 +140,12 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
+        let section = self.section
+        let scope = self.affectedSectionScope
         let updateCallback: ([NM]) -> Void
-        updateCallback = { [weak binder = self.binder, section = self.section, mapToViewModel] (models) in
+        updateCallback = { [weak binder = self.binder, mapToViewModel] (models) in
             let viewModels = models.map(mapToViewModel)
-            binder?.updateCellModels([section: models], viewModels: [section: viewModels], sections: [section])
+            binder?.updateCellModels([section: models], viewModels: [section: viewModels], affectedSections: scope)
         }
         callbackRef = updateCallback
         
@@ -168,7 +177,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         where NC: UITableViewCell & ReuseIdentifiable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
-        self.binder.updateCellModels([self.section: models], viewModels: nil, sections: [self.section])
+        self.binder.updateCellModels(
+            [self.section: models], viewModels: nil, affectedSections: self.affectedSectionScope)
         
         return TableViewModelSingleSectionBinder<NC, S, NM>(binder: self.binder, section: self.section)
     }
@@ -201,9 +211,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ReuseIdentifiable
     {
+        let section = self.section
+        let scope = self.affectedSectionScope
         let updateCallback: ([NM]) -> Void
-        updateCallback = { [weak binder = self.binder, section = self.section] (models) in
-            binder?.updateCellModels([section: models], viewModels: nil, sections: [section])
+        updateCallback = { [weak binder = self.binder] (models) in
+            binder?.updateCellModels([section: models], viewModels: nil, affectedSections: scope)
         }
         callbackRef = updateCallback
         
@@ -238,7 +250,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
             return cellProvider(row, models[row])
         }
         self.binder.addCellDequeueBlock(cellProvider: _cellProvider, sections: [self.section])
-        self.binder.updateCellModels([self.section: models], viewModels: nil, sections: [self.section])
+        self.binder.updateCellModels(
+            [self.section: models], viewModels: nil, affectedSections: self.affectedSectionScope)
         
         return TableViewModelSingleSectionBinder<UITableViewCell, S, NM>(binder: self.binder, section: self.section)
     }
@@ -268,9 +281,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
     {
+        let section = self.section
+        let scope = self.affectedSectionScope
         let updateCallback: ([NM]) -> Void
-        updateCallback = { [weak binder = self.binder, section = self.section] (models) in
-            binder?.updateCellModels([section: models], viewModels: nil, sections: [section])
+        updateCallback = { [weak binder = self.binder] (models) in
+            binder?.updateCellModels([section: models], viewModels: nil, affectedSections: scope)
         }
         callbackRef = updateCallback
         
@@ -297,7 +312,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<UITableViewCell, S>
     {
         self.binder.addCellDequeueBlock(cellProvider: cellProvider, sections: [self.section])
-        self.binder.updateNumberOfCells([self.section: numberOfCells], sections: [self.section])
+        self.binder.updateNumberOfCells([self.section: numberOfCells], affectedSections: self.affectedSectionScope)
         
         return TableViewSingleSectionBinder<UITableViewCell, S>(binder: self.binder, section: self.section)
     }
@@ -325,9 +340,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         updatedBy callbackRef: inout (_ numCells: Int) -> Void)
         -> TableViewSingleSectionBinder<UITableViewCell, S>
     {
+        let section = self.section
+        let scope = self.affectedSectionScope
         let updateCallback: (Int) -> Void
-        updateCallback = { [weak binder = self.binder, section = self.section] (numCells) in
-            binder?.updateNumberOfCells([section: numCells], sections: [section])
+        updateCallback = { [weak binder = self.binder] (numCells) in
+            binder?.updateNumberOfCells([section: numCells], affectedSections: scope)
         }
         callbackRef = updateCallback
         
@@ -355,7 +372,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addHeaderDequeueBlock(headerType: headerType, sections: [self.section])
-        self.binder.updateHeaderViewModels([self.section: viewModel], sections: [self.section])
+        self.binder.updateHeaderViewModels([self.section: viewModel], affectedSections: self.affectedSectionScope)
         
         return self
     }
@@ -382,9 +399,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<C, S>
         where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
+        let section = self.section
+        let scope = self.affectedSectionScope
         let updateCallback: (H.ViewModel?) -> Void
-        updateCallback = { [weak binder = self.binder, section = self.section] (viewModel) in
-            binder?.updateHeaderViewModels([section: viewModel], sections: [section])
+        updateCallback = { [weak binder = self.binder] (viewModel) in
+            binder?.updateHeaderViewModels([section: viewModel], affectedSections: scope)
         }
         callbackRef = updateCallback
         
@@ -406,7 +425,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         headerTitle: String?)
         -> TableViewSingleSectionBinder<C, S>
     {
-        self.binder.updateHeaderTitles([self.section: headerTitle], sections: [self.section])
+        self.binder.updateHeaderTitles([self.section: headerTitle], affectedSections: self.affectedSectionScope)
         
         return self
     }
@@ -430,9 +449,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         updatedBy callbackRef: inout (_ newTitle: String?) -> Void)
         -> TableViewSingleSectionBinder<C, S>
     {
+        let section = self.section
+        let scope = self.affectedSectionScope
         let updateCallback: (String?) -> Void
-        updateCallback = { [weak binder = self.binder, section = self.section] (title) in
-            binder?.updateHeaderTitles([section: title], sections: [section])
+        updateCallback = { [weak binder = self.binder] (title) in
+            binder?.updateHeaderTitles([section: title], affectedSections: scope)
         }
         callbackRef = updateCallback
 
@@ -458,7 +479,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addFooterDequeueBlock(footerType: footerType, sections: [self.section])
-        self.binder.updateFooterViewModels([self.section: viewModel], sections: [self.section])
+        self.binder.updateFooterViewModels([self.section: viewModel], affectedSections: self.affectedSectionScope)
         
         return self
     }
@@ -485,9 +506,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<C, S>
         where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
+        let section = self.section
+        let scope = self.affectedSectionScope
         let updateCallback: (F.ViewModel?) -> Void
-        updateCallback = { [weak binder = self.binder, section = self.section] (viewModel) in
-            binder?.updateFooterViewModels([section: viewModel], sections: [section])
+        updateCallback = { [weak binder = self.binder] (viewModel) in
+            binder?.updateFooterViewModels([section: viewModel], affectedSections: scope)
         }
         callbackRef = updateCallback
         
@@ -509,7 +532,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         footerTitle: String?)
         -> TableViewSingleSectionBinder<C, S>
     {
-        self.binder.updateFooterTitles([self.section: footerTitle], sections: [self.section])
+        self.binder.updateFooterTitles([self.section: footerTitle], affectedSections: self.affectedSectionScope)
         
         return self
     }
@@ -533,9 +556,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         updatedBy callbackRef: inout (_ newTitle: String?) -> Void)
         -> TableViewSingleSectionBinder<C, S>
     {
+        let section = self.section
+        let scope = self.affectedSectionScope
         let updateCallback: (String?) -> Void
-        updateCallback = { [weak binder = self.binder, section = self.section] (title) in
-            binder?.updateFooterTitles([section: title], sections: [section])
+        updateCallback = { [weak binder = self.binder] (title) in
+            binder?.updateFooterTitles([section: title], affectedSections: scope)
         }
         callbackRef = updateCallback
  

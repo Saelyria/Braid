@@ -18,6 +18,13 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
 {
     internal let binder: SectionedTableViewBinder<S>
     internal let sections: [S]?
+    internal var affectedSectionScope: SectionBindingScope<S> {
+        if let sections = self.sections {
+            return .forNamedSections(sections)
+        } else {
+            return .forAllUnnamedSections
+        }
+    }
     
     internal init(binder: SectionedTableViewBinder<S>, sections: [S]?) {
         self.binder = binder
@@ -44,7 +51,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: self.sections)
-        self.binder.updateCellModels(nil, viewModels: viewModels, sections: self.sections)
+        self.binder.updateCellModels(nil, viewModels: viewModels, affectedSections: self.affectedSectionScope)
         
         return TableViewMutliSectionBinder<NC, S>(binder: self.binder, sections: self.sections)
     }
@@ -71,8 +78,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
         let updateCallback: ([S: [NC.ViewModel]]) -> Void
-        updateCallback = { [weak binder = self.binder, sections = self.sections] (viewModels) in
-            binder?.updateCellModels(nil, viewModels: viewModels, sections: sections)
+        updateCallback = { [weak binder = self.binder, scope = self.affectedSectionScope] (viewModels) in
+            binder?.updateCellModels(nil, viewModels: viewModels, affectedSections: scope)
         }
         callbackRef = updateCallback
         
@@ -109,7 +116,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         for (s, m) in models {
             viewModels[s] = m.map(mapToViewModel)
         }
-        self.binder.updateCellModels(models, viewModels: viewModels, sections: self.sections)
+        self.binder.updateCellModels(models, viewModels: viewModels, affectedSections: self.affectedSectionScope)
         
         return TableViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections)
     }
@@ -144,12 +151,12 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
         let updateCallback: ([S: [NM]]) -> Void
-        updateCallback = { [weak binder = self.binder, sections = self.sections, mapToViewModel] (models) in
+        updateCallback = { [weak binder = self.binder, scope = self.affectedSectionScope, mapToViewModel] (models) in
             var viewModels: [S: [Any]] = [:]
             for (s, m) in models {
                 viewModels[s] = m.map(mapToViewModel)
             }
-            binder?.updateCellModels(models, viewModels: viewModels, sections: sections)
+            binder?.updateCellModels(models, viewModels: viewModels, affectedSections: scope)
         }
         callbackRef = updateCallback
         
@@ -178,7 +185,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         where NC: UITableViewCell & ReuseIdentifiable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: self.sections)
-        self.binder.updateCellModels(models, viewModels: nil, sections: self.sections)
+        self.binder.updateCellModels(models, viewModels: nil, affectedSections: self.affectedSectionScope)
         
         return TableViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections)
     }
@@ -209,8 +216,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         where NC: UITableViewCell & ReuseIdentifiable
     {
         let updateCallback: ([S: [NM]]) -> Void
-        updateCallback = { [weak binder = self.binder, sections = self.sections] (models) in
-            binder?.updateCellModels(models, viewModels: nil, sections: sections)
+        updateCallback = { [weak binder = self.binder, scope = self.affectedSectionScope] (models) in
+            binder?.updateCellModels(models, viewModels: nil, affectedSections: scope)
         }
         callbackRef = updateCallback
         
@@ -248,7 +255,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
             return cellProvider(section, row, models[row])
         }
         self.binder.addCellDequeueBlock(cellProvider: _cellProvider, sections: self.sections)
-        self.binder.updateCellModels(models, viewModels: nil, sections: self.sections)
+        self.binder.updateCellModels(models, viewModels: nil, affectedSections: self.affectedSectionScope)
         
         return TableViewModelMultiSectionBinder<UITableViewCell, S, NM>(binder: self.binder, sections: self.sections)
     }
@@ -282,8 +289,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
     {
         let updateCallback: ([S: [NM]]) -> Void
-        updateCallback = { [weak binder = self.binder, sections = self.sections] (models) in
-            binder?.updateCellModels(models, viewModels: nil, sections: sections)
+        updateCallback = { [weak binder = self.binder, scope = self.affectedSectionScope] (models) in
+            binder?.updateCellModels(models, viewModels: nil, affectedSections: scope)
         }
         callbackRef = updateCallback
         
@@ -312,7 +319,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         -> TableViewMutliSectionBinder<UITableViewCell, S>
     {
         self.binder.addCellDequeueBlock(cellProvider: cellProvider, sections: self.sections)
-        self.binder.updateNumberOfCells(numberOfCells, sections: self.sections)
+        self.binder.updateNumberOfCells(numberOfCells, affectedSections: self.affectedSectionScope)
         
         return TableViewMutliSectionBinder<UITableViewCell, S>(binder: self.binder, sections: self.sections)
     }
@@ -343,8 +350,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         -> TableViewMutliSectionBinder<UITableViewCell, S>
     {
         let updateCallback: ([S: Int]) -> Void
-        updateCallback = { [weak binder = self.binder, sections = self.sections] (numCells) in
-            binder?.updateNumberOfCells(numCells, sections: sections)
+        updateCallback = { [weak binder = self.binder, scope = self.affectedSectionScope] (numCells) in
+            binder?.updateNumberOfCells(numCells, affectedSections: scope)
         }
         callbackRef = updateCallback
         
@@ -379,12 +386,13 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         -> TableViewMutliSectionBinder<C, S>
         where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
+        let scope = self.affectedSectionScope
         self.binder.addHeaderDequeueBlock(headerType: headerType, sections: self.sections)
-        self.binder.updateHeaderViewModels(viewModels, sections: self.sections)
+        self.binder.updateHeaderViewModels(viewModels, affectedSections: scope)
         
         let updateCallback: ([S: H.ViewModel]) -> Void
-        updateCallback = { [weak binder = self.binder, sections = self.sections] (viewModels) in
-            binder?.updateHeaderViewModels(viewModels, sections: sections)
+        updateCallback = { [weak binder = self.binder] (viewModels) in
+            binder?.updateHeaderViewModels(viewModels, affectedSections: scope)
         }
         updateHandler?(updateCallback)
 
@@ -414,11 +422,11 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         updateWith updateHandler: ((_ updateCallback: (_ newTitles: [S: String]) -> Void) -> Void)? = nil)
         -> TableViewMutliSectionBinder<C, S>
     {
-        self.binder.updateHeaderTitles(headerTitles, sections: self.sections)
+        self.binder.updateHeaderTitles(headerTitles, affectedSections: self.affectedSectionScope)
         
         let updateCallback: ([S: String]) -> Void
-        updateCallback = { [weak binder = self.binder, sections = self.sections] (titles) in
-            binder?.updateHeaderTitles(titles, sections: sections)
+        updateCallback = { [weak binder = self.binder, scope = self.affectedSectionScope] (titles) in
+            binder?.updateHeaderTitles(titles, affectedSections: scope)
         }
         updateHandler?(updateCallback)
 
@@ -447,12 +455,13 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         -> TableViewMutliSectionBinder<C, S>
         where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
+        let scope = self.affectedSectionScope
         self.binder.addFooterDequeueBlock(footerType: footerType, sections: self.sections)
-        self.binder.updateFooterViewModels(viewModels, sections: self.sections)
+        self.binder.updateFooterViewModels(viewModels, affectedSections: scope)
         
         let updateCallback: ([S: F.ViewModel]) -> Void
-        updateCallback = { [weak binder = self.binder, sections = self.sections] (viewModels) in
-            binder?.updateFooterViewModels(viewModels, sections: sections)
+        updateCallback = { [weak binder = self.binder] (viewModels) in
+            binder?.updateFooterViewModels(viewModels, affectedSections: scope)
         }
         updateHandler?(updateCallback)
 
@@ -478,11 +487,12 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         updateWith updateHandler: ((_ updateCallback: (_ newTitles: [S: String]) -> Void) -> Void)? = nil)
         -> TableViewMutliSectionBinder<C, S>
     {
-        self.binder.updateFooterTitles(footerTitles, sections: self.sections)
+        let scope = self.affectedSectionScope
+        self.binder.updateFooterTitles(footerTitles, affectedSections: scope)
             
         let updateCallback: ([S: String]) -> Void
-        updateCallback = { [weak binder = self.binder, sections = self.sections] (titles) in
-            binder?.updateFooterTitles(titles, sections: sections)
+        updateCallback = { [weak binder = self.binder] (titles) in
+            binder?.updateFooterTitles(titles, affectedSections: scope)
         }
         updateHandler?(updateCallback)
         
@@ -518,12 +528,14 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
             handler(section, row, cell)
         }
         
-        if let sections = self.sections {
+        switch self.affectedSectionScope {
+        case .forNamedSections(let sections):
             for section in sections {
                 self.binder.handlers.sectionCellDequeuedCallbacks[section] = callback
             }
-        } else {
+        case .forAllUnnamedSections:
             self.binder.handlers.dynamicSectionsCellDequeuedCallback = callback
+        default: break
         }
         
         return self
@@ -555,12 +567,14 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
             handler(section, row, tappedCell)
         }
         
-        if let sections = self.sections {
+        switch self.affectedSectionScope {
+        case .forNamedSections(let sections):
             for section in sections {
                 self.binder.handlers.sectionCellTappedCallbacks[section] = callback
             }
-        } else {
+        case .forAllUnnamedSections:
             self.binder.handlers.dynamicSectionsCellTappedCallback = callback
+        default: break
         }
         
         return self
@@ -599,7 +613,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     
     internal func _dimensions(_ dimensions: [MultiSectionDimension<S>]) {
         for dimension in dimensions {
-            dimension.bindingFunc(self.binder, self.sections)
+            dimension.bindingFunc(self.binder, self.affectedSectionScope)
         }
     }
 }

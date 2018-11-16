@@ -18,13 +18,14 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
+        let scope = bindResult.affectedSectionScope
         
         bindResult.binder.addCellDequeueBlock(cellType: cellType, sections: sections)
         
         viewModels
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [Base.S: [NC.ViewModel]]) in
-                binder?.updateCellModels(nil, viewModels: viewModels, sections: sections)
+                binder?.updateCellModels(nil, viewModels: viewModels, affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return TableViewMutliSectionBinder<NC, Base.S>(binder: bindResult.binder, sections: sections)
@@ -46,6 +47,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
+        let scope = bindResult.affectedSectionScope
         
         bindResult.binder.addCellDequeueBlock(cellType: cellType, sections: sections)
 
@@ -56,7 +58,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
                 for (s, m) in models {
                     viewModels[s] = m.map(mapToViewModel)
                 }
-                binder?.updateCellModels(models, viewModels: viewModels, sections: sections)
+                binder?.updateCellModels(models, viewModels: viewModels, affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return TableViewModelMultiSectionBinder<NC, Base.S, NM>(binder: bindResult.binder, sections: sections)
@@ -83,13 +85,14 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
+        let scope = bindResult.affectedSectionScope
         
         bindResult.binder.addCellDequeueBlock(cellType: cellType, sections: sections)
         
         models
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [Base.S: [NM]]) in
-                binder?.updateCellModels(models, viewModels: nil, sections: sections)
+                binder?.updateCellModels(models, viewModels: nil, affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return TableViewModelMultiSectionBinder<NC, Base.S, NM>(binder: bindResult.binder, sections: sections)
@@ -123,6 +126,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
+        let scope = bindResult.affectedSectionScope
 
         let _cellProvider = { [weak binder = bindResult.binder] (_ section: Base.S, _ row: Int) -> UITableViewCell in
             guard let models = binder?.currentDataModel.sectionCellModels[section] as? [NM] else {
@@ -135,7 +139,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         models
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [Base.S: [NM]]) in
-                binder?.updateCellModels(models, viewModels: nil, sections: sections)
+                binder?.updateCellModels(models, viewModels: nil, affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return TableViewModelMultiSectionBinder<UITableViewCell, Base.S, NM>(binder: bindResult.binder, sections: sections)
@@ -166,13 +170,14 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
+        let scope = bindResult.affectedSectionScope
         
         bindResult.binder.addCellDequeueBlock(cellProvider: cellProvider, sections: sections)
         
         numberOfCells
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (numCells: [Base.S: Int]) in
-                binder?.updateNumberOfCells(numCells, sections: sections)
+                binder?.updateNumberOfCells(numCells, affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         
@@ -195,13 +200,14 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
+        let scope = bindResult.affectedSectionScope
         
         bindResult.binder.addHeaderDequeueBlock(headerType: headerType, sections: sections)
         
         viewModels
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [Base.S: H.ViewModel]) in
-                binder?.updateHeaderViewModels(viewModels, sections: sections)
+                binder?.updateHeaderViewModels(viewModels, affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return self.base
@@ -216,11 +222,12 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
+        let scope = bindResult.affectedSectionScope
         
         headerTitles
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (titles: [Base.S: String?]) in
-                binder?.updateHeaderTitles(titles, sections: sections)
+                binder?.updateHeaderTitles(titles, affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return self.base
@@ -240,13 +247,14 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let sections = bindResult.sections
+        let scope = bindResult.affectedSectionScope
         
         bindResult.binder.addFooterDequeueBlock(footerType: footerType, sections: sections)
         
         viewModels
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [Base.S: F.ViewModel]) in
-                binder?.updateFooterViewModels(viewModels, sections: sections)
+                binder?.updateFooterViewModels(viewModels, affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return self.base
@@ -260,12 +268,12 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         guard let bindResult = self.base as? TableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
-        let sections = bindResult.sections
+        let scope = bindResult.affectedSectionScope
         
         footerTitles
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (titles: [Base.S: String?]) in
-                binder?.updateFooterTitles(titles, sections: sections)
+                binder?.updateFooterTitles(titles, affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return self.base

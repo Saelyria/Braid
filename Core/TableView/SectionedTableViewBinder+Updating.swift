@@ -1,5 +1,13 @@
 import UIKit
 
+/// An enum indicating the scope of sections affected by an operation. For example, this enum answers the question
+/// "We're binding models - what section(s) is it for?"
+internal enum SectionBindingScope<S: TableViewSection> {
+    case forNamedSections([S])
+    case forAllUnnamedSections
+    case forAnySection
+}
+
 internal extension SectionedTableViewBinder {
     /**
      Updates the cell models and/or view models for the cells for either the given sections or 'any section'.
@@ -11,17 +19,21 @@ internal extension SectionedTableViewBinder {
         sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
         `onSections` methods on the binder).
      */
-    func updateCellModels(_ models: [S: [Any]]?, viewModels: [S: [Any]]?, sections: [S]?) {
+    func updateCellModels(_ models: [S: [Any]]?, viewModels: [S: [Any]]?, affectedSections: SectionBindingScope<S>) {
         guard !(models == nil && viewModels == nil) else {
             assertionFailure("Both the 'models' and 'view models' arrays were nil")
             return
         }
         
         if let models = models {
-            self.update(fromDataIn: models, updatingProperty: &self.nextDataModel.sectionCellModels, sections: sections)
+            self.update(fromDataIn: models,
+                        updatingProperty: &self.nextDataModel.sectionCellModels,
+                        affectedSections: affectedSections)
         }
         if let viewModels = viewModels {
-            self.update(fromDataIn: viewModels, updatingProperty: &self.nextDataModel.sectionCellViewModels, sections: sections)
+            self.update(fromDataIn: viewModels,
+                        updatingProperty: &self.nextDataModel.sectionCellViewModels,
+                        affectedSections: affectedSections)
         }
     }
     
@@ -34,8 +46,10 @@ internal extension SectionedTableViewBinder {
         sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
         `onSections` methods on the binder).
      */
-    func updateNumberOfCells(_ numCells: [S: Int], sections: [S]?) {
-        self.update(fromDataIn: numCells, updatingProperty: &self.nextDataModel.sectionNumberOfCells, sections: sections)
+    func updateNumberOfCells(_ numCells: [S: Int], affectedSections: SectionBindingScope<S>) {
+        self.update(fromDataIn: numCells,
+                    updatingProperty: &self.nextDataModel.sectionNumberOfCells,
+                    affectedSections: affectedSections)
     }
     
     /**
@@ -47,9 +61,11 @@ internal extension SectionedTableViewBinder {
         sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
         `onSections` methods on the binder).
      */
-    func updateHeaderTitles(_ titles: [S: String?], sections: [S]?) {
+    func updateHeaderTitles(_ titles: [S: String?], affectedSections: SectionBindingScope<S>) {
         let nonNilTitles: [S: String] = titles.filter { $0.value != nil }.mapValues { return $0! }
-        self.update(fromDataIn: nonNilTitles, updatingProperty: &self.nextDataModel.sectionHeaderTitles, sections: sections)
+        self.update(fromDataIn: nonNilTitles,
+                    updatingProperty: &self.nextDataModel.sectionHeaderTitles,
+                    affectedSections: affectedSections)
     }
     
     /**
@@ -61,9 +77,11 @@ internal extension SectionedTableViewBinder {
         sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
         `onSections` methods on the binder).
      */
-    func updateHeaderViewModels(_ viewModels: [S: Any?], sections: [S]?) {
+    func updateHeaderViewModels(_ viewModels: [S: Any?], affectedSections: SectionBindingScope<S>) {
         let nonNilViewModels: [S: Any] = viewModels.filter { $0.value != nil }.mapValues { return $0! }
-        self.update(fromDataIn: nonNilViewModels, updatingProperty: &self.nextDataModel.sectionHeaderViewModels, sections: sections)
+        self.update(fromDataIn: nonNilViewModels,
+                    updatingProperty: &self.nextDataModel.sectionHeaderViewModels,
+                    affectedSections: affectedSections)
     }
     
     /**
@@ -75,9 +93,11 @@ internal extension SectionedTableViewBinder {
         sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
         `onSections` methods on the binder).
      */
-    func updateFooterTitles(_ titles: [S: String?], sections: [S]?) {
+    func updateFooterTitles(_ titles: [S: String?], affectedSections: SectionBindingScope<S>) {
         let nonNilTitles: [S: String] = titles.filter { $0.value != nil }.mapValues { return $0! }
-        self.update(fromDataIn: nonNilTitles, updatingProperty: &self.nextDataModel.sectionFooterTitles, sections: sections)
+        self.update(fromDataIn: nonNilTitles,
+                    updatingProperty: &self.nextDataModel.sectionFooterTitles,
+                    affectedSections: affectedSections)
     }
     
     /**
@@ -89,9 +109,11 @@ internal extension SectionedTableViewBinder {
         sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
         `onSections` methods on the binder).
      */
-    func updateFooterViewModels(_ viewModels: [S: Any?], sections: [S]?) {
+    func updateFooterViewModels(_ viewModels: [S: Any?], affectedSections: SectionBindingScope<S>) {
         let nonNilViewModels: [S: Any] = viewModels.filter { $0.value != nil }.mapValues { return $0! }
-        self.update(fromDataIn: nonNilViewModels, updatingProperty: &self.nextDataModel.sectionFooterViewModels, sections: sections)
+        self.update(fromDataIn: nonNilViewModels,
+                    updatingProperty: &self.nextDataModel.sectionFooterViewModels,
+                    affectedSections: affectedSections)
     }
 }
 
@@ -107,19 +129,24 @@ private extension SectionedTableViewBinder {
         sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
         `onSections` methods on the binder).
     */
-    func update<V>(fromDataIn new: [S: V], updatingProperty current: inout [S: V], sections: [S]?) {
-        // If we were given the sections to update, simply iterate over the given sections and set the value for the
-        // section in the reference to the 'current' data model to the data for the section in 'new'.
-        if let sections = sections {
+    func update<V>(
+        fromDataIn new: [S: V],
+        updatingProperty current: inout [S: V],
+        affectedSections: SectionBindingScope<S>)
+    {
+        switch affectedSections {
+        case .forNamedSections(let sections):
+            // If the new values are for specific named sections, simply iterate over the given sections and set the
+            // value for the section in the reference to the 'current' data model to the data for the section in 'new'.
             for section in sections {
                 current[section] = new[section]
             }
-        } else {
+        case .forAllUnnamedSections:
             /*
-             If we're binding for 'dynamic sections' (i.e. the 'sections' array was nil), we assume that the data in the
-             'new' dict given is the 'state of the table' for any section not explicitly bound with the 'onSection' or
-             'onSections' methods. So, if a models/VMs array isn't included for a section in the titles/VMs dict, that
-             section doesn't have any cells.
+             If we're binding for dynamic, unnamed sections, we assume that the data in the 'new' dict given is the
+             'state of the table' for any section not explicitly bound with the 'onSection' or 'onSections' methods. So,
+             if a models/VMs array isn't included for a section in the titles/VMs dict, that section doesn't have any
+             cells.
              
              Because explicitly bound sections have priority, we don't want to overwrite the models/VMs for a section
              that wasn't given if that section *was* bound uniquely by name. So, we create a 'sections to iterate' set
@@ -134,6 +161,8 @@ private extension SectionedTableViewBinder {
                 guard self.nextDataModel.uniquelyBoundSections.contains(section) == false else { continue }
                 current[section] = new[section]
             }
+        case .forAnySection:
+            assertionFailure("Data binding not supported for 'any section' - internal error")
         }
     }
 }

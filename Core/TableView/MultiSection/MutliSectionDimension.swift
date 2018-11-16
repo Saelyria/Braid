@@ -1,9 +1,15 @@
 import Foundation
 
 public class MultiSectionDimension<S: TableViewSection> {
-    internal let bindingFunc: (SectionedTableViewBinder<S>, [S]?) -> Void
+    /// A function called by the 'dimensions' function that passes in the binder to bind the handlers to, the sections
+    /// (nil if the binding handlers are for 'dynamic' sections from the 'onAllSections' method), and a boolean
+    /// indicating whether the binding is for 'all sections'. Functions of this type will then perform the work of
+    /// taking passed-in handlers and putting them in the correct handler dictionaries on the binder.
+    typealias BindingFunc = (SectionedTableViewBinder<S>, SectionBindingScope<S>) -> Void
     
-    internal init(bindingFunc: @escaping (SectionedTableViewBinder<S>, [S]?) -> Void) {
+    internal let bindingFunc: BindingFunc
+    
+    internal init(bindingFunc: @escaping BindingFunc) {
         self.bindingFunc = bindingFunc
     }
     
@@ -23,15 +29,25 @@ public class MultiSectionDimension<S: TableViewSection> {
     public class func cellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat)
         -> MultiSectionDimension<S>
     {
-        return MultiSectionDimension<S>(bindingFunc: { (binder, sections) in
-            if let sections = sections {
+        return MultiSectionDimension<S>(bindingFunc: cellHeightBindingFunc(for: handler))
+    }
+    
+    // allows implementation to be shared between this and 'multi section model dimension'
+    internal class func cellHeightBindingFunc(for handler: @escaping (_ section: S, _ row: Int) -> CGFloat)
+        -> BindingFunc
+    {
+        return { (binder, affectedSections) in
+            switch affectedSections {
+            case .forNamedSections(let sections):
                 for section in sections {
                     binder.handlers.sectionCellHeightBlocks[section] = handler
                 }
-            } else {
+            case .forAllUnnamedSections:
                 binder.handlers.dynamicSectionsCellHeightBlock = handler
+            case .forAnySection:
+                binder.handlers.anySectionCellHeightBlock = handler
             }
-        })
+        }
     }
     
     /**
@@ -50,15 +66,25 @@ public class MultiSectionDimension<S: TableViewSection> {
     public class func estimatedCellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat)
         -> MultiSectionDimension<S>
     {
-        return MultiSectionDimension<S>(bindingFunc: { (binder, sections) in
-            if let sections = sections {
+        return MultiSectionDimension<S>(bindingFunc: estimatedCellHeightBindingFunc(for: handler))
+    }
+    
+    // allows implementation to be shared between this and 'multi section model dimension'
+    internal class func estimatedCellHeightBindingFunc(for handler: @escaping (_ section: S, _ row: Int) -> CGFloat)
+        -> BindingFunc
+    {
+        return { (binder, affectedSections) in
+            switch affectedSections {
+            case .forNamedSections(let sections):
                 for section in sections {
                     binder.handlers.sectionEstimatedCellHeightBlocks[section] = handler
                 }
-            } else {
+            case .forAllUnnamedSections:
                 binder.handlers.dynamicSectionsEstimatedCellHeightBlock = handler
+            case .forAnySection:
+                binder.handlers.anySectionEstimatedCellHeightBlock = handler
             }
-        })
+        }
     }
     
     /**
@@ -71,15 +97,25 @@ public class MultiSectionDimension<S: TableViewSection> {
      */
     @discardableResult
     public class func headerHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> MultiSectionDimension<S> {
-        return MultiSectionDimension<S>(bindingFunc: { (binder, sections) in
-            if let sections = sections {
+        return MultiSectionDimension<S>(bindingFunc: headerHeightBindingFunc(for: handler))
+    }
+    
+    // allows implementation to be shared between this and 'multi section model dimension'
+    internal class func headerHeightBindingFunc(for handler: @escaping (_ section: S) -> CGFloat)
+        -> BindingFunc
+    {
+        return { (binder, affectedSections) in
+            switch affectedSections {
+            case .forNamedSections(let sections):
                 for section in sections {
                     binder.handlers.sectionHeaderHeightBlocks[section] = handler
                 }
-            } else {
+            case .forAllUnnamedSections:
                 binder.handlers.dynamicSectionsHeaderHeightBlock = handler
+            case .forAnySection:
+                binder.handlers.anySectionHeaderHeightBlock = handler
             }
-        })
+        }
     }
 
     /**
@@ -92,15 +128,25 @@ public class MultiSectionDimension<S: TableViewSection> {
      */
     @discardableResult
     public class func estimatedHeaderHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> MultiSectionDimension<S> {
-        return MultiSectionDimension<S>(bindingFunc: { (binder, sections) in
-            if let sections = sections {
+        return MultiSectionDimension<S>(bindingFunc: estimatedHeaderHeightBindingFunc(for: handler))
+    }
+    
+    // allows implementation to be shared between this and 'multi section model dimension'
+    internal class func estimatedHeaderHeightBindingFunc(for handler: @escaping (_ section: S) -> CGFloat)
+        -> BindingFunc
+    {
+        return { (binder, affectedSections) in
+            switch affectedSections {
+            case .forNamedSections(let sections):
                 for section in sections {
                     binder.handlers.sectionHeaderEstimatedHeightBlocks[section] = handler
                 }
-            } else {
+            case .forAllUnnamedSections:
                 binder.handlers.dynamicSectionsHeaderEstimatedHeightBlock = handler
+            case .forAnySection:
+                binder.handlers.anySectionHeaderEstimatedHeightBlock = handler
             }
-        })
+        }
     }
     
     /**
@@ -113,15 +159,25 @@ public class MultiSectionDimension<S: TableViewSection> {
      */
     @discardableResult
     public class func footerHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> MultiSectionDimension<S> {
-        return MultiSectionDimension<S>(bindingFunc: { (binder, sections) in
-            if let sections = sections {
+        return MultiSectionDimension<S>(bindingFunc: footerHeightBindingFunc(for: handler))
+    }
+    
+    // allows implementation to be shared between this and 'multi section model dimension'
+    internal class func footerHeightBindingFunc(for handler: @escaping (_ section: S) -> CGFloat)
+        -> BindingFunc
+    {
+        return { (binder, affectedSections) in
+            switch affectedSections {
+            case .forNamedSections(let sections):
                 for section in sections {
                     binder.handlers.sectionFooterHeightBlocks[section] = handler
                 }
-            } else {
+            case .forAllUnnamedSections:
                 binder.handlers.dynamicSectionsFooterHeightBlock = handler
+            case .forAnySection:
+                binder.handlers.anySectionFooterHeightBlock = handler
             }
-        })
+        }
     }
 
     /**
@@ -134,14 +190,24 @@ public class MultiSectionDimension<S: TableViewSection> {
      */
     @discardableResult
     public class func estimatedFooterHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> MultiSectionDimension<S> {
-        return MultiSectionDimension<S>(bindingFunc: { (binder, sections) in
-            if let sections = sections {
+        return MultiSectionDimension<S>(bindingFunc: estimatedFooterHeightBindingFunc(for: handler))
+    }
+    
+    // allows implementation to be shared between this and 'multi section model dimension'
+    internal class func estimatedFooterHeightBindingFunc(for handler: @escaping (_ section: S) -> CGFloat)
+        -> BindingFunc
+    {
+        return { (binder, affectedSections) in
+            switch affectedSections {
+            case .forNamedSections(let sections):
                 for section in sections {
                     binder.handlers.sectionFooterEstimatedHeightBlocks[section] = handler
                 }
-            } else {
+            case .forAllUnnamedSections:
                 binder.handlers.dynamicSectionsFooterEstimatedHeightBlock = handler
+            case .forAnySection:
+                binder.handlers.anySectionFooterEstimatedHeightBlock = handler
             }
-        })
+        }
     }
 }

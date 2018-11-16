@@ -27,7 +27,8 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         viewModels
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [NC.ViewModel]) in
-                binder?.updateCellModels(nil, viewModels: [section: viewModels], sections: [section])
+                let scope: SectionBindingScope<Base.S> = .forNamedSections([section])
+                binder?.updateCellModels(nil, viewModels: [section: viewModels], affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return TableViewSingleSectionBinder<NC, Base.S>(binder: bindResult.binder, section: section)
@@ -58,7 +59,8 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         models
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [NM]) in
-                binder?.updateCellModels([section: models], viewModels: nil, sections: [section])
+                let scope: SectionBindingScope<Base.S> = .forNamedSections([section])
+                binder?.updateCellModels([section: models], viewModels: nil, affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return TableViewModelSingleSectionBinder<NC, Base.S, NM>(binder: bindResult.binder, section: bindResult.section)
@@ -92,7 +94,8 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [NM]) in
                 let viewModels = models.map(mapToViewModel)
-                binder?.updateCellModels([section: models], viewModels: [section: viewModels], sections: [section])
+                let scope: SectionBindingScope<Base.S> = .forNamedSections([section])
+                binder?.updateCellModels([section: models], viewModels: [section: viewModels], affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return TableViewModelSingleSectionBinder<NC, Base.S, NM>(binder: bindResult.binder, section: bindResult.section)
@@ -135,7 +138,8 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         models
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [NM]) in
-                binder?.updateCellModels([section: models], viewModels: nil, sections: [section])
+                let scope: SectionBindingScope<Base.S> = .forNamedSections([section])
+                binder?.updateCellModels([section: models], viewModels: nil, affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>(binder: bindResult.binder, section: section)
@@ -170,7 +174,8 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         numberOfCells
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (numCells: Int) in
-                binder?.updateNumberOfCells([section: numCells], sections: [section])
+                let scope: SectionBindingScope<Base.S> = .forNamedSections([section])
+                binder?.updateNumberOfCells([section: numCells], affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return bindResult
@@ -195,7 +200,8 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         viewModel
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModel: H.ViewModel?) in
-                binder?.updateHeaderViewModels([section: viewModel], sections: [section])
+                let scope: SectionBindingScope<Base.S> = .forNamedSections([section])
+                binder?.updateHeaderViewModels([section: viewModel], affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return self.base
@@ -215,7 +221,8 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
             .subscribeOn(MainScheduler.instance)
             .distinctUntilChanged()
             .subscribe(onNext: { [weak binder = bindResult.binder] (title: String?) in
-                binder?.updateHeaderTitles([section: title], sections: [section])
+                let scope: SectionBindingScope<Base.S> = .forNamedSections([section])
+                binder?.updateHeaderTitles([section: title], affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return self.base
@@ -241,7 +248,8 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         viewModel
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModel: F.ViewModel?) in
-                binder?.updateFooterViewModels([section: viewModel], sections: [section])
+                let scope: SectionBindingScope<Base.S> = .forNamedSections([section])
+                binder?.updateFooterViewModels([section: viewModel], affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return self.base
@@ -261,7 +269,8 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
             .subscribeOn(MainScheduler.instance)
             .distinctUntilChanged()
             .subscribe(onNext: { [weak binder = bindResult.binder] (title: String?) in
-                binder?.updateFooterTitles([section: title], sections: [section])
+                let scope: SectionBindingScope<Base.S> = .forNamedSections([section])
+                binder?.updateFooterTitles([section: title], affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
         return self.base

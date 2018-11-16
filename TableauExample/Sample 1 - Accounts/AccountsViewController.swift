@@ -59,8 +59,7 @@ class AccountsViewController: UIViewController {
                 detailVC.account = account
                 self.navigationController?.pushViewController(detailVC, animated: true)
             }
-            .dimensions(
-                .cellHeight { section, row, model in 100 })
+            .dimensions(.cellHeight { section, row, model in 100 })
         
         // 10.
         self.binder.onSections(.checking, .savings, .other)
