@@ -1,5 +1,4 @@
 import UIKit
-import Differ
 #if RX_TABLEAU
 import RxSwift
 #endif

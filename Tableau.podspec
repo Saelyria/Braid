@@ -14,7 +14,6 @@ Pod::Spec.new do |s|
   s.swift_version    = '4.2'
 
   s.ios.deployment_target = '8.0'
-  s.dependency 'Differ', '~> 1.3'
   s.default_subspec = "Core"
 
   s.subspec "Core" do |ss|

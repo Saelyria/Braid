@@ -1,5 +1,3 @@
-import Differ
-
 internal protocol _TableViewDataModelDelegate: AnyObject {
     func dataModelDidChange()
 }
