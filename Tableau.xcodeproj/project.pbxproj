@@ -26,6 +26,7 @@
 		AB577BC0217FE9CC00CD2363 /* _TableViewBindingHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BBF217FE9CC00CD2363 /* _TableViewBindingHandlers.swift */; };
 		AB577BC3217FED4F00CD2363 /* AnySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BC2217FED4F00CD2363 /* AnySection.swift */; };
 		AB577BD82187A66E00CD2363 /* CollectionIdentifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BD72187A66E00CD2363 /* CollectionIdentifiable.swift */; };
+		AB940634219E843D0034C34A /* Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB940633219E843D0034C34A /* Diff.swift */; };
 		ABB9635521714B6600519963 /* _TableViewDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB9635421714B6600519963 /* _TableViewDataModel.swift */; };
 		ABF5ADE7219C8F5100E41183 /* SingleSectionDimension.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF5ADE6219C8F5100E41183 /* SingleSectionDimension.swift */; };
 		ABF5ADE9219C9AF400E41183 /* MutliSectionDimension.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF5ADE8219C9AF400E41183 /* MutliSectionDimension.swift */; };
@@ -55,6 +56,7 @@
 		AB577BBF217FE9CC00CD2363 /* _TableViewBindingHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _TableViewBindingHandlers.swift; sourceTree = "<group>"; };
 		AB577BC2217FED4F00CD2363 /* AnySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnySection.swift; sourceTree = "<group>"; };
 		AB577BD72187A66E00CD2363 /* CollectionIdentifiable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionIdentifiable.swift; sourceTree = "<group>"; };
+		AB940633219E843D0034C34A /* Diff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diff.swift; sourceTree = "<group>"; };
 		ABB9635421714B6600519963 /* _TableViewDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _TableViewDataModel.swift; sourceTree = "<group>"; };
 		ABF5ADE6219C8F5100E41183 /* SingleSectionDimension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleSectionDimension.swift; sourceTree = "<group>"; };
 		ABF5ADE8219C9AF400E41183 /* MutliSectionDimension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutliSectionDimension.swift; sourceTree = "<group>"; };
@@ -117,6 +119,7 @@
 		938132F520B6469F00CBF8F6 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				AB94062C219E4D930034C34A /* Diffing */,
 				9381333A20B6EC5600CBF8F6 /* Protocols */,
 				9381333F20B6EC5600CBF8F6 /* TableView */,
 				93C36A4B20DB209F006B7ECF /* CollectionView */,
@@ -177,6 +180,14 @@
 			path = AnySection;
 			sourceTree = "<group>";
 		};
+		AB94062C219E4D930034C34A /* Diffing */ = {
+			isa = PBXGroup;
+			children = (
+				AB940633219E843D0034C34A /* Diff.swift */,
+			);
+			path = Diffing;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -220,7 +231,7 @@
 				TargetAttributes = {
 					938132F220B6469F00CBF8F6 = {
 						CreatedOnToolsVersion = 9.3.1;
-						LastSwiftMigration = 0930;
+						LastSwiftMigration = 1000;
 					};
 				};
 			};
@@ -262,6 +273,7 @@
 				ABF5ADEF219E04D000E41183 /* MutliSectionModelDimension.swift in Sources */,
 				AB577BBA217D5BEB00CD2363 /* SectionedTableViewBinder+Updating.swift in Sources */,
 				ABB9635521714B6600519963 /* _TableViewDataModel.swift in Sources */,
+				AB940634219E843D0034C34A /* Diff.swift in Sources */,
 				9381334620B6EC5600CBF8F6 /* UINibInitable.swift in Sources */,
 				9378E76A20D72D180039849F /* TableViewModelMultiSectionBinder.swift in Sources */,
 				9381334420B6EC5600CBF8F6 /* ReuseIdentifiable.swift in Sources */,
