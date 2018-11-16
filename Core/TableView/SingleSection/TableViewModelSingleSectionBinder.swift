@@ -24,6 +24,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
      - parameter row: The row of the cell that was tapped.
      - parameter tappedCell: The cell that was tapped.
      - parameter model: The model object that the cell was dequeued to represent in the table.
+     
      - returns: A section binder to continue the binding chain with.
     */
     @discardableResult
@@ -55,6 +56,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
      - parameter row: The row of the cell that was dequeued.
      - parameter dequeuedCell: The cell that was dequeued that can now be configured.
      - parameter model: The model object that the cell was dequeued to represent in the table.
+     
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
