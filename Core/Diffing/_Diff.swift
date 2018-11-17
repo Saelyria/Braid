@@ -1,42 +1,22 @@
 protocol DiffProtocol: Collection {
-    
     associatedtype DiffElementType
     
     var elements: [DiffElementType] { get }
 }
 
-/// A sequence of deletions and insertions where deletions point to locations in the source and insertions point to locations in the output.
-/// Examples:
-/// ```
-/// "12" -> "": D(0)D(1)
-/// "" -> "12": I(0)I(1)
-/// ```
-/// - SeeAlso: Diff
 struct Diff: DiffProtocol {
-    
     enum Element {
         case insert(at: Int)
         case delete(at: Int)
         case update(at: Int)
     }
-    
-    /// Returns the position immediately after the given index.
-    ///
-    /// - Parameters:
-    ///   - i: A valid index of the collection. `i` must be less than
-    ///   `endIndex`.
-    /// - Returns: The index value immediately after `i`.
+
     func index(after i: Int) -> Int {
         return i + 1
     }
     
-    /// An array of particular diff operations
     var elements: [Diff.Element]
     
-    /// Initializes a new `Diff` from a given array of diff operations.
-    ///
-    /// - Parameters:
-    ///   - elements: an array of particular diff operations
     init(elements: [Diff.Element]) {
         self.elements = elements
     }
@@ -119,9 +99,8 @@ struct TraceStep {
 typealias EqualityChecker<T: Collection> = (T.Element, T.Element) -> Bool
 
 extension Collection where Index == Int {
-    
     /**
-     Creates a diff between the callee and `other` collection
+     Creates a diff between the callee and `other` collection.
      - complexity: O((N+M)*D)
      - parameters:
      - other: a collection to compare the calee to
@@ -138,8 +117,7 @@ extension Collection where Index == Int {
     {
         let diffPath = outputDiffPathTraces(
             to: other,
-            isSame: isSame
-        )
+            isSame: isSame)
         return Diff(elements:
             diffPath
                 .map { trace -> Diff.Element? in
@@ -154,15 +132,16 @@ extension Collection where Index == Int {
         )
     }
     
-    /// Generates all traces required to create an output diff. See the [paper](http://www.xmailserver.org/diff2.pdf) for more information on traces.
-    ///
-    /// - Parameters:
-    ///   - to: other collection
-    /// - Returns: all traces required to create an output diff
-    func diffTraces(
-        to: Self,
-        isSame: EqualityChecker<Self>
-        ) -> [Trace] {
+    /**
+     Generates all traces required to create an output diff. See the [paper](http://www.xmailserver.org/diff2.pdf) for
+     more information on traces.
+    
+     - parameter to: other collection
+     - parameter isSame: a closure that determines whether the two items are meant to represent the same item (i.e.
+        'identity')
+     - returns: all traces required to create an output diff
+    */
+    func diffTraces(to: Self, isSame: EqualityChecker<Self>) -> [Trace] {
         if count == 0 && to.count == 0 {
             return []
         } else if count == 0 {
@@ -175,10 +154,7 @@ extension Collection where Index == Int {
     }
     
     /// Returns the traces which mark the shortest diff path.
-    func outputDiffPathTraces(
-        to: Self,
-        isSame: EqualityChecker<Self>
-        ) -> [Trace] {
+    func outputDiffPathTraces(to: Self, isSame: EqualityChecker<Self>) -> [Trace] {
         return findPath(
             diffTraces(to: to, isSame: isSame),
             n: Int(count),
@@ -204,11 +180,7 @@ extension Collection where Index == Int {
         return traces
     }
     
-    fileprivate func myersDiffTraces(
-        to: Self,
-        isSame: (Element, Element) -> Bool
-        ) -> [Trace] {
-        
+    fileprivate func myersDiffTraces(to: Self, isSame: (Element, Element) -> Bool) -> [Trace] {
         // fromCount is N, N is the number of from array
         let fromCount = Int(count)
         // toCount is M, M is the number of to array
@@ -300,7 +272,6 @@ extension Collection where Index == Int {
     }
     
     fileprivate func findPath(_ traces: [Trace], n: Int, m: Int) -> [Trace] {
-        
         guard traces.count > 0 else {
             return []
         }
@@ -326,7 +297,6 @@ extension Collection where Index == Int {
 }
 
 extension DiffProtocol {
-    
     typealias IndexType = Array<DiffElementType>.Index
     
     var startIndex: IndexType {
@@ -362,7 +332,6 @@ extension Diff.Element: CustomDebugStringConvertible {
 }
 
 extension Diff: ExpressibleByArrayLiteral {
-    
     init(arrayLiteral elements: Diff.Element...) {
         self.elements = elements
     }

@@ -1,12 +1,4 @@
-/// A sequence of deletions, insertions, and moves where deletions point to locations in the source and insertions point to locations in the output.
-/// Examples:
-/// ```
-/// "12" -> "": D(0)D(1)
-/// "" -> "12": I(0)I(1)
-/// ```
-/// - SeeAlso: Diff
 struct ExtendedDiff: DiffProtocol {
-    
     typealias Index = Int
     
     enum Element {
@@ -15,13 +7,7 @@ struct ExtendedDiff: DiffProtocol {
         case update(at: Int)
         case move(from: Int, to: Int)
     }
-    
-    /// Returns the position immediately after the given index.
-    ///
-    /// - Parameters:
-    ///   - i: A valid index of the collection. `i` must be less than
-    ///   `endIndex`.
-    /// - Returns: The index value immediately after `i`.
+
     func index(after i: Int) -> Int {
         return i + 1
     }
@@ -53,37 +39,45 @@ extension ExtendedDiff.Element {
 
 extension Collection where Index == Int {
     
-    /// Creates an extended diff between the callee and `other` collection
-    ///
-    /// - Complexity: O((N+M)*D). There's additional cost of O(D^2) to compute the moves.
-    ///
-    /// - Parameters:
-    ///   - other: a collection to compare the callee to
-    ///   - isSame: instance comparator closure
-    /// - Returns: ExtendedDiff between the callee and `other` collection
+    /**
+     Creates an extended diff between the callee and `other` collection
+    
+     - complexity: O((N+M)*D). There's additional cost of O(D^2) to compute the moves.
+     - parameters:
+     - other: a collection to compare the callee to
+     - isSame: a closure that determines whether the two items are meant to represent the same item (i.e. 'identity')
+     - isEqual: a closure that determines whether the two items (deemed to represent the same item) are 'equal' (i.e.
+        whether the second instance of the item has any changes from the first that would warrant a cell update)
+     - returns: ExtendedDiff between the callee and `other` collection
+    */
     func extendedDiff(
         _ other: Self,
         isSame: EqualityChecker<Self>,
         isEqual: EqualityChecker<Self>)
         -> ExtendedDiff
     {
-        return extendedDiff(from: diff(other, isSame: isSame, isEqual: isEqual), other: other, isSame: isSame, isEqual: isEqual)
+        return extendedDiff(
+            from: diff(other, isSame: isSame, isEqual: isEqual), other: other, isSame: isSame, isEqual: isEqual)
     }
     
-    /// Creates an extended diff between the callee and `other` collection
-    ///
-    /// - Complexity: O(D^2). where D is number of elements in diff.
-    ///
-    /// - Parameters:
-    ///   - diff: source diff
-    ///   - other: a collection to compare the callee to
-    ///   - isSame: instance comparator closure
-    /// - Returns: ExtendedDiff between the callee and `other` collection
+    /**
+     Creates an extended diff between the callee and `other` collection
+    
+     - complexity: O(D^2). where D is number of elements in diff.
+     - parameters:
+     - diff: source diff
+     - other: a collection to compare the callee to
+     - isSame: a closure that determines whether the two items are meant to represent the same item (i.e. 'identity')
+     - isEqual: a closure that determines whether the two items (deemed to represent the same item) are 'equal' (i.e.
+        whether the second instance of the item has any changes from the first that would warrant a cell update)
+     - returns: ExtendedDiff between the callee and `other` collection
+    */
     func extendedDiff(
         from diff: Diff,
         other: Self,
         isSame: EqualityChecker<Self>,
-        isEqual: EqualityChecker<Self>) -> ExtendedDiff
+        isEqual: EqualityChecker<Self>)
+        -> ExtendedDiff
     {
         
         var elements: [ExtendedDiff.Element] = []

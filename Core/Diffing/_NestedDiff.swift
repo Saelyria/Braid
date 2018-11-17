@@ -1,5 +1,4 @@
 struct NestedDiff: DiffProtocol {
-    
     typealias Index = Int
     
     enum Element {
@@ -11,40 +10,38 @@ struct NestedDiff: DiffProtocol {
         case insertElement(Int, section: Int)
     }
     
-    /// Returns the position immediately after the given index.
-    ///
-    /// - Parameters:
-    ///   - i: A valid index of the collection. `i` must be less than `endIndex`.
-    /// - Returns: The index value immediately after `i`.
     func index(after i: Int) -> Int {
         return i + 1
     }
     
-    /// An array of particular diff operations
     var elements: [Element]
-    
-    /// Initializes a new `NestedDiff` from a given array of diff operations.
-    ///
-    /// - Parameters:
-    ///   - elements: an array of particular diff operations
+
     init(elements: [Element]) {
         self.elements = elements
     }
 }
 
 extension Collection where Index == Int, Element: Collection, Element.Index == Int {
+    /**
+     Creates a diff between the callee and `other` collection. It diffs elements two levels deep (therefore "nested")
     
-    /// Creates a diff between the callee and `other` collection. It diffs elements two levels deep (therefore "nested")
-    ///
-    /// - Parameters:
-    ///   - other: a collection to compare the calee to
-    /// - Returns: a `NestedDiff` between the calee and `other` collection
+     - parameters:
+     - other: a collection to compare the callee to
+     - isSameSection: a closure that determines whether the two section are meant to represent the same item (i.e.
+        'identity')
+     - isSameElement: a closure that determines whether the two items are meant to represent the same item (i.e.
+        'identity')
+     - isEqual: a closure that determines whether the two items (deemed to represent the same item) are 'equal' (i.e.
+        whether the second instance of the item has any changes from the first that would warrant a cell update)
+     - returns: a `NestedDiff` between the calee and `other` collection
+    */
     func nestedDiff(
         to: Self,
         isSameSection: EqualityChecker<Self>,
         isSameElement: NestedElementEqualityChecker<Self>,
-        isEqualElement: NestedElementEqualityChecker<Self>
-        ) -> NestedDiff {
+        isEqualElement: NestedElementEqualityChecker<Self>)
+        -> NestedDiff
+    {
         let diffTraces = outputDiffPathTraces(to: to, isSame: isSameSection)
         
         // Diff sections
