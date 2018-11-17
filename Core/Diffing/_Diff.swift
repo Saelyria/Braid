@@ -50,7 +50,7 @@ extension Diff.Element {
         case .deletion:
             self = .delete(at: trace.from.x)
         case .matchPoint:
-            return nil //TODO: I think this is where we compare?
+            return nil
         }
     }
     
@@ -118,7 +118,7 @@ struct TraceStep {
 
 typealias EqualityChecker<T: Collection> = (T.Element, T.Element) -> Bool
 
-extension Collection {
+extension Collection where Index == Int {
     
     /**
      Creates a diff between the callee and `other` collection
@@ -141,7 +141,15 @@ extension Collection {
         )
         return Diff(elements:
             diffPath
-                .compactMap { Diff.Element(trace: $0) }
+                .map { trace -> Diff.Element? in
+                    if let change = Diff.Element(trace: trace) {
+                        return change
+                    } else if !isEqual(self[trace.from.x], other[trace.from.x]) {
+                        return .update(at: trace.from.x)
+                    }
+                    return nil
+                }
+                .compactMap { $0 }
         )
     }
     
