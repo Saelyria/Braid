@@ -12,6 +12,7 @@ struct ExtendedDiff: DiffProtocol {
     enum Element {
         case insert(at: Int)
         case delete(at: Int)
+        case update(at: Int)
         case move(from: Int, to: Int)
     }
     
@@ -44,6 +45,8 @@ extension ExtendedDiff.Element {
             self = .delete(at: at)
         case let .insert(at):
             self = .insert(at: at)
+        case let .update(at: at):
+            self = .update(at: at)
         }
     }
 }
@@ -56,10 +59,10 @@ extension Collection {
     ///
     /// - Parameters:
     ///   - other: a collection to compare the callee to
-    ///   - isEqual: instance comparator closure
+    ///   - isSame: instance comparator closure
     /// - Returns: ExtendedDiff between the callee and `other` collection
-    func extendedDiff(_ other: Self, isEqual: EqualityChecker<Self>) -> ExtendedDiff {
-        return extendedDiff(from: diff(other, isEqual: isEqual), other: other, isEqual: isEqual)
+    func extendedDiff(_ other: Self, isSame: EqualityChecker<Self>) -> ExtendedDiff {
+        return extendedDiff(from: diff(other, isSame: isSame), other: other, isSame: isSame)
     }
     
     /// Creates an extended diff between the callee and `other` collection
@@ -69,9 +72,9 @@ extension Collection {
     /// - Parameters:
     ///   - diff: source diff
     ///   - other: a collection to compare the callee to
-    ///   - isEqual: instance comparator closure
+    ///   - isSame: instance comparator closure
     /// - Returns: ExtendedDiff between the callee and `other` collection
-    func extendedDiff(from diff: Diff, other: Self, isEqual: EqualityChecker<Self>) -> ExtendedDiff {
+    func extendedDiff(from diff: Diff, other: Self, isSame: EqualityChecker<Self>) -> ExtendedDiff {
         
         var elements: [ExtendedDiff.Element] = []
         var moveOriginIndices = Set<Int>()
@@ -97,7 +100,7 @@ extension Collection {
         for candidateIndex in diff.indices {
             if !moveTargetIndices.contains(candidateIndex) && !moveOriginIndices.contains(candidateIndex) {
                 let candidate = diff[candidateIndex]
-                let match = firstMatch(diff, dirtyIndices: moveTargetIndices.union(moveOriginIndices), candidate: candidate, candidateIndex: candidateIndex, other: other, isEqual: isEqual)
+                let match = firstMatch(diff, dirtyIndices: moveTargetIndices.union(moveOriginIndices), candidate: candidate, candidateIndex: candidateIndex, other: other, isSame: isSame)
                 if let match = match {
                     switch match.0 {
                     case let .move(from, _):
@@ -139,12 +142,12 @@ extension Collection {
         candidate: Diff.Element,
         candidateIndex: Diff.Index,
         other: Self,
-        isEqual: EqualityChecker<Self>
+        isSame: EqualityChecker<Self>
         ) -> (ExtendedDiff.Element, Diff.Index)? {
         for matchIndex in (candidateIndex + 1) ..< diff.endIndex {
             if !dirtyIndices.contains(matchIndex) {
                 let match = diff[matchIndex]
-                if let move = createMatch(candidate, match: match, other: other, isEqual: isEqual) {
+                if let move = createMatch(candidate, match: match, other: other, isSame: isSame) {
                     return (move, matchIndex)
                 }
             }
@@ -152,31 +155,21 @@ extension Collection {
         return nil
     }
     
-    func createMatch(_ candidate: Diff.Element, match: Diff.Element, other: Self, isEqual: EqualityChecker<Self>) -> ExtendedDiff.Element? {
+    func createMatch(_ candidate: Diff.Element, match: Diff.Element, other: Self, isSame: EqualityChecker<Self>) -> ExtendedDiff.Element? {
         switch (candidate, match) {
         case (.delete, .insert):
-            if isEqual(itemOnStartIndex(advancedBy: candidate.at()), other.itemOnStartIndex(advancedBy: match.at())) {
+            if isSame(itemOnStartIndex(advancedBy: candidate.at()), other.itemOnStartIndex(advancedBy: match.at())) {
                 return .move(from: candidate.at(), to: match.at())
             }
         case (.insert, .delete):
-            if isEqual(itemOnStartIndex(advancedBy: match.at()), other.itemOnStartIndex(advancedBy: candidate.at())) {
+            if isSame(itemOnStartIndex(advancedBy: match.at()), other.itemOnStartIndex(advancedBy: candidate.at())) {
                 return .move(from: match.at(), to: candidate.at())
             }
         default: return nil
         }
         return nil
     }
-}
 
-extension Collection where Element: Equatable {
-    
-    /// - SeeAlso: `extendedDiff(_:isEqual:)`
-    func extendedDiff(_ other: Self) -> ExtendedDiff {
-        return extendedDiff(other, isEqual: { $0 == $1 })
-    }
-}
-
-extension Collection {
     func itemOnStartIndex(advancedBy n: Int) -> Element {
         return self[self.index(startIndex, offsetBy: n)]
     }
@@ -197,6 +190,8 @@ extension ExtendedDiff.Element: CustomDebugStringConvertible {
             return "I(\(at))"
         case let .move(from, to):
             return "M(\(from),\(to))"
+        case let .update(at):
+            return "U(\(at))"
         }
     }
 }

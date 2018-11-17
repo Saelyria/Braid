@@ -5,6 +5,8 @@ struct NestedDiff: DiffProtocol {
     enum Element {
         case deleteSection(Int)
         case insertSection(Int)
+        case updateSection(Int)
+        case updateElement(Int, section: Int)
         case deleteElement(Int, section: Int)
         case insertElement(Int, section: Int)
     }
@@ -40,10 +42,10 @@ where Element: Collection {
     /// - Returns: a `NestedDiff` between the calee and `other` collection
     func nestedDiff(
         to: Self,
-        isEqualSection: EqualityChecker<Self>,
-        isEqualElement: NestedElementEqualityChecker<Self>
+        isSameSection: EqualityChecker<Self>,
+        isSameElement: NestedElementEqualityChecker<Self>
         ) -> NestedDiff {
-        let diffTraces = outputDiffPathTraces(to: to, isEqual: isEqualSection)
+        let diffTraces = outputDiffPathTraces(to: to, isSame: isSameSection)
         
         // Diff sections
         let sectionDiff = Diff(traces: diffTraces).map { element -> NestedDiff.Element in
@@ -52,6 +54,8 @@ where Element: Collection {
                 return .deleteSection(at)
             case let .insert(at):
                 return .insertSection(at)
+            case let .update(at):
+                return .updateSection(at)
             }
         }
         
@@ -79,63 +83,19 @@ where Element: Collection {
         let elementDiff = zip(zip(fromSections, toSections), matchingSectionTraces)
             .flatMap { (args) -> [NestedDiff.Element] in
                 let (sections, trace) = args
-                return sections.0.diff(sections.1, isEqual: isEqualElement).map { diffElement -> NestedDiff.Element in
+                return sections.0.diff(sections.1, isSame: isSameElement).map { diffElement -> NestedDiff.Element in
                     switch diffElement {
                     case let .delete(at):
                         return .deleteElement(at, section: trace.from.x)
                     case let .insert(at):
                         return .insertElement(at, section: trace.from.y)
+                    case let .update(at):
+                        return .updateElement(at, section: trace.from.y)
                     }
                 }
         }
         
         return NestedDiff(elements: sectionDiff + elementDiff)
-    }
-}
-
-extension Collection
-where Element: Collection, Element.Element: Equatable {
-    
-    /// - SeeAlso: `nestedDiff(to:isEqualSection:isEqualElement:)`
-    func nestedDiff(
-        to: Self,
-        isEqualSection: EqualityChecker<Self>
-        ) -> NestedDiff {
-        return nestedDiff(
-            to: to,
-            isEqualSection: isEqualSection,
-            isEqualElement: { $0 == $1 }
-        )
-    }
-}
-
-extension Collection
-where Element: Collection, Element: Equatable {
-    
-    /// - SeeAlso: `nestedDiff(to:isEqualSection:isEqualElement:)`
-    func nestedDiff(
-        to: Self,
-        isEqualElement: NestedElementEqualityChecker<Self>
-        ) -> NestedDiff {
-        return nestedDiff(
-            to: to,
-            isEqualSection: { $0 == $1 },
-            isEqualElement: isEqualElement
-        )
-    }
-}
-
-extension Collection
-    where Element: Collection, Element: Equatable,
-Element.Element: Equatable {
-    
-    /// - SeeAlso: `nestedDiff(to:isEqualSection:isEqualElement:)`
-    func nestedDiff(to: Self) -> NestedDiff {
-        return nestedDiff(
-            to: to,
-            isEqualSection: { $0 == $1 },
-            isEqualElement: { $0 == $1 }
-        )
     }
 }
 
@@ -150,6 +110,10 @@ extension NestedDiff.Element: CustomDebugStringConvertible {
             return "IE(\(row),\(section))"
         case let .insertSection(section):
             return "IS(\(section))"
+        case let .updateSection(section):
+            return "US(\(section))"
+        case let .updateElement(row, section):
+            return "UE(\(row),\(section))"
         }
     }
 }

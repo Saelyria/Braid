@@ -123,13 +123,13 @@ extension _TableViewDataModel {
     
     /**
      Creates a Differ 'nested extended diff' object from this data model and the 'other' given model. Returns nil if the
-     data is not diffable (i.e. one or more of its data arrays did not contain  models that conformed to
+     data is not diffable (i.e. one or more of its data arrays did not contain models that conformed to
      `CollectionIdentifiable`).
      */
-    func diff(from other: _TableViewDataModel<S>) -> NestedExtendedDiff? {
-        guard let selfSectionModels = self.asDiffableSectionModels(), let otherSectionModels = other.asDiffableSectionModels() else {
-            return nil
-        }
-        return selfSectionModels.nestedExtendedDiff(to: otherSectionModels, isEqualElement: { $0.collectionId == $1.collectionId })
-    }
+//    func diff(from other: _TableViewDataModel<S>) -> NestedExtendedDiff? {
+//        guard let selfSectionModels = self.asDiffableSectionModels(), let otherSectionModels = other.asDiffableSectionModels() else {
+//            return nil
+//        }
+//        return selfSectionModels.nestedExtendedDiff(to: otherSectionModels, isEqualElement: { $0.collectionId == $1.collectionId })
+//    }
 }

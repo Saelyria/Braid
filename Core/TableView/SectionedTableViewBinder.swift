@@ -460,15 +460,15 @@ extension SectionedTableViewBinder: _TableViewDataModelDelegate {
             let next = self.nextDataModel.asDiffableSectionModels() {
                 self.createNextDataModel()
                 
-                self.tableView.animateRowAndSectionChanges(
-                    oldData: current,
-                    newData: next,
-                    isEqualSection: { $0.section == $1.section },
-                    isEqualElement: { $0.collectionId == $1.collectionId },
-                    rowDeletionAnimation: self.rowDeletionAnimation,
-                    rowInsertionAnimation: self.rowInsertionAnimation,
-                    sectionDeletionAnimation: self.sectionDeletionAnimation,
-                    sectionInsertionAnimation: self.sectionInsertionAnimation)
+//                self.tableView.animateRowAndSectionChanges(
+//                    oldData: current,
+//                    newData: next,
+//                    isEqualSection: { $0.section == $1.section },
+//                    isEqualElement: { $0.collectionId == $1.collectionId },
+//                    rowDeletionAnimation: self.rowDeletionAnimation,
+//                    rowInsertionAnimation: self.rowInsertionAnimation,
+//                    sectionDeletionAnimation: self.sectionDeletionAnimation,
+//                    sectionInsertionAnimation: self.sectionInsertionAnimation)
             }
             // otherwise, just do a plain table view reload.
             else {
