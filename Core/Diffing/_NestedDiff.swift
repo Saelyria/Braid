@@ -32,8 +32,7 @@ struct NestedDiff: DiffProtocol {
     }
 }
 
-extension Collection
-where Element: Collection {
+extension Collection where Index == Int, Element: Collection, Element.Index == Int {
     
     /// Creates a diff between the callee and `other` collection. It diffs elements two levels deep (therefore "nested")
     ///
@@ -43,7 +42,8 @@ where Element: Collection {
     func nestedDiff(
         to: Self,
         isSameSection: EqualityChecker<Self>,
-        isSameElement: NestedElementEqualityChecker<Self>
+        isSameElement: NestedElementEqualityChecker<Self>,
+        isEqualElement: NestedElementEqualityChecker<Self>
         ) -> NestedDiff {
         let diffTraces = outputDiffPathTraces(to: to, isSame: isSameSection)
         
@@ -83,7 +83,7 @@ where Element: Collection {
         let elementDiff = zip(zip(fromSections, toSections), matchingSectionTraces)
             .flatMap { (args) -> [NestedDiff.Element] in
                 let (sections, trace) = args
-                return sections.0.diff(sections.1, isSame: isSameElement).map { diffElement -> NestedDiff.Element in
+                return sections.0.diff(sections.1, isSame: isSameElement, isEqual: isEqualElement).map { diffElement -> NestedDiff.Element in
                     switch diffElement {
                     case let .delete(at):
                         return .deleteElement(at, section: trace.from.x)
@@ -103,17 +103,17 @@ extension NestedDiff.Element: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
         case let .deleteElement(row, section):
-            return "DE(\(row),\(section))"
+            return "DE(s:\(section),r:\(row))"
         case let .deleteSection(section):
-            return "DS(\(section))"
+            return "DS(s:\(section))"
         case let .insertElement(row, section):
-            return "IE(\(row),\(section))"
+            return "IE(s:\(section),r:\(row))"
         case let .insertSection(section):
-            return "IS(\(section))"
+            return "IS(s:\(section))"
         case let .updateSection(section):
-            return "US(\(section))"
+            return "US(s:\(section))"
         case let .updateElement(row, section):
-            return "UE(\(row),\(section))"
+            return "UE(s:\(section),r:\(row))"
         }
     }
 }

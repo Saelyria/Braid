@@ -133,8 +133,9 @@ extension Collection where Index == Int {
     func diff(
         _ other: Self,
         isSame: EqualityChecker<Self>,
-        isEqual: EqualityChecker<Self>
-        ) -> Diff {
+        isEqual: EqualityChecker<Self>)
+        -> Diff
+    {
         let diffPath = outputDiffPathTraces(
             to: other,
             isSame: isSame
@@ -144,7 +145,7 @@ extension Collection where Index == Int {
                 .map { trace -> Diff.Element? in
                     if let change = Diff.Element(trace: trace) {
                         return change
-                    } else if !isEqual(self[trace.from.x], other[trace.from.x]) {
+                    } else if !isEqual(self[trace.from.x], other[trace.from.y]) {
                         return .update(at: trace.from.x)
                     }
                     return nil
@@ -351,11 +352,11 @@ extension Diff.Element: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
         case let .delete(at):
-            return "D(\(at))"
+            return "D(r:\(at))"
         case let .insert(at):
-            return "I(\(at))"
+            return "I(r:\(at))"
         case let .update(at):
-            return "U(\(at))"
+            return "U(r:\(at))"
         }
     }
 }

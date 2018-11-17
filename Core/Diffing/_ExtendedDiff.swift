@@ -51,7 +51,7 @@ extension ExtendedDiff.Element {
     }
 }
 
-extension Collection {
+extension Collection where Index == Int {
     
     /// Creates an extended diff between the callee and `other` collection
     ///
@@ -61,8 +61,13 @@ extension Collection {
     ///   - other: a collection to compare the callee to
     ///   - isSame: instance comparator closure
     /// - Returns: ExtendedDiff between the callee and `other` collection
-    func extendedDiff(_ other: Self, isSame: EqualityChecker<Self>) -> ExtendedDiff {
-        return extendedDiff(from: diff(other, isSame: isSame), other: other, isSame: isSame)
+    func extendedDiff(
+        _ other: Self,
+        isSame: EqualityChecker<Self>,
+        isEqual: EqualityChecker<Self>)
+        -> ExtendedDiff
+    {
+        return extendedDiff(from: diff(other, isSame: isSame, isEqual: isEqual), other: other, isSame: isSame, isEqual: isEqual)
     }
     
     /// Creates an extended diff between the callee and `other` collection
@@ -74,7 +79,12 @@ extension Collection {
     ///   - other: a collection to compare the callee to
     ///   - isSame: instance comparator closure
     /// - Returns: ExtendedDiff between the callee and `other` collection
-    func extendedDiff(from diff: Diff, other: Self, isSame: EqualityChecker<Self>) -> ExtendedDiff {
+    func extendedDiff(
+        from diff: Diff,
+        other: Self,
+        isSame: EqualityChecker<Self>,
+        isEqual: EqualityChecker<Self>) -> ExtendedDiff
+    {
         
         var elements: [ExtendedDiff.Element] = []
         var moveOriginIndices = Set<Int>()
@@ -185,13 +195,13 @@ extension ExtendedDiff.Element: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
         case let .delete(at):
-            return "D(\(at))"
+            return "D(r:\(at))"
         case let .insert(at):
-            return "I(\(at))"
+            return "I(r:\(at))"
         case let .move(from, to):
-            return "M(\(from),\(to))"
+            return "M(from:\(from),to:\(to))"
         case let .update(at):
-            return "U(\(at))"
+            return "U(r:\(at))"
         }
     }
 }
