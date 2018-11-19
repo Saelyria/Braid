@@ -44,6 +44,38 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<NC, S>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
+        return self._bind(cellType: cellType, viewModels: viewModels)
+    }
+    
+    /**
+     Bind the given cell type to the declared section, creating them based on the view models from a given array.
+     
+     - parameter cellType: The class of the header to bind.
+     - parameter viewModels: The view models to bind to the the dequeued cells for this section.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<NC>(
+        cellType: NC.Type,
+        viewModels: [NC.ViewModel])
+        -> TableViewSingleSectionBinder<NC, S>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
+        NC.ViewModel: Equatable & CollectionIdentifiable
+    {
+        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
+            guard let lhs = lhs as? NC.ViewModel, let rhs = rhs as? NC.ViewModel else { return nil }
+            return lhs == rhs
+        }
+        return self._bind(cellType: cellType, viewModels: viewModels)
+    }
+    
+    private func _bind<NC>(
+        cellType: NC.Type,
+        viewModels: [NC.ViewModel])
+        -> TableViewSingleSectionBinder<NC, S>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+    {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
         self.binder.updateCellModels(
             nil, viewModels: [self.section: viewModels], affectedSections: self.affectedSectionScope)
@@ -70,6 +102,43 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<NC, S>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
+        return self._bind(cellType: cellType, viewModels: viewModels, updatedBy: &callbackRef)
+    }
+    
+    /**
+     Bind the given cell type to the declared section, creating them based on the view models from a given array.
+     
+     - parameter cellType: The class of the header to bind.
+     - parameter viewModels: The view models to bind to the the dequeued cells for this section.
+     - parameter callbackRef: A reference to a closure that is called with an array of new view models. A new 'update
+     callback' closure is created and assigned to this reference that can be used to update the view models for the
+     bound section after binding.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<NC>(
+        cellType: NC.Type,
+        viewModels: [NC.ViewModel],
+        updatedBy callbackRef: inout (_ newModels: [NC.ViewModel]) -> Void)
+        -> TableViewSingleSectionBinder<NC, S>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
+        NC.ViewModel: Equatable & CollectionIdentifiable
+    {
+        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
+            guard let lhs = lhs as? NC.ViewModel, let rhs = rhs as? NC.ViewModel else { return nil }
+            return lhs == rhs
+        }
+        return self._bind(cellType: cellType, viewModels: viewModels, updatedBy: &callbackRef)
+    }
+    
+    private func _bind<NC>(
+        cellType: NC.Type,
+        viewModels: [NC.ViewModel],
+        updatedBy callbackRef: inout (_ newModels: [NC.ViewModel]) -> Void)
+        -> TableViewSingleSectionBinder<NC, S>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+    {
         let section = self.section
         let scope = self.affectedSectionScope
         let updateCallback: ([NC.ViewModel]) -> Void
@@ -80,6 +149,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         
         return self.bind(cellType: cellType, viewModels: viewModels)
     }
+    
+    // MARK: -
     
     /**
      Bind the given cell type to the declared section, creating them based on the view models created from a given
@@ -104,12 +175,145 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
+        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+    }
+    
+    /**
+     Bind the given cell type to the declared section, creating them based on the view models created from a given
+     array of models mapped to view models by a given function.
+     
+     When using this method, you pass in an array of your raw models and a function that transforms them into the view
+     models for the cells. This function is stored so, if you later update the models for the section using the section
+     binder's created 'update' callback, the models can be mapped to the cells' view models.
+     
+     - parameter cellType: The class of the header to bind.
+     - parameter models: The model objects to bind to the dequeued cells for this section.
+     - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
+        for the associated cell using the data from the model object.
+     
+     - returns: A section binder to continue the binding chain with.
+    */
+    @discardableResult
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: [NM],
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        -> TableViewModelSingleSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
+    {
+        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
+            guard let lhs = lhs as? NM, let rhs = rhs as? NM else { return nil }
+            return lhs == rhs
+        }
+        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+    }
+    
+    /**
+     Bind the given cell type to the declared section, creating them based on the view models created from a given
+     array of models mapped to view models by a given function.
+     
+     When using this method, you pass in an array of your raw models and a function that transforms them into the view
+     models for the cells. This function is stored so, if you later update the models for the section using the section
+     binder's created 'update' callback, the models can be mapped to the cells' view models.
+     
+     - parameter cellType: The class of the header to bind.
+     - parameter models: The model objects to bind to the dequeued cells for this section.
+     - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
+     for the associated cell using the data from the model object.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: [NM],
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        -> TableViewModelSingleSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
+        NC.ViewModel: Equatable & CollectionIdentifiable
+    {
+        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
+            guard let lhs = lhs as? NC.ViewModel, let rhs = rhs as? NC.ViewModel else { return nil }
+            return lhs == rhs
+        }
+        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+    }
+    
+    /**
+     Bind the given cell type to the declared section, creating them based on the view models created from a given
+     array of models mapped to view models by a given function.
+     
+     When using this method, you pass in an array of your raw models and a function that transforms them into the view
+     models for the cells. This function is stored so, if you later update the models for the section using the section
+     binder's created 'update' callback, the models can be mapped to the cells' view models.
+     
+     - parameter cellType: The class of the header to bind.
+     - parameter models: The model objects to bind to the dequeued cells for this section.
+     - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
+     for the associated cell using the data from the model object.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: [NM],
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        -> TableViewModelSingleSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable,
+        NC.ViewModel: Equatable & CollectionIdentifiable
+    {
+        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
+            guard let lhs = lhs as? NC.ViewModel, let rhs = rhs as? NC.ViewModel else { return nil }
+            return lhs == rhs
+        }
+        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+    }
+    
+    private func _bind<NC, NM>(
+        cellType: NC.Type,
+        models: [NM],
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        -> TableViewModelSingleSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+    {
         self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
         let viewModels = [self.section: models.map(mapToViewModel)]
         self.binder.updateCellModels(
             [self.section: models], viewModels: viewModels, affectedSections: self.affectedSectionScope)
         
         return TableViewModelSingleSectionBinder<NC, S, NM>(binder: self.binder, section: self.section)
+    }
+    
+    /**
+     Bind the given cell type to the declared section, creating them based on the view models created from a given
+     array of models mapped to view models by a given function.
+     
+     When using this method, you pass in an array of your raw models and a function that transforms them into the view
+     models for the cells. This function is stored so, if you later update the models for the section using the section
+     binder's created 'update' callback, the models can be mapped to the cells' view models.
+     
+     - parameter cellType: The class of the header to bind.
+     - parameter models: The model objects to bind to the dequeued cells for this section.
+     - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
+     for the associated cell using the data from the model object.
+     - parameter callbackRef: A reference to a closure that is called with an array of new models. A new 'update
+     callback' closure is created and assigned to this reference that can be used to update the models for the bound
+     section after binding. Models passed to this closure are mapped to view models using the supplied
+     `mapToViewModel` function.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: [NM],
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
+        -> TableViewModelSingleSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+    {
+        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
     }
     
     /**
@@ -138,6 +342,93 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
+        NC.ViewModel: Equatable & CollectionIdentifiable
+    {
+        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
+            guard let lhs = lhs as? NC.ViewModel, let rhs = rhs as? NC.ViewModel else { return nil }
+            return lhs == rhs
+        }
+        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
+    }
+    
+    /**
+     Bind the given cell type to the declared section, creating them based on the view models created from a given
+     array of models mapped to view models by a given function.
+     
+     When using this method, you pass in an array of your raw models and a function that transforms them into the view
+     models for the cells. This function is stored so, if you later update the models for the section using the section
+     binder's created 'update' callback, the models can be mapped to the cells' view models.
+     
+     - parameter cellType: The class of the header to bind.
+     - parameter models: The model objects to bind to the dequeued cells for this section.
+     - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
+     for the associated cell using the data from the model object.
+     - parameter callbackRef: A reference to a closure that is called with an array of new models. A new 'update
+     callback' closure is created and assigned to this reference that can be used to update the models for the bound
+     section after binding. Models passed to this closure are mapped to view models using the supplied
+     `mapToViewModel` function.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: [NM],
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
+        -> TableViewModelSingleSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
+    {
+        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
+            guard let lhs = lhs as? NM, let rhs = rhs as? NM else { return nil }
+            return lhs == rhs
+        }
+        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
+    }
+    
+    /**
+     Bind the given cell type to the declared section, creating them based on the view models created from a given
+     array of models mapped to view models by a given function.
+     
+     When using this method, you pass in an array of your raw models and a function that transforms them into the view
+     models for the cells. This function is stored so, if you later update the models for the section using the section
+     binder's created 'update' callback, the models can be mapped to the cells' view models.
+     
+     - parameter cellType: The class of the header to bind.
+     - parameter models: The model objects to bind to the dequeued cells for this section.
+     - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
+     for the associated cell using the data from the model object.
+     - parameter callbackRef: A reference to a closure that is called with an array of new models. A new 'update
+     callback' closure is created and assigned to this reference that can be used to update the models for the bound
+     section after binding. Models passed to this closure are mapped to view models using the supplied
+     `mapToViewModel` function.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: [NM],
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
+        -> TableViewModelSingleSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable,
+        NC.ViewModel: Equatable & CollectionIdentifiable
+    {
+        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
+            guard let lhs = lhs as? NC.ViewModel, let rhs = rhs as? NC.ViewModel else { return nil }
+            return lhs == rhs
+        }
+        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
+    }
+    
+    public func _bind<NC, NM>(
+        cellType: NC.Type,
+        models: [NM],
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
+        -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
         let section = self.section
@@ -150,6 +441,35 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         callbackRef = updateCallback
         
         return self.bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+    }
+    
+    // MARK: -
+    
+    /**
+     Bind the given cell type to the declared section, creating a cell for each item in the given array of models.
+     
+     Using this method allows a convenient mapping between the raw model objects that each cell in your table
+     represents and the cells. When binding with this method, various other event binding methods (most notably the
+     `onTapped` and `onCellDequeue` event methods) can have their handlers be passed in the associated model (cast to
+     the same type as the models observable type) along with the row and cell.
+     
+     When using this method, it is expected that you also provide a handler to the `onCellDequeue` method to bind the
+     model to the cell manually. This handler will be passed in a model cast to this model type if the `onCellDequeue`
+     method is called after this method.
+     
+     - parameter cellType: The class of the header to bind.
+     - parameter models: The models objects to bind to the dequeued cells for this section.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: [NM])
+        -> TableViewModelSingleSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ReuseIdentifiable
+    {
+        return self._bind(cellType: cellType, models: models)
     }
     
     /**
@@ -171,6 +491,19 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: [NM])
+        -> TableViewModelSingleSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
+    {
+        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
+            guard let lhs = lhs as? NM, let rhs = rhs as? NM else { return nil }
+            return lhs == rhs
+        }
+        return self._bind(cellType: cellType, models: models)
+    }
+    
+    private func _bind<NC, NM>(
         cellType: NC.Type,
         models: [NM])
         -> TableViewModelSingleSectionBinder<NC, S, NM>
@@ -211,6 +544,51 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ReuseIdentifiable
     {
+        return self._bind(cellType: cellType, models: models, updatedBy: &callbackRef)
+    }
+    
+    /**
+     Bind the given cell type to the declared section, creating a cell for each item in the given array of models.
+     
+     Using this method allows a convenient mapping between the raw model objects that each cell in your table
+     represents and the cells. When binding with this method, various other event binding methods (most notably the
+     `onTapped` and `onCellDequeue` event methods) can have their handlers be passed in the associated model (cast to
+     the same type as the models observable type) along with the row and cell.
+     
+     When using this method, it is expected that you also provide a handler to the `onCellDequeue` method to bind the
+     model to the cell manually. This handler will be passed in a model cast to this model type if the `onCellDequeue`
+     method is called after this method.
+     
+     - parameter cellType: The class of the header to bind.
+     - parameter models: The models objects to bind to the dequeued cells for this section.
+     - parameter callbackRef: A reference to a closure that is called with an array of new models. A new 'update
+     callback' closure is created and assigned to this reference that can be used to update the models for the bound
+     section after binding.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: [NM],
+        updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
+        -> TableViewModelSingleSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
+    {
+        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
+            guard let lhs = lhs as? NM, let rhs = rhs as? NM else { return nil }
+            return lhs == rhs
+        }
+        return self._bind(cellType: cellType, models: models, updatedBy: &callbackRef)
+    }
+    
+    private func _bind<NC, NM>(
+        cellType: NC.Type,
+        models: [NM],
+        updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
+        -> TableViewModelSingleSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ReuseIdentifiable
+    {
         let section = self.section
         let scope = self.affectedSectionScope
         let updateCallback: ([NM]) -> Void
@@ -220,6 +598,32 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         callbackRef = updateCallback
         
         return self.bind(cellType: cellType, models: models)
+    }
+    
+    // MARK: -
+    
+    /**
+     Bind a custom handler that will provide table view cells for the declared section, created according to the given
+     models.
+     
+     Use this method if you want more manual control over cell dequeueing. You might decide to use this method if you
+     use different cell types in the same section, the cell type is not known at compile-time, or you have some other
+     particularly complex use cases.
+     
+     - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter row: The row in the section the closure should provide a cell for.
+     - parameter model: The model the cell is dequeued for.
+     - parameter models: The models objects to bind to the dequeued cells for this section.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<NM>(
+        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        models: [NM])
+        -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
+    {
+        return self._bind(cellProvider: cellProvider, models: models)
     }
     
     /**
@@ -239,6 +643,19 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func bind<NM>(
+        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        models: [NM])
+        -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
+        where NM: Equatable & CollectionIdentifiable
+    {
+        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
+            guard let lhs = lhs as? NM, let rhs = rhs as? NM else { return nil }
+            return lhs == rhs
+        }
+        return self._bind(cellProvider: cellProvider, models: models)
+    }
+    
+    private func _bind<NM>(
         cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
         models: [NM])
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
@@ -269,13 +686,55 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter model: The model the cell is dequeued for.
      - parameter models: The models objects to bind to the dequeued cells for this section.
      - parameter callbackRef: A reference to a closure that is called with an array of new models. A new 'update
-        callback' closure is created and assigned to this reference that can be used to update the models for the bound
-        section after binding.
+     callback' closure is created and assigned to this reference that can be used to update the models for the bound
+     section after binding.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind<NM>(
+        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        models: [NM],
+        updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
+        -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
+    {
+        return self._bind(cellProvider: cellProvider, models: models, updatedBy: &callbackRef)
+    }
+    
+    /**
+     Bind a custom handler that will provide table view cells for the declared section, created according to the given
+     models.
+     
+     Use this method if you want more manual control over cell dequeueing. You might decide to use this method if you
+     use different cell types in the same section, the cell type is not known at compile-time, or you have some other
+     particularly complex use cases.
+     
+     - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter row: The row in the section the closure should provide a cell for.
+     - parameter model: The model the cell is dequeued for.
+     - parameter models: The models objects to bind to the dequeued cells for this section.
+     - parameter callbackRef: A reference to a closure that is called with an array of new models. A new 'update
+     callback' closure is created and assigned to this reference that can be used to update the models for the bound
+     section after binding.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<NM>(
+        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        models: [NM],
+        updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
+        -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
+        where NM: Equatable & CollectionIdentifiable
+    {
+        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
+            guard let lhs = lhs as? NM, let rhs = rhs as? NM else { return nil }
+            return lhs == rhs
+        }
+        return self._bind(cellProvider: cellProvider, models: models, updatedBy: &callbackRef)
+    }
+    
+    private func _bind<NM>(
         cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
         models: [NM],
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
@@ -291,6 +750,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         
         return self.bind(cellProvider: cellProvider, models: models)
     }
+    
+    // MARK: -
     
     /**
      Bind a custom handler that will provide table view cells for the section, along with the number of cells to create.
@@ -566,7 +1027,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
  
         return self.bind(footerTitle: footerTitle)
     }
-    
+
     // MARK: -
     
     /**

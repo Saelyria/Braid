@@ -154,18 +154,18 @@ extension _TableViewDataModel {
         return selfSectionModels.nestedExtendedDiff(
             to: otherSectionModels,
             isSameSection: { $0.section == $1.section },
-            isSameElement: { _rhs, _lhs in
-                if let rhs = _rhs as? CollectionIdentifiable, let lhs = _lhs as? CollectionIdentifiable {
-                    return rhs.collectionId == lhs.collectionId
+            isSameElement: { _lhs, _rhs in
+                if let lhs = _lhs as? CollectionIdentifiable, let rhs = _rhs as? CollectionIdentifiable {
+                    return lhs.collectionId == rhs.collectionId
                 }
                 return false
             },
-            isEqualElement: { [unowned self] rhs, lhs in
+            isEqualElement: { [unowned self] lhs, rhs in
                 let sections: Set<S> = Set(self.displayedSections).union(other.displayedSections)
                 for section in sections {
-                    if self.sectionItemEqualityCheckers[section]?(rhs, lhs) == true {
+                    if self.sectionItemEqualityCheckers[section]?(lhs, rhs) == true {
                         return true
-                    } else if self.sectionItemEqualityCheckers[section]?(rhs, lhs) == false {
+                    } else if self.sectionItemEqualityCheckers[section]?(lhs, rhs) == false {
                         return false
                     }
                 }
