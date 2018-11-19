@@ -451,30 +451,23 @@ extension SectionedTableViewBinder: _TableViewDataModelDelegate {
         guard self.hasFinishedBinding, !self.hasRefreshQueued else { return }
         self.hasRefreshQueued = true
         
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
             self.applyDisplayedSectionBehavior()
             
-            // If we were able to create 'diffable section models' from the data models (i.e. the cell models or view
-            // models conformed to 'CollectionIdentifiable'), then animate the changes.
-            if let current = self.currentDataModel.asDiffableSectionModels(),
-            let next = self.nextDataModel.asDiffableSectionModels() {
-                self.createNextDataModel()
-                
-//                self.tableView.animateRowAndSectionChanges(
-//                    oldData: current,
-//                    newData: next,
-//                    isEqualSection: { $0.section == $1.section },
-//                    isEqualElement: { $0.collectionId == $1.collectionId },
-//                    rowDeletionAnimation: self.rowDeletionAnimation,
-//                    rowInsertionAnimation: self.rowInsertionAnimation,
-//                    sectionDeletionAnimation: self.sectionDeletionAnimation,
-//                    sectionInsertionAnimation: self.sectionInsertionAnimation)
-            }
-            // otherwise, just do a plain table view reload.
-            else {
-                self.createNextDataModel()
-                self.tableView.reloadData()
-            }
+            let diff = self.currentDataModel.diff(from: self.nextDataModel)
+            let update = NestedBatchUpdate(diff: diff)
+            self.createNextDataModel()
+            
+            self.tableView.beginUpdates()
+            self.tableView.deleteRows(at: update.itemDeletions, with: self.rowDeletionAnimation)
+            self.tableView.insertRows(at: update.itemInsertions, with: self.rowInsertionAnimation)
+            update.itemMoves.forEach { self.tableView.moveRow(at: $0.from, to: $0.to) }
+            self.tableView.deleteSections(update.sectionDeletions, with: self.sectionDeletionAnimation)
+            self.tableView.insertSections(update.sectionInsertions, with: self.sectionInsertionAnimation)
+            update.sectionMoves.forEach { self.tableView.moveSection($0.from, toSection: $0.to) }
+            self.tableView.endUpdates()
             
             self.hasRefreshQueued = false
         }

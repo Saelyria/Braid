@@ -1,3 +1,9 @@
+/*
+ Forked from tonyarnold's 'Differ' library to add equality checking.
+ 
+ https://github.com/tonyarnold/Differ
+ */
+
 struct ExtendedDiff: DiffProtocol {
     typealias Index = Int
     
@@ -38,7 +44,6 @@ extension ExtendedDiff.Element {
 }
 
 extension Collection where Index == Int {
-    
     /**
      Creates an extended diff between the callee and `other` collection
     
@@ -52,7 +57,7 @@ extension Collection where Index == Int {
     */
     func extendedDiff(
         _ other: Self,
-        isSame: EqualityChecker<Self>,
+        isSame: IdentityChecker<Self>,
         isEqual: EqualityChecker<Self>)
         -> ExtendedDiff
     {
@@ -75,7 +80,7 @@ extension Collection where Index == Int {
     func extendedDiff(
         from diff: Diff,
         other: Self,
-        isSame: EqualityChecker<Self>,
+        isSame: IdentityChecker<Self>,
         isEqual: EqualityChecker<Self>)
         -> ExtendedDiff
     {
@@ -146,8 +151,9 @@ extension Collection where Index == Int {
         candidate: Diff.Element,
         candidateIndex: Diff.Index,
         other: Self,
-        isSame: EqualityChecker<Self>
-        ) -> (ExtendedDiff.Element, Diff.Index)? {
+        isSame: IdentityChecker<Self>)
+        -> (ExtendedDiff.Element, Diff.Index)?
+    {
         for matchIndex in (candidateIndex + 1) ..< diff.endIndex {
             if !dirtyIndices.contains(matchIndex) {
                 let match = diff[matchIndex]
@@ -159,7 +165,13 @@ extension Collection where Index == Int {
         return nil
     }
     
-    func createMatch(_ candidate: Diff.Element, match: Diff.Element, other: Self, isSame: EqualityChecker<Self>) -> ExtendedDiff.Element? {
+    func createMatch(
+        _ candidate: Diff.Element,
+        match: Diff.Element,
+        other: Self,
+        isSame: IdentityChecker<Self>)
+        -> ExtendedDiff.Element?
+    {
         switch (candidate, match) {
         case (.delete, .insert):
             if isSame(itemOnStartIndex(advancedBy: candidate.at()), other.itemOnStartIndex(advancedBy: match.at())) {

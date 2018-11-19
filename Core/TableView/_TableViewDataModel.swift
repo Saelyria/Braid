@@ -40,6 +40,10 @@ internal class _TableViewDataModel<S: TableViewSection> {
     var sectionFooterViewModels: [S: Any] = [:] {
         didSet { self.delegate?.dataModelDidChange() }
     }
+    // A function for each section that determines whether the model for a given row was updated. In most cases, this
+    // will be a wrapper around `Equatable` conformance. These functions return nil if it can't compare the objects
+    // given to it (e.g. weren't the right type).
+    var sectionItemEqualityCheckers: [S: (Any, Any) -> Bool?] = [:]
     
     // Returns a set containing all sections that have cell data bound.
     var sectionsWithCellData: Set<S> {
@@ -73,11 +77,18 @@ internal class _TableViewDataModel<S: TableViewSection> {
 }
 
 extension _TableViewDataModel {
-    internal struct DiffableSectionModel: Equatable, Collection {
+    internal class SectionModel: Collection {
         typealias Index = Int
         
         let section: S
-        let items: [CollectionIdentifiable]
+        let items: [Any]
+        let itemEqualityChecker: ((Any, Any) -> Bool?)?
+        
+        init(section: S, items: [Any], itemEqualityChecker: ((Any, Any) -> Bool?)?) {
+            self.section = section
+            self.items = items
+            self.itemEqualityChecker = itemEqualityChecker
+        }
         
         var startIndex: Int {
             return items.startIndex
@@ -87,16 +98,21 @@ extension _TableViewDataModel {
             return items.endIndex
         }
         
-        subscript(i: Int) -> CollectionIdentifiable {
+        subscript(i: Int) -> Any {
             return items[i]
         }
         
         func index(after i: Int) -> Int {
             return items.index(after: i)
         }
+    }
+    
+    internal class DiffableSectionModel: SectionModel {
+        let identifiableItems: [CollectionIdentifiable]
         
-        static func == (lhs: DiffableSectionModel, rhs: DiffableSectionModel) -> Bool {
-            return lhs.section == rhs.section
+        init(section: S, items: [CollectionIdentifiable], itemEqualityChecker: ((Any, Any) -> Bool?)?) {
+            self.identifiableItems = items
+            super.init(section: section, items: items, itemEqualityChecker: itemEqualityChecker)
         }
     }
     
@@ -105,19 +121,25 @@ extension _TableViewDataModel {
      table view. Returns nil if the data is not diffable (i.e. one or more of its data arrays did not contain models
      that conformed to `CollectionIdentifiable`).
      */
-    func asDiffableSectionModels() -> [DiffableSectionModel]? {
-        return try? self.displayedSections.map { (section) throws -> DiffableSectionModel in
-            var _identifiableItems: [CollectionIdentifiable]?
+    func asDiffableSectionModels() -> [SectionModel] {
+        return self.displayedSections.map { (section) -> SectionModel in
+            var identifiableItems: [CollectionIdentifiable]?
             if let identifiableVMs = self.sectionCellViewModels as? [S: [CollectionIdentifiable]] {
-                _identifiableItems = identifiableVMs[section]
+                identifiableItems = identifiableVMs[section]
             } else if let identifiableMs = self.sectionCellModels as? [S: [CollectionIdentifiable]] {
-                _identifiableItems = identifiableMs[section]
+                identifiableItems = identifiableMs[section]
             } else if self.sectionCellViewModels.isEmpty && self.sectionCellModels.isEmpty {
-                _identifiableItems = []
+                identifiableItems = []
             }
-            guard let identifiableItems = _identifiableItems else { throw NSError(domain: "", code: 0, userInfo: nil) }
             
-            return DiffableSectionModel(section: section, items: identifiableItems)
+            if let items = identifiableItems {
+                return DiffableSectionModel(
+                    section: section, items: items, itemEqualityChecker: self.sectionItemEqualityCheckers[section])
+            } else {
+                let items: [Any] = self.sectionCellViewModels[section] ?? self.sectionCellModels[section] ?? []
+                return SectionModel(
+                    section: section, items: items, itemEqualityChecker: self.sectionItemEqualityCheckers[section])
+            }
         }
     }
     
@@ -126,10 +148,28 @@ extension _TableViewDataModel {
      data is not diffable (i.e. one or more of its data arrays did not contain models that conformed to
      `CollectionIdentifiable`).
      */
-//    func diff(from other: _TableViewDataModel<S>) -> NestedExtendedDiff? {
-//        guard let selfSectionModels = self.asDiffableSectionModels(), let otherSectionModels = other.asDiffableSectionModels() else {
-//            return nil
-//        }
-//        return selfSectionModels.nestedExtendedDiff(to: otherSectionModels, isEqualElement: { $0.collectionId == $1.collectionId })
-//    }
+    func diff(from other: _TableViewDataModel<S>) -> NestedExtendedDiff {
+        let selfSectionModels = self.asDiffableSectionModels()
+        let otherSectionModels = other.asDiffableSectionModels()
+        return selfSectionModels.nestedExtendedDiff(
+            to: otherSectionModels,
+            isSameSection: { $0.section == $1.section },
+            isSameElement: { _rhs, _lhs in
+                if let rhs = _rhs as? CollectionIdentifiable, let lhs = _lhs as? CollectionIdentifiable {
+                    return rhs.collectionId == lhs.collectionId
+                }
+                return false
+            },
+            isEqualElement: { [unowned self] rhs, lhs in
+                let sections: Set<S> = Set(self.displayedSections).union(other.displayedSections)
+                for section in sections {
+                    if self.sectionItemEqualityCheckers[section]?(rhs, lhs) == true {
+                        return true
+                    } else if self.sectionItemEqualityCheckers[section]?(rhs, lhs) == false {
+                        return false
+                    }
+                }
+                return nil
+            })
+    }
 }

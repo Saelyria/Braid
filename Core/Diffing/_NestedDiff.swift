@@ -1,3 +1,9 @@
+/*
+ Forked from tonyarnold's 'Differ' library to add equality checking.
+ 
+ https://github.com/tonyarnold/Differ
+ */
+
 struct NestedDiff: DiffProtocol {
     typealias Index = Int
     
@@ -37,9 +43,9 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
     */
     func nestedDiff(
         to: Self,
-        isSameSection: EqualityChecker<Self>,
-        isSameElement: NestedElementEqualityChecker<Self>,
-        isEqualElement: NestedElementEqualityChecker<Self>)
+        isSameSection: IdentityChecker<Self>,
+        isSameElement: NestedIdentityChecker<Self>,
+        isEqualElement: NestedEqualityChecker<Self>)
         -> NestedDiff
     {
         let diffTraces = outputDiffPathTraces(to: to, isSame: isSameSection)

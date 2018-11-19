@@ -1,3 +1,9 @@
+/*
+ Forked from tonyarnold's 'Differ' library to add equality checking.
+ 
+ https://github.com/tonyarnold/Differ
+*/
+
 protocol DiffProtocol: Collection {
     associatedtype DiffElementType
     
@@ -96,7 +102,11 @@ struct TraceStep {
     let nextX: Int?
 }
 
-typealias EqualityChecker<T: Collection> = (T.Element, T.Element) -> Bool
+/// A closure used to check whether two items are meant to represent the same object (i.e. their 'identity' is the same)
+typealias IdentityChecker<T: Collection> = (T.Element, T.Element) -> Bool
+/// A closure used to check whether there the two items are equal (i.e. whether the difference between them would
+/// warrant an update). Can return nil to mean that the closure was unable to compare the two items.
+typealias EqualityChecker<T: Collection> = (T.Element, T.Element) -> Bool?
 
 extension Collection where Index == Int {
     /**
@@ -111,7 +121,7 @@ extension Collection where Index == Int {
      */
     func diff(
         _ other: Self,
-        isSame: EqualityChecker<Self>,
+        isSame: IdentityChecker<Self>,
         isEqual: EqualityChecker<Self>)
         -> Diff
     {
@@ -123,7 +133,7 @@ extension Collection where Index == Int {
                 .map { trace -> Diff.Element? in
                     if let change = Diff.Element(trace: trace) {
                         return change
-                    } else if !isEqual(self[trace.from.x], other[trace.from.y]) {
+                    } else if isEqual(self[trace.from.x], other[trace.from.y]) == false {
                         return .update(at: trace.from.x)
                     }
                     return nil
@@ -141,7 +151,7 @@ extension Collection where Index == Int {
         'identity')
      - returns: all traces required to create an output diff
     */
-    func diffTraces(to: Self, isSame: EqualityChecker<Self>) -> [Trace] {
+    func diffTraces(to: Self, isSame: IdentityChecker<Self>) -> [Trace] {
         if count == 0 && to.count == 0 {
             return []
         } else if count == 0 {
@@ -154,7 +164,7 @@ extension Collection where Index == Int {
     }
     
     /// Returns the traces which mark the shortest diff path.
-    func outputDiffPathTraces(to: Self, isSame: EqualityChecker<Self>) -> [Trace] {
+    func outputDiffPathTraces(to: Self, isSame: IdentityChecker<Self>) -> [Trace] {
         return findPath(
             diffTraces(to: to, isSame: isSame),
             n: Int(count),
