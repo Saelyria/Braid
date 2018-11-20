@@ -50,7 +50,37 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         -> TableViewMutliSectionBinder<NC, S>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
-        self.binder.addCellDequeueBlock(cellType: cellType, sections: self.sections)
+        return self._bind(cellType: cellType, viewModels: viewModels)
+    }
+    
+    /**
+     Bind the given cell type to the declared sections, creating them based on the view models from a given array.
+     
+     - parameter cellType: The class of the header to bind.
+     - parameter viewModels: A dictionary where the key is a section and the value are the view models for the cells
+     created for the section. This dictionary does not need to contain a view models array for each section being
+     bound - sections not present in the dictionary have no cells dequeued for them.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<NC>(
+        cellType: NC.Type,
+        viewModels: [S: [NC.ViewModel]])
+        -> TableViewMutliSectionBinder<NC, S>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
+        NC.ViewModel: Equatable & CollectionIdentifiable
+    {
+        return self._bind(cellType: cellType, viewModels: viewModels)
+    }
+    
+    private func _bind<NC>(
+        cellType: NC.Type,
+        viewModels: [S: [NC.ViewModel]])
+        -> TableViewMutliSectionBinder<NC, S>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+    {
+        self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         self.binder.updateCellModels(nil, viewModels: viewModels, affectedSections: self.affectedSectionScope)
         
         return TableViewMutliSectionBinder<NC, S>(binder: self.binder, sections: self.sections)
@@ -77,6 +107,16 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         -> TableViewMutliSectionBinder<NC, S>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
+        return self._bind(cellType: cellType, viewModels: viewModels, updatedBy: &callbackRef)
+    }
+    
+    private func _bind<NC>(
+        cellType: NC.Type,
+        viewModels: [S: [NC.ViewModel]],
+        updatedBy callbackRef: inout (_ newViewModels: [S: [NC.ViewModel]]) -> Void)
+        -> TableViewMutliSectionBinder<NC, S>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+    {
         let updateCallback: ([S: [NC.ViewModel]]) -> Void
         updateCallback = { [weak binder = self.binder, scope = self.affectedSectionScope] (viewModels) in
             binder?.updateCellModels(nil, viewModels: viewModels, affectedSections: scope)
@@ -85,6 +125,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         
         return self.bind(cellType: cellType, viewModels: viewModels)
     }
+    
+    // MARK: -
     
     /**
      Bind the given cell type to the declared sections, creating them based on the view models created from a given
@@ -111,7 +153,17 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         -> TableViewModelMultiSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
-        self.binder.addCellDequeueBlock(cellType: cellType, sections: self.sections)
+        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+    }
+    
+    private func _bind<NC, NM>(
+        cellType: NC.Type,
+        models: [S: [NM]],
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        -> TableViewModelMultiSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+    {
+        self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         var viewModels: [S: [Any]] = [:]
         for (s, m) in models {
             viewModels[s] = m.map(mapToViewModel)
@@ -150,6 +202,17 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         -> TableViewModelMultiSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
+        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
+    }
+    
+    private func _bind<NC, NM>(
+        cellType: NC.Type,
+        models: [S: [NM]],
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        updatedBy callbackRef: inout (_ newModels: [S: [NM]]) -> Void)
+        -> TableViewModelMultiSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+    {
         let updateCallback: ([S: [NM]]) -> Void
         updateCallback = { [weak binder = self.binder, scope = self.affectedSectionScope, mapToViewModel] (models) in
             var viewModels: [S: [Any]] = [:]
@@ -162,6 +225,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         
         return self.bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
     }
+    
+    // MARK: -
     
     /**
      Bind the given cell type to the declared section, creating a cell for each item in the given array of models.
@@ -184,7 +249,16 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         -> TableViewModelMultiSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ReuseIdentifiable
     {
-        self.binder.addCellDequeueBlock(cellType: cellType, sections: self.sections)
+        return self._bind(cellType: cellType, models: models)
+    }
+    
+    private func _bind<NC, NM>(
+        cellType: NC.Type,
+        models: [S: [NM]])
+        -> TableViewModelMultiSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ReuseIdentifiable
+    {
+        self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         self.binder.updateCellModels(models, viewModels: nil, affectedSections: self.affectedSectionScope)
         
         return TableViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections)
@@ -215,6 +289,16 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         -> TableViewModelMultiSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ReuseIdentifiable
     {
+        return self._bind(cellType: cellType, models: models, updatedBy: &callbackRef)
+    }
+    
+    private func _bind<NC, NM>(
+        cellType: NC.Type,
+        models: [S: [NM]],
+        updatedBy callbackRef: inout (_ newModels: [S: [NM]]) -> Void)
+        -> TableViewModelMultiSectionBinder<NC, S, NM>
+        where NC: UITableViewCell & ReuseIdentifiable
+    {
         let updateCallback: ([S: [NM]]) -> Void
         updateCallback = { [weak binder = self.binder, scope = self.affectedSectionScope] (models) in
             binder?.updateCellModels(models, viewModels: nil, affectedSections: scope)
@@ -223,6 +307,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         
         return self.bind(cellType: cellType, models: models)
     }
+    
+    // MARK: -
     
     /**
      Bind a custom handler that will provide table view cells for the declared sections, created according to the given
@@ -248,13 +334,21 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         models: [S: [NM]])
         -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
     {
+        return self._bind(cellProvider: cellProvider, models: models)
+    }
+    
+    private func _bind<NM>(
+        cellProvider: @escaping (_ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
+        models: [S: [NM]])
+        -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
+    {
         let _cellProvider = { [weak binder = self.binder] (_ section: S, _ row: Int) -> UITableViewCell in
             guard let models = binder?.currentDataModel.sectionCellModels[section] as? [NM] else {
                 fatalError("Model type wasn't as expected, something went awry!")
             }
             return cellProvider(section, row, models[row])
         }
-        self.binder.addCellDequeueBlock(cellProvider: _cellProvider, sections: self.sections)
+        self.binder.addCellDequeueBlock(cellProvider: _cellProvider, affectedSections: self.affectedSectionScope)
         self.binder.updateCellModels(models, viewModels: nil, affectedSections: self.affectedSectionScope)
         
         return TableViewModelMultiSectionBinder<UITableViewCell, S, NM>(binder: self.binder, sections: self.sections)
@@ -288,6 +382,15 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         updatedBy callbackRef: inout (_ newModels: [S: [NM]]) -> Void)
         -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
     {
+        return self._bind(cellProvider: cellProvider, models: models, updatedBy: &callbackRef)
+    }
+    
+    private func _bind<NM>(
+        cellProvider: @escaping (_ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
+        models: [S: [NM]],
+        updatedBy callbackRef: inout (_ newModels: [S: [NM]]) -> Void)
+        -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
+    {
         let updateCallback: ([S: [NM]]) -> Void
         updateCallback = { [weak binder = self.binder, scope = self.affectedSectionScope] (models) in
             binder?.updateCellModels(models, viewModels: nil, affectedSections: scope)
@@ -296,6 +399,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         
         return self.bind(cellProvider: cellProvider, models: models)
     }
+    
+    // MARK: -
     
     /**
      Bind a custom handler that will provide table view cells for the declared sections, along with the number of cells
@@ -318,7 +423,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         numberOfCells: [S: Int])
         -> TableViewMutliSectionBinder<UITableViewCell, S>
     {
-        self.binder.addCellDequeueBlock(cellProvider: cellProvider, sections: self.sections)
+        self.binder.addCellDequeueBlock(cellProvider: cellProvider, affectedSections: self.affectedSectionScope)
         self.binder.updateNumberOfCells(numberOfCells, affectedSections: self.affectedSectionScope)
         
         return TableViewMutliSectionBinder<UITableViewCell, S>(binder: self.binder, sections: self.sections)
@@ -337,8 +442,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter numberOfCells: The number of cells to create for each section using the provided closure.
      - parameter callbackRef: A reference to a closure that is called with a dictionary of integers representing the
-     number of cells in a section. A new 'update callback' closure is created and assigned to this reference that can
-     be used to update the number of cells for the bound sections after binding.
+        number of cells in a section. A new 'update callback' closure is created and assigned to this reference that can
+        be used to update the number of cells for the bound sections after binding.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -346,7 +451,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind(
         cellProvider: @escaping (_ section: S, _ row: Int) -> UITableViewCell,
         numberOfCells: [S: Int],
-        updatedBy callbackRef: inout (_ newModels: [S: Int]) -> Void)
+        updatedBy callbackRef: inout (_ newNumberOfCells: [S: Int]) -> Void)
         -> TableViewMutliSectionBinder<UITableViewCell, S>
     {
         let updateCallback: ([S: Int]) -> Void
@@ -387,7 +492,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
         let scope = self.affectedSectionScope
-        self.binder.addHeaderDequeueBlock(headerType: headerType, sections: self.sections)
+        self.binder.addHeaderDequeueBlock(headerType: headerType, affectedSections: self.affectedSectionScope)
         self.binder.updateHeaderViewModels(viewModels, affectedSections: scope)
         
         let updateCallback: ([S: H.ViewModel]) -> Void
@@ -456,7 +561,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
         let scope = self.affectedSectionScope
-        self.binder.addFooterDequeueBlock(footerType: footerType, sections: self.sections)
+        self.binder.addFooterDequeueBlock(footerType: footerType, affectedSections: self.affectedSectionScope)
         self.binder.updateFooterViewModels(viewModels, affectedSections: scope)
         
         let updateCallback: ([S: F.ViewModel]) -> Void

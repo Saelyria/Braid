@@ -14,10 +14,7 @@ internal extension SectionedTableViewBinder {
      
      - parameter models: The models (organized by section in a dictionary) to update to.
      - parameter viewModels: The view models (organized by section in a dictionary) to update to.
-     - parameter sections: The sections the titles are for. Single- or multi-section binders should pass in their
-        'section(s)' property for this argument. If this parameter is nil, the data is assumed to be for the 'any
-        sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
-        `onSections` methods on the binder).
+     - parameter affectedSections: The section scope affected by this update.
      */
     func updateCellModels(_ models: [S: [Any]]?, viewModels: [S: [Any]]?, affectedSections: SectionBindingScope<S>) {
         guard !(models == nil && viewModels == nil) else {
@@ -41,10 +38,7 @@ internal extension SectionedTableViewBinder {
      Updates the number of manually created cells for either the given sections or 'any section'.
      
      - parameter numCells: The number of cells (organized by section in a dictionary) to update to.
-     - parameter sections: The sections the titles are for. Single- or multi-section binders should pass in their
-        'section(s)' property for this argument. If this parameter is nil, the data is assumed to be for the 'any
-        sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
-        `onSections` methods on the binder).
+     - parameter affectedSections: The section scope affected by this update.
      */
     func updateNumberOfCells(_ numCells: [S: Int], affectedSections: SectionBindingScope<S>) {
         self.update(fromDataIn: numCells,
@@ -56,10 +50,7 @@ internal extension SectionedTableViewBinder {
      Updates the titles for the headers for either the given sections or 'any section'.
      
      - parameter titles: The titles (organized by section in a dictionary) to update to.
-     - parameter sections: The sections the titles are for. Single- or multi-section binders should pass in their
-        'section(s)' property for this argument. If this parameter is nil, the data is assumed to be for the 'any
-        sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
-        `onSections` methods on the binder).
+     - parameter affectedSections: The section scope affected by this update.
      */
     func updateHeaderTitles(_ titles: [S: String?], affectedSections: SectionBindingScope<S>) {
         let nonNilTitles: [S: String] = titles.filter { $0.value != nil }.mapValues { return $0! }
@@ -72,10 +63,7 @@ internal extension SectionedTableViewBinder {
      Updates the view models for the headers for either the given sections or 'any section'.
      
      - parameter titles: The titles (organized by section in a dictionary) to update to.
-     - parameter sections: The sections the models are for. Single- or multi-section binders should pass in their
-        'section(s)' property for this argument. If this parameter is nil, the data is assumed to be for the 'any
-        sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
-        `onSections` methods on the binder).
+     - parameter affectedSections: The section scope affected by this update.
      */
     func updateHeaderViewModels(_ viewModels: [S: Any?], affectedSections: SectionBindingScope<S>) {
         let nonNilViewModels: [S: Any] = viewModels.filter { $0.value != nil }.mapValues { return $0! }
@@ -88,10 +76,7 @@ internal extension SectionedTableViewBinder {
      Updates the titles for the footers for either the given sections or 'any section'.
      
      - parameter titles: The titles (organized by section in a dictionary) to update to.
-     - parameter sections: The sections the titles are for. Single- or multi-section binders should pass in their
-        'section(s)' property for this argument. If this parameter is nil, the data is assumed to be for the 'any
-        sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
-        `onSections` methods on the binder).
+     - parameter affectedSections: The section scope affected by this update.
      */
     func updateFooterTitles(_ titles: [S: String?], affectedSections: SectionBindingScope<S>) {
         let nonNilTitles: [S: String] = titles.filter { $0.value != nil }.mapValues { return $0! }
@@ -104,10 +89,7 @@ internal extension SectionedTableViewBinder {
      Updates the view models for the header for either the given sections or 'any section'.
      
      - parameter titles: The titles (organized by section in a dictionary) to update to.
-     - parameter sections: The sections the models are for. Single- or multi-section binders should pass in their
-        'section(s)' property for this argument. If this parameter is nil, the data is assumed to be for the 'any
-        sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
-        `onSections` methods on the binder).
+     - parameter affectedSections: The section scope affected by this update.
      */
     func updateFooterViewModels(_ viewModels: [S: Any?], affectedSections: SectionBindingScope<S>) {
         let nonNilViewModels: [S: Any] = viewModels.filter { $0.value != nil }.mapValues { return $0! }
@@ -124,10 +106,7 @@ private extension SectionedTableViewBinder {
      - parameter new: The dictionary containing values to update the 'next data model' with.
      - parameter current: A pointer to the dictionary property on the binder's `nextDataModel` that gets updated
         with the values from the 'new' dictionary.
-     - parameter sections: The sections the models are for. Single- or multi-section binders should pass in their
-        'section(s)' property for this argument. If this parameter is nil, the data is assumed to be for the 'dynamic
-        sections' entry (i.e. data that is used to populate sections not explicitly bound with the `onSection` or
-        `onSections` methods on the binder).
+     - parameter affectedSections: The section scope affected by this update.
     */
     func update<V>(
         fromDataIn new: [S: V],

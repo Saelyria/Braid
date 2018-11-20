@@ -76,7 +76,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<NC, S>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
-        self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
+        self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         self.binder.updateCellModels(
             nil, viewModels: [self.section: viewModels], affectedSections: self.affectedSectionScope)
         
@@ -111,8 +111,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter cellType: The class of the header to bind.
      - parameter viewModels: The view models to bind to the the dequeued cells for this section.
      - parameter callbackRef: A reference to a closure that is called with an array of new view models. A new 'update
-     callback' closure is created and assigned to this reference that can be used to update the view models for the
-     bound section after binding.
+        callback' closure is created and assigned to this reference that can be used to update the view models for the
+        bound section after binding.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -219,7 +219,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter cellType: The class of the header to bind.
      - parameter models: The model objects to bind to the dequeued cells for this section.
      - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
-     for the associated cell using the data from the model object.
+        for the associated cell using the data from the model object.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -250,7 +250,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter cellType: The class of the header to bind.
      - parameter models: The model objects to bind to the dequeued cells for this section.
      - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
-     for the associated cell using the data from the model object.
+        for the associated cell using the data from the model object.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -277,7 +277,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
-        self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
+        self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         let viewModels = [self.section: models.map(mapToViewModel)]
         self.binder.updateCellModels(
             [self.section: models], viewModels: viewModels, affectedSections: self.affectedSectionScope)
@@ -296,11 +296,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter cellType: The class of the header to bind.
      - parameter models: The model objects to bind to the dequeued cells for this section.
      - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
-     for the associated cell using the data from the model object.
+        for the associated cell using the data from the model object.
      - parameter callbackRef: A reference to a closure that is called with an array of new models. A new 'update
-     callback' closure is created and assigned to this reference that can be used to update the models for the bound
-     section after binding. Models passed to this closure are mapped to view models using the supplied
-     `mapToViewModel` function.
+        callback' closure is created and assigned to this reference that can be used to update the models for the bound
+        section after binding. Models passed to this closure are mapped to view models using the supplied
+        `mapToViewModel` function.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -363,11 +363,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter cellType: The class of the header to bind.
      - parameter models: The model objects to bind to the dequeued cells for this section.
      - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
-     for the associated cell using the data from the model object.
+        for the associated cell using the data from the model object.
      - parameter callbackRef: A reference to a closure that is called with an array of new models. A new 'update
-     callback' closure is created and assigned to this reference that can be used to update the models for the bound
-     section after binding. Models passed to this closure are mapped to view models using the supplied
-     `mapToViewModel` function.
+        callback' closure is created and assigned to this reference that can be used to update the models for the bound
+        section after binding. Models passed to this closure are mapped to view models using the supplied
+        `mapToViewModel` function.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -398,11 +398,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter cellType: The class of the header to bind.
      - parameter models: The model objects to bind to the dequeued cells for this section.
      - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
-     for the associated cell using the data from the model object.
+        for the associated cell using the data from the model object.
      - parameter callbackRef: A reference to a closure that is called with an array of new models. A new 'update
-     callback' closure is created and assigned to this reference that can be used to update the models for the bound
-     section after binding. Models passed to this closure are mapped to view models using the supplied
-     `mapToViewModel` function.
+        callback' closure is created and assigned to this reference that can be used to update the models for the bound
+        section after binding. Models passed to this closure are mapped to view models using the supplied
+        `mapToViewModel` function.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -509,7 +509,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ReuseIdentifiable
     {
-        self.binder.addCellDequeueBlock(cellType: cellType, sections: [self.section])
+        self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         self.binder.updateCellModels(
             [self.section: models], viewModels: nil, affectedSections: self.affectedSectionScope)
         
@@ -562,8 +562,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter cellType: The class of the header to bind.
      - parameter models: The models objects to bind to the dequeued cells for this section.
      - parameter callbackRef: A reference to a closure that is called with an array of new models. A new 'update
-     callback' closure is created and assigned to this reference that can be used to update the models for the bound
-     section after binding.
+        callback' closure is created and assigned to this reference that can be used to update the models for the bound
+        section after binding.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -666,7 +666,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
             }
             return cellProvider(row, models[row])
         }
-        self.binder.addCellDequeueBlock(cellProvider: _cellProvider, sections: [self.section])
+        self.binder.addCellDequeueBlock(cellProvider: _cellProvider, affectedSections: self.affectedSectionScope)
         self.binder.updateCellModels(
             [self.section: models], viewModels: nil, affectedSections: self.affectedSectionScope)
         
@@ -686,8 +686,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter model: The model the cell is dequeued for.
      - parameter models: The models objects to bind to the dequeued cells for this section.
      - parameter callbackRef: A reference to a closure that is called with an array of new models. A new 'update
-     callback' closure is created and assigned to this reference that can be used to update the models for the bound
-     section after binding.
+        callback' closure is created and assigned to this reference that can be used to update the models for the bound
+        section after binding.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -714,8 +714,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter model: The model the cell is dequeued for.
      - parameter models: The models objects to bind to the dequeued cells for this section.
      - parameter callbackRef: A reference to a closure that is called with an array of new models. A new 'update
-     callback' closure is created and assigned to this reference that can be used to update the models for the bound
-     section after binding.
+        callback' closure is created and assigned to this reference that can be used to update the models for the bound
+        section after binding.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -772,7 +772,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         numberOfCells: Int)
         -> TableViewSingleSectionBinder<UITableViewCell, S>
     {
-        self.binder.addCellDequeueBlock(cellProvider: cellProvider, sections: [self.section])
+        self.binder.addCellDequeueBlock(cellProvider: cellProvider, affectedSections: self.affectedSectionScope)
         self.binder.updateNumberOfCells([self.section: numberOfCells], affectedSections: self.affectedSectionScope)
         
         return TableViewSingleSectionBinder<UITableViewCell, S>(binder: self.binder, section: self.section)
@@ -832,7 +832,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<C, S>
         where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
-        self.binder.addHeaderDequeueBlock(headerType: headerType, sections: [self.section])
+        self.binder.addHeaderDequeueBlock(headerType: headerType, affectedSections: self.affectedSectionScope)
         self.binder.updateHeaderViewModels([self.section: viewModel], affectedSections: self.affectedSectionScope)
         
         return self
@@ -939,7 +939,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<C, S>
         where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
-        self.binder.addFooterDequeueBlock(footerType: footerType, sections: [self.section])
+        self.binder.addFooterDequeueBlock(footerType: footerType, affectedSections: self.affectedSectionScope)
         self.binder.updateFooterViewModels([self.section: viewModel], affectedSections: self.affectedSectionScope)
         
         return self

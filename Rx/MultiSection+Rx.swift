@@ -20,7 +20,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         let sections = bindResult.sections
         let scope = bindResult.affectedSectionScope
         
-        bindResult.binder.addCellDequeueBlock(cellType: cellType, sections: sections)
+        bindResult.binder.addCellDequeueBlock(cellType: cellType, affectedSections: scope)
         
         viewModels
             .subscribeOn(MainScheduler.instance)
@@ -49,7 +49,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         let sections = bindResult.sections
         let scope = bindResult.affectedSectionScope
         
-        bindResult.binder.addCellDequeueBlock(cellType: cellType, sections: sections)
+        bindResult.binder.addCellDequeueBlock(cellType: cellType, affectedSections: scope)
 
         models
             .subscribeOn(MainScheduler.instance)
@@ -87,7 +87,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         let sections = bindResult.sections
         let scope = bindResult.affectedSectionScope
         
-        bindResult.binder.addCellDequeueBlock(cellType: cellType, sections: sections)
+        bindResult.binder.addCellDequeueBlock(cellType: cellType, affectedSections: scope)
         
         models
             .subscribeOn(MainScheduler.instance)
@@ -134,7 +134,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
             }
             return cellProvider(section, row, models[row])
         }
-        bindResult.binder.addCellDequeueBlock(cellProvider: _cellProvider, sections: sections)
+        bindResult.binder.addCellDequeueBlock(cellProvider: _cellProvider, affectedSections: scope)
         
         models
             .subscribeOn(MainScheduler.instance)
@@ -169,10 +169,9 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         guard let bindResult = self.base as? TableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
-        let sections = bindResult.sections
         let scope = bindResult.affectedSectionScope
         
-        bindResult.binder.addCellDequeueBlock(cellProvider: cellProvider, sections: sections)
+        bindResult.binder.addCellDequeueBlock(cellProvider: cellProvider, affectedSections: scope)
         
         numberOfCells
             .subscribeOn(MainScheduler.instance)
@@ -199,10 +198,9 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         guard let bindResult = self.base as? TableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
-        let sections = bindResult.sections
         let scope = bindResult.affectedSectionScope
         
-        bindResult.binder.addHeaderDequeueBlock(headerType: headerType, sections: sections)
+        bindResult.binder.addHeaderDequeueBlock(headerType: headerType, affectedSections: scope)
         
         viewModels
             .subscribeOn(MainScheduler.instance)
@@ -221,7 +219,6 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         guard let bindResult = self.base as? TableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
-        let sections = bindResult.sections
         let scope = bindResult.affectedSectionScope
         
         headerTitles
@@ -246,10 +243,9 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         guard let bindResult = self.base as? TableViewMutliSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
-        let sections = bindResult.sections
         let scope = bindResult.affectedSectionScope
         
-        bindResult.binder.addFooterDequeueBlock(footerType: footerType, sections: sections)
+        bindResult.binder.addFooterDequeueBlock(footerType: footerType, affectedSections: scope)
         
         viewModels
             .subscribeOn(MainScheduler.instance)
