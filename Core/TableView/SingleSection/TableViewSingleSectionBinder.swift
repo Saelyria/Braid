@@ -63,10 +63,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
-        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
-            guard let lhs = lhs as? NC.ViewModel, let rhs = rhs as? NC.ViewModel else { return nil }
-            return lhs == rhs
-        }
+        self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, viewModels: viewModels)
     }
     
@@ -125,10 +122,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
-        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
-            guard let lhs = lhs as? NC.ViewModel, let rhs = rhs as? NC.ViewModel else { return nil }
-            return lhs == rhs
-        }
+        self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, viewModels: viewModels, updatedBy: &callbackRef)
     }
     
@@ -201,10 +195,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
     {
-        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
-            guard let lhs = lhs as? NM, let rhs = rhs as? NM else { return nil }
-            return lhs == rhs
-        }
+        self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
     }
     
@@ -232,10 +223,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
-        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
-            guard let lhs = lhs as? NC.ViewModel, let rhs = rhs as? NC.ViewModel else { return nil }
-            return lhs == rhs
-        }
+        self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
     }
     
@@ -263,10 +251,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
-        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
-            guard let lhs = lhs as? NC.ViewModel, let rhs = rhs as? NC.ViewModel else { return nil }
-            return lhs == rhs
-        }
+        self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
     }
     
@@ -345,10 +330,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
-        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
-            guard let lhs = lhs as? NC.ViewModel, let rhs = rhs as? NC.ViewModel else { return nil }
-            return lhs == rhs
-        }
+        self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
     }
     
@@ -380,10 +362,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
     {
-        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
-            guard let lhs = lhs as? NM, let rhs = rhs as? NM else { return nil }
-            return lhs == rhs
-        }
+        self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
     }
     
@@ -416,10 +395,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
-        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
-            guard let lhs = lhs as? NC.ViewModel, let rhs = rhs as? NC.ViewModel else { return nil }
-            return lhs == rhs
-        }
+        self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
     }
     
@@ -496,10 +472,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
     {
-        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
-            guard let lhs = lhs as? NM, let rhs = rhs as? NM else { return nil }
-            return lhs == rhs
-        }
+        self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, models: models)
     }
     
@@ -575,10 +548,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
     {
-        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
-            guard let lhs = lhs as? NM, let rhs = rhs as? NM else { return nil }
-            return lhs == rhs
-        }
+        self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, models: models, updatedBy: &callbackRef)
     }
     
@@ -648,10 +618,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
         where NM: Equatable & CollectionIdentifiable
     {
-        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
-            guard let lhs = lhs as? NM, let rhs = rhs as? NM else { return nil }
-            return lhs == rhs
-        }
+        self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellProvider: cellProvider, models: models)
     }
     
@@ -727,10 +694,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
         where NM: Equatable & CollectionIdentifiable
     {
-        self.binder.currentDataModel.sectionItemEqualityCheckers[self.section] = { (lhs, rhs) -> Bool? in
-            guard let lhs = lhs as? NM, let rhs = rhs as? NM else { return nil }
-            return lhs == rhs
-        }
+        self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellProvider: cellProvider, models: models, updatedBy: &callbackRef)
     }
     

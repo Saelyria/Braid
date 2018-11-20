@@ -80,6 +80,27 @@ internal extension SectionedTableViewBinder {
         self.addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
     }
     
+    func addCellEqualityChecker<I: Equatable & CollectionIdentifiable>(
+        itemType: I.Type, affectedSections: SectionBindingScope<S>)
+    {
+        let handler: (Any, Any) -> Bool? = { (lhs, rhs) in
+            guard let lhs = lhs as? I, let rhs = rhs as? I else { return nil }
+            return lhs == rhs
+        }
+        
+        switch affectedSections {
+        case .forNamedSections(let sections):
+            for section in sections {
+                self.handlers.sectionItemEqualityCheckers[section] = handler
+            }
+        case .forAllUnnamedSections:
+            self.handlers.dynamicSectionItemEqualityChecker = handler
+        case .forAnySection:
+            assertionFailure("Can't add a cell equality checker for 'any section'")
+        }
+        
+    }
+    
     /**
      Adds a dequeueing block to the binder for a view model-bindable header for the given sections or 'any section'.
      

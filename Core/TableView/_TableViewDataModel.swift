@@ -1,9 +1,12 @@
 internal protocol _TableViewDataModelDelegate: AnyObject {
+    associatedtype S: TableViewSection
+    
+    func itemEqualityChecker(for section: S) -> ((Any, Any) -> Bool?)?
     func dataModelDidChange()
 }
 
 internal class _TableViewDataModel<S: TableViewSection> {
-    weak var delegate: _TableViewDataModelDelegate?
+    weak var delegate: SectionedTableViewBinder<S>?
     
     // The sections that were bound uniquely with either the `onSection` or `onSections` methods. This is used to
     // ensure that updates to data bound with `onAllSections` does not overwrite data for these sections.
@@ -40,10 +43,6 @@ internal class _TableViewDataModel<S: TableViewSection> {
     var sectionFooterViewModels: [S: Any] = [:] {
         didSet { self.delegate?.dataModelDidChange() }
     }
-    // A function for each section that determines whether the model for a given row was updated. In most cases, this
-    // will be a wrapper around `Equatable` conformance. These functions return nil if it can't compare the objects
-    // given to it (e.g. weren't the right type).
-    var sectionItemEqualityCheckers: [S: (Any, Any) -> Bool?] = [:]
     
     // Returns a set containing all sections that have cell data bound.
     var sectionsWithCellData: Set<S> {
@@ -134,11 +133,15 @@ extension _TableViewDataModel {
             
             if let items = identifiableItems {
                 return DiffableSectionModel(
-                    section: section, items: items, itemEqualityChecker: self.sectionItemEqualityCheckers[section])
+                    section: section,
+                    items: items,
+                    itemEqualityChecker: self.delegate?.itemEqualityChecker(for: section))
             } else {
                 let items: [Any] = self.sectionCellViewModels[section] ?? self.sectionCellModels[section] ?? []
                 return SectionModel(
-                    section: section, items: items, itemEqualityChecker: self.sectionItemEqualityCheckers[section])
+                    section: section,
+                    items: items,
+                    itemEqualityChecker: self.delegate?.itemEqualityChecker(for: section))
             }
         }
     }
@@ -160,12 +163,13 @@ extension _TableViewDataModel {
                 }
                 return false
             },
-            isEqualElement: { [unowned self] lhs, rhs in
+            isEqualElement: { [weak self] lhs, rhs in
+                guard let self = self else { return nil }
                 let sections: Set<S> = Set(self.displayedSections).union(other.displayedSections)
                 for section in sections {
-                    if self.sectionItemEqualityCheckers[section]?(lhs, rhs) == true {
+                    if self.delegate?.itemEqualityChecker(for: section)?(lhs, rhs) == true {
                         return true
-                    } else if self.sectionItemEqualityCheckers[section]?(lhs, rhs) == false {
+                    } else if self.delegate?.itemEqualityChecker(for: section)?(lhs, rhs) == false {
                         return false
                     }
                 }

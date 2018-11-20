@@ -441,6 +441,13 @@ public extension SectionedTableViewBinder.SectionDisplayBehavior where S: Compar
 }
 
 extension SectionedTableViewBinder: _TableViewDataModelDelegate {
+    func itemEqualityChecker(for section: S) -> ((Any, Any) -> Bool?)? {
+        if self.nextDataModel.uniquelyBoundSections.contains(section) {
+            return self.handlers.sectionItemEqualityCheckers[section]
+        }
+        return self.handlers.dynamicSectionItemEqualityChecker
+    }
+    
     /*
      The binder is set as the delegate on its 'next' data model. When this next model receives a data update, this
      method is called. The binder responds by queueing an update for the next render frame (using `DispatchQueue.async`)
