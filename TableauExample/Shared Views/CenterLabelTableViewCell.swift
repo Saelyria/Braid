@@ -9,7 +9,7 @@ import Tableau
 final class CenterLabelTableViewCell: UITableViewCell, ViewModelBindable, ReuseIdentifiable {
     /// The 'view model' for cells of this type. This view model conforms to `CollectionIdentifiable` so table binders
     /// can generate diffs for these cells (i.e. track insertions, deletions, and moves, and animate them on the table).
-    struct ViewModel: CollectionIdentifiable {
+    struct ViewModel: CollectionIdentifiable, Equatable {
         let text: String
         var collectionId: String { return self.text }
     }

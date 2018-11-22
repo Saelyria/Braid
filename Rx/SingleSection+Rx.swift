@@ -17,6 +17,37 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         -> TableViewSingleSectionBinder<NC, Base.S>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
+        return self._bind(cellType: cellType, viewModels: viewModels)
+    }
+    
+    /**
+     Bind the given cell type to the declared sections, creating them based on the view models from a given observable.
+     
+     When using this method, you pass in an observable array of the cell's view models. From there, the binder will
+     handle dequeuing of your cells based on the observable view models array.
+     */
+    @discardableResult
+    public func bind<NC>(
+        cellType: NC.Type,
+        viewModels: Observable<[NC.ViewModel]>)
+        -> TableViewSingleSectionBinder<NC, Base.S>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
+        NC.ViewModel: Equatable & CollectionIdentifiable
+    {
+        guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
+            fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
+        }
+        bindResult.binder.addCellEqualityChecker(
+            itemType: NC.ViewModel.self, affectedSections: bindResult.affectedSectionScope)
+        return self._bind(cellType: cellType, viewModels: viewModels)
+    }
+    
+    private func _bind<NC>(
+        cellType: NC.Type,
+        viewModels: Observable<[NC.ViewModel]>)
+        -> TableViewSingleSectionBinder<NC, Base.S>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+    {
         guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
@@ -24,7 +55,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         let scope = bindResult.affectedSectionScope
         
         bindResult.binder.addCellDequeueBlock(cellType: cellType, affectedSections: scope)
-
+        
         viewModels
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [NC.ViewModel]) in
@@ -44,6 +75,37 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
     */
     @discardableResult
     public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: Observable<[NM]>)
+        -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
+        where NC: UITableViewCell & ReuseIdentifiable
+    {
+        return self._bind(cellType: cellType, models: models)
+    }
+    
+    /**
+     Bind the given cell type to the declared section, creating a cell for each item in the given observable array of
+     models.
+     
+     When using this method, you pass in an observable array of your raw models. From there, the binder will handle
+     dequeuing of your cells based on the observable models array. It's expected that you will add an `onCellDequeue`
+     handler to your chain when using this method to configure dequeued cells with their associated model objects.
+     */
+    @discardableResult
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: Observable<[NM]>)
+        -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
+        where NC: UITableViewCell & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
+    {
+        guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
+            fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
+        }
+        bindResult.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: bindResult.affectedSectionScope)
+        return self._bind(cellType: cellType, models: models)
+    }
+    
+    private func _bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[NM]>)
         -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
@@ -84,12 +146,99 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
+        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+    }
+    
+    /**
+     Bind the given cell type to the declared section, creating them based on the view models created from a given
+     array of models mapped to view models by a given function.
+     
+     When using this method, you pass in an observable array of your raw models and a function that transforms them into
+     the view models for the cells. From there, the binder will handle dequeuing of your cells based on the observable
+     models array. Whenever a cell is dequeued, the binder will create an instance of the cell's view model from the
+     associated model using the given `mapToViewModel` function.
+     */
+    @discardableResult
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: Observable<[NM]>,
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
+        NC.ViewModel: Equatable & CollectionIdentifiable
+    {
+        guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
+            fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
+        }
+        bindResult.binder.addCellEqualityChecker(
+            itemType: NC.ViewModel.self, affectedSections: bindResult.affectedSectionScope)
+        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+    }
+    
+    /**
+     Bind the given cell type to the declared section, creating them based on the view models created from a given
+     array of models mapped to view models by a given function.
+     
+     When using this method, you pass in an observable array of your raw models and a function that transforms them into
+     the view models for the cells. From there, the binder will handle dequeuing of your cells based on the observable
+     models array. Whenever a cell is dequeued, the binder will create an instance of the cell's view model from the
+     associated model using the given `mapToViewModel` function.
+     */
+    @discardableResult
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: Observable<[NM]>,
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
+        NC.ViewModel: Equatable & CollectionIdentifiable, NM: Equatable & CollectionIdentifiable
+    {
+        guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
+            fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
+        }
+        bindResult.binder.addCellEqualityChecker(
+            itemType: NC.ViewModel.self, affectedSections: bindResult.affectedSectionScope)
+        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+    }
+    
+    /**
+     Bind the given cell type to the declared section, creating them based on the view models created from a given
+     array of models mapped to view models by a given function.
+     
+     When using this method, you pass in an observable array of your raw models and a function that transforms them into
+     the view models for the cells. From there, the binder will handle dequeuing of your cells based on the observable
+     models array. Whenever a cell is dequeued, the binder will create an instance of the cell's view model from the
+     associated model using the given `mapToViewModel` function.
+     */
+    @discardableResult
+    public func bind<NC, NM>(
+        cellType: NC.Type,
+        models: Observable<[NM]>,
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
+    {
+        guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
+            fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
+        }
+        bindResult.binder.addCellEqualityChecker(
+            itemType: NM.self, affectedSections: bindResult.affectedSectionScope)
+        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+    }
+    
+    private func _bind<NC, NM>(
+        cellType: NC.Type,
+        models: Observable<[NM]>,
+        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
+        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+    {
         guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let section = bindResult.section
         let scope = bindResult.affectedSectionScope
- 
+        
         bindResult.binder.addCellDequeueBlock(cellType: cellType, affectedSections: scope)
         
         models
@@ -123,6 +272,44 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         models: Observable<[NM]>)
         -> TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>
     {
+        return self._bind(cellProvider: cellProvider, models: models)
+    }
+    
+    /**
+     Bind a custom handler that will provide table view cells for the declared section, created according to the given
+     models.
+     
+     Use this method if you want more manual control over cell dequeueing. You might decide to use this method if you
+     use different cell types in the same section, the cell type is not known at compile-time, or you have some other
+     particularly complex use cases.
+     
+     - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter row: The row in the section the closure should provide a cell for.
+     - parameter model: The model the cell is dequeued for.
+     - parameter models: The models objects to bind to the dequeued cells for this section.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<NM>(
+        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        models: Observable<[NM]>)
+        -> TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>
+        where NM: Equatable & CollectionIdentifiable
+    {
+        guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
+            fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
+        }
+        bindResult.binder.addCellEqualityChecker(
+            itemType: NM.self, affectedSections: bindResult.affectedSectionScope)
+        return self._bind(cellProvider: cellProvider, models: models)
+    }
+    
+    private func _bind<NM>(
+        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        models: Observable<[NM]>)
+        -> TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>
+    {
         guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
@@ -145,6 +332,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         
         return TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>(binder: bindResult.binder, section: section)
     }
+
     
     /**
      Bind a custom handler that will provide table view cells for the section, along with the number of cells to create.

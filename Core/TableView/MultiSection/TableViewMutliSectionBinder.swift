@@ -685,6 +685,39 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         return self._bind(cellProvider: cellProvider, models: models, updatedBy: &callbackRef)
     }
     
+    /**
+     Bind a custom handler that will provide table view cells for the declared sections, created according to the given
+     models.
+     
+     Use this method if you want more manual control over cell dequeueing. You might decide to use this method if you
+     use different cell types in the same section, the cell type is not known at compile-time, or you have some other
+     particularly complex use cases.
+     
+     - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter section: The section the closure should provide a cell for.
+     - parameter row: The row in the section the closure should provide a cell for.
+     - parameter model: The model the cell is dequeued for.
+     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
+     the section. This dictionary does not need to contain a models array for each section being bound - sections not
+     present in the dictionary have no cells dequeued for them.
+     - parameter callbackRef: A reference to a closure that is called with a dictionary of new models. A new 'update
+     callback' closure is created and assigned to this reference that can be used to update the models for the bound
+     sections after binding.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<NM>(
+        cellProvider: @escaping (_ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
+        models: [S: [NM]],
+        updatedBy callbackRef: inout (_ newModels: [S: [NM]]) -> Void)
+        -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
+        where NM: Equatable & CollectionIdentifiable
+    {
+        self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
+        return self._bind(cellProvider: cellProvider, models: models, updatedBy: &callbackRef)
+    }
+    
     private func _bind<NM>(
         cellProvider: @escaping (_ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [S: [NM]],

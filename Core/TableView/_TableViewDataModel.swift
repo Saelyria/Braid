@@ -64,6 +64,7 @@ internal class _TableViewDataModel<S: TableViewSection> {
     init() { }
     
     init(from other: _TableViewDataModel<S>) {
+        self.delegate = other.delegate
         self.uniquelyBoundSections = other.uniquelyBoundSections
         self.displayedSections = other.displayedSections
         self.sectionCellViewModels = other.sectionCellViewModels
@@ -163,17 +164,8 @@ extension _TableViewDataModel {
                 }
                 return false
             },
-            isEqualElement: { [weak self] lhs, rhs in
-                guard let self = self else { return nil }
-                let sections: Set<S> = Set(self.displayedSections).union(other.displayedSections)
-                for section in sections {
-                    if self.delegate?.itemEqualityChecker(for: section)?(lhs, rhs) == true {
-                        return true
-                    } else if self.delegate?.itemEqualityChecker(for: section)?(lhs, rhs) == false {
-                        return false
-                    }
-                }
-                return nil
+            isEqualElement: { sectionModel, lhs, rhs in
+                return other.delegate?.itemEqualityChecker(for: sectionModel.section)?(lhs, rhs)
             })
     }
 }

@@ -7,7 +7,7 @@ import Tableau
 class SectionHeaderView: UITableViewHeaderFooterView, ReuseIdentifiable, ViewModelBindable {
     /// The 'view model' for views of this type. Note that this view model doesn't need to conform to
     /// `CollectionIdentifiable`, since section headers don't move/aren't diffed.
-    struct ViewModel {
+    struct ViewModel: Equatable {
         let title: String
     }
     

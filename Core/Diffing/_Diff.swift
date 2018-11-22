@@ -4,6 +4,12 @@
  https://github.com/tonyarnold/Differ
 */
 
+/// A closure used to check whether two items are meant to represent the same object (i.e. their 'identity' is the same)
+typealias IdentityChecker<T: Collection> = (T.Element, T.Element) -> Bool
+/// A closure used to check whether there the two items are equal (i.e. whether the difference between them would
+/// warrant an update). Can return nil to mean that the closure was unable to compare the two items.
+typealias EqualityChecker<T: Collection> = (T.Element, T.Element) -> Bool?
+
 protocol DiffProtocol: Collection {
     associatedtype DiffElementType
     
@@ -101,12 +107,6 @@ struct TraceStep {
     let previousX: Int?
     let nextX: Int?
 }
-
-/// A closure used to check whether two items are meant to represent the same object (i.e. their 'identity' is the same)
-typealias IdentityChecker<T: Collection> = (T.Element, T.Element) -> Bool
-/// A closure used to check whether there the two items are equal (i.e. whether the difference between them would
-/// warrant an update). Can return nil to mean that the closure was unable to compare the two items.
-typealias EqualityChecker<T: Collection> = (T.Element, T.Element) -> Bool?
 
 extension Collection where Index == Int {
     /**

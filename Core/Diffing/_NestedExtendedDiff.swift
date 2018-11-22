@@ -4,6 +4,12 @@
  https://github.com/tonyarnold/Differ
  */
 
+/// A closure used to check whether two items are meant to represent the same object (i.e. their 'identity' is the same)
+typealias NestedIdentityChecker<T: Collection> = (T.Element.Element, T.Element.Element) -> Bool where T.Element: Collection
+/// A closure used to check whether there the two items are equal (i.e. whether the difference between them would
+/// warrant an update). Can return nil to mean that the closure was unable to compare the two items.
+typealias NestedEqualityChecker<T: Collection> = (T.Element, T.Element.Element, T.Element.Element) -> Bool? where T.Element: Collection
+
 struct NestedExtendedDiff: DiffProtocol {
     typealias Index = Int
     
@@ -28,9 +34,6 @@ struct NestedExtendedDiff: DiffProtocol {
         self.elements = elements
     }
 }
-
-typealias NestedIdentityChecker<T: Collection> = (T.Element.Element, T.Element.Element) -> Bool where T.Element: Collection
-typealias NestedEqualityChecker<T: Collection> = (T.Element.Element, T.Element.Element) -> Bool? where T.Element: Collection
 
 extension Collection where Index == Int, Element: Collection, Element.Index == Int {
     /**
@@ -121,7 +124,9 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
         let elementDiff = zip(zip(fromSections, toSections), matchingSectionTraces)
             .flatMap { (args) -> [NestedExtendedDiff.Element] in
                 let (sections, trace) = args
-                return sections.0.extendedDiff(sections.1, isSame: isSameElement, isEqual: isEqualElement).map { diffElement -> NestedExtendedDiff.Element in
+                return sections.0.extendedDiff(sections.1, isSame: isSameElement, isEqual: { lhs, rhs in
+                    return isEqualElement(sections.0, lhs, rhs)
+                }).map { diffElement -> NestedExtendedDiff.Element in
                     switch diffElement {
                     case let .delete(at):
                         return .deleteElement(at, section: trace.from.x)

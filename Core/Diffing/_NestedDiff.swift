@@ -86,7 +86,9 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
         let elementDiff = zip(zip(fromSections, toSections), matchingSectionTraces)
             .flatMap { (args) -> [NestedDiff.Element] in
                 let (sections, trace) = args
-                return sections.0.diff(sections.1, isSame: isSameElement, isEqual: isEqualElement).map { diffElement -> NestedDiff.Element in
+                return sections.0.diff(sections.1, isSame: isSameElement, isEqual: { lhs, rhs in
+                    return isEqualElement(sections.0, lhs, rhs)
+                }).map { diffElement -> NestedDiff.Element in
                     switch diffElement {
                     case let .delete(at):
                         return .deleteElement(at, section: trace.from.x)

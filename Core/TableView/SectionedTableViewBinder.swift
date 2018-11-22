@@ -188,8 +188,12 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     public var rowDeletionAnimation: UITableView.RowAnimation = .automatic
     /// The animation the binder will use to animate row insertions. The default value is `automatic`.
     public var rowInsertionAnimation: UITableView.RowAnimation = .automatic
+    /// The animation the binder will use to animate row updates. The default value is `automatic`.
+    public var rowUpdateAnimation: UITableView.RowAnimation = .automatic
     /// The animation the binder will use to animate section deletions. The default value is `automatic`.
     public var sectionDeletionAnimation: UITableView.RowAnimation = .automatic
+    /// The animation the binder will use to animate section updates. The default value is `automatic`.
+    public var sectionUpdateAnimation: UITableView.RowAnimation = .automatic
     /// The animation the binder will use to animate section insertions. The default value is `automatic`.
     public var sectionInsertionAnimation: UITableView.RowAnimation = .automatic
     
@@ -475,6 +479,9 @@ extension SectionedTableViewBinder: _TableViewDataModelDelegate {
             self.tableView.insertSections(update.sectionInsertions, with: self.sectionInsertionAnimation)
             update.sectionMoves.forEach { self.tableView.moveSection($0.from, toSection: $0.to) }
             self.tableView.endUpdates()
+            
+            self.tableView.reloadRows(at: update.itemUpdates, with: self.rowUpdateAnimation)
+            self.tableView.reloadSections(update.sectionUpdates, with: self.sectionUpdateAnimation)
             
             self.hasRefreshQueued = false
         }
