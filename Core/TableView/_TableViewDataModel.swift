@@ -152,10 +152,10 @@ extension _TableViewDataModel {
      data is not diffable (i.e. one or more of its data arrays did not contain models that conformed to
      `CollectionIdentifiable`).
      */
-    func diff(from other: _TableViewDataModel<S>) -> NestedExtendedDiff {
+    func diff(from other: _TableViewDataModel<S>) -> NestedExtendedDiff? {
         let selfSectionModels = self.asDiffableSectionModels()
         let otherSectionModels = other.asDiffableSectionModels()
-        return selfSectionModels.nestedExtendedDiff(
+        return try? selfSectionModels.nestedExtendedDiff(
             to: otherSectionModels,
             isSameSection: { $0.section == $1.section },
             isSameElement: { _lhs, _rhs in

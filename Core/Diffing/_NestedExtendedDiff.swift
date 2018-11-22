@@ -5,10 +5,10 @@
  */
 
 /// A closure used to check whether two items are meant to represent the same object (i.e. their 'identity' is the same)
-typealias NestedIdentityChecker<T: Collection> = (T.Element.Element, T.Element.Element) -> Bool where T.Element: Collection
+typealias NestedComparisonHandler<T: Collection> = (T.Element.Element, T.Element.Element) -> Bool? where T.Element: Collection
 /// A closure used to check whether there the two items are equal (i.e. whether the difference between them would
 /// warrant an update). Can return nil to mean that the closure was unable to compare the two items.
-typealias NestedEqualityChecker<T: Collection> = (T.Element, T.Element.Element, T.Element.Element) -> Bool? where T.Element: Collection
+typealias NestedElementComparisonHandler<T: Collection> = (T.Element, T.Element.Element, T.Element.Element) -> Bool? where T.Element: Collection
 
 struct NestedExtendedDiff: DiffProtocol {
     typealias Index = Int
@@ -51,13 +51,13 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
     */
     func nestedExtendedDiff(
         to: Self,
-        isSameSection: IdentityChecker<Self>,
-        isSameElement: NestedIdentityChecker<Self>,
-        isEqualElement: NestedEqualityChecker<Self>)
-        -> NestedExtendedDiff
+        isSameSection: ComparisonHandler<Self>,
+        isSameElement: NestedComparisonHandler<Self>,
+        isEqualElement: NestedElementComparisonHandler<Self>)
+        throws -> NestedExtendedDiff
     {
         // FIXME: This implementation is a copy paste of NestedDiff with some adjustments.
-        let diffTraces = outputDiffPathTraces(to: to, isSame: isSameSection)
+        let diffTraces = try outputDiffPathTraces(to: to, isSame: isSameSection)
         
         let sectionDiff =
             extendedDiff(
@@ -87,13 +87,13 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
         }
         
         let sectionMoves =
-            sectionDiff.compactMap { diffElement -> (Int, Int)? in
+            try sectionDiff.compactMap { diffElement -> (Int, Int)? in
                 if case let .moveSection(from, to) = diffElement {
                     return (from, to)
                 }
                 return nil
                 }.flatMap { move -> [NestedExtendedDiff.Element] in
-                    return itemOnStartIndex(advancedBy: move.0).extendedDiff(to.itemOnStartIndex(advancedBy: move.1), isSame: isSameElement, isEqual: { _,_ in false })
+                    return try itemOnStartIndex(advancedBy: move.0).extendedDiff(to.itemOnStartIndex(advancedBy: move.1), isSame: isSameElement, isEqual: { _,_ in false })
                         .map { diffElement -> NestedExtendedDiff.Element in
                             switch diffElement {
                             case let .insert(at):
@@ -121,10 +121,10 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
             to.itemOnStartIndex(advancedBy: $0.from.y)
         }
         
-        let elementDiff = zip(zip(fromSections, toSections), matchingSectionTraces)
+        let elementDiff = try zip(zip(fromSections, toSections), matchingSectionTraces)
             .flatMap { (args) -> [NestedExtendedDiff.Element] in
                 let (sections, trace) = args
-                return sections.0.extendedDiff(sections.1, isSame: isSameElement, isEqual: { lhs, rhs in
+                return try sections.0.extendedDiff(sections.1, isSame: isSameElement, isEqual: { lhs, rhs in
                     return isEqualElement(sections.0, lhs, rhs)
                 }).map { diffElement -> NestedExtendedDiff.Element in
                     switch diffElement {

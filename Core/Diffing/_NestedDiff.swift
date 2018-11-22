@@ -43,12 +43,12 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
     */
     func nestedDiff(
         to: Self,
-        isSameSection: IdentityChecker<Self>,
-        isSameElement: NestedIdentityChecker<Self>,
-        isEqualElement: NestedEqualityChecker<Self>)
-        -> NestedDiff
+        isSameSection: ComparisonHandler<Self>,
+        isSameElement: NestedComparisonHandler<Self>,
+        isEqualElement: NestedElementComparisonHandler<Self>)
+        throws -> NestedDiff
     {
-        let diffTraces = outputDiffPathTraces(to: to, isSame: isSameSection)
+        let diffTraces = try outputDiffPathTraces(to: to, isSame: isSameSection)
         
         // Diff sections
         let sectionDiff = Diff(traces: diffTraces).map { element -> NestedDiff.Element in
@@ -83,10 +83,11 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
             to.itemOnStartIndex(advancedBy: $0.from.y)
         }
         
-        let elementDiff = zip(zip(fromSections, toSections), matchingSectionTraces)
+        var undiffableSections: [Trace] = []
+        let elementDiff = try zip(zip(fromSections, toSections), matchingSectionTraces)
             .flatMap { (args) -> [NestedDiff.Element] in
                 let (sections, trace) = args
-                return sections.0.diff(sections.1, isSame: isSameElement, isEqual: { lhs, rhs in
+                return try sections.0.diff(sections.1, isSame: isSameElement, isEqual: { lhs, rhs in
                     return isEqualElement(sections.0, lhs, rhs)
                 }).map { diffElement -> NestedDiff.Element in
                     switch diffElement {

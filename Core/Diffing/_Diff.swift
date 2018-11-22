@@ -4,17 +4,17 @@
  https://github.com/tonyarnold/Differ
 */
 
-/// A closure used to check whether two items are meant to represent the same object (i.e. their 'identity' is the same)
-typealias IdentityChecker<T: Collection> = (T.Element, T.Element) -> Bool
 /// A closure used to check whether there the two items are equal (i.e. whether the difference between them would
 /// warrant an update). Can return nil to mean that the closure was unable to compare the two items.
-typealias EqualityChecker<T: Collection> = (T.Element, T.Element) -> Bool?
+typealias ComparisonHandler<T: Collection> = (T.Element, T.Element) -> Bool?
 
 protocol DiffProtocol: Collection {
     associatedtype DiffElementType
     
     var elements: [DiffElementType] { get }
 }
+
+struct UndiffableError: Error { }
 
 struct Diff: DiffProtocol {
     enum Element {
@@ -121,11 +121,11 @@ extension Collection where Index == Int {
      */
     func diff(
         _ other: Self,
-        isSame: IdentityChecker<Self>,
-        isEqual: EqualityChecker<Self>)
-        -> Diff
+        isSame: ComparisonHandler<Self>,
+        isEqual: ComparisonHandler<Self>)
+        throws -> Diff
     {
-        let diffPath = outputDiffPathTraces(
+        let diffPath = try outputDiffPathTraces(
             to: other,
             isSame: isSame)
         return Diff(elements:
@@ -151,7 +151,7 @@ extension Collection where Index == Int {
         'identity')
      - returns: all traces required to create an output diff
     */
-    func diffTraces(to: Self, isSame: IdentityChecker<Self>) -> [Trace] {
+    func diffTraces(to: Self, isSame: ComparisonHandler<Self>) throws -> [Trace] {
         if count == 0 && to.count == 0 {
             return []
         } else if count == 0 {
@@ -159,14 +159,15 @@ extension Collection where Index == Int {
         } else if to.count == 0 {
             return tracesForDeletions()
         } else {
-            return myersDiffTraces(to: to, isSame: isSame)
+            return try myersDiffTraces(to: to, isSame: isSame)
         }
     }
     
     /// Returns the traces which mark the shortest diff path.
-    func outputDiffPathTraces(to: Self, isSame: IdentityChecker<Self>) -> [Trace] {
+    func outputDiffPathTraces(to: Self, isSame: ComparisonHandler<Self>) throws -> [Trace] {
+        let traces = try diffTraces(to: to, isSame: isSame)
         return findPath(
-            diffTraces(to: to, isSame: isSame),
+            traces,
             n: Int(count),
             m: Int(to.count)
         )
@@ -190,7 +191,7 @@ extension Collection where Index == Int {
         return traces
     }
     
-    fileprivate func myersDiffTraces(to: Self, isSame: (Element, Element) -> Bool) -> [Trace] {
+    fileprivate func myersDiffTraces(to: Self, isSame: (Element, Element) -> Bool?) throws -> [Trace] {
         // fromCount is N, N is the number of from array
         let fromCount = Int(count)
         // toCount is M, M is the number of to array
@@ -222,12 +223,12 @@ extension Collection where Index == Int {
                     while x >= 0 && y >= 0 && x < fromCount && y < toCount {
                         let targetItem = to.itemOnStartIndex(advancedBy: y)
                         let baseItem = itemOnStartIndex(advancedBy: x)
-                        if isSame(baseItem, targetItem) {
+                        if isSame(baseItem, targetItem) == true {
                             x += 1
                             y += 1
                             traces.append(Trace(from: Point(x: x - 1, y: y - 1), to: Point(x: x, y: y), D: numberOfDifferences))
                         } else {
-                            break
+                            throw UndiffableError()
                         }
                     }
                     

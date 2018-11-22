@@ -57,12 +57,12 @@ extension Collection where Index == Int {
     */
     func extendedDiff(
         _ other: Self,
-        isSame: IdentityChecker<Self>,
-        isEqual: EqualityChecker<Self>)
-        -> ExtendedDiff
+        isSame: ComparisonHandler<Self>,
+        isEqual: ComparisonHandler<Self>)
+        throws -> ExtendedDiff
     {
         return extendedDiff(
-            from: diff(other, isSame: isSame, isEqual: isEqual), other: other, isSame: isSame, isEqual: isEqual)
+            from: try diff(other, isSame: isSame, isEqual: isEqual), other: other, isSame: isSame, isEqual: isEqual)
     }
     
     /**
@@ -80,8 +80,8 @@ extension Collection where Index == Int {
     func extendedDiff(
         from diff: Diff,
         other: Self,
-        isSame: IdentityChecker<Self>,
-        isEqual: EqualityChecker<Self>)
+        isSame: ComparisonHandler<Self>,
+        isEqual: ComparisonHandler<Self>)
         -> ExtendedDiff
     {
         
@@ -151,7 +151,7 @@ extension Collection where Index == Int {
         candidate: Diff.Element,
         candidateIndex: Diff.Index,
         other: Self,
-        isSame: IdentityChecker<Self>)
+        isSame: ComparisonHandler<Self>)
         -> (ExtendedDiff.Element, Diff.Index)?
     {
         for matchIndex in (candidateIndex + 1) ..< diff.endIndex {
@@ -169,16 +169,16 @@ extension Collection where Index == Int {
         _ candidate: Diff.Element,
         match: Diff.Element,
         other: Self,
-        isSame: IdentityChecker<Self>)
+        isSame: ComparisonHandler<Self>)
         -> ExtendedDiff.Element?
     {
         switch (candidate, match) {
         case (.delete, .insert):
-            if isSame(itemOnStartIndex(advancedBy: candidate.at()), other.itemOnStartIndex(advancedBy: match.at())) {
+            if isSame(itemOnStartIndex(advancedBy: candidate.at()), other.itemOnStartIndex(advancedBy: match.at())) == true {
                 return .move(from: candidate.at(), to: match.at())
             }
         case (.insert, .delete):
-            if isSame(itemOnStartIndex(advancedBy: match.at()), other.itemOnStartIndex(advancedBy: candidate.at())) {
+            if isSame(itemOnStartIndex(advancedBy: match.at()), other.itemOnStartIndex(advancedBy: candidate.at())) == true {
                 return .move(from: match.at(), to: candidate.at())
             }
         default: return nil

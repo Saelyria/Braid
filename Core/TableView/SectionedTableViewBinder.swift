@@ -467,21 +467,24 @@ extension SectionedTableViewBinder: _TableViewDataModelDelegate {
             
             self.applyDisplayedSectionBehavior()
             
-            let diff = self.currentDataModel.diff(from: self.nextDataModel)
-            let update = NestedBatchUpdate(diff: diff)
-            self.createNextDataModel()
-            
-            self.tableView.beginUpdates()
-            self.tableView.deleteRows(at: update.itemDeletions, with: self.rowDeletionAnimation)
-            self.tableView.insertRows(at: update.itemInsertions, with: self.rowInsertionAnimation)
-            update.itemMoves.forEach { self.tableView.moveRow(at: $0.from, to: $0.to) }
-            self.tableView.deleteSections(update.sectionDeletions, with: self.sectionDeletionAnimation)
-            self.tableView.insertSections(update.sectionInsertions, with: self.sectionInsertionAnimation)
-            update.sectionMoves.forEach { self.tableView.moveSection($0.from, toSection: $0.to) }
-            self.tableView.endUpdates()
-            
-            self.tableView.reloadRows(at: update.itemUpdates, with: self.rowUpdateAnimation)
-            self.tableView.reloadSections(update.sectionUpdates, with: self.sectionUpdateAnimation)
+            if let diff = self.currentDataModel.diff(from: self.nextDataModel) {
+                let update = NestedBatchUpdate(diff: diff)
+                self.createNextDataModel()
+                
+                self.tableView.beginUpdates()
+                self.tableView.deleteRows(at: update.itemDeletions, with: self.rowDeletionAnimation)
+                self.tableView.insertRows(at: update.itemInsertions, with: self.rowInsertionAnimation)
+                update.itemMoves.forEach { self.tableView.moveRow(at: $0.from, to: $0.to) }
+                self.tableView.deleteSections(update.sectionDeletions, with: self.sectionDeletionAnimation)
+                self.tableView.insertSections(update.sectionInsertions, with: self.sectionInsertionAnimation)
+                update.sectionMoves.forEach { self.tableView.moveSection($0.from, toSection: $0.to) }
+                self.tableView.endUpdates()
+                
+                self.tableView.reloadRows(at: update.itemUpdates, with: self.rowUpdateAnimation)
+                self.tableView.reloadSections(update.sectionUpdates, with: self.sectionUpdateAnimation)
+            } else {
+                self.tableView.reloadData()
+            }
             
             self.hasRefreshQueued = false
         }
