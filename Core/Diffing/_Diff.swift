@@ -223,12 +223,15 @@ extension Collection where Index == Int {
                     while x >= 0 && y >= 0 && x < fromCount && y < toCount {
                         let targetItem = to.itemOnStartIndex(advancedBy: y)
                         let baseItem = itemOnStartIndex(advancedBy: x)
-                        if isSame(baseItem, targetItem) == true {
+                        let _isSame = isSame(baseItem, targetItem)
+                        if _isSame == true {
                             x += 1
                             y += 1
                             traces.append(Trace(from: Point(x: x - 1, y: y - 1), to: Point(x: x, y: y), D: numberOfDifferences))
-                        } else {
+                        } else if _isSame == nil {
                             throw UndiffableError()
+                        } else {
+                            break
                         }
                     }
                     

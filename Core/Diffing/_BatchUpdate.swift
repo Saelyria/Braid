@@ -42,6 +42,8 @@ struct NestedBatchUpdate {
     let sectionDeletions: IndexSet
     let sectionInsertions: IndexSet
     let sectionUpdates: IndexSet
+    let undiffableSectionUpdates: IndexSet
+    let sectionHeaderFooterUpdates: IndexSet
     let sectionMoves: [(from: Int, to: Int)]
     
     init(diff: NestedExtendedDiff) {
@@ -52,6 +54,8 @@ struct NestedBatchUpdate {
         var sectionDeletions: IndexSet = []
         var sectionInsertions: IndexSet = []
         var sectionUpdates: IndexSet = []
+        var undiffableSectionUpdates: IndexSet = []
+        var sectionHeaderFooterUpdates: IndexSet = []
         var sectionMoves: [(from: Int, to: Int)] = []
         
         diff.forEach { element in
@@ -72,6 +76,10 @@ struct NestedBatchUpdate {
                 sectionMoves.append((move.from, move.to))
             case let .updateSection(at):
                 sectionUpdates.insert(at)
+            case let .updateUndiffableSection(at):
+                undiffableSectionUpdates.insert(at)
+            case let .updateSectionHeaderFooter(at):
+                sectionHeaderFooterUpdates.insert(at)
             }
         }
         
@@ -83,5 +91,7 @@ struct NestedBatchUpdate {
         self.sectionInsertions = sectionInsertions
         self.sectionUpdates = sectionUpdates
         self.sectionDeletions = sectionDeletions
+        self.undiffableSectionUpdates = undiffableSectionUpdates
+        self.sectionHeaderFooterUpdates = sectionHeaderFooterUpdates
     }
 }

@@ -12,7 +12,6 @@ class ArtistsViewController: UIViewController {
         }
     }
     
-    private let tableView = UITableView()
     private let spinner = UIActivityIndicatorView(activityIndicatorStyle: .gray)
     private var binder: SectionedTableViewBinder<Section>!
     
@@ -26,14 +25,15 @@ class ArtistsViewController: UIViewController {
         self.title = "Artists"
         
         // 3.
-        self.view.addSubview(self.tableView)
-        self.tableView.frame = self.view.frame
-        self.tableView.tableFooterView = UIView()
-        self.tableView.sectionFooterHeight = 0.0
-        self.tableView.register(TitleDetailTableViewCell.self)
+        let tableView = UITableView()
+        self.view.addSubview(tableView)
+        tableView.frame = self.view.frame
+        tableView.tableFooterView = UIView()
+        tableView.sectionFooterHeight = 0.0
+        tableView.register(TitleDetailTableViewCell.self)
         
-        self.binder = SectionedTableViewBinder(
-            tableView: self.tableView, sectionedBy: Section.self, sectionDisplayBehavior: .hidesSectionsWithNoCellData)
+        self.binder = SectionedTableViewBinder(tableView: tableView, sectionedBy: Section.self)
+        self.binder.sectionDisplayBehavior = .hidesSectionsWithNoCellData
         
         // 4.
         self.binder.onAllSections()

@@ -13,7 +13,6 @@ class AccountsViewController: UIViewController {
     }
 
     private let spinner = UIActivityIndicatorView(activityIndicatorStyle: .gray)
-    private var tableView: UITableView!
     
     // 2.
     private var binder: SectionedTableViewBinder<Section>!
@@ -27,16 +26,17 @@ class AccountsViewController: UIViewController {
         super.viewDidLoad()
         self.title = "Accounts"
         
+        
         // 4.
-        self.tableView = UITableView(frame: self.view.frame, style: .grouped)
-        self.tableView.register(CenterLabelTableViewCell.self)
-        self.tableView.register(SectionHeaderView.self)
-        self.tableView.register(TitleDetailTableViewCell.self)
-        self.view.addSubview(self.tableView)
-        self.tableView.frame = self.view.frame
+        let tableView = UITableView(frame: self.view.frame, style: .grouped)
+        tableView.register(CenterLabelTableViewCell.self)
+        tableView.register(SectionHeaderView.self)
+        tableView.register(TitleDetailTableViewCell.self)
+        self.view.addSubview(tableView)
+        tableView.frame = self.view.frame
         
         // 5.
-        self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
+        self.binder = SectionedTableViewBinder(tableView: tableView, sectionedBy: Section.self)
         
         // 6.
         self.binder.sectionDisplayBehavior = .hidesSectionsWithNoCellData

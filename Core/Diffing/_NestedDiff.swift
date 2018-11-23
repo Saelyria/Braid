@@ -83,7 +83,6 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
             to.itemOnStartIndex(advancedBy: $0.from.y)
         }
         
-        var undiffableSections: [Trace] = []
         let elementDiff = try zip(zip(fromSections, toSections), matchingSectionTraces)
             .flatMap { (args) -> [NestedDiff.Element] in
                 let (sections, trace) = args

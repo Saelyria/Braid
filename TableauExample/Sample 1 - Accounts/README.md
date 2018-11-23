@@ -26,7 +26,9 @@ framework is highly recommended before continuing.
 
 4. Here, we instantiate the actual `UITableView` object, and register the cells we're going to use with it. Tableau provides convienient 
     `register` methods on table views for cells that conform to `ReuseIdentifiable` that registers the cell with the reuse identifier given by 
-    conformance to this protocol. If the cell conforms to `UINibInitable`,  then this method will register the cell's nib instead of the class.
+    conformance to this protocol. If the cell conforms to `UINibInitable`,  then this method will register the cell's nib instead of the class. 
+    Note that the table view is just created locally - the binder object (and our view, since it's added as a subview) will hold the reference to the
+    table, so we don't need a property for it on our view controller.
     
 5. Here we instantiate the 'binder' object. The init method is given the table view it will perform the binding on along with the enum type we 
     want the table's sections to be described by.

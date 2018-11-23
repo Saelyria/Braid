@@ -19,14 +19,6 @@ internal class _TableViewDataModel<S: TableViewSection> {
     var sectionNumberOfCells: [S: Int] = [:] {
         didSet { self.delegate?.dataModelDidChange() }
     }
-    // Titles for the footers for a section.
-    var sectionFooterTitles: [S: String] = [:] {
-        didSet { self.delegate?.dataModelDidChange() }
-    }
-    // Titles for the headers for a section.
-    var sectionHeaderTitles: [S: String] = [:] {
-        didSet { self.delegate?.dataModelDidChange() }
-    }
     // The view models for the cells for a section.
     var sectionCellViewModels: [S: [Any]] = [:] {
         didSet { self.delegate?.dataModelDidChange() }
@@ -43,6 +35,19 @@ internal class _TableViewDataModel<S: TableViewSection> {
     var sectionFooterViewModels: [S: Any] = [:] {
         didSet { self.delegate?.dataModelDidChange() }
     }
+    // Titles for the footers for a section.
+    var sectionFooterTitles: [S: String] = [:] {
+        didSet { self.delegate?.dataModelDidChange() }
+    }
+    // Titles for the headers for a section.
+    var sectionHeaderTitles: [S: String] = [:] {
+        didSet { self.delegate?.dataModelDidChange() }
+    }
+
+    // Sections whose cell data was just updated. This is set by the binder.
+    var cellUpdatedSections: Set<S> = []
+    // Sections whose header/footer data was just updated. This is set by the binder.
+    var headerFooterUpdatedSections: Set<S> = []
     
     // Returns a set containing all sections that have cell data bound.
     var sectionsWithCellData: Set<S> {
@@ -107,15 +112,6 @@ extension _TableViewDataModel {
         }
     }
     
-    internal class DiffableSectionModel: SectionModel {
-        let identifiableItems: [CollectionIdentifiable]
-        
-        init(section: S, items: [CollectionIdentifiable], itemEqualityChecker: ((Any, Any) -> Bool?)?) {
-            self.identifiableItems = items
-            super.init(section: section, items: items, itemEqualityChecker: itemEqualityChecker)
-        }
-    }
-    
     /**
      Maps the data model to an array of diffable section models that can be used with Differ to animate changes on the
      table view. Returns nil if the data is not diffable (i.e. one or more of its data arrays did not contain models
@@ -123,27 +119,18 @@ extension _TableViewDataModel {
      */
     func asDiffableSectionModels() -> [SectionModel] {
         return self.displayedSections.map { (section) -> SectionModel in
-            var identifiableItems: [CollectionIdentifiable]?
+            // make sure to favour items that are diffable
+            var items: [Any]?
             if let identifiableVMs = self.sectionCellViewModels as? [S: [CollectionIdentifiable]] {
-                identifiableItems = identifiableVMs[section]
+                items = identifiableVMs[section]
             } else if let identifiableMs = self.sectionCellModels as? [S: [CollectionIdentifiable]] {
-                identifiableItems = identifiableMs[section]
-            } else if self.sectionCellViewModels.isEmpty && self.sectionCellModels.isEmpty {
-                identifiableItems = []
+                items = identifiableMs[section]
             }
             
-            if let items = identifiableItems {
-                return DiffableSectionModel(
-                    section: section,
-                    items: items,
-                    itemEqualityChecker: self.delegate?.itemEqualityChecker(for: section))
-            } else {
-                let items: [Any] = self.sectionCellViewModels[section] ?? self.sectionCellModels[section] ?? []
-                return SectionModel(
-                    section: section,
-                    items: items,
-                    itemEqualityChecker: self.delegate?.itemEqualityChecker(for: section))
-            }
+            return SectionModel(
+                section: section,
+                items: items ?? [],
+                itemEqualityChecker: self.delegate?.itemEqualityChecker(for: section))
         }
     }
     
@@ -155,17 +142,31 @@ extension _TableViewDataModel {
     func diff(from other: _TableViewDataModel<S>) -> NestedExtendedDiff? {
         let selfSectionModels = self.asDiffableSectionModels()
         let otherSectionModels = other.asDiffableSectionModels()
-        return try? selfSectionModels.nestedExtendedDiff(
+        guard var diff = try? selfSectionModels.nestedExtendedDiff(
             to: otherSectionModels,
             isSameSection: { $0.section == $1.section },
             isSameElement: { _lhs, _rhs in
                 if let lhs = _lhs as? CollectionIdentifiable, let rhs = _rhs as? CollectionIdentifiable {
                     return lhs.collectionId == rhs.collectionId
                 }
-                return false
+                return nil
             },
             isEqualElement: { sectionModel, lhs, rhs in
-                return other.delegate?.itemEqualityChecker(for: sectionModel.section)?(lhs, rhs)
-            })
+                return sectionModel.itemEqualityChecker?(lhs, rhs)
+        }) else { return nil }
+        
+        // Reload sections whose header or footer were updated
+        for section in other.headerFooterUpdatedSections.filter({ !other.cellUpdatedSections.contains($0) }) {
+            guard let i = other.displayedSections.firstIndex(of: section) else { continue }
+            diff.elements.append(.updateSectionHeaderFooter(i))
+        }
+        
+        // Reload sections that were updated whose items weren't equatable
+        for section in other.cellUpdatedSections.filter({ other.delegate?.itemEqualityChecker(for: $0) == nil }) {
+            guard let i = other.displayedSections.firstIndex(of: section) else { continue }
+            diff.elements.append(.updateUndiffableSection(i))
+        }
+        
+        return diff
     }
 }

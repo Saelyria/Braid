@@ -25,12 +25,14 @@ internal extension SectionedTableViewBinder {
         if let models = models {
             self.update(fromDataIn: models,
                         updatingProperty: &self.nextDataModel.sectionCellModels,
-                        affectedSections: affectedSections)
+                        affectedSections: affectedSections,
+                        isCellUpdate: true)
         }
         if let viewModels = viewModels {
             self.update(fromDataIn: viewModels,
                         updatingProperty: &self.nextDataModel.sectionCellViewModels,
-                        affectedSections: affectedSections)
+                        affectedSections: affectedSections,
+                        isCellUpdate: true)
         }
     }
     
@@ -43,7 +45,8 @@ internal extension SectionedTableViewBinder {
     func updateNumberOfCells(_ numCells: [S: Int], affectedSections: SectionBindingScope<S>) {
         self.update(fromDataIn: numCells,
                     updatingProperty: &self.nextDataModel.sectionNumberOfCells,
-                    affectedSections: affectedSections)
+                    affectedSections: affectedSections,
+                    isCellUpdate: true)
     }
     
     /**
@@ -56,7 +59,8 @@ internal extension SectionedTableViewBinder {
         let nonNilTitles: [S: String] = titles.filter { $0.value != nil }.mapValues { return $0! }
         self.update(fromDataIn: nonNilTitles,
                     updatingProperty: &self.nextDataModel.sectionHeaderTitles,
-                    affectedSections: affectedSections)
+                    affectedSections: affectedSections,
+                    isCellUpdate: false)
     }
     
     /**
@@ -69,7 +73,8 @@ internal extension SectionedTableViewBinder {
         let nonNilViewModels: [S: Any] = viewModels.filter { $0.value != nil }.mapValues { return $0! }
         self.update(fromDataIn: nonNilViewModels,
                     updatingProperty: &self.nextDataModel.sectionHeaderViewModels,
-                    affectedSections: affectedSections)
+                    affectedSections: affectedSections,
+                    isCellUpdate: false)
     }
     
     /**
@@ -82,7 +87,8 @@ internal extension SectionedTableViewBinder {
         let nonNilTitles: [S: String] = titles.filter { $0.value != nil }.mapValues { return $0! }
         self.update(fromDataIn: nonNilTitles,
                     updatingProperty: &self.nextDataModel.sectionFooterTitles,
-                    affectedSections: affectedSections)
+                    affectedSections: affectedSections,
+                    isCellUpdate: false)
     }
     
     /**
@@ -95,7 +101,8 @@ internal extension SectionedTableViewBinder {
         let nonNilViewModels: [S: Any] = viewModels.filter { $0.value != nil }.mapValues { return $0! }
         self.update(fromDataIn: nonNilViewModels,
                     updatingProperty: &self.nextDataModel.sectionFooterViewModels,
-                    affectedSections: affectedSections)
+                    affectedSections: affectedSections,
+                    isCellUpdate: false)
     }
 }
 
@@ -107,11 +114,13 @@ private extension SectionedTableViewBinder {
      - parameter current: A pointer to the dictionary property on the binder's `nextDataModel` that gets updated
         with the values from the 'new' dictionary.
      - parameter affectedSections: The section scope affected by this update.
+     - parameter isCellUpdate: Whether this update concerns cell data or header/footer data.
     */
     func update<V>(
         fromDataIn new: [S: V],
         updatingProperty current: inout [S: V],
-        affectedSections: SectionBindingScope<S>)
+        affectedSections: SectionBindingScope<S>,
+        isCellUpdate: Bool)
     {
         switch affectedSections {
         case .forNamedSections(let sections):
@@ -119,6 +128,12 @@ private extension SectionedTableViewBinder {
             // value for the section in the reference to the 'current' data model to the data for the section in 'new'.
             for section in sections {
                 current[section] = new[section]
+            }
+            if isCellUpdate {
+                self.nextDataModel.cellUpdatedSections = self.nextDataModel.cellUpdatedSections.union(sections)
+            } else {
+                self.nextDataModel.headerFooterUpdatedSections =
+                    self.nextDataModel.headerFooterUpdatedSections.union(sections)
             }
         case .forAllUnnamedSections:
             /*
@@ -139,6 +154,12 @@ private extension SectionedTableViewBinder {
             for section in sectionsToIterate {
                 guard self.nextDataModel.uniquelyBoundSections.contains(section) == false else { continue }
                 current[section] = new[section]
+            }
+            if isCellUpdate {
+                self.nextDataModel.cellUpdatedSections = self.nextDataModel.cellUpdatedSections.union(sectionsToIterate)
+            } else {
+                self.nextDataModel.headerFooterUpdatedSections =
+                    self.nextDataModel.headerFooterUpdatedSections.union(sectionsToIterate)
             }
         case .forAnySection:
             assertionFailure("Data binding not supported for 'any section' - internal error")

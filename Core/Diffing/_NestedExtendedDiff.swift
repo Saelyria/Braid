@@ -22,6 +22,9 @@ struct NestedExtendedDiff: DiffProtocol {
         case insertElement(Int, section: Int)
         case updateElement(Int, section: Int)
         case moveElement(from: (item: Int, section: Int), to: (item: Int, section: Int))
+        
+        case updateUndiffableSection(Int)
+        case updateSectionHeaderFooter(Int)
     }
     
     func index(after i: Int) -> Int {
@@ -64,19 +67,19 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
                 from: Diff(traces: diffTraces),
                 other: to,
                 isSame: isSameSection,
-                isEqual: { _, _ in return false } // TODO: other checks for section updating
-                ).map { element -> NestedExtendedDiff.Element in
-                    switch element {
-                    case let .delete(at):
-                        return .deleteSection(at)
-                    case let .insert(at):
-                        return .insertSection(at)
-                    case let .move(from, to):
-                        return .moveSection(from: from, to: to)
-                    case .update(let at):
-                        return .updateSection(at)
-                    }
-        }
+                isEqual: { _, _ in return false }) // TODO: other checks for section updating
+            .map { element -> NestedExtendedDiff.Element in
+                switch element {
+                case let .delete(at):
+                    return .deleteSection(at)
+                case let .insert(at):
+                    return .insertSection(at)
+                case let .move(from, to):
+                    return .moveSection(from: from, to: to)
+                case .update(let at):
+                    return .updateSection(at)
+                }
+            }
         
         // Diff matching sections (moves, deletions, insertions)
         let filterMatchPoints = { (trace: Trace) -> Bool in
@@ -86,27 +89,32 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
             return false
         }
         
-        let sectionMoves =
-            try sectionDiff.compactMap { diffElement -> (Int, Int)? in
+        let sectionMoves = sectionDiff
+            .compactMap { diffElement -> (Int, Int)? in
                 if case let .moveSection(from, to) = diffElement {
                     return (from, to)
                 }
                 return nil
-                }.flatMap { move -> [NestedExtendedDiff.Element] in
-                    return try itemOnStartIndex(advancedBy: move.0).extendedDiff(to.itemOnStartIndex(advancedBy: move.1), isSame: isSameElement, isEqual: { _,_ in false })
-                        .map { diffElement -> NestedExtendedDiff.Element in
-                            switch diffElement {
-                            case let .insert(at):
-                                return .insertElement(at, section: move.1)
-                            case let .delete(at):
-                                return .deleteElement(at, section: move.0)
-                            case let .move(from, to):
-                                return .moveElement(from: (from, move.0), to: (to, move.1))
-                            case .update(let at):
-                                return .updateElement(at, section: move.0)
-                            }
-                    }
-        }
+            }.flatMap { move -> [NestedExtendedDiff.Element] in
+                if let elements = try? itemOnStartIndex(advancedBy: move.0)
+                    .extendedDiff(to.itemOnStartIndex(advancedBy: move.1), isSame: isSameElement, isEqual: { _,_ in false })
+                    .map { diffElement -> NestedExtendedDiff.Element in
+                        switch diffElement {
+                        case let .insert(at):
+                            return .insertElement(at, section: move.1)
+                        case let .delete(at):
+                            return .deleteElement(at, section: move.0)
+                        case let .move(from, to):
+                            return .moveElement(from: (from, move.0), to: (to, move.1))
+                        case .update(let at):
+                            return .updateElement(at, section: move.0)
+                        }
+                    } {
+                    return elements
+                } else {
+                    return []
+                }
+            }
         
         // offset & section
         
@@ -121,22 +129,26 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
             to.itemOnStartIndex(advancedBy: $0.from.y)
         }
         
-        let elementDiff = try zip(zip(fromSections, toSections), matchingSectionTraces)
+        let elementDiff = zip(zip(fromSections, toSections), matchingSectionTraces)
             .flatMap { (args) -> [NestedExtendedDiff.Element] in
                 let (sections, trace) = args
-                return try sections.0.extendedDiff(sections.1, isSame: isSameElement, isEqual: { lhs, rhs in
-                    return isEqualElement(sections.0, lhs, rhs)
-                }).map { diffElement -> NestedExtendedDiff.Element in
-                    switch diffElement {
-                    case let .delete(at):
-                        return .deleteElement(at, section: trace.from.x)
-                    case let .insert(at):
-                        return .insertElement(at, section: trace.from.y)
-                    case let .move(from, to):
-                        return .moveElement(from: (from, trace.from.x), to: (to, trace.from.y))
-                    case .update(let at):
-                        return .updateElement(at, section: trace.from.x) //TODO: not sure if x or y?
-                    }
+                if let elements = try? sections.0
+                    .extendedDiff(sections.1, isSame: isSameElement, isEqual: { isEqualElement(sections.1, $0, $1)})
+                    .map { diffElement -> NestedExtendedDiff.Element in
+                        switch diffElement {
+                        case let .delete(at):
+                            return .deleteElement(at, section: trace.from.x)
+                        case let .insert(at):
+                            return .insertElement(at, section: trace.from.y)
+                        case let .move(from, to):
+                            return .moveElement(from: (from, trace.from.x), to: (to, trace.from.y))
+                        case .update(let at):
+                            return .updateElement(at, section: trace.from.x)
+                        }
+                    } {
+                    return elements
+                } else {
+                    return []
                 }
         }
         
@@ -163,6 +175,10 @@ extension NestedExtendedDiff.Element: CustomDebugStringConvertible {
             return "US(s:\(section))"
         case let .updateElement(row, section):
             return "UE(s:\(section),r:\(row))"
+        case let .updateUndiffableSection(section):
+            return "US(s:\(section))"
+        case let .updateSectionHeaderFooter(section):
+            return "US(s:\(section))"
         }
     }
 }

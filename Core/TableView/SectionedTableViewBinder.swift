@@ -196,6 +196,12 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     public var sectionUpdateAnimation: UITableView.RowAnimation = .automatic
     /// The animation the binder will use to animate section insertions. The default value is `automatic`.
     public var sectionInsertionAnimation: UITableView.RowAnimation = .automatic
+    /// The animation the binder will use to animate section updates for sections whose items was 'undiffable' (i.e.
+    /// did not conform to `CollectionIdentifiable` or `Equatable`). The default value is `none`.
+    public var undiffableSectionUpdateAnimation: UITableView.RowAnimation = .none
+    /// The animation the binder will use to animate section updates when the section's header or footer updates. The
+    /// default value is `none`.
+    public var sectionHeaderFooterUpdateAnimation: UITableView.RowAnimation = .none
     
     /// A value indicating how this table view binder manages the visibility of sections bound to it.
     public var sectionDisplayBehavior: SectionDisplayBehavior {
@@ -482,6 +488,8 @@ extension SectionedTableViewBinder: _TableViewDataModelDelegate {
                 
                 self.tableView.reloadRows(at: update.itemUpdates, with: self.rowUpdateAnimation)
                 self.tableView.reloadSections(update.sectionUpdates, with: self.sectionUpdateAnimation)
+                self.tableView.reloadSections(update.sectionHeaderFooterUpdates, with: self.sectionHeaderFooterUpdateAnimation)
+                self.tableView.reloadSections(update.undiffableSectionUpdates, with: self.undiffableSectionUpdateAnimation)
             } else {
                 self.tableView.reloadData()
             }
