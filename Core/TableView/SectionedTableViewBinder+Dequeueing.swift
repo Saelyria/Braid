@@ -24,7 +24,7 @@ internal extension SectionedTableViewBinder {
             assertionFailure("ERROR: Didn't return the right cell type - something went awry!")
             return UITableViewCell()
         }
-        
+
         self.addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
     }
     
@@ -132,12 +132,13 @@ private extension SectionedTableViewBinder {
         switch affectedSections {
         case .forNamedSections(let sections):
             for section in sections {
-                if self.handlers.sectionCellDequeueBlocks[section] != nil {
-                    assertionFailure("Section already has a cell type bound to it - re-binding not supported.")
+                if self.nextDataModel.uniquelyBoundCellSections.contains(section) {
+                    assertionFailure("Section '\(section)' already has a cell type bound to it - re-binding not supported.")
                     return
                 }
                 self.handlers.sectionCellDequeueBlocks[section] = cellDequeueBlock
             }
+            self.nextDataModel.uniquelyBoundCellSections.append(contentsOf: sections)
         case .forAllUnnamedSections:
             self.handlers.dynamicSectionCellDequeueBlock = cellDequeueBlock
         case .forAnySection:
@@ -170,12 +171,13 @@ private extension SectionedTableViewBinder {
             switch affectedSections {
             case .forNamedSections(let sections):
                 for section in sections {
-                    if self.handlers.sectionHeaderDequeueBlocks[section] != nil {
-                        print("WARNING: Section already has a header type bound to it - re-binding not supported.")
+                    if self.nextDataModel.uniquelyBoundHeaderSections.contains(section) {
+                        print("Section '\(section)' already has a header type bound to it - re-binding not supported.")
                         return
                     }
                     self.handlers.sectionHeaderDequeueBlocks[section] = dequeueBlock
                 }
+                self.nextDataModel.uniquelyBoundHeaderSections.append(contentsOf: sections)
             case .forAllUnnamedSections:
                 self.handlers.dynamicSectionsHeaderDequeueBlock = dequeueBlock
             case .forAnySection:
@@ -185,12 +187,13 @@ private extension SectionedTableViewBinder {
             switch affectedSections {
             case .forNamedSections(let sections):
                 for section in sections {
-                    if self.handlers.sectionFooterDequeueBlocks[section] != nil {
-                        print("WARNING: Section already has a footer type bound to it - re-binding not supported.")
+                    if self.nextDataModel.uniquelyBoundFooterSections.contains(section) {
+                        print("Section '\(section)' already has a footer type bound to it - re-binding not supported.")
                         return
                     }
                     self.handlers.sectionFooterDequeueBlocks[section] = dequeueBlock
                 }
+                self.nextDataModel.uniquelyBoundFooterSections.append(contentsOf: sections)
             case .forAllUnnamedSections:
                 self.handlers.dynamicSectionsFooterDequeueBlock = dequeueBlock
             case .forAnySection:
@@ -198,5 +201,4 @@ private extension SectionedTableViewBinder {
             }
         }
     }
-
 }

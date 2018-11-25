@@ -12,6 +12,13 @@ titles. Just like the previous sample, tapping the 'Refresh' button starts a new
 the 'accounts' sample. Similarly, this view controller uses RxSwift to do much of its work, so familiarity with this framework is highly 
 recommended before continuing.
 
+> Before reading through this, it's also recommended that you take a quick look through these tutorials:
+- [Getting started](../../Documentation/GettingStarted.md)
+- [Updating data](../../Documentation/UpdatingData.md)
+- [Hiding, showing, and ordering sections automatically](../../Documentation/SectionDisplayBehaviour.md)
+- [Using view models](../../Documentation/UsingViewModels.md)
+- [Advanced binding chains](../../Documentation/AdvancedBindingChains.md)
+
 ## Walkthrough
 
 1. Here, instead of using an enum to define our sections, we use a struct object. While enums provide better code legibility for more static 

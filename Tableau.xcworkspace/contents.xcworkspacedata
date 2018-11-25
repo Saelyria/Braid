@@ -29,6 +29,9 @@
          location = "group:UsingViewModels.md">
       </FileRef>
       <FileRef
+         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/AdvancedBindingChains.md">
+      </FileRef>
+      <FileRef
          location = "group:TipsTricksFAQ.md">
       </FileRef>
       <FileRef

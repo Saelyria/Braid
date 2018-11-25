@@ -1,4 +1,4 @@
-# Sample 1 - Account
+# Sample 1 - Accounts
 
 ## Overview
 
@@ -11,6 +11,12 @@ object. It uses the `CenterLabelTableViewCell`, `TitleDetailTableViewCell`, and 
 data. Whenever the 'Refresh' button is tapped in the view's nav bar, it starts a new 'fetch' and fills the table with the new data, 
 demonstrating Tableau's ability to auto-animate changes. This view controller uses RxSwift to do much of its work, so a familiarity with this
 framework is highly recommended before continuing.
+
+> Before reading through this, it's also recommended that you take a quick look through these tutorials:
+- [Getting started](../../Documentation/GettingStarted.md)
+- [Updating data](../../Documentation/UpdatingData.md)
+- [Hiding, showing, and ordering sections automatically](../../Documentation/SectionDisplayBehaviour.md)
+- [Using view models](../../Documentation/UsingViewModels.md)
 
 ## Walkthrough
 

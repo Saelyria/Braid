@@ -4,6 +4,9 @@ import UIKit
 class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDataSource, UITableViewDelegate {
 
     private weak var binder: SectionedTableViewBinder<S>!
+    private var dataModel: _TableViewDataModel<S>! {
+        return self.binder.currentDataModel
+    }
 
     init(binder: SectionedTableViewBinder<S>) {
         self.binder = binder
@@ -45,12 +48,12 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let section = self.binder.currentDataModel.displayedSections[section]
-        if let models = self.binder.currentDataModel.sectionCellModels[section] {
+        let section = self.dataModel.displayedSections[section]
+        if let models = self.dataModel.sectionCellModels[section] {
             return models.count
-        } else if let viewModels = self.binder.currentDataModel.sectionCellViewModels[section] {
+        } else if let viewModels = self.dataModel.sectionCellViewModels[section] {
             return viewModels.count
-        } else if let numCells = self.binder.currentDataModel.sectionNumberOfCells[section] {
+        } else if let numCells = self.dataModel.sectionNumberOfCells[section] {
             return numCells
         } else {
             return 0
@@ -58,10 +61,10 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let section = self.binder.currentDataModel.displayedSections[indexPath.section]
+        let section = self.dataModel.displayedSections[indexPath.section]
         
         // We can't fall back to the 'all sections' cell dequeue block - might expect a different cell type.
-        let _dequeueBlock = (sectionWasUniquelyBound(section)) ?
+        let _dequeueBlock = (self.dataModel.uniquelyBoundCellSections.contains(section)) ?
             self.binder.handlers.sectionCellDequeueBlocks[section] :
             self.binder.handlers.dynamicSectionCellDequeueBlock
         guard let dequeueBlock = _dequeueBlock else { return UITableViewCell() }
@@ -71,64 +74,66 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        let section = self.binder.currentDataModel.displayedSections[section]
+        let section = self.dataModel.displayedSections[section]
         
         // don't return a title if the section has a header dequeue block specifically assigned or if the section
         // was not uniquely bound and there is an 'all sections' header dequeue block
-        if self.binder.handlers.sectionHeaderDequeueBlocks[section] != nil ||
-        (!sectionWasUniquelyBound(section) && self.binder.handlers.dynamicSectionsHeaderDequeueBlock != nil) {
+        let wasBoundUniquely = self.dataModel.uniquelyBoundHeaderSections.contains(section)
+        if self.binder.handlers.sectionHeaderDequeueBlocks[section] != nil
+        || (wasBoundUniquely && self.binder.handlers.dynamicSectionsHeaderDequeueBlock != nil) {
             return nil
         }
-        return self.binder.currentDataModel.sectionHeaderTitles[section]
+        return self.dataModel.sectionHeaderTitles[section]
     }
     
     func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        let section = self.binder.currentDataModel.displayedSections[section]
+        let section = self.dataModel.displayedSections[section]
         
         // don't return a title if the section has a footer dequeue block specifically assigned or if the section
         // was not uniquely bound and there is an 'all sections' footer dequeue block
-        if self.binder.handlers.sectionFooterDequeueBlocks[section] != nil ||
-        (!sectionWasUniquelyBound(section) && self.binder.handlers.dynamicSectionsFooterDequeueBlock != nil) {
+        let wasBoundUniquely = self.dataModel.uniquelyBoundFooterSections.contains(section)
+        if self.binder.handlers.sectionFooterDequeueBlocks[section] != nil
+        || (!wasBoundUniquely && self.binder.handlers.dynamicSectionsFooterDequeueBlock != nil) {
             return nil
         }
-        return self.binder.currentDataModel.sectionFooterTitles[section]
+        return self.dataModel.sectionFooterTitles[section]
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection sectionInt: Int) -> UIView? {
-        let section = self.binder.currentDataModel.displayedSections[sectionInt]
+        let section = self.dataModel.displayedSections[sectionInt]
         
         // We can't fall back to the 'all sections' header dequeue block - might expect a different header type.
-        let dequeueBlock = (sectionWasUniquelyBound(section)) ?
+        let dequeueBlock = (self.dataModel.uniquelyBoundHeaderSections.contains(section)) ?
             self.binder.handlers.sectionHeaderDequeueBlocks[section] :
             self.binder.handlers.dynamicSectionsHeaderDequeueBlock
         return dequeueBlock?(section, tableView)
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection sectionInt: Int) -> UIView? {
-        let section = self.binder.currentDataModel.displayedSections[sectionInt]
+        let section = self.dataModel.displayedSections[sectionInt]
         
-        let dequeueBlock = (sectionWasUniquelyBound(section)) ?
+        let dequeueBlock = (self.dataModel.uniquelyBoundFooterSections.contains(section)) ?
             self.binder.handlers.sectionFooterDequeueBlocks[section] :
             self.binder.handlers.dynamicSectionsFooterDequeueBlock
         return dequeueBlock?(section, tableView)
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let section = self.binder.currentDataModel.displayedSections[indexPath.section]
+        let section = self.dataModel.displayedSections[indexPath.section]
+        
         guard let cell = tableView.cellForRow(at: indexPath) else { return }
-        let callback = (sectionWasUniquelyBound(section)) ?
+        let callback = (self.dataModel.uniquelyBoundFooterSections.contains(section)) ?
             self.binder.handlers.sectionCellTappedCallbacks[section] :
             self.binder.handlers.dynamicSectionsCellTappedCallback
         callback?(section, indexPath.row, cell)
         self.binder.handlers.anySectionCellTappedCallback?(section, indexPath.row, cell)
     }
     
-    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let section = self.binder.currentDataModel.displayedSections[indexPath.section]
+        let section = self.dataModel.displayedSections[indexPath.section]
         
         var _heightBlock: CellHeightBlock<S>?
-        if sectionWasUniquelyBound(section) {
+        if self.dataModel.uniquelyBoundCellSections.contains(section) {
             _heightBlock = self.binder.handlers.sectionCellHeightBlocks[section]
         } else {
             _heightBlock = self.binder.handlers.dynamicSectionsCellHeightBlock
@@ -143,7 +148,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         let section = self.binder.currentDataModel.displayedSections[sectionInt]
         
         var _heightBlock: HeaderFooterHeightBlock<S>?
-        if sectionWasUniquelyBound(section) {
+        if self.dataModel.uniquelyBoundHeaderSections.contains(section) {
             _heightBlock = self.binder.handlers.sectionHeaderHeightBlocks[section]
         } else {
             _heightBlock = self.binder.handlers.dynamicSectionsHeaderHeightBlock
@@ -159,7 +164,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         let section = self.binder.currentDataModel.displayedSections[sectionInt]
         
         var _heightBlock: HeaderFooterHeightBlock<S>?
-        if sectionWasUniquelyBound(section) {
+        if self.dataModel.uniquelyBoundFooterSections.contains(section) {
             _heightBlock = self.binder.handlers.sectionFooterHeightBlocks[section]
         } else {
             _heightBlock = self.binder.handlers.dynamicSectionsFooterHeightBlock
@@ -175,7 +180,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         let section = self.binder.currentDataModel.displayedSections[indexPath.section]
         
         var _heightBlock: CellHeightBlock<S>?
-        if sectionWasUniquelyBound(section) {
+        if self.dataModel.uniquelyBoundCellSections.contains(section) {
             _heightBlock = self.binder.handlers.sectionEstimatedCellHeightBlocks[section]
         } else {
             _heightBlock = self.binder.handlers.dynamicSectionsEstimatedCellHeightBlock
@@ -191,7 +196,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         let section = self.binder.currentDataModel.displayedSections[sectionInt]
         
         var _heightBlock: HeaderFooterHeightBlock<S>?
-        if sectionWasUniquelyBound(section) {
+        if self.dataModel.uniquelyBoundHeaderSections.contains(section) {
             _heightBlock = self.binder.handlers.sectionHeaderEstimatedHeightBlocks[section]
         } else {
             _heightBlock = self.binder.handlers.dynamicSectionsHeaderEstimatedHeightBlock
@@ -207,7 +212,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         let section = self.binder.currentDataModel.displayedSections[sectionInt]
         
         var _heightBlock: HeaderFooterHeightBlock<S>?
-        if sectionWasUniquelyBound(section) {
+        if self.dataModel.uniquelyBoundFooterSections.contains(section) {
             _heightBlock = self.binder.handlers.sectionFooterEstimatedHeightBlocks[section]
         } else {
             _heightBlock = self.binder.handlers.dynamicSectionsFooterEstimatedHeightBlock
@@ -217,9 +222,5 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         }
         
         return heightBlock(section)
-    }
-    
-    private func sectionWasUniquelyBound(_ section: S) -> Bool {
-        return self.binder.currentDataModel.uniquelyBoundSections.contains(section)
     }
 }

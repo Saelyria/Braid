@@ -72,7 +72,9 @@ public class TableViewBinder {
     
     /// Starts binding on the table.
     public func onTable() -> TableViewSingleSectionBinder<UITableViewCell, _SingleSection> {
-        self._sectionBinder.nextDataModel.uniquelyBoundSections.append(.table)
+        self._sectionBinder.nextDataModel.uniquelyBoundCellSections.append(.table)
+        self._sectionBinder.nextDataModel.uniquelyBoundHeaderSections.append(.table)
+        self._sectionBinder.nextDataModel.uniquelyBoundFooterSections.append(.table)
         return TableViewSingleSectionBinder<UITableViewCell, _SingleSection>(
             binder: self._sectionBinder, section: .table)
     }
@@ -297,7 +299,6 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
-        self.nextDataModel.uniquelyBoundSections.append(section)
         return TableViewSingleSectionBinder<UITableViewCell, S>(binder: self, section: section)
     }
     
@@ -318,8 +319,6 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         guard sections.isEmpty == false else {
             fatalError("The given 'sections' array to begin a binding chain was empty.")
         }
-        self.nextDataModel.uniquelyBoundSections.append(contentsOf: sections)
-        
         return TableViewMutliSectionBinder<UITableViewCell, S>(binder: self, sections: sections)
     }
 
@@ -452,7 +451,7 @@ public extension SectionedTableViewBinder.SectionDisplayBehavior where S: Compar
 
 extension SectionedTableViewBinder: _TableViewDataModelDelegate {
     func itemEqualityChecker(for section: S) -> ((Any, Any) -> Bool?)? {
-        if self.nextDataModel.uniquelyBoundSections.contains(section) {
+        if self.nextDataModel.uniquelyBoundCellSections.contains(section) {
             return self.handlers.sectionItemEqualityCheckers[section]
         }
         return self.handlers.dynamicSectionItemEqualityChecker

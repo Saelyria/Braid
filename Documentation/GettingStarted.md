@@ -212,6 +212,8 @@ started with other features of Tableau, like updating data on your bound table v
 using dynamic sections, and others. 
 - [Updating data](UpdatingData.md)
 - [Hiding, showing, and ordering sections automatically](SectionDisplayBehaviour.md)
+- [Providing dimensions](ProvidingDimensions.md)
+- [Advanced binding chains](AdvancedBindingChains.md)
 - [Using view models](UsingViewModels.md)
 - [Tips, tricks, and FAQ](TipsTricksFAQ.md)
 - [How it works](HowItWorks.md)

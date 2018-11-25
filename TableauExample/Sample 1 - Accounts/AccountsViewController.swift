@@ -26,7 +26,6 @@ class AccountsViewController: UIViewController {
         super.viewDidLoad()
         self.title = "Accounts"
         
-        
         // 4.
         let tableView = UITableView(frame: self.view.frame, style: .grouped)
         tableView.register(CenterLabelTableViewCell.self)

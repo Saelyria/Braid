@@ -26,13 +26,13 @@ internal extension SectionedTableViewBinder {
             self.update(fromDataIn: models,
                         updatingProperty: &self.nextDataModel.sectionCellModels,
                         affectedSections: affectedSections,
-                        isCellUpdate: true)
+                        dataType: .cell)
         }
         if let viewModels = viewModels {
             self.update(fromDataIn: viewModels,
                         updatingProperty: &self.nextDataModel.sectionCellViewModels,
                         affectedSections: affectedSections,
-                        isCellUpdate: true)
+                        dataType: .cell)
         }
     }
     
@@ -46,7 +46,7 @@ internal extension SectionedTableViewBinder {
         self.update(fromDataIn: numCells,
                     updatingProperty: &self.nextDataModel.sectionNumberOfCells,
                     affectedSections: affectedSections,
-                    isCellUpdate: true)
+                    dataType: .cell)
     }
     
     /**
@@ -60,7 +60,7 @@ internal extension SectionedTableViewBinder {
         self.update(fromDataIn: nonNilTitles,
                     updatingProperty: &self.nextDataModel.sectionHeaderTitles,
                     affectedSections: affectedSections,
-                    isCellUpdate: false)
+                    dataType: .header)
     }
     
     /**
@@ -74,7 +74,7 @@ internal extension SectionedTableViewBinder {
         self.update(fromDataIn: nonNilViewModels,
                     updatingProperty: &self.nextDataModel.sectionHeaderViewModels,
                     affectedSections: affectedSections,
-                    isCellUpdate: false)
+                    dataType: .header)
     }
     
     /**
@@ -88,7 +88,7 @@ internal extension SectionedTableViewBinder {
         self.update(fromDataIn: nonNilTitles,
                     updatingProperty: &self.nextDataModel.sectionFooterTitles,
                     affectedSections: affectedSections,
-                    isCellUpdate: false)
+                    dataType: .footer)
     }
     
     /**
@@ -102,11 +102,17 @@ internal extension SectionedTableViewBinder {
         self.update(fromDataIn: nonNilViewModels,
                     updatingProperty: &self.nextDataModel.sectionFooterViewModels,
                     affectedSections: affectedSections,
-                    isCellUpdate: false)
+                    dataType: .header)
     }
 }
 
 private extension SectionedTableViewBinder {
+    enum DataUpdateType {
+        case cell
+        case header
+        case footer
+    }
+    
     /**
      Updates a dictionary on the binder's `nextDataModel` to the given values for the given section.
      
@@ -114,13 +120,13 @@ private extension SectionedTableViewBinder {
      - parameter current: A pointer to the dictionary property on the binder's `nextDataModel` that gets updated
         with the values from the 'new' dictionary.
      - parameter affectedSections: The section scope affected by this update.
-     - parameter isCellUpdate: Whether this update concerns cell data or header/footer data.
+     - parameter dataType: The type of data being updated (cell, header, or footer).
     */
     func update<V>(
         fromDataIn new: [S: V],
         updatingProperty current: inout [S: V],
         affectedSections: SectionBindingScope<S>,
-        isCellUpdate: Bool)
+        dataType: DataUpdateType)
     {
         switch affectedSections {
         case .forNamedSections(let sections):
@@ -129,12 +135,16 @@ private extension SectionedTableViewBinder {
             for section in sections {
                 current[section] = new[section]
             }
-            if isCellUpdate {
+            
+            // mark either the cells or header/footers for the affected sections as dirty so they're reloaded
+            switch dataType {
+            case .cell:
                 self.nextDataModel.cellUpdatedSections = self.nextDataModel.cellUpdatedSections.union(sections)
-            } else {
+            case .header, .footer:
                 self.nextDataModel.headerFooterUpdatedSections =
                     self.nextDataModel.headerFooterUpdatedSections.union(sections)
             }
+        
         case .forAllUnnamedSections:
             /*
              If we're binding for dynamic, unnamed sections, we assume that the data in the 'new' dict given is the
@@ -150,14 +160,25 @@ private extension SectionedTableViewBinder {
              */
             var sectionsToIterate = Set<S>(current.keys)
             sectionsToIterate.formUnion(new.keys)
-            sectionsToIterate.subtract(self.nextDataModel.uniquelyBoundSections)
+            
+            let uniquelyBoundSections: [S]
+            switch dataType {
+            case .cell: uniquelyBoundSections = self.nextDataModel.uniquelyBoundCellSections
+            case .header: uniquelyBoundSections = self.nextDataModel.uniquelyBoundHeaderSections
+            case .footer: uniquelyBoundSections = self.nextDataModel.uniquelyBoundFooterSections
+            }
+            
+            sectionsToIterate.subtract(uniquelyBoundSections)
             for section in sectionsToIterate {
-                guard self.nextDataModel.uniquelyBoundSections.contains(section) == false else { continue }
+                guard uniquelyBoundSections.contains(section) == false else { continue }
                 current[section] = new[section]
             }
-            if isCellUpdate {
+            
+            // mark either the cells or header/footers for the affected sections as dirty so they're reloaded
+            switch dataType {
+            case .cell:
                 self.nextDataModel.cellUpdatedSections = self.nextDataModel.cellUpdatedSections.union(sectionsToIterate)
-            } else {
+            case .header, .footer:
                 self.nextDataModel.headerFooterUpdatedSections =
                     self.nextDataModel.headerFooterUpdatedSections.union(sectionsToIterate)
             }

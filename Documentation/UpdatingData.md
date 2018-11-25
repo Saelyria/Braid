@@ -99,19 +99,24 @@ binder.onSection(.first)
 ## Animating Updates
 
 Tableau includes support for automatically creating diffs when data for cells or sections is updated as well as for automatically animating diffs 
-in data with UIKit's native table view animations. Enabling this feature is voluntary, and simply requires conformance to the 
-`CollectionIdentifiable` protocol on the model objects (or view models) used for cells. This protocol has only one requirement: a
-`collectionId` string property. Table and collection view binders use this property to track insertion, movement, and deletion of items on the
-table.
+in data with UIKit's native table view animations. Enabling this feature is voluntary, and simply requires conformance to a couple protocols on
+the data you want to be diffable. At a minimum, your data type must conform to the `CollectionIdentifiable` protocol to track moves, 
+inserts, and deletes. The `CollectionIdentifiable` protocol has only one requirement: a `collectionId` string property, which should
+uniquely identify an instance of the model in the collection of data bound to the table. Your data can then additionally conform to the
+`Equatable` protocol to enable 'reload' animations.
 
-> Note that all models represented by the table must conform to `CollectionIdentifiable` for any of the sections to be animatable. So, if
-you use different model or view model types for different sections, ensure that all types conform to the protocol and that you ensure that their
-`collectionId` properties can't collide.
+### Example
 
-For animation updates to work as expected, it's important to understand what value to assign to this property, as it can be any string. The
-`collectionId` property is meant to uniquely identify an object in a collection of similar objects, like a serial number on a product or license 
-plate on a car, and should not change when the object is 'updated' (e.g. a car keeps the same license plate if its tires are changed or it is 
-repainted). In other words, this id should identify an object's 'identity', not its 'equality'. Obeying this distinction allows Tableau to identify when 
-a model has 'moved' in a dataset (it found its `collectionId` in a position different than where it was before when it attempts to generate a
-diff) versus when a model has 'updated' (its `collectionId` is the same, just the other properties on the model have changed). This property 
-is generally mapped to some kind of main 'id' property on a model object where possible.
+For animation updates to work as expected, it's important to understand how each of these conformances plays in diffing and what value to
+use for the `collectionId` property. The distinction between the protocols is the difference between 'identity' and 'equality', and can be 
+explained with a row of cars.
+
+In a row of cars, each car has a license plate that uniquely identifies which car it is. When cars are re-ordered in their parking lot, we can check
+which cars moved where by checking their license plates - this maps to insertions, deletions, and moves in a diff. The license plates must be
+unique for this diff to work properly - it marks the 'identity' of the car. However, cars have a number of other properties that might change (paint
+colour, wheels, audio system) that, when changed, would reflect an 'update'. By comparing these properties to their previous values, we can 
+determine the 'equality' of the car.
+
+These roles - identity and equality - are expressed by the `CollectionIdentifiable` and `Equatable` protocols, respectively. Tableau will
+use the `collectionId` (like a car's license plate) you provide to track where items have moved and, if your model conforms to `Equatable`, 
+will use its `==` method to see if items that didn't move were updated (thus reloading its cell).

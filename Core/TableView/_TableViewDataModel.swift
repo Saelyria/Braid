@@ -10,7 +10,9 @@ internal class _TableViewDataModel<S: TableViewSection> {
     
     // The sections that were bound uniquely with either the `onSection` or `onSections` methods. This is used to
     // ensure that updates to data bound with `onAllSections` does not overwrite data for these sections.
-    var uniquelyBoundSections: [S] = []
+    var uniquelyBoundCellSections: [S] = []
+    var uniquelyBoundHeaderSections: [S] = []
+    var uniquelyBoundFooterSections: [S] = []
     // The displayed section on the table view.
     var displayedSections: [S] = [] {
         didSet { self.delegate?.dataModelDidChange() }
@@ -70,7 +72,9 @@ internal class _TableViewDataModel<S: TableViewSection> {
     
     init(from other: _TableViewDataModel<S>) {
         self.delegate = other.delegate
-        self.uniquelyBoundSections = other.uniquelyBoundSections
+        self.uniquelyBoundCellSections = other.uniquelyBoundCellSections
+        self.uniquelyBoundFooterSections = other.uniquelyBoundFooterSections
+        self.uniquelyBoundHeaderSections = other.uniquelyBoundHeaderSections
         self.displayedSections = other.displayedSections
         self.sectionCellViewModels = other.sectionCellViewModels
         self.sectionCellModels = other.sectionCellModels
