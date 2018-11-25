@@ -72,9 +72,6 @@ public class TableViewBinder {
     
     /// Starts binding on the table.
     public func onTable() -> TableViewSingleSectionBinder<UITableViewCell, _SingleSection> {
-        self._sectionBinder.nextDataModel.uniquelyBoundCellSections.append(.table)
-        self._sectionBinder.nextDataModel.uniquelyBoundHeaderSections.append(.table)
-        self._sectionBinder.nextDataModel.uniquelyBoundFooterSections.append(.table)
         return TableViewSingleSectionBinder<UITableViewCell, _SingleSection>(
             binder: self._sectionBinder, section: .table)
     }
