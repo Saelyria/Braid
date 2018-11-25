@@ -7,12 +7,11 @@ class ArtistsViewController: UIViewController {
     struct Section: TableViewSection, Comparable {
         let title: String
         
-        static func < (lhs: ArtistsViewController.Section, rhs: ArtistsViewController.Section) -> Bool {
+        static func < (lhs: Section, rhs: Section) -> Bool {
             return lhs.title < rhs.title
         }
     }
     
-    private let tableView = UITableView()
     private let spinner = UIActivityIndicatorView(activityIndicatorStyle: .gray)
     private var binder: SectionedTableViewBinder<Section>!
     
@@ -26,14 +25,15 @@ class ArtistsViewController: UIViewController {
         self.title = "Artists"
         
         // 3.
-        self.view.addSubview(self.tableView)
-        self.tableView.frame = self.view.frame
-        self.tableView.tableFooterView = UIView()
-        self.tableView.sectionFooterHeight = 0.0
-        self.tableView.register(TitleDetailTableViewCell.self)
+        let tableView = UITableView()
+        self.view.addSubview(tableView)
+        tableView.frame = self.view.frame
+        tableView.tableFooterView = UIView()
+        tableView.sectionFooterHeight = 0.0
+        tableView.register(TitleDetailTableViewCell.self)
         
-        self.binder = SectionedTableViewBinder(
-            tableView: self.tableView, sectionedBy: Section.self, sectionDisplayBehavior: .hidesSectionsWithNoCellData)
+        self.binder = SectionedTableViewBinder(tableView: tableView, sectionedBy: Section.self)
+        self.binder.sectionDisplayBehavior = .hidesSectionsWithNoCellData
         
         // 4.
         self.binder.onAllSections()
@@ -41,7 +41,7 @@ class ArtistsViewController: UIViewController {
                      models: self.artistsForSections.asObservable(),
                      mapToViewModelsWith: { (artist: Artist) in return artist.asTitleDetailCellViewModel() })
             // 5.
-            .rx.headerTitles(self.artistsForSections.asObservable()
+            .rx.bind(headerTitles: self.artistsForSections.asObservable()
                 .map { (artistsForSections: [Section: [Artist]]) -> [Section: String?] in
                     var titles: [Section: String?] = [:]
                     artistsForSections.forEach { titles[$0.key] = $0.key.title }

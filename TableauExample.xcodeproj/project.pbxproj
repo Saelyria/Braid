@@ -11,7 +11,7 @@
 		938132DA20B6463000CBF8F6 /* AccountsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938132D920B6463000CBF8F6 /* AccountsViewController.swift */; };
 		938132DF20B6463200CBF8F6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 938132DE20B6463200CBF8F6 /* Assets.xcassets */; };
 		938132E220B6463200CBF8F6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 938132E020B6463200CBF8F6 /* LaunchScreen.storyboard */; };
-		9381335120B6EE2A00CBF8F6 /* TItleDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9381335020B6EE2A00CBF8F6 /* TItleDetailTableViewCell.swift */; };
+		9381335120B6EE2A00CBF8F6 /* TitleDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9381335020B6EE2A00CBF8F6 /* TitleDetailTableViewCell.swift */; };
 		93C36A4820DAFF97006B7ECF /* SamplesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C36A4720DAFF97006B7ECF /* SamplesViewController.swift */; };
 		93C36A4A20DB02E0006B7ECF /* TitleDetailTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 93C36A4920DB02E0006B7ECF /* TitleDetailTableViewCell.xib */; };
 		AA8B7612901AEED60C395EB0 /* Pods_TableauExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5FEBC5088F0D7E30632BBD0 /* Pods_TableauExample.framework */; };
@@ -27,6 +27,7 @@
 		AB577BD62184DC6F00CD2363 /* ImageTitleSubtitleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BD52184DC6F00CD2363 /* ImageTitleSubtitleTableViewCell.swift */; };
 		AB577BDD2189769800CD2363 /* AccountDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BDC2189769800CD2363 /* AccountDetailViewController.swift */; };
 		AB86C3BF2141718C00FA4945 /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */; };
+		AB8A137121A4838600821F84 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8A137021A4838600821F84 /* TestViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -51,7 +52,7 @@
 		938132DE20B6463200CBF8F6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		938132E120B6463200CBF8F6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		938132E320B6463200CBF8F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9381335020B6EE2A00CBF8F6 /* TItleDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TItleDetailTableViewCell.swift; sourceTree = "<group>"; };
+		9381335020B6EE2A00CBF8F6 /* TitleDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleDetailTableViewCell.swift; sourceTree = "<group>"; };
 		93C36A4720DAFF97006B7ECF /* SamplesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamplesViewController.swift; sourceTree = "<group>"; };
 		93C36A4920DB02E0006B7ECF /* TitleDetailTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TitleDetailTableViewCell.xib; sourceTree = "<group>"; };
 		AB577B9B21759F6C00CD2363 /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
@@ -70,6 +71,7 @@
 		AB577BDB2187CC2100CD2363 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		AB577BDC2189769800CD2363 /* AccountDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDetailViewController.swift; sourceTree = "<group>"; };
 		AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
+		AB8A137021A4838600821F84 /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
 		B5FEBC5088F0D7E30632BBD0 /* Pods_TableauExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TableauExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -118,6 +120,7 @@
 				AB577BDB2187CC2100CD2363 /* README.md */,
 				938132D720B6463000CBF8F6 /* AppDelegate.swift */,
 				93C36A4720DAFF97006B7ECF /* SamplesViewController.swift */,
+				AB8A137021A4838600821F84 /* TestViewController.swift */,
 				AB577B98217596AF00CD2363 /* Sample 1 - Accounts */,
 				AB577BA02176444000CD2363 /* Sample 2 - Artists & Songs */,
 				AB577BA82179662400CD2363 /* Sample 3 - Dynamic Home Page */,
@@ -152,7 +155,7 @@
 			isa = PBXGroup;
 			children = (
 				AB577B9E2175A6EE00CD2363 /* CenterLabelTableViewCell.swift */,
-				9381335020B6EE2A00CBF8F6 /* TItleDetailTableViewCell.swift */,
+				9381335020B6EE2A00CBF8F6 /* TitleDetailTableViewCell.swift */,
 				93C36A4920DB02E0006B7ECF /* TitleDetailTableViewCell.xib */,
 				AB577BD52184DC6F00CD2363 /* ImageTitleSubtitleTableViewCell.swift */,
 				AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */,
@@ -269,14 +272,12 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-TableauExample/Pods-TableauExample-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/Differ/Differ.framework",
 				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/Tableau/Tableau.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Differ.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Tableau.framework",
@@ -313,12 +314,13 @@
 			files = (
 				AB577BA2217655DD00CD2363 /* ArtistsViewController.swift in Sources */,
 				AB577BAC2179838B00CD2363 /* MusicLibraryService.swift in Sources */,
+				AB8A137121A4838600821F84 /* TestViewController.swift in Sources */,
 				938132DA20B6463000CBF8F6 /* AccountsViewController.swift in Sources */,
 				938132D820B6463000CBF8F6 /* AppDelegate.swift in Sources */,
 				AB577BD62184DC6F00CD2363 /* ImageTitleSubtitleTableViewCell.swift in Sources */,
 				AB86C3BF2141718C00FA4945 /* SectionHeaderView.swift in Sources */,
 				AB577BDD2189769800CD2363 /* AccountDetailViewController.swift in Sources */,
-				9381335120B6EE2A00CBF8F6 /* TItleDetailTableViewCell.swift in Sources */,
+				9381335120B6EE2A00CBF8F6 /* TitleDetailTableViewCell.swift in Sources */,
 				AB577BAA2179665400CD2363 /* HomeViewController.swift in Sources */,
 				AB577BD42183D8C200CD2363 /* Store.swift in Sources */,
 				AB577B9C21759F6C00CD2363 /* AccountService.swift in Sources */,

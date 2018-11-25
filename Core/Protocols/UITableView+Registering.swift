@@ -29,7 +29,9 @@ public extension UITableView {
      
      - parameter headerFooterType: The header/footer view type to register to the table view.
     */
-    public func register<T: UITableViewHeaderFooterView & UINibInitable & ReuseIdentifiable>(_ headerFooterType: T.Type) {
+    public func register<T>(_ headerFooterType: T.Type)
+        where T: UITableViewHeaderFooterView & UINibInitable & ReuseIdentifiable
+    {
         let nib = UINib(nibName: T.nibName, bundle: T.bundle)
         self.register(nib, forHeaderFooterViewReuseIdentifier: T.reuseIdentifier)
     }

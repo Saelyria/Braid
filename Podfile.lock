@@ -1,12 +1,9 @@
 PODS:
-  - Differ (1.3.0)
   - RxCocoa (4.1.2):
     - RxSwift (~> 4.0)
   - RxSwift (4.1.2)
-  - Tableau/Core (1.0.0):
-    - Differ (~> 1.3)
+  - Tableau/Core (1.0.0)
   - Tableau/Rx (1.0.0):
-    - Differ (~> 1.3)
     - RxCocoa (~> 4.0)
     - RxSwift (~> 4.0)
     - Tableau/Core
@@ -17,7 +14,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
-    - Differ
     - RxCocoa
     - RxSwift
 
@@ -26,10 +22,9 @@ EXTERNAL SOURCES:
     :path: "."
 
 SPEC CHECKSUMS:
-  Differ: 9fcee7602542d7c6484ce05a0faec1c11258ed63
   RxCocoa: d88ba0f1f6abf040011a9eb4b539324fc426843a
   RxSwift: e49536837d9901277638493ea537394d4b55f570
-  Tableau: ae2649aa971ccc2208f36e237e5a651a1ebb586f
+  Tableau: d187bb8619bfc1954abba04e9a96d55ca2b2193c
 
 PODFILE CHECKSUM: 2c660d4c4fc917a2ee98a95494f6915a1788b4a2
 

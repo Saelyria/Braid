@@ -1,5 +1,4 @@
 import UIKit
-import Differ
 #if RX_TABLEAU
 import RxSwift
 #endif
@@ -21,6 +20,12 @@ public extension TableViewSection where Self: CollectionIdentifiable {
     }
 }
 
+public extension TableViewSection where Self: RawRepresentable, Self.RawValue: Comparable {
+    static func < (lhs: Self, rhs: Self) -> Bool {
+        return lhs.rawValue < rhs.rawValue
+    }
+}
+
 /**
  An object that dequeues and binds data to cells in sections for a given table view.
  
@@ -37,15 +42,15 @@ public extension TableViewSection where Self: CollectionIdentifiable {
  Using a table view binder is done with chaining function calls. A typical setup would look something like this:
  
  ```
- var cellModels: Observable<[MyCellModel]>
+ var cellModels: [MyModel] = ...
  
  let binder = TableViewBinder(tableView: tableView)
  binder.onTable()
     .bind(cellType: MyCell.self, models: cellModels)
-    .onDequeue { [unowned self] (row: Int, cell: MyCell) in
+    .onCellDequeue { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
         // called when a cell in section `one` is dequeued
     }
-    .onTapped { [unowned self] (row: Int, cell: MyCell) in
+    .onTapped { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
         // called when a cell in section `one` is tapped
     }
  ```
@@ -66,9 +71,9 @@ public class TableViewBinder {
     }
     
     /// Starts binding on the table.
-    public func onTable() -> TableViewInitialSingleSectionBinder<_SingleSection> {
-        self._sectionBinder.nextDataModel.uniquelyBoundSections.append(.table)
-        return TableViewInitialSingleSectionBinder<_SingleSection>(binder: self._sectionBinder, section: .table)
+    public func onTable() -> TableViewSingleSectionBinder<UITableViewCell, _SingleSection> {
+        return TableViewSingleSectionBinder<UITableViewCell, _SingleSection>(
+            binder: self._sectionBinder, section: .table)
     }
     
     public func finish() {
@@ -103,15 +108,15 @@ public protocol SectionedTableViewBinderProtocol: AnyObject {
     case three
  }
  
- var cellModels: Observable<[MyCellModel]>
+ var cellModels: [MyModel] = ...
  
  let binder = RxSectionedTableViewBinder(tableView: tableView, sectionedBy: Section.self)
-binder.onSection(.one)
+ binder.onSection(.one)
     .bind(cellType: MyCell.self, models: cellModels)
-    .onDequeue { [unowned self] (row: Int, cell: MyCell) in
+    .onCellDequeue { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
         // called when a cell in section `one` is dequeued
     }
-    .onTapped { [unowned self] (row: Int, cell: MyCell) in
+    .onTapped { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
         // called when a cell in section `one` is tapped
     }
  binder.finish()
@@ -182,10 +187,20 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     public var rowDeletionAnimation: UITableView.RowAnimation = .automatic
     /// The animation the binder will use to animate row insertions. The default value is `automatic`.
     public var rowInsertionAnimation: UITableView.RowAnimation = .automatic
+    /// The animation the binder will use to animate row updates. The default value is `automatic`.
+    public var rowUpdateAnimation: UITableView.RowAnimation = .automatic
     /// The animation the binder will use to animate section deletions. The default value is `automatic`.
     public var sectionDeletionAnimation: UITableView.RowAnimation = .automatic
+    /// The animation the binder will use to animate section updates. The default value is `automatic`.
+    public var sectionUpdateAnimation: UITableView.RowAnimation = .automatic
     /// The animation the binder will use to animate section insertions. The default value is `automatic`.
     public var sectionInsertionAnimation: UITableView.RowAnimation = .automatic
+    /// The animation the binder will use to animate section updates for sections whose items was 'undiffable' (i.e.
+    /// did not conform to `CollectionIdentifiable` or `Equatable`). The default value is `none`.
+    public var undiffableSectionUpdateAnimation: UITableView.RowAnimation = .none
+    /// The animation the binder will use to animate section updates when the section's header or footer updates. The
+    /// default value is `none`.
+    public var sectionHeaderFooterUpdateAnimation: UITableView.RowAnimation = .none
     
     /// A value indicating how this table view binder manages the visibility of sections bound to it.
     public var sectionDisplayBehavior: SectionDisplayBehavior {
@@ -201,13 +216,13 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
 
     private var tableViewDataSourceDelegate: (UITableViewDataSource & UITableViewDelegate)?
     
-    private(set) var handlers = TableViewBindingHandlers<S>()
+    private(set) var handlers = _TableViewBindingHandlers<S>()
     
     // The data model currently shown by the table view.
-    private(set) var currentDataModel = TableViewDataModel<S>()
+    private(set) var currentDataModel = _TableViewDataModel<S>()
     // The next data model to be shown by the table view. When this model's properties are updated, the binder will
     // queue appropriate animations on the table view to be done on the next render frame.
-    private(set) var nextDataModel = TableViewDataModel<S>()
+    private(set) var nextDataModel = _TableViewDataModel<S>()
     
     private var hasRefreshQueued: Bool = false
     
@@ -222,7 +237,10 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         sections. This defaults to `manuallyManageSections`, meaning the binder's `displayedSections` property must be
         set to determine the visibility and order of sections.
     */
-    public init(tableView: UITableView, sectionedBy sectionModel: S.Type, sectionDisplayBehavior: SectionDisplayBehavior = .manuallyManaged) {
+    public init(tableView: UITableView,
+                sectionedBy sectionModel: S.Type,
+                sectionDisplayBehavior: SectionDisplayBehavior = .manuallyManaged)
+    {
         self.tableView = tableView
         self.sectionDisplayBehavior = sectionDisplayBehavior
     }
@@ -274,12 +292,11 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      
      - returns: A 'section binder' object used to begin binding handlers to the given section.
      */
-    public func onSection(_ section: S) -> TableViewInitialSingleSectionBinder<S> {
+    public func onSection(_ section: S) -> TableViewSingleSectionBinder<UITableViewCell, S> {
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
-        self.nextDataModel.uniquelyBoundSections.append(section)
-        return TableViewInitialSingleSectionBinder<S>(binder: self, section: section)
+        return TableViewSingleSectionBinder<UITableViewCell, S>(binder: self, section: section)
     }
     
     /**
@@ -292,16 +309,14 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      
      - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
      */
-    public func onSections(_ sections: [S]) -> TableViewInitialMutliSectionBinder<S> {
+    public func onSections(_ sections: S...) -> TableViewMutliSectionBinder<UITableViewCell, S> {
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
         guard sections.isEmpty == false else {
             fatalError("The given 'sections' array to begin a binding chain was empty.")
         }
-        self.nextDataModel.uniquelyBoundSections.append(contentsOf: sections)
-        
-        return TableViewInitialMutliSectionBinder<S>(binder: self, sections: sections)
+        return TableViewMutliSectionBinder<UITableViewCell, S>(binder: self, sections: sections)
     }
 
     /**
@@ -334,11 +349,11 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      
      - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
      */
-    public func onAllSections() -> TableViewInitialMutliSectionBinder<S> {
+    public func onAllSections() -> TableViewMutliSectionBinder<UITableViewCell, S> {
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
-        return TableViewInitialMutliSectionBinder<S>(binder: self, sections: nil)
+        return TableViewMutliSectionBinder<UITableViewCell, S>(binder: self, sections: nil)
     }
     
     /**
@@ -355,7 +370,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      
      - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
      */
-    public func onAllOtherSections() -> TableViewInitialMutliSectionBinder<S> {
+    public func onAllOtherSections() -> TableViewMutliSectionBinder<UITableViewCell, S> {
         return self.onAllSections()
     }
     
@@ -380,7 +395,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     private func createNextDataModel() {
         self.currentDataModel = self.nextDataModel
         self.currentDataModel.delegate = nil
-        self.nextDataModel = TableViewDataModel<S>(from: self.currentDataModel)
+        self.nextDataModel = _TableViewDataModel<S>(from: self.currentDataModel)
         self.nextDataModel.delegate = self
     }
     
@@ -413,7 +428,8 @@ public extension SectionedTableViewBinder.SectionDisplayBehavior where S: Compar
         let orderingFunc = { (unordered: [S]) -> [S] in
             return unordered.sorted()
         }
-        return SectionedTableViewBinder.SectionDisplayBehavior(behavior: .hidesSectionsWithNoCellData, orderingFunction: orderingFunc)
+        return SectionedTableViewBinder.SectionDisplayBehavior(
+            behavior: .hidesSectionsWithNoCellData, orderingFunction: orderingFunc)
     }
     
     /**
@@ -425,11 +441,19 @@ public extension SectionedTableViewBinder.SectionDisplayBehavior where S: Compar
         let orderingFunc = { (unordered: [S]) -> [S] in
             return unordered.sorted()
         }
-        return SectionedTableViewBinder.SectionDisplayBehavior(behavior: .hidesSectionsWithNoData, orderingFunction: orderingFunc)
+        return SectionedTableViewBinder.SectionDisplayBehavior(
+            behavior: .hidesSectionsWithNoData, orderingFunction: orderingFunc)
     }
 }
 
-extension SectionedTableViewBinder: TableViewDataModelDelegate {
+extension SectionedTableViewBinder: _TableViewDataModelDelegate {
+    func itemEqualityChecker(for section: S) -> ((Any, Any) -> Bool?)? {
+        if self.nextDataModel.uniquelyBoundCellSections.contains(section) {
+            return self.handlers.sectionItemEqualityCheckers[section]
+        }
+        return self.handlers.dynamicSectionItemEqualityChecker
+    }
+    
     /*
      The binder is set as the delegate on its 'next' data model. When this next model receives a data update, this
      method is called. The binder responds by queueing an update for the next render frame (using `DispatchQueue.async`)
@@ -440,28 +464,29 @@ extension SectionedTableViewBinder: TableViewDataModelDelegate {
         guard self.hasFinishedBinding, !self.hasRefreshQueued else { return }
         self.hasRefreshQueued = true
         
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
             self.applyDisplayedSectionBehavior()
             
-            // If we were able to create 'diffable section models' from the data models (i.e. the cell models or view
-            // models conformed to 'CollectionIdentifiable'), then animate the changes.
-            if let current = self.currentDataModel.asDiffableSectionModels(),
-            let next = self.nextDataModel.asDiffableSectionModels() {
+            if let diff = self.currentDataModel.diff(from: self.nextDataModel) {
+                let update = NestedBatchUpdate(diff: diff)
                 self.createNextDataModel()
                 
-                self.tableView.animateRowAndSectionChanges(
-                    oldData: current,
-                    newData: next,
-                    isEqualSection: { $0.section == $1.section },
-                    isEqualElement: { $0.collectionId == $1.collectionId },
-                    rowDeletionAnimation: self.rowDeletionAnimation,
-                    rowInsertionAnimation: self.rowInsertionAnimation,
-                    sectionDeletionAnimation: self.sectionDeletionAnimation,
-                    sectionInsertionAnimation: self.sectionInsertionAnimation)
-            }
-            // otherwise, just do a plain table view reload.
-            else {
-                self.createNextDataModel()
+                self.tableView.beginUpdates()
+                self.tableView.deleteRows(at: update.itemDeletions, with: self.rowDeletionAnimation)
+                self.tableView.insertRows(at: update.itemInsertions, with: self.rowInsertionAnimation)
+                update.itemMoves.forEach { self.tableView.moveRow(at: $0.from, to: $0.to) }
+                self.tableView.deleteSections(update.sectionDeletions, with: self.sectionDeletionAnimation)
+                self.tableView.insertSections(update.sectionInsertions, with: self.sectionInsertionAnimation)
+                update.sectionMoves.forEach { self.tableView.moveSection($0.from, toSection: $0.to) }
+                self.tableView.endUpdates()
+                
+                self.tableView.reloadRows(at: update.itemUpdates, with: self.rowUpdateAnimation)
+                self.tableView.reloadSections(update.sectionUpdates, with: self.sectionUpdateAnimation)
+                self.tableView.reloadSections(update.sectionHeaderFooterUpdates, with: self.sectionHeaderFooterUpdateAnimation)
+                self.tableView.reloadSections(update.undiffableSectionUpdates, with: self.undiffableSectionUpdateAnimation)
+            } else {
                 self.tableView.reloadData()
             }
             

@@ -1,6 +1,4 @@
-# Contributor Quickstart Guide
-
-*Shameless foreword - this document is as much for myself to remember how everything works as for contributors.*
+# How Tableau Works
 
 Hey! Whether you're looking to contribute or just want to know how Tableau works under the hood, this file's the right place to start. I like to 
 think the code is easy enough to understand on its own, but I'm sure there's a bunch of stuff there that's a little mucky. Diving into this code is 
@@ -27,7 +25,7 @@ class type is `_TableViewDataSourceDelegate`. That's pretty much it.
 
 This object is the collection of view models/models/title strings/etc. that represents a 'data state' of a table view. Its properties are a series of
 dictionaries and arrays that stores the data the table view displays. Table data models are used with the Differ library that Tableau has as a 
-CocoaPods dependency to animate changes in data on the table view. The concrete class for this object type is the  `TableViewDataModel`.
+CocoaPods dependency to animate changes in data on the table view. The concrete class for this object type is the  `_TableViewDataModel`.
 
 ## The 'table binder'
 

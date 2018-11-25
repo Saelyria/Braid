@@ -14,7 +14,7 @@ typealias CellHeightBlock<S: TableViewSection> = (S, Int) -> CGFloat
 typealias HeaderFooterHeightBlock<S: TableViewSection> = (S) -> CGFloat
 
 /// An object that stores the various handlers the binder uses.
-class TableViewBindingHandlers<S: TableViewSection> {
+class _TableViewBindingHandlers<S: TableViewSection> {
     // Cell handlers
     
     // Blocks to call to dequeue a cell in a section.
@@ -35,6 +35,15 @@ class TableViewBindingHandlers<S: TableViewSection> {
     var anySectionCellHeightBlock: CellHeightBlock<S>?
     // A fallback block to call to get the estimated height for cells whose sections weren't given a unique block.
     var anySectionEstimatedCellHeightBlock: CellHeightBlock<S>?
+    
+    // A function for each section that determines whether the model for a given row was updated. In most cases, this
+    // will be a wrapper around `Equatable` conformance. These functions return nil if it can't compare the objects
+    // given to it (e.g. weren't the right type).
+    var sectionItemEqualityCheckers: [S: (Any, Any) -> Bool?] = [:]
+    // A function for dynamic section that determines whether the model for a given row was updated. In most cases, this
+    // will be a wrapper around `Equatable` conformance. These functions return nil if it can't compare the objects
+    // given to it (e.g. weren't the right type).
+    var dynamicSectionItemEqualityChecker: ((Any, Any) -> Bool?)?
     
     // Header handlers
     

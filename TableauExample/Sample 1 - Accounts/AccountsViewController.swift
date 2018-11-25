@@ -10,14 +10,9 @@ class AccountsViewController: UIViewController {
         case checking
         case savings
         case other
-        
-        static func < (lhs: AccountsViewController.Section, rhs: AccountsViewController.Section) -> Bool {
-            return lhs.rawValue < rhs.rawValue
-        }
     }
 
     private let spinner = UIActivityIndicatorView(activityIndicatorStyle: .gray)
-    private var tableView: UITableView!
     
     // 2.
     private var binder: SectionedTableViewBinder<Section>!
@@ -32,15 +27,15 @@ class AccountsViewController: UIViewController {
         self.title = "Accounts"
         
         // 4.
-        self.tableView = UITableView(frame: self.view.frame, style: .grouped)
-        self.tableView.register(CenterLabelTableViewCell.self)
-        self.tableView.register(SectionHeaderView.self)
-        self.tableView.register(TitleDetailTableViewCell.self)
-        self.view.addSubview(self.tableView)
-        self.tableView.frame = self.view.frame
+        let tableView = UITableView(frame: self.view.frame, style: .grouped)
+        tableView.register(CenterLabelTableViewCell.self)
+        tableView.register(SectionHeaderView.self)
+        tableView.register(TitleDetailTableViewCell.self)
+        self.view.addSubview(tableView)
+        tableView.frame = self.view.frame
         
         // 5.
-        self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
+        self.binder = SectionedTableViewBinder(tableView: tableView, sectionedBy: Section.self)
         
         // 6.
         self.binder.sectionDisplayBehavior = .hidesSectionsWithNoCellData
@@ -52,7 +47,7 @@ class AccountsViewController: UIViewController {
             ])
         
         // 8.
-        self.binder.onSections([.checking, .savings, .other])
+        self.binder.onSections(.checking, .savings, .other)
             .rx.bind(cellType: TitleDetailTableViewCell.self,
                      models: self.accountsForSections.asObservable(),
                      mapToViewModelsWith: { (account: Account) in return account.asTitleDetailCellViewModel() })
@@ -65,13 +60,13 @@ class AccountsViewController: UIViewController {
             }
         
         // 10.
-        self.binder.onSections([.checking, .savings, .other])
+        self.binder.onSections(.checking, .savings, .other)
             .bind(headerType: SectionHeaderView.self, viewModels: [
                 .checking: SectionHeaderView.ViewModel(title: "CHECKING"),
                 .savings: SectionHeaderView.ViewModel(title: "SAVINGS"),
                 .other: SectionHeaderView.ViewModel(title: "OTHER")])
             // 11.
-            .footerTitles([
+            .bind(footerTitles: [
                 .other: "This section includes your investing and credit card accounts."])
         
         // 12.
