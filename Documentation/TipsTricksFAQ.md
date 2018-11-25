@@ -1,10 +1,11 @@
 #  Tips, Tricks, and FAQ
 
 [Only one of the data types in my table view is diffable. Can I still have it animate?](#partial-diffing)
+[If I use both models and view models for my section, how is diffing done?](#viewmodel-model-diffing)
 
-<a name="partial-diffing">
-### Only one of the data types in my table view is diffable. Can I still have it animate?
-</a>
+<h2 name="partial-diffing">
+Only one of the data types in my table view is diffable. Can I still have it animate?
+</h2>
 
 If none of your models are 'diffable' (i.e. conform to `CollectionIdentifiable` or `Equatable`), then no animation is done and the table 
 view's `reloadData()` method is used to update the table view. However, *Tableau doesn't require that all data in the table be 'diffable' for 
@@ -40,7 +41,9 @@ conform to `Equatable` if you'd like to animate updates as well. However, note t
 changed) if they don't conform to `Equatable`, so you generally should. Keep in mind that Swift now supports automatically providing an `==`
 method for `struct`s, so it could be as easy as just declaring conformance!
 
-### If I use both models and view models for my section, how is diffing done?
+<h2 name="viewmodel-model-diffing">
+If I use both models and view models for my section, how is diffing done?
+</h2>
 
 If you use models mapped to view models for cells in a section using the `bind(cellType:models:mappedToViewModelsWith:)` method,
 then diffing is done with whichever of the two is 'diffable'. If both are 'diffable', then Tableau favours using the view models to diff with.
