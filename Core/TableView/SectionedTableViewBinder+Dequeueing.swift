@@ -17,8 +17,12 @@ internal extension SectionedTableViewBinder {
             if var cell = binder?.tableView.dequeueReusableCell(withIdentifier: C.reuseIdentifier, for: indexPath) as? C,
             let viewModel = (binder?.currentDataModel.sectionCellViewModels[section] as? [C.ViewModel])?[indexPath.row] {
                 cell.viewModel = viewModel
-                binder?.handlers.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
-                binder?.handlers.dynamicSectionsCellDequeuedCallback?(section, indexPath.row, cell)
+                if binder?.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
+                    binder?.handlers.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
+                } else {
+                    binder?.handlers.dynamicSectionsCellDequeuedCallback?(section, indexPath.row, cell)
+                }
+                binder?.handlers.anySectionCellDequeuedCallback?(section, indexPath.row, cell)
                 return cell
             }
             assertionFailure("ERROR: Didn't return the right cell type - something went awry!")
@@ -39,8 +43,12 @@ internal extension SectionedTableViewBinder {
     {
         let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = self] (section, tableView, indexPath) in
             if let cell = binder?.tableView.dequeueReusableCell(withIdentifier: C.reuseIdentifier, for: indexPath) as? C {
-                binder?.handlers.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
-                binder?.handlers.dynamicSectionsCellDequeuedCallback?(section, indexPath.row, cell)
+                if binder?.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
+                    binder?.handlers.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
+                } else {
+                    binder?.handlers.dynamicSectionsCellDequeuedCallback?(section, indexPath.row, cell)
+                }
+                binder?.handlers.anySectionCellDequeuedCallback?(section, indexPath.row, cell)
                 return cell
             }
             assertionFailure("ERROR: Didn't return the right cell type - something went awry!")
@@ -59,8 +67,15 @@ internal extension SectionedTableViewBinder {
     func addCellDequeueBlock(
         cellProvider: @escaping (_ row: Int) -> UITableViewCell, affectedSections: SectionBindingScope<S>)
     {
-        let cellDequeueBlock: CellDequeueBlock<S> = { (_, _, indexPath) in
-            return cellProvider(indexPath.row)
+        let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = self] (section, _, indexPath) in
+            let cell = cellProvider(indexPath.row)
+            if binder?.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
+                binder?.handlers.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
+            } else {
+                binder?.handlers.dynamicSectionsCellDequeuedCallback?(section, indexPath.row, cell)
+            }
+            binder?.handlers.anySectionCellDequeuedCallback?(section, indexPath.row, cell)
+            return cell
         }
         self.addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
     }
@@ -74,8 +89,15 @@ internal extension SectionedTableViewBinder {
     func addCellDequeueBlock(
         cellProvider: @escaping (_ section: S, _ row: Int) -> UITableViewCell, affectedSections: SectionBindingScope<S>)
     {
-        let cellDequeueBlock: CellDequeueBlock<S> = { (section, _, indexPath) in
-            return cellProvider(section, indexPath.row)
+        let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = self] (section, _, indexPath) in
+            let cell = cellProvider(section, indexPath.row)
+            if binder?.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
+                binder?.handlers.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
+            } else {
+                binder?.handlers.dynamicSectionsCellDequeuedCallback?(section, indexPath.row, cell)
+            }
+            binder?.handlers.anySectionCellDequeuedCallback?(section, indexPath.row, cell)
+            return cell
         }
         self.addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
     }

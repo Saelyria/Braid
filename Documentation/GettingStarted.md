@@ -138,12 +138,12 @@ let friends = [
     Person(name: "Joanne", age: 31) // gives me good deals at Bulk Barn
 ]
 let enemies = [
-    Person(name: "Joseph", age: 22), // doesn't like chocolate
+    Person(name: "Joseph", age: 22), // doesn't like dark chocolate
     Person(name: "Sue", age: 42) // thinks 'Attack of the Clones' is the best Star Wars movie
 ]
 let undecided = [
     Person(name: "Madeleine", age: 54), // is kind of passive-aggressive, but has a cute dog
-    Person(name: "Jorge", age: 19) // loves daytime television, but does like chocolate
+    Person(name: "Jorge", age: 19) // loves daytime television, but does like dark chocolate
 ]
 ```
 

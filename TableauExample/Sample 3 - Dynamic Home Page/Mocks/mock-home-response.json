@@ -1,0 +1,61 @@
+[
+    {
+        "title": "Recommended for you",
+        "products": [
+            {
+                "title": "Bernie Bott's Every Flavour Beans",
+                "price": 8.99,
+                "unit": "ea",
+                "imageUrl": "/"
+            },
+            {
+                "title": "Blue Bantha Milk",
+                "price": 5.99,
+                "unit": "litre",
+                "imageUrl": "/"
+            }
+        ],
+        "footerText": "See more",
+        "footerRoute": "<some kind of link for routing in the app>"
+    },
+    {
+        "title": "Featured products",
+        "products": [
+            {
+                "title": "Sonic Screwdriver",
+                "price": 75.99,
+                "unit": "ea",
+                "imageUrl": "/"
+            },
+            {
+                "title": "Hookshot",
+                "price": 45.95,
+                "unit": "ea",
+                "imageUrl": "/"
+            },
+            {
+                "title": "FLUDD",
+                "price": 223.80,
+                "unit": "ea",
+                "imageUrl": "/"
+            }
+        ],
+        "footerText": "See more",
+        "footerRoute": "<some kind of link for routing in the app>"
+    },
+    {
+        "title": "Stores near you",
+        "stores": [
+            {
+                "location": "Bathurst & Queen",
+                "distance": "2.3 km",
+            },
+            {
+                "location": "Granville & Dunsmuir",
+                "distance": "7.8 km"
+            }
+        ],
+        "footerText": "See all",
+        "footerRoute": "<some kind of link for routing in the app>"
+    }
+]

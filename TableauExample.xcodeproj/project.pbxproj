@@ -28,6 +28,7 @@
 		AB577BDD2189769800CD2363 /* AccountDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BDC2189769800CD2363 /* AccountDetailViewController.swift */; };
 		AB86C3BF2141718C00FA4945 /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */; };
 		AB8A137121A4838600821F84 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8A137021A4838600821F84 /* TestViewController.swift */; };
+		ABE0F35921AE3F7F0098950D /* ImageTitleSubtitleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABE0F35821AE3F7F0098950D /* ImageTitleSubtitleTableViewCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -72,6 +73,7 @@
 		AB577BDC2189769800CD2363 /* AccountDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDetailViewController.swift; sourceTree = "<group>"; };
 		AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
 		AB8A137021A4838600821F84 /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
+		ABE0F35821AE3F7F0098950D /* ImageTitleSubtitleTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageTitleSubtitleTableViewCell.xib; sourceTree = "<group>"; };
 		B5FEBC5088F0D7E30632BBD0 /* Pods_TableauExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TableauExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -158,6 +160,7 @@
 				9381335020B6EE2A00CBF8F6 /* TitleDetailTableViewCell.swift */,
 				93C36A4920DB02E0006B7ECF /* TitleDetailTableViewCell.xib */,
 				AB577BD52184DC6F00CD2363 /* ImageTitleSubtitleTableViewCell.swift */,
+				ABE0F35821AE3F7F0098950D /* ImageTitleSubtitleTableViewCell.xib */,
 				AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */,
 			);
 			path = "Shared Views";
@@ -181,9 +184,17 @@
 				AB577BC42181105500CD2363 /* HomeService.swift */,
 				AB577BD12183D7F200CD2363 /* Product.swift */,
 				AB577BD32183D8C200CD2363 /* Store.swift */,
-				AB577BCC2183D5C100CD2363 /* mock-home-response.json */,
+				ABE0F35721AD10340098950D /* Mocks */,
 			);
 			path = "Sample 3 - Dynamic Home Page";
+			sourceTree = "<group>";
+		};
+		ABE0F35721AD10340098950D /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				AB577BCC2183D5C100CD2363 /* mock-home-response.json */,
+			);
+			path = Mocks;
 			sourceTree = "<group>";
 		};
 		EBF40F86B284BBBC4E5ACCEB /* Frameworks */ = {
@@ -256,6 +267,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				93C36A4A20DB02E0006B7ECF /* TitleDetailTableViewCell.xib in Resources */,
+				ABE0F35921AE3F7F0098950D /* ImageTitleSubtitleTableViewCell.xib in Resources */,
 				938132E220B6463200CBF8F6 /* LaunchScreen.storyboard in Resources */,
 				938132DF20B6463200CBF8F6 /* Assets.xcassets in Resources */,
 				AB577BCD2183D5C100CD2363 /* mock-home-response.json in Resources */,
