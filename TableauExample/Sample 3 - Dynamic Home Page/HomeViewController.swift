@@ -64,8 +64,10 @@ class HomeViewController: UIViewController {
         self.tableView.register(SectionHeaderView.self)
         
         self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
-        
         // 5.
+        self.binder.undiffableSectionUpdateAnimation = .left
+        
+        // 6.
         self.sections
             .bind(to: self.binder.rx.displayedSections)
             .disposed(by: self.disposeBag)
@@ -75,7 +77,7 @@ class HomeViewController: UIViewController {
                 CenterLabelTableViewCell.ViewModel(text: "<Brand Name>. Shopping made easy.")
             ])
         
-        // 6.
+        // 7.
         self.binder.onAllOtherSections()
             .rx.bind(cellProvider: { [unowned self] (section: Section, row: Int, viewModel: CollectionIdentifiable) in
                 if let viewModel = viewModel as? TitleDetailTableViewCell.ViewModel {
@@ -92,7 +94,7 @@ class HomeViewController: UIViewController {
             .rx.bind(headerTitles: self.sectionHeaderTitles)
             .rx.bind(footerType: SectionHeaderView.self, viewModels: self.footerViewModels)
         
-        // 7.
+        // 8.
         self.binder.onAnySection()
             .onCellDequeue { _, _, cell in
                 cell.selectionStyle = .none
@@ -101,6 +103,8 @@ class HomeViewController: UIViewController {
         self.binder.finish()
     }
 }
+
+// MARK: - Helper extensions
 
 private extension Array where Element == HomePageSectionContent {
     /// Reduces an array of 'home page section content' objects into a dictionary of home view sections and cell view

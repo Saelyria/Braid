@@ -88,6 +88,8 @@ class ArtistsViewController: UIViewController {
     }
 }
 
+// MARK: - Helper extensions
+
 private extension Artist {
     /// Maps the 'artist' into a view model for a 'title detail cell'
     func asTitleDetailCellViewModel() -> TitleDetailTableViewCell.ViewModel {

@@ -10,25 +10,49 @@ import Foundation
  */
 public struct CollectionUpdate {
     /// The index paths of items that were deleted.
-    let itemDeletions: [IndexPath]
+    public let itemDeletions: [IndexPath]
     /// The index paths of items that were inserted.
-    let itemInsertions: [IndexPath]
+    public let itemInsertions: [IndexPath]
     /// The index paths of items that were updates.
-    let itemUpdates: [IndexPath]
+    public let itemUpdates: [IndexPath]
     /// The index paths of items that were moved.
-    let itemMoves: [(from: IndexPath, to: IndexPath)]
+    public let itemMoves: [(from: IndexPath, to: IndexPath)]
     /// The section integers of section that were deleted.
-    let sectionDeletions: IndexSet
+    public let sectionDeletions: IndexSet
     /// The section integers of section that were inserted.
-    let sectionInsertions: IndexSet
+    public let sectionInsertions: IndexSet
     /// The section integers of section that were updated.
-    let sectionUpdates: IndexSet
+    public let sectionUpdates: IndexSet
     /// The section integers of section that were updated, but whose data was not 'diffable' at the item scope.
-    let undiffableSectionUpdates: IndexSet
+    public let undiffableSectionUpdates: IndexSet
     /// The section integers whose header or footer were updated.
-    let sectionHeaderFooterUpdates: IndexSet
+    public let sectionHeaderFooterUpdates: IndexSet
     /// The section integers of sections that were moved.
-    let sectionMoves: [(from: Int, to: Int)]
+    public let sectionMoves: [(from: Int, to: Int)]
+    
+    internal init(
+        itemDeletions: [IndexPath] = [],
+        itemInsertions: [IndexPath] = [],
+        itemUpdates: [IndexPath] = [],
+        itemMoves: [(from: IndexPath, to: IndexPath)] = [],
+        sectionDeletions: IndexSet = [],
+        sectionInsertions: IndexSet = [],
+        sectionUpdates: IndexSet = [],
+        undiffableSectionUpdates: IndexSet = [],
+        sectionHeaderFooterUpdates: IndexSet = [],
+        sectionMoves: [(from: Int, to: Int)] = [])
+    {
+        self.itemDeletions = itemDeletions
+        self.itemInsertions = itemInsertions
+        self.itemUpdates = itemUpdates
+        self.itemMoves = itemMoves
+        self.sectionDeletions = sectionDeletions
+        self.sectionInsertions = sectionInsertions
+        self.sectionUpdates = sectionUpdates
+        self.undiffableSectionUpdates = undiffableSectionUpdates
+        self.sectionHeaderFooterUpdates = sectionHeaderFooterUpdates
+        self.sectionMoves = sectionMoves
+    }
     
     internal init(diff: _NestedExtendedDiff) {
         var itemDeletions: [IndexPath] = []
@@ -67,15 +91,16 @@ public struct CollectionUpdate {
             }
         }
         
-        self.itemInsertions = itemInsertions
-        self.itemDeletions = itemDeletions
-        self.itemUpdates = itemUpdates
-        self.itemMoves = itemMoves
-        self.sectionMoves = sectionMoves
-        self.sectionInsertions = sectionInsertions
-        self.sectionUpdates = sectionUpdates
-        self.sectionDeletions = sectionDeletions
-        self.undiffableSectionUpdates = undiffableSectionUpdates
-        self.sectionHeaderFooterUpdates = sectionHeaderFooterUpdates
+        self.init(
+            itemDeletions: itemDeletions,
+            itemInsertions: itemInsertions,
+            itemUpdates: itemUpdates,
+            itemMoves: itemMoves,
+            sectionDeletions: sectionDeletions,
+            sectionInsertions: sectionInsertions,
+            sectionUpdates: sectionUpdates,
+            undiffableSectionUpdates: undiffableSectionUpdates,
+            sectionHeaderFooterUpdates: sectionHeaderFooterUpdates,
+            sectionMoves: sectionMoves)
     }
 }

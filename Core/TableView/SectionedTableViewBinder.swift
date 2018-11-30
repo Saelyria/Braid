@@ -195,14 +195,17 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     public var sectionUpdateAnimation: UITableView.RowAnimation = .automatic
     /// The animation the binder will use to animate section insertions. The default value is `automatic`.
     public var sectionInsertionAnimation: UITableView.RowAnimation = .automatic
-    /// The animation the binder will use to animate section updates for sections whose items was 'undiffable' (i.e.
-    /// did not conform to `CollectionIdentifiable` or `Equatable`). The default value is `none`.
-    public var undiffableSectionUpdateAnimation: UITableView.RowAnimation = .none
+    /// The animation the binder will use to animate section updates for sections whose items were 'undiffable' (i.e.
+    /// did not conform to `CollectionIdentifiable` or `Equatable`). The default value is `fade`.
+    public var undiffableSectionUpdateAnimation: UITableView.RowAnimation = .fade
     /// The animation the binder will use to animate section updates when the section's header or footer updates. The
     /// default value is `none`.
     public var sectionHeaderFooterUpdateAnimation: UITableView.RowAnimation = .none
     /// Whether the binder should animate changes in data on its table view. Defaults to `true`.
     public var animateChanges: Bool = true
+    
+    /// An object that will perform table view animations on behalf of the table view binder.
+    public weak var updateDelegate: TableViewUpdateDelegate?
     
     /// A value indicating how this table view binder manages the visibility of sections bound to it.
     public var sectionDisplayBehavior: SectionDisplayBehavior {
@@ -470,32 +473,34 @@ extension SectionedTableViewBinder: _TableViewDataModelDelegate {
             guard let self = self else { return }
             
             self.applyDisplayedSectionBehavior()
+            let update: CollectionUpdate
             
-            if self.animateChanges {
-                if let diff = self.currentDataModel.diff(from: self.nextDataModel) {
-                    let update = CollectionUpdate(diff: diff)
-                    self.createNextDataModel()
-                    
-                    self.tableView.beginUpdates()
-                    self.tableView.deleteRows(at: update.itemDeletions, with: self.rowDeletionAnimation)
-                    self.tableView.insertRows(at: update.itemInsertions, with: self.rowInsertionAnimation)
-                    update.itemMoves.forEach { self.tableView.moveRow(at: $0.from, to: $0.to) }
-                    self.tableView.deleteSections(update.sectionDeletions, with: self.sectionDeletionAnimation)
-                    self.tableView.insertSections(update.sectionInsertions, with: self.sectionInsertionAnimation)
-                    update.sectionMoves.forEach { self.tableView.moveSection($0.from, toSection: $0.to) }
-                    self.tableView.endUpdates()
-                    
-                    self.tableView.reloadRows(at: update.itemUpdates, with: self.rowUpdateAnimation)
-                    self.tableView.reloadSections(update.sectionUpdates, with: self.sectionUpdateAnimation)
-                    self.tableView.reloadSections(update.sectionHeaderFooterUpdates, with: self.sectionHeaderFooterUpdateAnimation)
-                    self.tableView.reloadSections(update.undiffableSectionUpdates, with: self.undiffableSectionUpdateAnimation)
-                } else {
-                    self.createNextDataModel()
-                    let sections: IndexSet = IndexSet(self.currentDataModel.displayedSections.enumerated().map { i, _ in i })
-                    self.tableView.reloadSections(sections, with: self.undiffableSectionUpdateAnimation)
-                }
+            if let diff = self.currentDataModel.diff(from: self.nextDataModel) {
+                self.createNextDataModel()
+                update = CollectionUpdate(diff: diff)
             } else {
                 self.createNextDataModel()
+                let sections: IndexSet = IndexSet(self.currentDataModel.displayedSections.enumerated().map { i, _ in i })
+                update = CollectionUpdate(undiffableSectionUpdates: sections)
+            }
+            
+            if let delegate = self.updateDelegate {
+                delegate.animate(updates: update, on: self.tableView)
+            } else if self.animateChanges {
+                self.tableView.beginUpdates()
+                self.tableView.deleteRows(at: update.itemDeletions, with: self.rowDeletionAnimation)
+                self.tableView.insertRows(at: update.itemInsertions, with: self.rowInsertionAnimation)
+                update.itemMoves.forEach { self.tableView.moveRow(at: $0.from, to: $0.to) }
+                self.tableView.deleteSections(update.sectionDeletions, with: self.sectionDeletionAnimation)
+                self.tableView.insertSections(update.sectionInsertions, with: self.sectionInsertionAnimation)
+                update.sectionMoves.forEach { self.tableView.moveSection($0.from, toSection: $0.to) }
+                self.tableView.endUpdates()
+                
+                self.tableView.reloadRows(at: update.itemUpdates, with: self.rowUpdateAnimation)
+                self.tableView.reloadSections(update.sectionUpdates, with: self.sectionUpdateAnimation)
+                self.tableView.reloadSections(update.sectionHeaderFooterUpdates, with: self.sectionHeaderFooterUpdateAnimation)
+                self.tableView.reloadSections(update.undiffableSectionUpdates, with: self.undiffableSectionUpdateAnimation)
+            } else {
                 self.tableView.reloadData()
             }
             

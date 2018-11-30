@@ -109,6 +109,8 @@ class AccountsViewController: UIViewController {
     }
 }
 
+// MARK: - Helper extensions
+
 private extension Observable where Element == [Account] {
     typealias Section = AccountsViewController.Section
     
