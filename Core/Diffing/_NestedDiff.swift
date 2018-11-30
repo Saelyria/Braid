@@ -4,7 +4,7 @@
  https://github.com/tonyarnold/Differ
  */
 
-struct NestedDiff: DiffProtocol {
+struct _NestedDiff: DiffProtocol {
     typealias Index = Int
     
     enum Element {
@@ -46,12 +46,12 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
         isSameSection: ComparisonHandler<Self>,
         isSameElement: NestedComparisonHandler<Self>,
         isEqualElement: NestedElementComparisonHandler<Self>)
-        throws -> NestedDiff
+        throws -> _NestedDiff
     {
         let diffTraces = try outputDiffPathTraces(to: to, isSame: isSameSection)
         
         // Diff sections
-        let sectionDiff = Diff(traces: diffTraces).map { element -> NestedDiff.Element in
+        let sectionDiff = _Diff(traces: diffTraces).map { element -> _NestedDiff.Element in
             switch element {
             case let .delete(at):
                 return .deleteSection(at)
@@ -84,11 +84,11 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
         }
         
         let elementDiff = try zip(zip(fromSections, toSections), matchingSectionTraces)
-            .flatMap { (args) -> [NestedDiff.Element] in
+            .flatMap { (args) -> [_NestedDiff.Element] in
                 let (sections, trace) = args
                 return try sections.0.diff(sections.1, isSame: isSameElement, isEqual: { lhs, rhs in
                     return isEqualElement(sections.0, lhs, rhs)
-                }).map { diffElement -> NestedDiff.Element in
+                }).map { diffElement -> _NestedDiff.Element in
                     switch diffElement {
                     case let .delete(at):
                         return .deleteElement(at, section: trace.from.x)
@@ -100,11 +100,11 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
                 }
         }
         
-        return NestedDiff(elements: sectionDiff + elementDiff)
+        return _NestedDiff(elements: sectionDiff + elementDiff)
     }
 }
 
-extension NestedDiff.Element: CustomDebugStringConvertible {
+extension _NestedDiff.Element: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
         case let .deleteElement(row, section):
@@ -123,7 +123,7 @@ extension NestedDiff.Element: CustomDebugStringConvertible {
     }
 }
 
-extension NestedDiff: ExpressibleByArrayLiteral {
+extension _NestedDiff: ExpressibleByArrayLiteral {
     
     init(arrayLiteral elements: Element...) {
         self.elements = elements

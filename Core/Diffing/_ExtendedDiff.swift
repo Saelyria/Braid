@@ -4,7 +4,7 @@
  https://github.com/tonyarnold/Differ
  */
 
-struct ExtendedDiff: DiffProtocol {
+struct _ExtendedDiff: DiffProtocol {
     typealias Index = Int
     
     enum Element {
@@ -19,19 +19,19 @@ struct ExtendedDiff: DiffProtocol {
     }
     
     /// Diff used to compute an instance
-    let source: Diff
+    let source: _Diff
     /// An array which holds indices of diff elements in the source diff (i.e. diff without moves).
     let sourceIndex: [Int]
     /// An array which holds indices of diff elements in a diff where move's subelements (deletion and insertion) are ordered accordingly
     let reorderedIndex: [Int]
     
     /// An array of particular diff operations
-    let elements: [ExtendedDiff.Element]
+    let elements: [_ExtendedDiff.Element]
     let moveIndices: Set<Int>
 }
 
-extension ExtendedDiff.Element {
-    init(_ diffElement: Diff.Element) {
+extension _ExtendedDiff.Element {
+    init(_ diffElement: _Diff.Element) {
         switch diffElement {
         case let .delete(at):
             self = .delete(at: at)
@@ -59,7 +59,7 @@ extension Collection where Index == Int {
         _ other: Self,
         isSame: ComparisonHandler<Self>,
         isEqual: ComparisonHandler<Self>)
-        throws -> ExtendedDiff
+        throws -> _ExtendedDiff
     {
         return extendedDiff(
             from: try diff(other, isSame: isSame, isEqual: isEqual), other: other, isSame: isSame, isEqual: isEqual)
@@ -78,14 +78,14 @@ extension Collection where Index == Int {
      - returns: ExtendedDiff between the callee and `other` collection
     */
     func extendedDiff(
-        from diff: Diff,
+        from diff: _Diff,
         other: Self,
         isSame: ComparisonHandler<Self>,
         isEqual: ComparisonHandler<Self>)
-        -> ExtendedDiff
+        -> _ExtendedDiff
     {
         
-        var elements: [ExtendedDiff.Element] = []
+        var elements: [_ExtendedDiff.Element] = []
         var moveOriginIndices = Set<Int>()
         var moveTargetIndices = Set<Int>()
         // It maps indices after reordering (e.g. bringing move origin and target next to each other in the output) to their positions in the source Diff
@@ -129,14 +129,14 @@ extension Collection where Index == Int {
                     elements.append(match.0)
                 } else {
                     sourceIndex.append(candidateIndex)
-                    elements.append(ExtendedDiff.Element(candidate))
+                    elements.append(_ExtendedDiff.Element(candidate))
                 }
             }
         }
         
         let reorderedIndices = flip(array: sourceIndex)
         
-        return ExtendedDiff(
+        return _ExtendedDiff(
             source: diff,
             sourceIndex: sourceIndex,
             reorderedIndex: reorderedIndices,
@@ -146,13 +146,13 @@ extension Collection where Index == Int {
     }
     
     func firstMatch(
-        _ diff: Diff,
-        dirtyIndices: Set<Diff.Index>,
-        candidate: Diff.Element,
-        candidateIndex: Diff.Index,
+        _ diff: _Diff,
+        dirtyIndices: Set<_Diff.Index>,
+        candidate: _Diff.Element,
+        candidateIndex: _Diff.Index,
         other: Self,
         isSame: ComparisonHandler<Self>)
-        -> (ExtendedDiff.Element, Diff.Index)?
+        -> (_ExtendedDiff.Element, _Diff.Index)?
     {
         for matchIndex in (candidateIndex + 1) ..< diff.endIndex {
             if !dirtyIndices.contains(matchIndex) {
@@ -166,11 +166,11 @@ extension Collection where Index == Int {
     }
     
     func createMatch(
-        _ candidate: Diff.Element,
-        match: Diff.Element,
+        _ candidate: _Diff.Element,
+        match: _Diff.Element,
         other: Self,
         isSame: ComparisonHandler<Self>)
-        -> ExtendedDiff.Element?
+        -> _ExtendedDiff.Element?
     {
         switch (candidate, match) {
         case (.delete, .insert):
@@ -197,7 +197,7 @@ func flip(array: [Int]) -> [Int] {
         .map { $0.1 }
 }
 
-extension ExtendedDiff.Element: CustomDebugStringConvertible {
+extension _ExtendedDiff.Element: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
         case let .delete(at):

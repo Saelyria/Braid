@@ -16,7 +16,7 @@ protocol DiffProtocol: Collection {
 
 struct UndiffableError: Error { }
 
-struct Diff: DiffProtocol {
+struct _Diff: DiffProtocol {
     enum Element {
         case insert(at: Int)
         case delete(at: Int)
@@ -27,14 +27,14 @@ struct Diff: DiffProtocol {
         return i + 1
     }
     
-    var elements: [Diff.Element]
+    var elements: [_Diff.Element]
     
-    init(elements: [Diff.Element]) {
+    init(elements: [_Diff.Element]) {
         self.elements = elements
     }
 }
 
-extension Diff.Element {
+extension _Diff.Element {
     init?(trace: Trace) {
         switch trace.type() {
         case .insertion:
@@ -123,15 +123,15 @@ extension Collection where Index == Int {
         _ other: Self,
         isSame: ComparisonHandler<Self>,
         isEqual: ComparisonHandler<Self>)
-        throws -> Diff
+        throws -> _Diff
     {
         let diffPath = try outputDiffPathTraces(
             to: other,
             isSame: isSame)
-        return Diff(elements:
+        return _Diff(elements:
             diffPath
-                .map { trace -> Diff.Element? in
-                    if let change = Diff.Element(trace: trace) {
+                .map { trace -> _Diff.Element? in
+                    if let change = _Diff.Element(trace: trace) {
                         return change
                     } else if isEqual(self[trace.from.x], other[trace.from.y]) == false {
                         return .update(at: trace.from.x)
@@ -326,13 +326,13 @@ extension DiffProtocol {
     }
 }
 
-extension Diff {
+extension _Diff {
     init(traces: [Trace]) {
-        elements = traces.compactMap { Diff.Element(trace: $0) }
+        elements = traces.compactMap { _Diff.Element(trace: $0) }
     }
 }
 
-extension Diff.Element: CustomDebugStringConvertible {
+extension _Diff.Element: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
         case let .delete(at):
@@ -345,8 +345,8 @@ extension Diff.Element: CustomDebugStringConvertible {
     }
 }
 
-extension Diff: ExpressibleByArrayLiteral {
-    init(arrayLiteral elements: Diff.Element...) {
+extension _Diff: ExpressibleByArrayLiteral {
+    init(arrayLiteral elements: _Diff.Element...) {
         self.elements = elements
     }
 }

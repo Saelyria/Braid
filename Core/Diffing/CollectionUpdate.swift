@@ -5,48 +5,32 @@
  */
 import Foundation
 
-struct BatchUpdate {
-    struct MoveStep: Equatable {
-        let from: IndexPath
-        let to: IndexPath
-    }
-    
-    let deletions: [IndexPath]
-    let insertions: [IndexPath]
-    let updates: [IndexPath]
-    let moves: [MoveStep]
-    
-    init(diff: ExtendedDiff) {
-        (deletions, insertions, updates, moves) = diff.reduce(([IndexPath](), [IndexPath](), [IndexPath](), [MoveStep]()), { (acc, element) in
-            var (deletions, insertions, updates, moves) = acc
-            switch element {
-            case let .delete(at):
-                deletions.append([0, at])
-            case let .insert(at):
-                insertions.append([0, at])
-            case let .move(from, to):
-                moves.append(MoveStep(from: [0, from], to: [0, to]))
-            case let .update(at):
-                updates.append([0, at])
-            }
-            return (deletions, insertions, updates, moves)
-        })
-    }
-}
-
-struct NestedBatchUpdate {
+/**
+ An object that details the section and item updates (insertions, moves, deletions, and updates) from a data update.
+ */
+public struct CollectionUpdate {
+    /// The index paths of items that were deleted.
     let itemDeletions: [IndexPath]
+    /// The index paths of items that were inserted.
     let itemInsertions: [IndexPath]
+    /// The index paths of items that were updates.
     let itemUpdates: [IndexPath]
+    /// The index paths of items that were moved.
     let itemMoves: [(from: IndexPath, to: IndexPath)]
+    /// The section integers of section that were deleted.
     let sectionDeletions: IndexSet
+    /// The section integers of section that were inserted.
     let sectionInsertions: IndexSet
+    /// The section integers of section that were updated.
     let sectionUpdates: IndexSet
+    /// The section integers of section that were updated, but whose data was not 'diffable' at the item scope.
     let undiffableSectionUpdates: IndexSet
+    /// The section integers whose header or footer were updated.
     let sectionHeaderFooterUpdates: IndexSet
+    /// The section integers of sections that were moved.
     let sectionMoves: [(from: Int, to: Int)]
     
-    init(diff: NestedExtendedDiff) {
+    internal init(diff: _NestedExtendedDiff) {
         var itemDeletions: [IndexPath] = []
         var itemInsertions: [IndexPath] = []
         var itemUpdates: [IndexPath] = []
