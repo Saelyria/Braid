@@ -13,6 +13,12 @@ internal class _TableViewDataModel<S: TableViewSection> {
     var uniquelyBoundCellSections: [S] = []
     var uniquelyBoundHeaderSections: [S] = []
     var uniquelyBoundFooterSections: [S] = []
+    
+    var headerViewBound: Bool = false
+    var footerViewBound: Bool = false
+    var headerTitleBound: Bool = false
+    var footerTitleBound: Bool = false
+    
     // The displayed section on the table view.
     var displayedSections: [S] = [] {
         didSet { self.delegate?.dataModelDidChange() }
@@ -75,6 +81,10 @@ internal class _TableViewDataModel<S: TableViewSection> {
         self.uniquelyBoundCellSections = other.uniquelyBoundCellSections
         self.uniquelyBoundFooterSections = other.uniquelyBoundFooterSections
         self.uniquelyBoundHeaderSections = other.uniquelyBoundHeaderSections
+        self.headerTitleBound = other.headerTitleBound
+        self.headerViewBound = other.headerViewBound
+        self.footerTitleBound = other.footerTitleBound
+        self.footerViewBound = other.footerViewBound
         self.displayedSections = other.displayedSections
         self.sectionCellViewModels = other.sectionCellViewModels
         self.sectionCellModels = other.sectionCellModels

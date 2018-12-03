@@ -405,6 +405,8 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
+        bindResult.binder.nextDataModel.headerTitleBound = true
+        
         let section = bindResult.section
         headerTitle
             .subscribeOn(MainScheduler.instance)
@@ -452,6 +454,8 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
+        
+        bindResult.binder.nextDataModel.footerTitleBound = true
         
         let section = bindResult.section
         footerTitle

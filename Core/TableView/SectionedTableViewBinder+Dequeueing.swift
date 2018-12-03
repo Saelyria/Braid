@@ -190,6 +190,7 @@ private extension SectionedTableViewBinder {
         
         // Go over the parameters we were given and put the dequeue block in the right place on the binder
         if isHeader {
+            self.nextDataModel.headerViewBound = true
             switch affectedSections {
             case .forNamedSections(let sections):
                 for section in sections {
@@ -206,6 +207,7 @@ private extension SectionedTableViewBinder {
                 assertionFailure("Can't add header dequeue blocks for 'any section'")
             }
         } else {
+            self.nextDataModel.footerViewBound = true
             switch affectedSections {
             case .forNamedSections(let sections):
                 for section in sections {

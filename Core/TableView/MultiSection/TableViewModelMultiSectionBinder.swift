@@ -58,11 +58,12 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
         return self
     }
     
+    // MARK: -
+    
     @discardableResult
     public override func bind<H>(
         headerType: H.Type,
-        viewModels: [S : H.ViewModel],
-        updatedWith updateHandler: ((([S : H.ViewModel]) -> Void) -> Void)?)
+        viewModels: [S : H.ViewModel])
         -> TableViewModelMultiSectionBinder<C, S, M>
         where H : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
     {
@@ -71,12 +72,44 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     }
     
     @discardableResult
+    public override func bind<H>(
+        headerType: H.Type,
+        viewModels: [S : H.ViewModel],
+        updatedBy callbackRef: inout ([S : H.ViewModel]) -> Void)
+        -> TableViewModelMultiSectionBinder<C, S, M>
+        where H : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
+    {
+        super.bind(headerType: headerType, viewModels: viewModels, updatedBy: &callbackRef)
+        return self
+    }
+    
+    @discardableResult
     public override func bind(
-        headerTitles: [S : String],
-        updateWith updateHandler: ((([S : String]) -> Void) -> Void)?)
+        headerTitles: [S : String])
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
-        super.bind(headerTitles: headerTitles, updateWith: updateHandler)
+        super.bind(headerTitles: headerTitles)
+        return self
+    }
+    
+    @discardableResult
+    public override func bind(
+        headerTitles: [S : String],
+        updatedBy callbackRef: inout ([S : String]) -> Void)
+        -> TableViewModelMultiSectionBinder<C, S, M>
+    {
+        super.bind(headerTitles: headerTitles, updatedBy: &callbackRef)
+        return self
+    }
+    
+    @discardableResult
+    public override func bind<F>(
+        footerType: F.Type,
+        viewModels: [S : F.ViewModel])
+        -> TableViewModelMultiSectionBinder<C, S, M>
+        where F : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
+    {
+        super.bind(footerType: footerType, viewModels: viewModels)
         return self
     }
     
@@ -84,23 +117,34 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     public override func bind<F>(
         footerType: F.Type,
         viewModels: [S : F.ViewModel],
-        updatedWith updateHandler: ((([S : F.ViewModel]) -> Void) -> Void)?)
+        updatedBy callbackRef: inout ([S : F.ViewModel]) -> Void)
         -> TableViewModelMultiSectionBinder<C, S, M>
         where F : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
     {
-        super.bind(footerType: footerType, viewModels: viewModels, updatedWith: updateHandler)
+        super.bind(footerType: footerType, viewModels: viewModels, updatedBy: &callbackRef)
+        return self
+    }
+    
+    @discardableResult
+    public override func bind(
+        footerTitles: [S : String])
+        -> TableViewModelMultiSectionBinder<C, S, M>
+    {
+        super.bind(footerTitles: footerTitles)
         return self
     }
     
     @discardableResult
     public override func bind(
         footerTitles: [S : String],
-        updateWith updateHandler: ((([S : String]) -> Void) -> Void)?)
+        updatedBy callbackRef: inout ([S : String]) -> Void)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
-        super.bind(footerTitles: footerTitles, updateWith: updateHandler)
+        super.bind(footerTitles: footerTitles, updatedBy: &callbackRef)
         return self
     }
+    
+    // MARK: -
     
     @discardableResult
     public override func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C) -> Void)

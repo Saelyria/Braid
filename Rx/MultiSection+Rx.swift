@@ -397,6 +397,8 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         }
         let scope = bindResult.affectedSectionScope
         
+        bindResult.binder.nextDataModel.headerTitleBound = true
+        
         headerTitles
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (titles: [Base.S: String?]) in
@@ -441,6 +443,8 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let scope = bindResult.affectedSectionScope
+        
+        bindResult.binder.nextDataModel.footerTitleBound = true
         
         footerTitles
             .subscribeOn(MainScheduler.instance)

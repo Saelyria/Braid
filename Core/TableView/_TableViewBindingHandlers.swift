@@ -45,6 +45,11 @@ class _TableViewBindingHandlers<S: TableViewSection> {
     // given to it (e.g. weren't the right type).
     var dynamicSectionItemEqualityChecker: ((Any, Any) -> Bool?)?
     
+    var sectionPrefetchBehavior: [S: PrefetchBehavior] = [:]
+    var sectionPrefetchHandlers: [S: (Int) -> Void] = [:]
+    var dynamicSectionPrefetchBehavior: PrefetchBehavior?
+    var dynamicSectionPrefetchHandler: ((Int) -> Void)?
+    
     // Header handlers
     
     // Blocks to call to dequeue a header in a section.

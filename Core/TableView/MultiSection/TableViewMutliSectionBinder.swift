@@ -809,18 +809,13 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         header created for the section. This dictionary does not need to contain a view model for each section being
         bound - sections not present in the dictionary have no header view created for them. This view models dictionary
         should not contain entries for sections not declared as a part of the current binding chain.
-     - parameter updateHandler: A closure called instantly that is passed in an 'update callback' closure that can be
-        used to update the header view models for these sections after binding. This passed-in 'update callback' should
-        be referenced somewhere useful to call later whenever the header view models for these sections need updated.
-        This argument can be left as nil if the sections are never updated.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind<H>(
         headerType: H.Type,
-        viewModels: [S: H.ViewModel],
-        updatedWith updateHandler: ((_ updateCallback: (_ newViewModels: [S: H.ViewModel]) -> Void) -> Void)? = nil)
+        viewModels: [S: H.ViewModel])
         -> TableViewMutliSectionBinder<C, S>
         where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
@@ -828,12 +823,64 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         self.binder.addHeaderDequeueBlock(headerType: headerType, affectedSections: self.affectedSectionScope)
         self.binder.updateHeaderViewModels(viewModels, affectedSections: scope)
         
+        return self
+    }
+    
+    /**
+     Binds the given header type to the declared section with the given view models for each section.
+     
+     Use this method to use a custom `UITableViewHeaderFooterView` subclass for the section header with a table view
+     binder. The view must conform to `ViewModelBindable` and `ReuseIdentifiable` to be compatible.
+     
+     - parameter headerType: The class of the header to bind.
+     - parameter viewModels: A dictionary where the key is a section and the value is the header view model for the
+        header created for the section. This dictionary does not need to contain a view model for each section being
+        bound - sections not present in the dictionary have no header view created for them. This view models dictionary
+        should not contain entries for sections not declared as a part of the current binding chain.
+     - parameter updateHandler: A reference to a closure that is called with new view models for the headers in the
+        sections. A new 'update callback' closure is created and assigned to this reference that can be used to
+        update the header view models for the bound sections after binding.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<H>(
+        headerType: H.Type,
+        viewModels: [S: H.ViewModel],
+        updatedBy callbackRef: inout (_ newViewModels: [S: H.ViewModel]) -> Void)
+        -> TableViewMutliSectionBinder<C, S>
+        where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+    {
+        let scope = self.affectedSectionScope
         let updateCallback: ([S: H.ViewModel]) -> Void
         updateCallback = { [weak binder = self.binder] (viewModels) in
             binder?.updateHeaderViewModels(viewModels, affectedSections: scope)
         }
-        updateHandler?(updateCallback)
+        callbackRef = updateCallback
 
+        return self.bind(headerType: headerType, viewModels: viewModels)
+    }
+    
+    /**
+     Binds the given titles to the section's headers.
+     
+     This method will provide the given titles as the titles for the iOS native section headers. If you have bound a
+     custom header type to the table view using the `bind(headerType:viewModels:)` method, this method will do nothing.
+     
+     - parameter titles: A dictionary where the key is a section and the value is the title for the section. This
+        dictionary does not need to contain a title for each section being bound - sections not present in the
+        dictionary have no title assigned to them. This titles dictionary cannot contain entries for sections not
+        declared as a part of the current binding chain.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind(
+        headerTitles: [S: String])
+        -> TableViewMutliSectionBinder<C, S>
+    {
+        self.binder.nextDataModel.headerTitleBound = true
+        self.binder.updateHeaderTitles(headerTitles, affectedSections: self.affectedSectionScope)
         return self
     }
     
@@ -847,27 +894,52 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         dictionary does not need to contain a title for each section being bound - sections not present in the
         dictionary have no title assigned to them. This titles dictionary cannot contain entries for sections not
         declared as a part of the current binding chain.
-     - parameter updateHandler: A closure called instantly that is passed in an 'update callback' closure that can be
-        used to update the header titles for these sections after binding. This passed-in 'update callback' should be
-        referenced somewhere useful to call later whenever the header titles for these sections need updated. This
-        argument can be left as nil if the sections are never updated.
+     - parameter callbackRef: A reference to a closure that is called with a new titles for the footer in the section. A
+        new 'update callback' closure is created and assigned to this reference that can be used to update the footer
+        titles for the bound sections after binding.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind(
         headerTitles: [S: String],
-        updateWith updateHandler: ((_ updateCallback: (_ newTitles: [S: String]) -> Void) -> Void)? = nil)
+        updatedBy callbackRef: inout (_ newTitles: [S: String]) -> Void)
         -> TableViewMutliSectionBinder<C, S>
     {
-        self.binder.updateHeaderTitles(headerTitles, affectedSections: self.affectedSectionScope)
-        
         let updateCallback: ([S: String]) -> Void
         updateCallback = { [weak binder = self.binder, scope = self.affectedSectionScope] (titles) in
             binder?.updateHeaderTitles(titles, affectedSections: scope)
         }
-        updateHandler?(updateCallback)
+        callbackRef = updateCallback
 
+        return self.bind(headerTitles: headerTitles)
+    }
+    
+    /**
+     Binds the given footer type to the declared section with the given view models for each section.
+     
+     Use this method to use a custom `UITableViewHeaderFooterView` subclass for the section footer with a table view
+     binder. The view must conform to `ViewModelBindable` and `ReuseIdentifiable` to be compatible.
+     
+     - parameter footerType: The class of the header to bind.
+     - parameter viewModels: A dictionary where the key is a section and the value is the footer view model for the
+        footer created for the section. This dictionary does not need to contain a view model for each section being
+        bound - sections not present in the dictionary have no footer view created for them. This view models dictionary
+        cannot contain entries for sections not declared as a part of the current binding chain.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind<F>(
+        footerType: F.Type,
+        viewModels: [S: F.ViewModel])
+        -> TableViewMutliSectionBinder<C, S>
+        where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+    {
+        let scope = self.affectedSectionScope
+        self.binder.addFooterDequeueBlock(footerType: footerType, affectedSections: self.affectedSectionScope)
+        self.binder.updateFooterViewModels(viewModels, affectedSections: scope)
+        
         return self
     }
     
@@ -889,20 +961,41 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<F>(
         footerType: F.Type,
         viewModels: [S: F.ViewModel],
-        updatedWith updateHandler: ((_ updateCallback: (_ newViewModels: [S: F.ViewModel]) -> Void) -> Void)? = nil)
+        updatedBy callbackRef: inout (_ newViewModels: [S: F.ViewModel]) -> Void)
         -> TableViewMutliSectionBinder<C, S>
         where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
         let scope = self.affectedSectionScope
-        self.binder.addFooterDequeueBlock(footerType: footerType, affectedSections: self.affectedSectionScope)
-        self.binder.updateFooterViewModels(viewModels, affectedSections: scope)
-        
         let updateCallback: ([S: F.ViewModel]) -> Void
         updateCallback = { [weak binder = self.binder] (viewModels) in
             binder?.updateFooterViewModels(viewModels, affectedSections: scope)
         }
-        updateHandler?(updateCallback)
+        callbackRef = updateCallback
 
+        return self.bind(footerType: footerType, viewModels: viewModels)
+    }
+    
+    /**
+     Binds the given titles to the section's footers.
+     
+     This method will provide the given titles as the titles for the iOS native section footers. If you have bound a
+     custom footer type to the table view using the `bind(footerType:viewModels:)` method, this method will do nothing.
+     
+     - parameter titles: A dictionary where the key is a section and the value is the title for the footer section. This
+        dictionary does not need to contain a footer title for each section being bound - sections not present in the
+        dictionary have no footer title assigned to them. This titles dictionary cannot contain entries for sections not
+        declared as a part of the current binding chain.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func bind(
+        footerTitles: [S: String])
+        -> TableViewMutliSectionBinder<C, S>
+    {
+        let scope = self.affectedSectionScope
+        self.binder.updateFooterTitles(footerTitles, affectedSections: scope)
+        
         return self
     }
     
@@ -922,19 +1015,17 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     @discardableResult
     public func bind(
         footerTitles: [S: String],
-        updateWith updateHandler: ((_ updateCallback: (_ newTitles: [S: String]) -> Void) -> Void)? = nil)
+        updatedBy callbackRef: inout (_ newTitles: [S: String]) -> Void)
         -> TableViewMutliSectionBinder<C, S>
     {
         let scope = self.affectedSectionScope
-        self.binder.updateFooterTitles(footerTitles, affectedSections: scope)
-            
         let updateCallback: ([S: String]) -> Void
         updateCallback = { [weak binder = self.binder] (titles) in
             binder?.updateFooterTitles(titles, affectedSections: scope)
         }
-        updateHandler?(updateCallback)
+        callbackRef = updateCallback
         
-        return self
+        return self.bind(footerTitles: footerTitles)
     }
     
     // MARK: -

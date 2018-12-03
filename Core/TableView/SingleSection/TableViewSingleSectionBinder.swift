@@ -1,5 +1,20 @@
 import UIKit
 
+/**
+ An enum that describes at what point a section binder should call a 'data prefetch' handler.
+ */
+public enum PrefetchBehavior {
+    /// The default UIKit behaviour. If this is used, the binder will use a `UITableViewDataSourcePrefetching`
+    /// conformance to determine when to indicate that data should be prefetched.
+    case tableViewDecides
+    /// The binder will incidate that data should be prefetched when the table is the given number of cells away
+    /// from the end of the section.
+    case cellsFromEnd(Int)
+    /// The binder will incidate that data should be prefetched when the table is the given distance in points away
+    /// from the end of the section.
+//    case distanceFromEnd(CGFloat)
+}
+
 /// Protocol that allows us to have Reactive extensions
 public protocol TableViewSingleSectionBinderProtocol {
     associatedtype C: UITableViewCell
@@ -779,6 +794,31 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     // MARK: -
     
     /**
+     Binds a handler that will be called when new data should be prefetched for the table.
+     
+     This method is called with a 'prefetch behaviour' - this is an enum case that describes a heuristic the binder
+     should use to determine when data should be prefetched, such as 'when we're X number of cells from the end of the
+     section'. The binder will call the given 'prefetch handler' (according to the given behaviour) when new data should
+     be prefetched.
+     
+     - parameter prefetchBehaviour: A behavior indicating when a data prefetch should start.
+     - parameter prefetchHandler: A closure called that should prefetch new data for the section.
+     - parameter startingIndex: The starting index from which data should be fetched for.
+    */
+    @discardableResult
+    public func prefetch(
+        when prefetchBehaviour: PrefetchBehavior = .cellsFromEnd(2),
+        with prefetchHandler: @escaping (_ startingIndex: Int) -> Void)
+        -> TableViewSingleSectionBinder<C, S>
+    {
+        self.binder.handlers.sectionPrefetchBehavior[self.section] = prefetchBehaviour
+        self.binder.handlers.sectionPrefetchHandlers[self.section] = prefetchHandler
+        return self
+    }
+    
+    // MARK: -
+    
+    /**
      Binds the given header type to the declared section with the given view model.
      
      Use this method to use a custom `UITableViewHeaderFooterView` subclass for the section header with a table view
@@ -850,6 +890,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         headerTitle: String?)
         -> TableViewSingleSectionBinder<C, S>
     {
+        self.binder.nextDataModel.headerTitleBound = true
         self.binder.updateHeaderTitles([self.section: headerTitle], affectedSections: self.affectedSectionScope)
         
         return self
@@ -957,6 +998,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         footerTitle: String?)
         -> TableViewSingleSectionBinder<C, S>
     {
+        self.binder.nextDataModel.footerTitleBound = true
         self.binder.updateFooterTitles([self.section: footerTitle], affectedSections: self.affectedSectionScope)
         
         return self

@@ -23,6 +23,12 @@ class SamplesViewController: UIViewController {
             title: "Sample 3 - Home Page",
             subtitle: "A dynamic home page whose section information is given in a server response.",
             detail: "",
+            accessoryType: .disclosureIndicator),
+        TitleDetailTableViewCell.ViewModel(
+            collectionId: "4",
+            title: "Sample 4 - News Feed",
+            subtitle: "A news feed demonstrating infinite scrolling with data prefetching.",
+            detail: "",
             accessoryType: .disclosureIndicator)]
     
     override func viewDidLoad() {
@@ -46,6 +52,8 @@ class SamplesViewController: UIViewController {
                     self.navigationController?.pushViewController(ArtistsViewController(), animated: true)
                 case 2:
                     self.navigationController?.pushViewController(HomeViewController(), animated: true)
+                case 3:
+                    self.navigationController?.pushViewController(NewsFeedViewController(), animated: true)
                 default: break
                 }
             }
