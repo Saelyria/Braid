@@ -10,7 +10,7 @@ typealias NestedComparisonHandler<T: Collection> = (T.Element.Element, T.Element
 /// warrant an update). Can return nil to mean that the closure was unable to compare the two items.
 typealias NestedElementComparisonHandler<T: Collection> = (T.Element, T.Element.Element, T.Element.Element) -> Bool? where T.Element: Collection
 
-struct NestedExtendedDiff: DiffProtocol {
+struct _NestedExtendedDiff: DiffProtocol {
     typealias Index = Int
     
     enum Element {
@@ -57,18 +57,18 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
         isSameSection: ComparisonHandler<Self>,
         isSameElement: NestedComparisonHandler<Self>,
         isEqualElement: NestedElementComparisonHandler<Self>)
-        throws -> NestedExtendedDiff
+        throws -> _NestedExtendedDiff
     {
         // FIXME: This implementation is a copy paste of NestedDiff with some adjustments.
         let diffTraces = try outputDiffPathTraces(to: to, isSame: isSameSection)
         
         let sectionDiff =
             extendedDiff(
-                from: Diff(traces: diffTraces),
+                from: _Diff(traces: diffTraces),
                 other: to,
                 isSame: isSameSection,
                 isEqual: { _, _ in return false }) // TODO: other checks for section updating
-            .map { element -> NestedExtendedDiff.Element in
+            .map { element -> _NestedExtendedDiff.Element in
                 switch element {
                 case let .delete(at):
                     return .deleteSection(at)
@@ -95,10 +95,10 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
                     return (from, to)
                 }
                 return nil
-            }.flatMap { move -> [NestedExtendedDiff.Element] in
+            }.flatMap { move -> [_NestedExtendedDiff.Element] in
                 if let elements = try? itemOnStartIndex(advancedBy: move.0)
                     .extendedDiff(to.itemOnStartIndex(advancedBy: move.1), isSame: isSameElement, isEqual: { _,_ in false })
-                    .map { diffElement -> NestedExtendedDiff.Element in
+                    .map { diffElement -> _NestedExtendedDiff.Element in
                         switch diffElement {
                         case let .insert(at):
                             return .insertElement(at, section: move.1)
@@ -130,11 +130,11 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
         }
         
         let elementDiff = zip(zip(fromSections, toSections), matchingSectionTraces)
-            .flatMap { (args) -> [NestedExtendedDiff.Element] in
+            .flatMap { (args) -> [_NestedExtendedDiff.Element] in
                 let (sections, trace) = args
                 if let elements = try? sections.0
                     .extendedDiff(sections.1, isSame: isSameElement, isEqual: { isEqualElement(sections.1, $0, $1)})
-                    .map { diffElement -> NestedExtendedDiff.Element in
+                    .map { diffElement -> _NestedExtendedDiff.Element in
                         switch diffElement {
                         case let .delete(at):
                             return .deleteElement(at, section: trace.from.x)
@@ -152,11 +152,11 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
                 }
         }
         
-        return NestedExtendedDiff(elements: sectionDiff + sectionMoves + elementDiff)
+        return _NestedExtendedDiff(elements: sectionDiff + sectionMoves + elementDiff)
     }
 }
 
-extension NestedExtendedDiff.Element: CustomDebugStringConvertible {
+extension _NestedExtendedDiff.Element: CustomDebugStringConvertible {
     var debugDescription: String {
         switch self {
         case let .deleteElement(row, section):
@@ -183,9 +183,9 @@ extension NestedExtendedDiff.Element: CustomDebugStringConvertible {
     }
 }
 
-extension NestedExtendedDiff: ExpressibleByArrayLiteral {
+extension _NestedExtendedDiff: ExpressibleByArrayLiteral {
     
-    init(arrayLiteral elements: NestedExtendedDiff.Element...) {
+    init(arrayLiteral elements: _NestedExtendedDiff.Element...) {
         self.elements = elements
     }
 }

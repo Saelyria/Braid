@@ -142,11 +142,11 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[NM]>,
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -162,7 +162,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[NM]>,
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
@@ -172,7 +172,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         }
         bindResult.binder.addCellEqualityChecker(
             itemType: NC.ViewModel.self, affectedSections: bindResult.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -188,7 +188,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[NM]>,
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable, NM: Equatable & CollectionIdentifiable
@@ -198,7 +198,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         }
         bindResult.binder.addCellEqualityChecker(
             itemType: NC.ViewModel.self, affectedSections: bindResult.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -214,7 +214,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[NM]>,
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
     {
@@ -223,13 +223,13 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         }
         bindResult.binder.addCellEqualityChecker(
             itemType: NM.self, affectedSections: bindResult.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     private func _bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[NM]>,
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
@@ -244,7 +244,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         models
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [NM]) in
-                let viewModels = models.map(mapToViewModel)
+                let viewModels = models.map(mapToViewModels)
                 binder?.updateCellModels([section: models], viewModels: [section: viewModels], affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
@@ -268,7 +268,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ tableView: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: Observable<[NM]>)
         -> TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>
     {
@@ -292,7 +292,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ tableView: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: Observable<[NM]>)
         -> TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>
         where NM: Equatable & CollectionIdentifiable
@@ -306,7 +306,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
     }
     
     private func _bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ tableView: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: Observable<[NM]>)
         -> TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>
     {
@@ -316,11 +316,12 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         let section = bindResult.section
         let scope = bindResult.affectedSectionScope
         
-        let _cellProvider = { [weak binder = bindResult.binder] (_ section: Base.S, _ row: Int) -> UITableViewCell in
+        let _cellProvider: (UITableView, Base.S, Int) -> UITableViewCell
+        _cellProvider = { [weak binder = bindResult.binder] (tableView, section, row) in
             guard let models = binder?.currentDataModel.sectionCellModels[section] as? [NM] else {
                 fatalError("Model type wasn't as expected, something went awry!")
             }
-            return cellProvider(row, models[row])
+            return cellProvider(tableView, row, models[row])
         }
         bindResult.binder.addCellDequeueBlock(cellProvider: _cellProvider, affectedSections: scope)
         
@@ -349,7 +350,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      */
     @discardableResult
     public func bind(
-        cellProvider: @escaping (_ row: Int) -> UITableViewCell,
+        cellProvider: @escaping (_ tableView: UITableView, _ row: Int) -> UITableViewCell,
         numberOfCells: Observable<Int>)
         -> TableViewSingleSectionBinder<Base.C, Base.S>
     {
@@ -405,6 +406,8 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         
+        bindResult.binder.nextDataModel.headerTitleBound = true
+        
         let section = bindResult.section
         headerTitle
             .subscribeOn(MainScheduler.instance)
@@ -452,6 +455,8 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
+        
+        bindResult.binder.nextDataModel.footerTitleBound = true
         
         let section = bindResult.section
         footerTitle

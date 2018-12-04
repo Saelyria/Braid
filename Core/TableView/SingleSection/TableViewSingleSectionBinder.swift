@@ -1,5 +1,20 @@
 import UIKit
 
+/**
+ An enum that describes at what point a section binder should call a 'data prefetch' handler.
+ */
+public enum PrefetchBehavior {
+    /// The default UIKit behaviour. If this is used, the binder will use a `UITableViewDataSourcePrefetching`
+    /// conformance to determine when to indicate that data should be prefetched.
+    case tableViewDecides
+    /// The binder will incidate that data should be prefetched when the table is the given number of cells away
+    /// from the end of the section.
+    case cellsFromEnd(Int)
+    /// The binder will incidate that data should be prefetched when the table is the given distance in points away
+    /// from the end of the section.
+//    case distanceFromEnd(CGFloat)
+}
+
 /// Protocol that allows us to have Reactive extensions
 public protocol TableViewSingleSectionBinderProtocol {
     associatedtype C: UITableViewCell
@@ -165,11 +180,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -191,12 +206,12 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -218,13 +233,13 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -246,24 +261,24 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     private func _bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
-        let viewModels = [self.section: models.map(mapToViewModel)]
+        let viewModels = [self.section: models.map(mapToViewModels)]
         self.binder.updateCellModels(
             [self.section: models], viewModels: viewModels, affectedSections: self.affectedSectionScope)
         
@@ -293,12 +308,12 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        mapToViewModels: @escaping (NM) -> NC.ViewModel,
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels, updatedBy: &callbackRef)
     }
     
     /**
@@ -324,14 +339,14 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        mapToViewModels: @escaping (NM) -> NC.ViewModel,
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels, updatedBy: &callbackRef)
     }
     
     /**
@@ -357,13 +372,13 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        mapToViewModels: @escaping (NM) -> NC.ViewModel,
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels, updatedBy: &callbackRef)
     }
     
     /**
@@ -389,20 +404,20 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        mapToViewModels: @escaping (NM) -> NC.ViewModel,
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels, updatedBy: &callbackRef)
     }
     
     public func _bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        mapToViewModels: @escaping (NM) -> NC.ViewModel,
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
@@ -410,13 +425,13 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         let section = self.section
         let scope = self.affectedSectionScope
         let updateCallback: ([NM]) -> Void
-        updateCallback = { [weak binder = self.binder, mapToViewModel] (models) in
-            let viewModels = models.map(mapToViewModel)
+        updateCallback = { [weak binder = self.binder] (models) in
+            let viewModels = models.map(mapToViewModels)
             binder?.updateCellModels([section: models], viewModels: [section: viewModels], affectedSections: scope)
         }
         callbackRef = updateCallback
         
-        return self.bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self.bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     // MARK: -
@@ -581,6 +596,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      particularly complex use cases.
      
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter table: The table view to dequeue the cell on.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
      - parameter models: The models objects to bind to the dequeued cells for this section.
@@ -589,7 +605,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ table: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [NM])
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
     {
@@ -605,6 +621,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      particularly complex use cases.
      
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter table: The table view to dequeue the cell on.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
      - parameter models: The models objects to bind to the dequeued cells for this section.
@@ -613,7 +630,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ table: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [NM])
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
         where NM: Equatable & CollectionIdentifiable
@@ -623,15 +640,16 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     }
     
     private func _bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ table: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [NM])
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
     {
-        let _cellProvider = { [weak binder = self.binder] (_ section: S, _ row: Int) -> UITableViewCell in
+        let _cellProvider: (UITableView, S, Int) -> UITableViewCell
+        _cellProvider = { [weak binder = self.binder] (table, section, row) -> UITableViewCell in
             guard let models = binder?.currentDataModel.sectionCellModels[section] as? [NM] else {
                 fatalError("Model type wasn't as expected, something went awry!")
             }
-            return cellProvider(row, models[row])
+            return cellProvider(table, row, models[row])
         }
         self.binder.addCellDequeueBlock(cellProvider: _cellProvider, affectedSections: self.affectedSectionScope)
         self.binder.updateCellModels(
@@ -660,7 +678,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [NM],
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
@@ -688,7 +706,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [NM],
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
@@ -699,7 +717,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     }
     
     private func _bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [NM],
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
@@ -732,7 +750,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func bind(
-        cellProvider: @escaping (_ row: Int) -> UITableViewCell,
+        cellProvider: @escaping (UITableView, _ row: Int) -> UITableViewCell,
         numberOfCells: Int)
         -> TableViewSingleSectionBinder<UITableViewCell, S>
     {
@@ -760,7 +778,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func bind(
-        cellProvider: @escaping (_ row: Int) -> UITableViewCell,
+        cellProvider: @escaping (UITableView, _ row: Int) -> UITableViewCell,
         numberOfCells: Int,
         updatedBy callbackRef: inout (_ numCells: Int) -> Void)
         -> TableViewSingleSectionBinder<UITableViewCell, S>
@@ -776,6 +794,31 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         return self.bind(cellProvider: cellProvider, numberOfCells: numberOfCells)
     }
 
+    // MARK: -
+    
+    /**
+     Binds a handler that will be called when new data should be prefetched for the table.
+     
+     This method is called with a 'prefetch behaviour' - this is an enum case that describes a heuristic the binder
+     should use to determine when data should be prefetched, such as 'when we're X number of cells from the end of the
+     section'. The binder will call the given 'prefetch handler' (according to the given behaviour) when new data should
+     be prefetched.
+     
+     - parameter prefetchBehaviour: A behavior indicating when a data prefetch should start.
+     - parameter prefetchHandler: A closure called that should prefetch new data for the section.
+     - parameter startingIndex: The starting index from which data should be fetched for.
+    */
+    @discardableResult
+    public func prefetch(
+        when prefetchBehaviour: PrefetchBehavior = .cellsFromEnd(2),
+        with prefetchHandler: @escaping (_ startingIndex: Int) -> Void)
+        -> TableViewSingleSectionBinder<C, S>
+    {
+        self.binder.handlers.sectionPrefetchBehavior[self.section] = prefetchBehaviour
+        self.binder.handlers.sectionPrefetchHandlers[self.section] = prefetchHandler
+        return self
+    }
+    
     // MARK: -
     
     /**
@@ -850,6 +893,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         headerTitle: String?)
         -> TableViewSingleSectionBinder<C, S>
     {
+        self.binder.nextDataModel.headerTitleBound = true
         self.binder.updateHeaderTitles([self.section: headerTitle], affectedSections: self.affectedSectionScope)
         
         return self
@@ -957,6 +1001,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         footerTitle: String?)
         -> TableViewSingleSectionBinder<C, S>
     {
+        self.binder.nextDataModel.footerTitleBound = true
         self.binder.updateFooterTitles([self.section: footerTitle], affectedSections: self.affectedSectionScope)
         
         return self

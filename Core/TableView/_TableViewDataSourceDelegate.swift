@@ -14,6 +14,15 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     
     override func responds(to aSelector: Selector!) -> Bool {
         switch aSelector {
+        case #selector(UITableViewDataSource.tableView(_:titleForHeaderInSection:)):
+            return self.binder.nextDataModel.headerTitleBound
+        case #selector(UITableViewDataSource.tableView(_:titleForFooterInSection:)):
+            return self.binder.nextDataModel.footerTitleBound
+        case #selector(UITableViewDelegate.tableView(_:viewForHeaderInSection:)):
+            return self.binder.nextDataModel.headerViewBound
+        case #selector(UITableViewDelegate.tableView(_:viewForFooterInSection:)):
+            return self.binder.nextDataModel.footerViewBound
+            
         case #selector(UITableViewDelegate.tableView(_:estimatedHeightForRowAt:)):
             return !self.binder.handlers.sectionEstimatedCellHeightBlocks.isEmpty
                 || self.binder.handlers.dynamicSectionsEstimatedCellHeightBlock != nil
@@ -38,6 +47,11 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
             return !self.binder.handlers.sectionFooterHeightBlocks.isEmpty
                 || self.binder.handlers.dynamicSectionsFooterHeightBlock != nil
                 || self.binder.handlers.anySectionFooterHeightBlock != nil
+            
+        case #selector(UITableViewDelegate.tableView(_:willDisplay:forRowAt:)):
+            return !self.binder.handlers.sectionPrefetchBehavior.isEmpty
+                || self.binder.handlers.dynamicSectionPrefetchBehavior != nil
+            
         default:
             return super.responds(to: aSelector)
         }
@@ -71,6 +85,24 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         
         let cell = dequeueBlock(section, tableView, indexPath)
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let section = self.dataModel.displayedSections[indexPath.section]
+        
+        let prefetchBehavior: PrefetchBehavior? = self.dataModel.uniquelyBoundCellSections.contains(section) ?
+            self.binder.handlers.sectionPrefetchBehavior[section] : self.binder.handlers.dynamicSectionPrefetchBehavior
+        
+        if let prefetchBehavior = prefetchBehavior {
+            switch prefetchBehavior {
+            case .cellsFromEnd(let num):
+                let numItemsInSection = self.tableView(tableView, numberOfRowsInSection: indexPath.section)
+                if indexPath.row == numItemsInSection - num {
+                    self.binder.handlers.sectionPrefetchHandlers[section]?(indexPath.row)
+                }
+            default: break
+            }
+        }
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {

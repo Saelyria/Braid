@@ -76,6 +76,12 @@ public class TableViewBinder {
             binder: self._sectionBinder, section: .table)
     }
     
+    /**
+     Tells that binder that all setup binding has been completed.
+     
+     This method must be called once all binding of cell/view types and data observers have been completed on the table,
+     after which point no further binding can be done on the table with the binder's `onTable` methods.
+     */
     public func finish() {
         self._sectionBinder.finish()
     }
@@ -195,12 +201,17 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     public var sectionUpdateAnimation: UITableView.RowAnimation = .automatic
     /// The animation the binder will use to animate section insertions. The default value is `automatic`.
     public var sectionInsertionAnimation: UITableView.RowAnimation = .automatic
-    /// The animation the binder will use to animate section updates for sections whose items was 'undiffable' (i.e.
-    /// did not conform to `CollectionIdentifiable` or `Equatable`). The default value is `none`.
-    public var undiffableSectionUpdateAnimation: UITableView.RowAnimation = .none
+    /// The animation the binder will use to animate section updates for sections whose items were 'undiffable' (i.e.
+    /// did not conform to `CollectionIdentifiable` or `Equatable`). The default value is `fade`.
+    public var undiffableSectionUpdateAnimation: UITableView.RowAnimation = .fade
     /// The animation the binder will use to animate section updates when the section's header or footer updates. The
     /// default value is `none`.
     public var sectionHeaderFooterUpdateAnimation: UITableView.RowAnimation = .none
+    /// Whether the binder should animate changes in data on its table view. Defaults to `true`.
+    public var animateChanges: Bool = true
+    
+    /// An object that will perform table view animations on behalf of the table view binder.
+    public weak var updateDelegate: TableViewUpdateDelegate?
     
     /// A value indicating how this table view binder manages the visibility of sections bound to it.
     public var sectionDisplayBehavior: SectionDisplayBehavior {
@@ -468,11 +479,20 @@ extension SectionedTableViewBinder: _TableViewDataModelDelegate {
             guard let self = self else { return }
             
             self.applyDisplayedSectionBehavior()
+            let update: CollectionUpdate
             
             if let diff = self.currentDataModel.diff(from: self.nextDataModel) {
-                let update = NestedBatchUpdate(diff: diff)
                 self.createNextDataModel()
-                
+                update = CollectionUpdate(diff: diff)
+            } else {
+                self.createNextDataModel()
+                let sections: IndexSet = IndexSet(self.currentDataModel.displayedSections.enumerated().map { i, _ in i })
+                update = CollectionUpdate(undiffableSectionUpdates: sections)
+            }
+            
+            if let delegate = self.updateDelegate {
+                delegate.animate(updates: update, on: self.tableView)
+            } else if self.animateChanges {
                 self.tableView.beginUpdates()
                 self.tableView.deleteRows(at: update.itemDeletions, with: self.rowDeletionAnimation)
                 self.tableView.insertRows(at: update.itemInsertions, with: self.rowInsertionAnimation)

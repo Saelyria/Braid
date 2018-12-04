@@ -39,7 +39,7 @@ class ArtistsViewController: UIViewController {
         self.binder.onAllSections()
             .rx.bind(cellType: TitleDetailTableViewCell.self,
                      models: self.artistsForSections.asObservable(),
-                     mapToViewModelsWith: { (artist: Artist) in return artist.asTitleDetailCellViewModel() })
+                     mapToViewModels: { (artist: Artist) in return artist.asTitleDetailCellViewModel() })
             // 5.
             .rx.bind(headerTitles: self.artistsForSections.asObservable()
                 .map { (artistsForSections: [Section: [Artist]]) -> [Section: String?] in
@@ -87,6 +87,8 @@ class ArtistsViewController: UIViewController {
             .disposed(by: self.disposeBag)
     }
 }
+
+// MARK: - Helper extensions
 
 private extension Artist {
     /// Maps the 'artist' into a view model for a 'title detail cell'

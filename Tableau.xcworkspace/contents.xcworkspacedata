@@ -23,13 +23,16 @@
          location = "group:SectionDisplayBehaviour.md">
       </FileRef>
       <FileRef
+         location = "group:CellBindingMethods.md">
+      </FileRef>
+      <FileRef
+         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/AdvancedBindingChains.md">
+      </FileRef>
+      <FileRef
          location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/ProvidingDimensions.md">
       </FileRef>
       <FileRef
          location = "group:UsingViewModels.md">
-      </FileRef>
-      <FileRef
-         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/AdvancedBindingChains.md">
       </FileRef>
       <FileRef
          location = "group:TipsTricksFAQ.md">

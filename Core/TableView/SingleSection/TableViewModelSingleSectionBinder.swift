@@ -80,12 +80,32 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     @discardableResult
     public override func bind<H>(
         headerType: H.Type,
+        viewModel: H.ViewModel?)
+        -> TableViewModelSingleSectionBinder<C, S, M>
+        where H : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
+    {
+        super.bind(headerType: headerType, viewModel: viewModel)
+        return self
+    }
+    
+    @discardableResult
+    public override func bind<H>(
+        headerType: H.Type,
         viewModel: H.ViewModel?,
         updatedBy callbackRef: inout (_ newViewModel: H.ViewModel?) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
         where H : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
     {
         super.bind(headerType: headerType, viewModel: viewModel, updatedBy: &callbackRef)
+        return self
+    }
+    
+    @discardableResult
+    public override func bind(
+        headerTitle: String?)
+        -> TableViewModelSingleSectionBinder<C, S, M>
+    {
+        super.bind(headerTitle: headerTitle)
         return self
     }
     
@@ -102,12 +122,32 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     @discardableResult
     public override func bind<F>(
         footerType: F.Type,
+        viewModel: F.ViewModel?)
+        -> TableViewSingleSectionBinder<C, S>
+        where F : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
+    {
+        super.bind(footerType: footerType, viewModel: viewModel)
+        return self
+    }
+    
+    @discardableResult
+    public override func bind<F>(
+        footerType: F.Type,
         viewModel: F.ViewModel?,
         updatedBy callbackRef: inout (_ newViewModel: F.ViewModel?) -> Void)
         -> TableViewSingleSectionBinder<C, S>
         where F : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
     {
         super.bind(footerType: footerType, viewModel: viewModel, updatedBy: &callbackRef)
+        return self
+    }
+    
+    @discardableResult
+    public override func bind(
+        footerTitle: String?)
+        -> TableViewSingleSectionBinder<C, S>
+    {
+        super.bind(footerTitle: footerTitle)
         return self
     }
     

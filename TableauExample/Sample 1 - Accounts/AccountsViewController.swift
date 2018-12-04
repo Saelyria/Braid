@@ -50,7 +50,7 @@ class AccountsViewController: UIViewController {
         self.binder.onSections(.checking, .savings, .other)
             .rx.bind(cellType: TitleDetailTableViewCell.self,
                      models: self.accountsForSections.asObservable(),
-                     mapToViewModelsWith: { (account: Account) in return account.asTitleDetailCellViewModel() })
+                     mapToViewModels: { (account: Account) in return account.asTitleDetailCellViewModel() })
             // 9.
             .onTapped { [unowned self] (_, _, cell: TitleDetailTableViewCell, account: Account) in
                 cell.setSelected(false, animated: true)
@@ -108,6 +108,8 @@ class AccountsViewController: UIViewController {
             .disposed(by: self.disposeBag)
     }
 }
+
+// MARK: - Helper extensions
 
 private extension Observable where Element == [Account] {
     typealias Section = AccountsViewController.Section

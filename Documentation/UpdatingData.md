@@ -37,7 +37,7 @@ binder.onSection(.someSection)
 ```
 
 The subscriptions are observed by the binder and are disposed of by an internal dispose bag on the binder. Observables are internally 
-converted to `Driver` to ensure the subscriptions are always executed on the main thread.
+observed on the main thread, so it should be pretty much plug-and-play.
 
 ## Without RxSwift
 

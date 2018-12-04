@@ -4,18 +4,30 @@ import Tableau
 class SamplesViewController: UIViewController {
     private var tableView: UITableView!
     private var binder: TableViewBinder!
-    
+
     private var rows: [TitleDetailTableViewCell.ViewModel] = [
         TitleDetailTableViewCell.ViewModel(
             collectionId: "1",
             title: "Sample 1 - Accounts",
-            subtitle: "A mock 'accounts' view like you might find in a banking app. This view controller demonstrates hot reloading of sections and rows using RxSwift.",
+            subtitle: "A mock 'accounts' view like you might find in a banking app.",
             detail: "",
             accessoryType: .disclosureIndicator),
         TitleDetailTableViewCell.ViewModel(
             collectionId: "2",
             title: "Sample 2 - Artists & Songs",
-            subtitle: "A mock 'artists' view like you might find in a music app. This view controller demonstrates how to use a struct to represent sections instead of an enum for cases where you don't know the sections at compile-time, like when section data is provided via a network response.",
+            subtitle: "A mock 'artists' view like you might find in a music app.",
+            detail: "",
+            accessoryType: .disclosureIndicator),
+        TitleDetailTableViewCell.ViewModel(
+            collectionId: "3",
+            title: "Sample 3 - Home Page",
+            subtitle: "A dynamic home page whose section information is given in a server response.",
+            detail: "",
+            accessoryType: .disclosureIndicator),
+        TitleDetailTableViewCell.ViewModel(
+            collectionId: "4",
+            title: "Sample 4 - News Feed",
+            subtitle: "A news feed demonstrating infinite scrolling with data prefetching.",
             detail: "",
             accessoryType: .disclosureIndicator)]
     
@@ -38,6 +50,10 @@ class SamplesViewController: UIViewController {
                     self.navigationController?.pushViewController(AccountsViewController(), animated: true)
                 case 1:
                     self.navigationController?.pushViewController(ArtistsViewController(), animated: true)
+                case 2:
+                    self.navigationController?.pushViewController(HomeViewController(), animated: true)
+                case 3:
+                    self.navigationController?.pushViewController(NewsFeedViewController(), animated: true)
                 default: break
                 }
             }
