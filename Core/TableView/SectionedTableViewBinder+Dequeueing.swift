@@ -65,10 +65,12 @@ internal extension SectionedTableViewBinder {
      - parameter affectedSections: The section scope that this dequeueing block is used for.
      */
     func addCellDequeueBlock(
-        cellProvider: @escaping (_ row: Int) -> UITableViewCell, affectedSections: SectionBindingScope<S>)
+        cellProvider: @escaping (_ table: UITableView, _ row: Int) -> UITableViewCell,
+        affectedSections: SectionBindingScope<S>)
     {
         let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = self] (section, _, indexPath) in
-            let cell = cellProvider(indexPath.row)
+            guard let table = binder?.tableView else { return UITableViewCell() }
+            let cell = cellProvider(table, indexPath.row)
             if binder?.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
                 binder?.handlers.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
             } else {
@@ -87,10 +89,12 @@ internal extension SectionedTableViewBinder {
      - parameter affectedSections: The section scope that this dequeueing block is used for.
      */
     func addCellDequeueBlock(
-        cellProvider: @escaping (_ section: S, _ row: Int) -> UITableViewCell, affectedSections: SectionBindingScope<S>)
+        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int) -> UITableViewCell,
+        affectedSections: SectionBindingScope<S>)
     {
         let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = self] (section, _, indexPath) in
-            let cell = cellProvider(section, indexPath.row)
+            guard let table = binder?.tableView else { return UITableViewCell() }
+            let cell = cellProvider(table, section, indexPath.row)
             if binder?.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
                 binder?.handlers.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
             } else {

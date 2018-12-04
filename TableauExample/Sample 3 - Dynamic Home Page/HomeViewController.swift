@@ -79,13 +79,13 @@ class HomeViewController: UIViewController {
         
         // 7.
         self.binder.onAllOtherSections()
-            .rx.bind(cellProvider: { [unowned self] (section: Section, row: Int, viewModel: CollectionIdentifiable) in
+            .rx.bind(cellProvider: { (tableView, section: Section, row: Int, viewModel: CollectionIdentifiable) in
                 if let viewModel = viewModel as? TitleDetailTableViewCell.ViewModel {
-                    let cell = self.tableView.dequeue(TitleDetailTableViewCell.self)
+                    let cell = tableView.dequeue(TitleDetailTableViewCell.self)
                     cell.viewModel = viewModel
                     return cell
                 } else if let viewModel = viewModel as? ImageTitleSubtitleTableViewCell.ViewModel {
-                    let cell = self.tableView.dequeue(ImageTitleSubtitleTableViewCell.self)
+                    let cell = tableView.dequeue(ImageTitleSubtitleTableViewCell.self)
                     cell.viewModel = viewModel
                     return cell
                 }

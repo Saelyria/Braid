@@ -268,7 +268,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ tableView: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: Observable<[NM]>)
         -> TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>
     {
@@ -292,7 +292,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ tableView: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: Observable<[NM]>)
         -> TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>
         where NM: Equatable & CollectionIdentifiable
@@ -306,7 +306,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
     }
     
     private func _bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ tableView: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: Observable<[NM]>)
         -> TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>
     {
@@ -316,11 +316,12 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         let section = bindResult.section
         let scope = bindResult.affectedSectionScope
         
-        let _cellProvider = { [weak binder = bindResult.binder] (_ section: Base.S, _ row: Int) -> UITableViewCell in
+        let _cellProvider: (UITableView, Base.S, Int) -> UITableViewCell
+        _cellProvider = { [weak binder = bindResult.binder] (tableView, section, row) in
             guard let models = binder?.currentDataModel.sectionCellModels[section] as? [NM] else {
                 fatalError("Model type wasn't as expected, something went awry!")
             }
-            return cellProvider(row, models[row])
+            return cellProvider(tableView, row, models[row])
         }
         bindResult.binder.addCellDequeueBlock(cellProvider: _cellProvider, affectedSections: scope)
         
@@ -349,7 +350,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      */
     @discardableResult
     public func bind(
-        cellProvider: @escaping (_ row: Int) -> UITableViewCell,
+        cellProvider: @escaping (_ tableView: UITableView, _ row: Int) -> UITableViewCell,
         numberOfCells: Observable<Int>)
         -> TableViewSingleSectionBinder<Base.C, Base.S>
     {

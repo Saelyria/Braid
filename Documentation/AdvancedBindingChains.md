@@ -60,7 +60,9 @@ binder.onAllSections()
 ```
 
 > Just like with a switch statement, it's generally recommended that you favour covering all your cases by name (i.e. using the `onSection` or 
-`onSections` methods) instead of using this the `onAllOtherSections` method as it's more explicit and generally less error-prone.
+`onSections` methods) instead of using the `onAllOtherSections` method as it's more explicit and generally less error-prone.
+
+> The `onAllOtherSections` and `onAllSections` methods can only be called once on a binder.
 
 > Note the choice of using `onAllSections` rather than `onAllOtherSections`. Either of these methods in either of the last two examples
 would have the same effect - we just chose to, in the first example, use `onAllOtherSections` to make our binding setup more clear in the

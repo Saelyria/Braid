@@ -4,7 +4,7 @@ import Tableau
 class SamplesViewController: UIViewController {
     private var tableView: UITableView!
     private var binder: TableViewBinder!
-    
+
     private var rows: [TitleDetailTableViewCell.ViewModel] = [
         TitleDetailTableViewCell.ViewModel(
             collectionId: "1",

@@ -253,7 +253,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ section: Base.S, _ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (UITableView, _ section: Base.S, _ row: Int, _ model: NM) -> UITableViewCell,
         models: Observable<[Base.S: [NM]]>)
         -> TableViewModelMultiSectionBinder<UITableViewCell, Base.S, NM>
     {
@@ -280,7 +280,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ section: Base.S, _ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (UITableView, _ section: Base.S, _ row: Int, _ model: NM) -> UITableViewCell,
         models: Observable<[Base.S: [NM]]>)
         -> TableViewModelMultiSectionBinder<UITableViewCell, Base.S, NM>
         where NM: Equatable & CollectionIdentifiable
@@ -294,7 +294,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
     }
     
     private func _bind<NM>(
-        cellProvider: @escaping (_ section: Base.S, _ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (UITableView, _ section: Base.S, _ row: Int, _ model: NM) -> UITableViewCell,
         models: Observable<[Base.S: [NM]]>)
         -> TableViewModelMultiSectionBinder<UITableViewCell, Base.S, NM>
     {
@@ -304,11 +304,12 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         let sections = bindResult.sections
         let scope = bindResult.affectedSectionScope
         
-        let _cellProvider = { [weak binder = bindResult.binder] (_ section: Base.S, _ row: Int) -> UITableViewCell in
+        let _cellProvider: (UITableView, Base.S, Int) -> UITableViewCell
+        _cellProvider = { [weak binder = bindResult.binder] (tableView, section, row) -> UITableViewCell in
             guard let models = binder?.currentDataModel.sectionCellModels[section] as? [NM] else {
                 fatalError("Model type wasn't as expected, something went awry!")
             }
-            return cellProvider(section, row, models[row])
+            return cellProvider(tableView, section, row, models[row])
         }
         bindResult.binder.addCellDequeueBlock(cellProvider: _cellProvider, affectedSections: scope)
         
@@ -338,7 +339,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
      */
     @discardableResult
     public func bind(
-        cellProvider: @escaping (_ section: Base.S, _ row: Int) -> UITableViewCell,
+        cellProvider: @escaping (UITableView, _ section: Base.S, _ row: Int) -> UITableViewCell,
         numberOfCells: Observable<[Base.S: Int]>)
         -> TableViewMutliSectionBinder<Base.C, Base.S>
     {

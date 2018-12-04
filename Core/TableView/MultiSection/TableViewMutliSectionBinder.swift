@@ -601,7 +601,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [S: [NM]])
         -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
     {
@@ -628,7 +628,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [S: [NM]])
         -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
         where NM: Equatable & CollectionIdentifiable
@@ -638,15 +638,16 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     }
     
     private func _bind<NM>(
-        cellProvider: @escaping (_ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [S: [NM]])
         -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
     {
-        let _cellProvider = { [weak binder = self.binder] (_ section: S, _ row: Int) -> UITableViewCell in
+        let _cellProvider: (UITableView, S, Int) -> UITableViewCell
+        _cellProvider = { [weak binder = self.binder] (_ table, _ section, _ row) -> UITableViewCell in
             guard let models = binder?.currentDataModel.sectionCellModels[section] as? [NM] else {
                 fatalError("Model type wasn't as expected, something went awry!")
             }
-            return cellProvider(section, row, models[row])
+            return cellProvider(table, section, row, models[row])
         }
         self.binder.addCellDequeueBlock(cellProvider: _cellProvider, affectedSections: self.affectedSectionScope)
         self.binder.updateCellModels(models, viewModels: nil, affectedSections: self.affectedSectionScope)
@@ -677,7 +678,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [S: [NM]],
         updatedBy callbackRef: inout (_ newModels: [S: [NM]]) -> Void)
         -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
@@ -708,7 +709,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [S: [NM]],
         updatedBy callbackRef: inout (_ newModels: [S: [NM]]) -> Void)
         -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
@@ -719,7 +720,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     }
     
     private func _bind<NM>(
-        cellProvider: @escaping (_ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [S: [NM]],
         updatedBy callbackRef: inout (_ newModels: [S: [NM]]) -> Void)
         -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
@@ -752,7 +753,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
      */
     @discardableResult
     public func bind(
-        cellProvider: @escaping (_ section: S, _ row: Int) -> UITableViewCell,
+        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int) -> UITableViewCell,
         numberOfCells: [S: Int])
         -> TableViewMutliSectionBinder<UITableViewCell, S>
     {
@@ -782,7 +783,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
      */
     @discardableResult
     public func bind(
-        cellProvider: @escaping (_ section: S, _ row: Int) -> UITableViewCell,
+        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int) -> UITableViewCell,
         numberOfCells: [S: Int],
         updatedBy callbackRef: inout (_ newNumberOfCells: [S: Int]) -> Void)
         -> TableViewMutliSectionBinder<UITableViewCell, S>

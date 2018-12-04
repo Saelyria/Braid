@@ -27,7 +27,6 @@
 		AB577BD62184DC6F00CD2363 /* ImageTitleSubtitleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BD52184DC6F00CD2363 /* ImageTitleSubtitleTableViewCell.swift */; };
 		AB577BDD2189769800CD2363 /* AccountDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BDC2189769800CD2363 /* AccountDetailViewController.swift */; };
 		AB86C3BF2141718C00FA4945 /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */; };
-		AB8A137121A4838600821F84 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB8A137021A4838600821F84 /* TestViewController.swift */; };
 		ABE0F35921AE3F7F0098950D /* ImageTitleSubtitleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABE0F35821AE3F7F0098950D /* ImageTitleSubtitleTableViewCell.xib */; };
 		ABE0F35F21B49DD90098950D /* NewsFeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE0F35E21B49DD90098950D /* NewsFeedViewController.swift */; };
 		ABE0F36121B4AA830098950D /* NewsFeedService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE0F36021B4AA830098950D /* NewsFeedService.swift */; };
@@ -75,7 +74,6 @@
 		AB577BDB2187CC2100CD2363 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		AB577BDC2189769800CD2363 /* AccountDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDetailViewController.swift; sourceTree = "<group>"; };
 		AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
-		AB8A137021A4838600821F84 /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
 		ABE0F35821AE3F7F0098950D /* ImageTitleSubtitleTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageTitleSubtitleTableViewCell.xib; sourceTree = "<group>"; };
 		ABE0F35E21B49DD90098950D /* NewsFeedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsFeedViewController.swift; sourceTree = "<group>"; };
 		ABE0F36021B4AA830098950D /* NewsFeedService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsFeedService.swift; sourceTree = "<group>"; };
@@ -128,7 +126,6 @@
 				AB577BDB2187CC2100CD2363 /* README.md */,
 				938132D720B6463000CBF8F6 /* AppDelegate.swift */,
 				93C36A4720DAFF97006B7ECF /* SamplesViewController.swift */,
-				AB8A137021A4838600821F84 /* TestViewController.swift */,
 				AB577B98217596AF00CD2363 /* Sample 1 - Accounts */,
 				AB577BA02176444000CD2363 /* Sample 2 - Artists & Songs */,
 				AB577BA82179662400CD2363 /* Sample 3 - Dynamic Home Page */,
@@ -344,7 +341,6 @@
 			files = (
 				AB577BA2217655DD00CD2363 /* ArtistsViewController.swift in Sources */,
 				AB577BAC2179838B00CD2363 /* MusicLibraryService.swift in Sources */,
-				AB8A137121A4838600821F84 /* TestViewController.swift in Sources */,
 				938132DA20B6463000CBF8F6 /* AccountsViewController.swift in Sources */,
 				938132D820B6463000CBF8F6 /* AppDelegate.swift in Sources */,
 				AB577BD62184DC6F00CD2363 /* ImageTitleSubtitleTableViewCell.swift in Sources */,

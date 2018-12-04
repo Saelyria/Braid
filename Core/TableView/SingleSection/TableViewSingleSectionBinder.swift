@@ -596,6 +596,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      particularly complex use cases.
      
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter table: The table view to dequeue the cell on.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
      - parameter models: The models objects to bind to the dequeued cells for this section.
@@ -604,7 +605,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ table: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [NM])
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
     {
@@ -620,6 +621,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      particularly complex use cases.
      
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter table: The table view to dequeue the cell on.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
      - parameter models: The models objects to bind to the dequeued cells for this section.
@@ -628,7 +630,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ table: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [NM])
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
         where NM: Equatable & CollectionIdentifiable
@@ -638,15 +640,16 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     }
     
     private func _bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (_ table: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [NM])
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
     {
-        let _cellProvider = { [weak binder = self.binder] (_ section: S, _ row: Int) -> UITableViewCell in
+        let _cellProvider: (UITableView, S, Int) -> UITableViewCell
+        _cellProvider = { [weak binder = self.binder] (table, section, row) -> UITableViewCell in
             guard let models = binder?.currentDataModel.sectionCellModels[section] as? [NM] else {
                 fatalError("Model type wasn't as expected, something went awry!")
             }
-            return cellProvider(row, models[row])
+            return cellProvider(table, row, models[row])
         }
         self.binder.addCellDequeueBlock(cellProvider: _cellProvider, affectedSections: self.affectedSectionScope)
         self.binder.updateCellModels(
@@ -675,7 +678,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [NM],
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
@@ -703,7 +706,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [NM],
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
@@ -714,7 +717,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     }
     
     private func _bind<NM>(
-        cellProvider: @escaping (_ row: Int, _ model: NM) -> UITableViewCell,
+        cellProvider: @escaping (UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: [NM],
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
@@ -747,7 +750,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func bind(
-        cellProvider: @escaping (_ row: Int) -> UITableViewCell,
+        cellProvider: @escaping (UITableView, _ row: Int) -> UITableViewCell,
         numberOfCells: Int)
         -> TableViewSingleSectionBinder<UITableViewCell, S>
     {
@@ -775,7 +778,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func bind(
-        cellProvider: @escaping (_ row: Int) -> UITableViewCell,
+        cellProvider: @escaping (UITableView, _ row: Int) -> UITableViewCell,
         numberOfCells: Int,
         updatedBy callbackRef: inout (_ numCells: Int) -> Void)
         -> TableViewSingleSectionBinder<UITableViewCell, S>
