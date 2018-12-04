@@ -113,7 +113,7 @@ And that's pretty much it - the binder will then create two cells and populate t
 
 Many of the table views we work with use sections. When using Tableau, sections can be defined either with an enum or a struct that 
 conforms to `TableViewSection`. Let's say we're building a table that has three sections of `Person` objects - one section for friends, one
-section for enemies, and one section for people you aren't sure of yet. To start, we'll define our 'section model' enum like so:
+section for enemies, and one section for people you aren't sure of yet. To start, we'll define a 'section model' enum like so:
 
 ```swift
 enum Section: TableViewSection {
@@ -208,12 +208,12 @@ When we get into dynamic data in other tutorials, we'll introduce the other 'sec
 automatically when they're empty. For now, we'll leave this, call the binder's `finish()` method, and we're good to go!
 
 With that, you should be pretty much up to speed to start playing around with Tableau. Other tutorials are available on the repo to get you 
-started with other features of Tableau, like updating data on your bound table views, setting up your models so it can be animated for changes,
-using dynamic sections, and others. 
+started with other features, like updating data on your bound table views, setting up your models so it can be animated for changes, using 
+dynamic sections, and others. 
 - [Updating data](UpdatingData.md)
 - [Hiding, showing, and ordering sections automatically](SectionDisplayBehaviour.md)
+- [Binding chain scopes](AdvancedBindingChains.md)
 - [Providing dimensions](ProvidingDimensions.md)
-- [Advanced binding chains](AdvancedBindingChains.md)
 - [Using view models](UsingViewModels.md)
 - [Tips, tricks, and FAQ](TipsTricksFAQ.md)
 - [How it works](HowItWorks.md)

@@ -180,11 +180,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -206,12 +206,12 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -233,13 +233,13 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -261,24 +261,24 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     private func _bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
-        let viewModels = [self.section: models.map(mapToViewModel)]
+        let viewModels = [self.section: models.map(mapToViewModels)]
         self.binder.updateCellModels(
             [self.section: models], viewModels: viewModels, affectedSections: self.affectedSectionScope)
         
@@ -308,12 +308,12 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        mapToViewModels: @escaping (NM) -> NC.ViewModel,
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels, updatedBy: &callbackRef)
     }
     
     /**
@@ -339,14 +339,14 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        mapToViewModels: @escaping (NM) -> NC.ViewModel,
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels, updatedBy: &callbackRef)
     }
     
     /**
@@ -372,13 +372,13 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        mapToViewModels: @escaping (NM) -> NC.ViewModel,
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels, updatedBy: &callbackRef)
     }
     
     /**
@@ -404,20 +404,20 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        mapToViewModels: @escaping (NM) -> NC.ViewModel,
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels, updatedBy: &callbackRef)
     }
     
     public func _bind<NC, NM>(
         cellType: NC.Type,
         models: [NM],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        mapToViewModels: @escaping (NM) -> NC.ViewModel,
         updatedBy callbackRef: inout (_ newModels: [NM]) -> Void)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
@@ -425,13 +425,13 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         let section = self.section
         let scope = self.affectedSectionScope
         let updateCallback: ([NM]) -> Void
-        updateCallback = { [weak binder = self.binder, mapToViewModel] (models) in
-            let viewModels = models.map(mapToViewModel)
+        updateCallback = { [weak binder = self.binder] (models) in
+            let viewModels = models.map(mapToViewModels)
             binder?.updateCellModels([section: models], viewModels: [section: viewModels], affectedSections: scope)
         }
         callbackRef = updateCallback
         
-        return self.bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self.bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     // MARK: -

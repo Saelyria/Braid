@@ -25,7 +25,7 @@ class NewsFeedViewController: UIViewController {
         self.binder.onTable()
             .rx.bind(cellType: TitleDetailTableViewCell.self,
                      models: self.newsItems.asObservable(),
-                     mapToViewModelsWith: {
+                     mapToViewModels: {
                         TitleDetailTableViewCell.ViewModel(
                             collectionId: $0.title,
                             title: $0.title,

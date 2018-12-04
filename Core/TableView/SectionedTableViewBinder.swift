@@ -76,6 +76,12 @@ public class TableViewBinder {
             binder: self._sectionBinder, section: .table)
     }
     
+    /**
+     Tells that binder that all setup binding has been completed.
+     
+     This method must be called once all binding of cell/view types and data observers have been completed on the table,
+     after which point no further binding can be done on the table with the binder's `onTable` methods.
+     */
     public func finish() {
         self._sectionBinder.finish()
     }

@@ -1,12 +1,15 @@
-#  Advanced binding chains
+#  Binding chain scopes
 
 There are a few different methods you can use to start a binding chain. We've already seen two in the 'getting started' tutorial:
+
 - `onSection(_:)` - begins a binding chain that affects a single named section
 - `onSections(_:)` - begins a binding chain that affects multiple named sections
 
+These two are pretty straightforward - whatever handlers or data you bind to them are only used for the section(s) you explicitly declare. 
 However, Tableau also provides a couple others that, while a little trickier to grasp, are very powerful. These methods are:
+
 - `onAllSections()` / `onAllOtherSections()` - begins a binding chain for all sections not uniquely bound by name with one of the 
-    previously mentioned methods or for sections whose 'names' are not necessarily known at compile time.
+    previously mentioned methods (or for sections whose 'names' are not necessarily known at compile time).
 - `onAnySection()` - begins a binding chain for any section on the table. Binding chains started with this method are more limited in what
     they can do (primarily, they can't bind data like cell or header/footer data) and are used to provide any common handlers, especially 
     'dimension' binding.

@@ -142,11 +142,11 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[NM]>,
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -162,7 +162,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[NM]>,
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
@@ -172,7 +172,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         }
         bindResult.binder.addCellEqualityChecker(
             itemType: NC.ViewModel.self, affectedSections: bindResult.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -188,7 +188,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[NM]>,
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable, NM: Equatable & CollectionIdentifiable
@@ -198,7 +198,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         }
         bindResult.binder.addCellEqualityChecker(
             itemType: NC.ViewModel.self, affectedSections: bindResult.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -214,7 +214,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[NM]>,
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
     {
@@ -223,13 +223,13 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         }
         bindResult.binder.addCellEqualityChecker(
             itemType: NM.self, affectedSections: bindResult.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     private func _bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[NM]>,
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
@@ -244,7 +244,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         models
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [NM]) in
-                let viewModels = models.map(mapToViewModel)
+                let viewModels = models.map(mapToViewModels)
                 binder?.updateCellModels([section: models], viewModels: [section: viewModels], affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         

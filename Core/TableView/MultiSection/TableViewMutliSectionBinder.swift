@@ -176,11 +176,11 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [S: [NM]],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -204,13 +204,13 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [S: [NM]],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -234,12 +234,12 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [S: [NM]],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -263,26 +263,26 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [S: [NM]],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     private func _bind<NC, NM>(
         cellType: NC.Type,
         models: [S: [NM]],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         var viewModels: [S: [Any]] = [:]
         for (s, m) in models {
-            viewModels[s] = m.map(mapToViewModel)
+            viewModels[s] = m.map(mapToViewModels)
         }
         self.binder.updateCellModels(models, viewModels: viewModels, affectedSections: self.affectedSectionScope)
         
@@ -313,12 +313,12 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [S: [NM]],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        mapToViewModels: @escaping (NM) -> NC.ViewModel,
         updatedBy callbackRef: inout (_ newModels: [S: [NM]]) -> Void)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels, updatedBy: &callbackRef)
     }
     
     /**
@@ -345,14 +345,14 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [S: [NM]],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        mapToViewModels: @escaping (NM) -> NC.ViewModel,
         updatedBy callbackRef: inout (_ newModels: [S: [NM]]) -> Void)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels, updatedBy: &callbackRef)
     }
     
     /**
@@ -379,13 +379,13 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [S: [NM]],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        mapToViewModels: @escaping (NM) -> NC.ViewModel,
         updatedBy callbackRef: inout (_ newModels: [S: [NM]]) -> Void)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels, updatedBy: &callbackRef)
     }
     
     /**
@@ -412,35 +412,35 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: [S: [NM]],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        mapToViewModels: @escaping (NM) -> NC.ViewModel,
         updatedBy callbackRef: inout (_ newModels: [S: [NM]]) -> Void)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel, updatedBy: &callbackRef)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels, updatedBy: &callbackRef)
     }
     
     private func _bind<NC, NM>(
         cellType: NC.Type,
         models: [S: [NM]],
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel,
+        mapToViewModels: @escaping (NM) -> NC.ViewModel,
         updatedBy callbackRef: inout (_ newModels: [S: [NM]]) -> Void)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
         let updateCallback: ([S: [NM]]) -> Void
-        updateCallback = { [weak binder = self.binder, scope = self.affectedSectionScope, mapToViewModel] (models) in
+        updateCallback = { [weak binder = self.binder, scope = self.affectedSectionScope, mapToViewModels] (models) in
             var viewModels: [S: [Any]] = [:]
             for (s, m) in models {
-                viewModels[s] = m.map(mapToViewModel)
+                viewModels[s] = m.map(mapToViewModels)
             }
             binder?.updateCellModels(models, viewModels: viewModels, affectedSections: scope)
         }
         callbackRef = updateCallback
         
-        return self.bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self.bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     // MARK: -

@@ -67,11 +67,11 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[Base.S: [NM]]>,
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -82,7 +82,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[Base.S: [NM]]>,
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
@@ -92,7 +92,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         }
         bindResult.binder.addCellEqualityChecker(
             itemType: NC.ViewModel.self, affectedSections: bindResult.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -103,7 +103,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[Base.S: [NM]]>,
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable, NM: Equatable & CollectionIdentifiable
@@ -113,7 +113,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         }
         bindResult.binder.addCellEqualityChecker(
             itemType: NC.ViewModel.self, affectedSections: bindResult.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     /**
@@ -124,7 +124,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
     public func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[Base.S: [NM]]>,
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
         NM: Equatable & CollectionIdentifiable
@@ -134,13 +134,13 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         }
         bindResult.binder.addCellEqualityChecker(
             itemType: NM.self, affectedSections: bindResult.affectedSectionScope)
-        return self._bind(cellType: cellType, models: models, mapToViewModelsWith: mapToViewModel)
+        return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
     
     private func _bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[Base.S: [NM]]>,
-        mapToViewModelsWith mapToViewModel: @escaping (NM) -> NC.ViewModel)
+        mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, Base.S, NM>
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
@@ -157,7 +157,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
             .subscribe(onNext: { [weak binder = bindResult.binder] (models: [Base.S: [NM]]) in
                 var viewModels: [Base.S: [Any]] = [:]
                 for (s, m) in models {
-                    viewModels[s] = m.map(mapToViewModel)
+                    viewModels[s] = m.map(mapToViewModels)
                 }
                 binder?.updateCellModels(models, viewModels: viewModels, affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
