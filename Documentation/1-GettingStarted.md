@@ -15,7 +15,6 @@ are made just by initializing one with a reference to the table view they will b
 ```swift
 import Tableau
 
-// in 'viewDidLoad'
 let tableView = UITableView()
 let binder = TableViewBinder(tableView: tableView)
 ```
@@ -158,7 +157,7 @@ binder.onSection(.enemies)
     .onCellDequeue { (row: Int, cell: EnemyTableViewCell, person: Person) in
         // setup cell
     }
-    .onTapped { (row: Int, cell: EnemyTableViewCell, person: Person in
+    .onTapped { (row: Int, cell: EnemyTableViewCell, person: Person) in
         // go to a detail VC
     }
 ```
@@ -209,14 +208,16 @@ automatically when they're empty. For now, we'll leave this, call the binder's `
 
 With that, you should be pretty much up to speed to start playing around with Tableau. Other tutorials are available on the repo to get you 
 started with other features, like updating data on your bound table views, setting up your models so it can be animated for changes, using 
-dynamic sections, and others. 
-- [Updating data](UpdatingData.md)
-- [Hiding, showing, and ordering sections automatically](SectionDisplayBehaviour.md)
-- [Binding chain scopes](AdvancedBindingChains.md)
-- [Providing dimensions](ProvidingDimensions.md)
-- [Using view models](UsingViewModels.md)
-- [Tips, tricks, and FAQ](TipsTricksFAQ.md)
-- [How it works](HowItWorks.md)
+dynamic sections, other types of cell binding methods that give you more control over dequeueing, and more. 
+
+- **Getting Started**
+- [Updating data](2-UpdatingData.md)
+- [Other data binding methods](3-DataBindingMethods.md)
+- [Hiding, showing, and ordering sections automatically](4-SectionDisplayBehaviour.md)
+- [Binding chain scopes](5-AdvancedBindingChains.md)
+- [Providing dimensions](6-ProvidingDimensions.md)
+- [Tips, tricks, and FAQ](7-TipsTricksFAQ.md)
+- [How it works](8-HowItWorks.md)
 
 If you'd prefer to poke around some working examples, there are working samples in the `TableauExample` Xcode project you can run to see 
 the end result.

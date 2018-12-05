@@ -120,3 +120,12 @@ determine the 'equality' of the car.
 These roles - identity and equality - are expressed by the `CollectionIdentifiable` and `Equatable` protocols, respectively. Tableau will
 use the `collectionId` (like a car's license plate) you provide to track where items have moved and, if your model conforms to `Equatable`, 
 will use its `==` method to see if items that didn't move were updated (thus reloading its cell).
+
+- [Getting Started](1-GettingStarted.md)
+- **Updating data**
+- [Other data binding methods](3-DataBindingMethods.md)
+- [Hiding, showing, and ordering sections automatically](4-SectionDisplayBehaviour.md)
+- [Binding chain scopes](5-AdvancedBindingChains.md)
+- [Providing dimensions](6-ProvidingDimensions.md)
+- [Tips, tricks, and FAQ](7-TipsTricksFAQ.md)
+- [How it works](8-HowItWorks.md)

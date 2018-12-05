@@ -162,3 +162,12 @@ And that's pretty much the gist of using `onAllSections` and `onAnySection`! The
 we'll talk about in the [tips, tricks, and FAQ](TipsTricksFAQ.md) page, but they're pretty rare. For now, we'd recommend playing around with
 these different binding chain methods (again, there are full implementations using them in the included example project!) and see how you can 
 describe your binding with them - they'll make a lot more sense once you've seen them in action.
+
+- [Getting Started](1-GettingStarted.md)
+- [Updating data](2-UpdatingData.md)
+- [Other data binding methods](3-DataBindingMethods.md)
+- [Hiding, showing, and ordering sections automatically](4-SectionDisplayBehaviour.md)
+- **Binding chain scopes**
+- [Providing dimensions](6-ProvidingDimensions.md)
+- [Tips, tricks, and FAQ](7-TipsTricksFAQ.md)
+- [How it works](8-HowItWorks.md)

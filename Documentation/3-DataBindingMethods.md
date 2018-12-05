@@ -1,4 +1,4 @@
-#  Data binding methods
+#  Other data binding methods
 
 ## Cells
 
@@ -174,3 +174,12 @@ binder.onTable()
         return tableView.dequeue(MyCellType.self)
     }, numberOfCells: 5)
 ```
+
+- [Getting Started](1-GettingStarted.md)
+- [Updating data](2-UpdatingData.md)
+- **Other data binding methods**
+- [Hiding, showing, and ordering sections automatically](4-SectionDisplayBehaviour.md)
+- [Binding chain scopes](5-AdvancedBindingChains.md)
+- [Providing dimensions](6-ProvidingDimensions.md)
+- [Tips, tricks, and FAQ](7-TipsTricksFAQ.md)
+- [How it works](8-HowItWorks.md)
