@@ -14,31 +14,28 @@
       location = "group:Documentation"
       name = "Documentation">
       <FileRef
-         location = "group:GettingStarted.md">
+         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/1-GettingStarted.md">
       </FileRef>
       <FileRef
-         location = "group:UpdatingData.md">
+         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/2-UpdatingData.md">
       </FileRef>
       <FileRef
-         location = "group:SectionDisplayBehaviour.md">
+         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/3-DataBindingMethods.md">
       </FileRef>
       <FileRef
-         location = "group:CellBindingMethods.md">
+         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/4-SectionDisplayBehaviour.md">
       </FileRef>
       <FileRef
-         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/AdvancedBindingChains.md">
+         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/5-AdvancedBindingChains.md">
       </FileRef>
       <FileRef
-         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/ProvidingDimensions.md">
+         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/6-ProvidingDimensions.md">
       </FileRef>
       <FileRef
-         location = "group:UsingViewModels.md">
+         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/7-TipsTricksFAQ.md">
       </FileRef>
       <FileRef
-         location = "group:TipsTricksFAQ.md">
-      </FileRef>
-      <FileRef
-         location = "container:/Users/aaronbosnjak/Developer/Tableau/Documentation/HowItWorks.md">
+         location = "container:/Users/aaronbosnjak/Developer/Tableau/Documentation/8-HowItWorks.md">
       </FileRef>
    </Group>
    <FileRef

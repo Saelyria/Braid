@@ -63,3 +63,12 @@ then diffing is done with whichever of the two is 'diffable'. If both are 'diffa
 <h3 name="binding-chain-edge-cases">
 The 'binding chains' tutorial mentioned some weird edge cases. What are they?
 </h3>
+
+- [Getting Started](1-GettingStarted.md)
+- [Updating data](2-UpdatingData.md)
+- [Other data binding methods](3-DataBindingMethods.md)
+- [Hiding, showing, and ordering sections automatically](4-SectionDisplayBehaviour.md)
+- [Binding chain scopes](5-AdvancedBindingChains.md)
+- [Providing dimensions](6-ProvidingDimensions.md)
+- **Tips, tricks, and FAQ**
+- [How it works](8-HowItWorks.md)

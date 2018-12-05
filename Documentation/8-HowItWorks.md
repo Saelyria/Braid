@@ -83,3 +83,12 @@ adds stuff like a dispose bag to the table binder to save its section binders' s
 
 With that, that's pretty much how everything works - you should hopefully know enough now that you can read through the source and have 
 an idea of what's going on, and can maybe open a pull request with some features or (inevitably) fixes!
+
+- [Getting Started](1-GettingStarted.md)
+- [Updating data](2-UpdatingData.md)
+- [Other data binding methods](3-DataBindingMethods.md)
+- [Hiding, showing, and ordering sections automatically](4-SectionDisplayBehaviour.md)
+- [Binding chain scopes](5-AdvancedBindingChains.md)
+- [Providing dimensions](6-ProvidingDimensions.md)
+- [Tips, tricks, and FAQ](7-TipsTricksFAQ.md)
+- **How it works**

@@ -59,3 +59,12 @@ And for a multi-section binding chain:
 - `cellHeight` - `(_ section: Section, _ row: Int, _ model: Model) -> CGFloat`
 - `estimatedCellHeight` - `(_ section: Section, _ row: Int, _ model: Model) -> CGFloat`
 - `cellIndentationLevel` - `(_ section: Section, _ row: Int, _ model: Model) -> Int`
+
+- [Getting Started](1-GettingStarted.md)
+- [Updating data](2-UpdatingData.md)
+- [Other data binding methods](3-DataBindingMethods.md)
+- [Hiding, showing, and ordering sections automatically](4-SectionDisplayBehaviour.md)
+- [Binding chain scopes](5-AdvancedBindingChains.md)
+- **Providing dimensions**
+- [Tips, tricks, and FAQ](7-TipsTricksFAQ.md)
+- [How it works](8-HowItWorks.md)
