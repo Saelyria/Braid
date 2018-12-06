@@ -6,6 +6,7 @@ import Foundation
  View types that are 'view model bindable' declare a `ViewModel` associated type. This type should have properties for
  the various view data on the view - for example, a cell that is 'view model bindable' that has a title, subtitle, and
  detail labe might declare its `ViewModel` type to be this:
+ 
  ```
  struct ViewModel {
     let title: String

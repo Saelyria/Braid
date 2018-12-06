@@ -9,7 +9,8 @@ import UIKit
  simply returns the class name of the conforming type.
  */
 public protocol ReuseIdentifiable {
-    /// The reuse identifier that instances of this class should be dequeued with.
+    /// The reuse identifier that instances of this class should be dequeued with. Defaults to the name of the
+    /// conforming type if not explicitly provided.
     static var reuseIdentifier: String { get }
 }
 

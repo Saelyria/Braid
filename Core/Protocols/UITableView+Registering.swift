@@ -51,6 +51,8 @@ public extension UITableView {
      given from its `ReuseIdentifiable` conformance.
      
      - parameter cellType: The cell type to dequeue an instance of.
+     
+     - returns: A dequeued instance of the cell type.
     */
     public func dequeue<T: UITableViewCell & ReuseIdentifiable>(_ cellType: T.Type) -> T {
         guard let cell = self.dequeueReusableCell(withIdentifier: T.reuseIdentifier) as? T else {
@@ -64,6 +66,8 @@ public extension UITableView {
      identifier given from its `ReuseIdentifiable` conformance.
      
      - parameter headerFooterType: The header/footer view type to dequeue an instance of.
+     
+     - returns: A dequeued instance of the header/footer view type.
     */
     public func dequeue<T: UITableViewHeaderFooterView & ReuseIdentifiable>(_ headerFooterType: T.Type) -> T {
         guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: T.reuseIdentifier) as? T else {

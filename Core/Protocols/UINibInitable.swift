@@ -15,9 +15,6 @@ public protocol UINibInitable: AnyObject {
     /// The bundle containing the Nib file. Defaults to the conforming type's bundle if not explicitly provided by the
     /// conforming type.
     static var bundle: Bundle { get }
-    
-    /// Creates an instance of the conforming class from its Nib using its `UINibInitable` properties.
-    static func createFromNib(owner: Any?) -> Self
 }
 
 public extension UINibInitable where Self: UIView {
@@ -33,6 +30,13 @@ public extension UINibInitable where Self: UIView {
         return Bundle(for: Self.self)
     }
     
+    /**
+     Creates an instance of the conforming class from its Nib using its `UINibInitable` properties.
+     
+     - parameter owner: The owner of the nib contents. Defaults to nil.
+     
+     - returns: An instance of the nib-initable view.
+    */
     static func createFromNib(owner: Any? = nil) -> Self {
         let nib: UINib = UINib(nibName: self.nibName, bundle: self.bundle)
         guard let view: Self = nib.instantiate(withOwner: nil, options: nil)[self.indexInNib] as? Self else {

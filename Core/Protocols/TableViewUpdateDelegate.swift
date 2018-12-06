@@ -15,6 +15,7 @@ public protocol TableViewUpdateDelegate: AnyObject {
      Asks the update delegate to apply the given updates to the given table view.
      
      - parameter updates: An object indicating the index paths of updates items/sections.
+     - parameter tableView: The table view that the updates should be animated on.
     */
     func animate(updates: CollectionUpdate, on tableView: UITableView)
 }

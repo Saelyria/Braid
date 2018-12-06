@@ -15,5 +15,6 @@ import Foundation
  the other properties on the model have changed).
  */
 public protocol CollectionIdentifiable {
+    /// A string that uniquely identifies this object among other objects in a table or collection view's data.
     var collectionId: String { get }
 }
