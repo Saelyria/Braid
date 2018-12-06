@@ -153,7 +153,7 @@ Perfect. Now, we have two different cells we want to use - a normal cell for 'fr
 ```swift
 binder.onSection(.enemies)
     .bind(cellType: EnemyTableViewCell.self, models: enemies)
-    .headerTitle("ENEMIES")
+    .bind(headerTitle: "ENEMIES")
     .onCellDequeue { (row: Int, cell: EnemyTableViewCell, person: Person) in
         // setup cell
     }
@@ -176,7 +176,7 @@ binder.onSections([.friends, .undecided])
         .friends: friends,
         .undecided: undecided
     ])
-    .headerTitles([
+    .bind(headerTitles: [
         .friends: "FRIENDS",
         .undecided: "NOT SURE YET"
     ])

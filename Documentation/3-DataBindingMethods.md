@@ -170,7 +170,7 @@ It's generally used something like this:
 
 ```swift
 binder.onTable()
-    .bind(cellProvider: { (tableView, row: Int) in
+    .bind(cellProvider: { (tableView: UITableView, row: Int) in
         return tableView.dequeue(MyCellType.self)
     }, numberOfCells: 5)
 ```

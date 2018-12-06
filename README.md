@@ -3,70 +3,74 @@
 Tableau is an RxSwift-compatible library for making your table and collection view setup routine smaller, more declarative, more type safe, and
 simply more fun that lets you switch from the tired data source / delegate routine to a cleaner function chain that reads like a sentence.
 
-To give you a quick idea of some of the key features of the library, here's a sample of what a table view setup can look like:
+To give you a quick idea of some of the key features of the library, here's a quick overview of how you'd setup a table view with it:
 
 ```swift
+// First, define an enum (or struct!) that defines your sections...
 enum Section: TableViewSection {
     case first
     case second
     case third
+    case fourth
 }
 
+// ...define your data (support for observable Rx and non-Rx data!)...
 let firstSectionModels: Observable<[MyModel]> = ...
-let secondThirdSectionModels: Observable<[Section: [MyModel]]> = ...
+let secondThirdSectionModels: Observable<[Section: [MyOtherModel]]> = ...
 
+// ...create a 'binder' object...
 let binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
 
+// ...then start binding logic (kind of like a switch statement). 
+// You can bind logic to individual sections...
 binder.onSection(.first)
-    .bind(cellType: MyCell.self, models: firstSectionModels)
+    .rx.bind(cellType: MyCustomTableViewCell.self, models: firstSectionModels)
     .bind(headerTitle: "FIRST")
-    .onCellDequeue { (row: Int, cell: MyCell, model: MyModel) in
+    .onCellDequeue { (row: Int, cell: MyCustomTableViewCell, model: MyModel) in // (such type safety!)
         // setup the 'cell' with the 'model'
-    },
-    .onCellTapped { (row: Int, cell: MyCell, model: MyModel) in
+    }
+    .onCellTapped { (row, cell, model: MyModel) in
         // e.g. go to a detail view controller with the 'model'
-    })
+    }
+
+// ...to multiple sections...
+binder.onSections(.second, .third)
+    .rx.bind(cellType: MyOtherTableViewCell.self, models: secondThirdSectionModels)
+    .onCellTapped { (section: Section, row: Int, cell: MyOtherTableViewCell, model: MyOtherModel) in
+        ...
+    }
+    ...
+    
+// ...to all (other unbound) sections...
+binder.onAllOtherSections()
+    ...
+    
+// ...or bind shared logic for any section!
+binder.onAnySection()
     .dimensions(
         .cellHeight { UITableViewAutomaticDimension },
         .estimatedCellHeight { 100 })
 
-binder.onSections(.second, .third)
-    .bind(cellType: MyOtherCell.self, models: secondThirdSectionModels)
-    .onCellDequeue { (section: Section, row: Int, cell: MyOtherCell, model: MyModel) in
-        ...
-    }
-    ...
-
 binder.finish()
 ```
 
-This is much more legible and reads more like requirements you might get. Setting up your table view is done in functional chains where you
-declare the logic for your sections (what cell type they use, what models the cells are dequeued for, what's done when a cell is tapped, etc.) 
-directly on the sections. Everything is type safe and you don't need to map rows to model array indices. 
+This is much more legible and reads more like requirements you might get, and no more index bookkeeping for your model objects!
 
-You're a good developer, though - you look at that sample and think of all the limitations and edge cases you can run into with that. Luckily, 
-Tableau also scales easily with complexity. For more complex use cases that can't be described as easily as this sample, it allows you to do
-things like use a struct instead of an enum for more dynamic section logic, ability to bind handlers to any section (known or unknown), and
-also allows much more manual control by allowing you to call cell binding with closures to dequeue cells yourself if needed, so you should
-never be so limited by the library that you find yourself resorting to the regular UIKit 'data source / delegate' routine. 
-
-Tableau has a number of other features as well:
-- Easily hot swap sections by changing the binder's `displayedSections` property
-- Easier cell registration and dequeuing using  `UINibInitable` and `ReuseIdentifiable` protocols
-- Type safe updating of cells in a section via callback closures created during binding
-- Automatic diffing and animation between updates to the table's underlying models
-- Support for binding with or without RxSwift
-- `UICollectionView` support (coming soon!)
+You're a good developer, though - you look at that sample and think of all the limitations and edge cases you can run into with that (more than
+one cell or model type per section, custom header/footer view type, section data not known at compile time, infinite scroll...). Luckily, Tableau
+also scales easily with complexity and supports many more advanced features that cover cases like these, so you should never be so limited 
+by the library that you find yourself resorting to the regular UIKit 'data source / delegate' routine.
 
 Tableau is fully documented, including tutorials and working code samples (with documented walkthroughs!) in the 'TableauExample' Xcode 
 project in the repository. Available tutorials to get you familiar with Tableau are as follows:
-- [Getting started](GettingStarted.md)
-- [Updating data](UpdatingData.md)
-- [Hiding, showing, and ordering sections automatically](SectionDisplayBehaviour.md)
-- [Providing dimensions (cell height, header height, etc.)](ProvidingDimensions.md)
-- [Using view models](UsingViewModels.md)
-- [Tips, tricks, and FAQ](TipsTricksFAQ.md)
-- [How it works](HowItWorks.md)
+
+- [Getting started](Documentation/1-GettingStarted.md)
+- [Updating data](Documentation/2-UpdatingData.md)
+- [Other data binding methods](Documentation/3-DataBindingMethods.md)
+- [Hiding, showing, and ordering sections automatically](Documentation/4-SectionDisplayBehaviour.md)
+- [Providing dimensions (cell height, header height, etc.)](Documentation/6-ProvidingDimensions.md)
+- [Tips, tricks, and FAQ](Documentation/7-TipsTricksFAQ.md)
+- [How it works](Documentation/8-HowItWorks.md)
 
 ## Installation
 
@@ -85,8 +89,8 @@ this [Trello board](https://trello.com/b/8knAHovD/tableau).
 
 ## Acknowledgement
 
-Tableau uses Tony Arnold's super-awesome [Differ](https://github.com/tonyarnold/Differ) library to do its diffing work. If you like Tableau, make
-sure to give that repo a star as well!
+Tableau uses a fork of Tony Arnold's super-awesome [Differ](https://github.com/tonyarnold/Differ) library to do its diffing work. If you like 
+Tableau, make sure to give that repo a star as well!
 
 ## License
 
