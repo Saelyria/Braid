@@ -12,7 +12,7 @@ class ArtistsViewController: UIViewController {
         }
     }
     
-    private let spinner = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+    private let spinner = UIActivityIndicatorView(style: .gray)
     private var binder: SectionedTableViewBinder<Section>!
     
     private let disposeBag = DisposeBag()

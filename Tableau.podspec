@@ -25,8 +25,8 @@ Pod::Spec.new do |s|
     ss.source_files = 'Rx/'
     ss.ios.framework = "UIKit"
     ss.dependency 'Tableau/Core'
-    ss.dependency 'RxSwift', '~> 4.0'
-    ss.dependency 'RxCocoa', '~> 4.0'
+    ss.dependency 'RxSwift', '~> 4.4'
+    ss.dependency 'RxCocoa', '~> 4.4'
     ss.pod_target_xcconfig = { 'OTHER_SWIFT_FLAGS' => '-DRX_TABLEAU', }
   end
 end
