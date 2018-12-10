@@ -12,7 +12,7 @@ class AccountsViewController: UIViewController {
         case other
     }
 
-    private let spinner = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+    private let spinner = UIActivityIndicatorView(style: .gray)
     
     // 2.
     private var binder: SectionedTableViewBinder<Section>!

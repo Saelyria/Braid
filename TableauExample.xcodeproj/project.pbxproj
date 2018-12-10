@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6E2CB900CB0503EB7AE1EAC3 /* Pods_TableauExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE17F9A4879165AF43849970 /* Pods_TableauExampleTests.framework */; };
 		938132D820B6463000CBF8F6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938132D720B6463000CBF8F6 /* AppDelegate.swift */; };
 		938132DA20B6463000CBF8F6 /* AccountsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 938132D920B6463000CBF8F6 /* AccountsViewController.swift */; };
 		938132DF20B6463200CBF8F6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 938132DE20B6463200CBF8F6 /* Assets.xcassets */; };
@@ -31,7 +32,21 @@
 		ABE0F35F21B49DD90098950D /* NewsFeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE0F35E21B49DD90098950D /* NewsFeedViewController.swift */; };
 		ABE0F36121B4AA830098950D /* NewsFeedService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE0F36021B4AA830098950D /* NewsFeedService.swift */; };
 		ABE0F36321B4AB2D0098950D /* news-items.json in Resources */ = {isa = PBXBuildFile; fileRef = ABE0F36221B4AB2D0098950D /* news-items.json */; };
+		ABE0F36B21BE20380098950D /* TableDimensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE0F36A21BE20380098950D /* TableDimensionTests.swift */; };
+		ABE0F37521BE24F30098950D /* Cells.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE0F37421BE24F30098950D /* Cells.swift */; };
+		ABE0F37A21BE282A0098950D /* TableTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE0F37921BE282A0098950D /* TableTestCase.swift */; };
+		ABE0F37C21BE30730098950D /* TableCellBindingMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE0F37B21BE30730098950D /* TableCellBindingMethods.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		ABE0F36D21BE20380098950D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 938132CC20B6463000CBF8F6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 938132D320B6463000CBF8F6;
+			remoteInfo = TableauExample;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		9381330C20B6486400CBF8F6 /* Embed Frameworks */ = {
@@ -48,6 +63,8 @@
 
 /* Begin PBXFileReference section */
 		1386F8CF294C675AF9810979 /* Pods-TableauExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TableauExample.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TableauExample/Pods-TableauExample.debug.xcconfig"; sourceTree = "<group>"; };
+		55D765C5FB109FA81BDD1D5A /* Pods-TableauExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TableauExampleTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-TableauExampleTests/Pods-TableauExampleTests.release.xcconfig"; sourceTree = "<group>"; };
+		5AADC7CBA1D7A7674CACFA20 /* Pods-TableauExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TableauExampleTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-TableauExampleTests/Pods-TableauExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
 		6905CEA7EB85FC4B10F150DF /* Pods-TableauExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TableauExample.release.xcconfig"; path = "Pods/Target Support Files/Pods-TableauExample/Pods-TableauExample.release.xcconfig"; sourceTree = "<group>"; };
 		938132D420B6463000CBF8F6 /* TableauExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TableauExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		938132D720B6463000CBF8F6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -78,7 +95,14 @@
 		ABE0F35E21B49DD90098950D /* NewsFeedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsFeedViewController.swift; sourceTree = "<group>"; };
 		ABE0F36021B4AA830098950D /* NewsFeedService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsFeedService.swift; sourceTree = "<group>"; };
 		ABE0F36221B4AB2D0098950D /* news-items.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "news-items.json"; sourceTree = "<group>"; };
+		ABE0F36821BE20380098950D /* TableauExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TableauExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		ABE0F36A21BE20380098950D /* TableDimensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableDimensionTests.swift; sourceTree = "<group>"; };
+		ABE0F36C21BE20380098950D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		ABE0F37421BE24F30098950D /* Cells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cells.swift; sourceTree = "<group>"; };
+		ABE0F37921BE282A0098950D /* TableTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableTestCase.swift; sourceTree = "<group>"; };
+		ABE0F37B21BE30730098950D /* TableCellBindingMethods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableCellBindingMethods.swift; sourceTree = "<group>"; };
 		B5FEBC5088F0D7E30632BBD0 /* Pods_TableauExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TableauExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE17F9A4879165AF43849970 /* Pods_TableauExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TableauExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,6 +114,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		ABE0F36521BE20380098950D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6E2CB900CB0503EB7AE1EAC3 /* Pods_TableauExampleTests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -98,6 +130,8 @@
 			children = (
 				1386F8CF294C675AF9810979 /* Pods-TableauExample.debug.xcconfig */,
 				6905CEA7EB85FC4B10F150DF /* Pods-TableauExample.release.xcconfig */,
+				5AADC7CBA1D7A7674CACFA20 /* Pods-TableauExampleTests.debug.xcconfig */,
+				55D765C5FB109FA81BDD1D5A /* Pods-TableauExampleTests.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -106,6 +140,7 @@
 			isa = PBXGroup;
 			children = (
 				938132D620B6463000CBF8F6 /* TableauExample */,
+				ABE0F36921BE20380098950D /* TableauExampleTests */,
 				938132D520B6463000CBF8F6 /* Products */,
 				27AE4BDD9FD2F8BA2490D817 /* Pods */,
 				EBF40F86B284BBBC4E5ACCEB /* Frameworks */,
@@ -116,6 +151,7 @@
 			isa = PBXGroup;
 			children = (
 				938132D420B6463000CBF8F6 /* TableauExample.app */,
+				ABE0F36821BE20380098950D /* TableauExampleTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -211,10 +247,39 @@
 			path = "Sample 4 - News Feed";
 			sourceTree = "<group>";
 		};
+		ABE0F36921BE20380098950D /* TableauExampleTests */ = {
+			isa = PBXGroup;
+			children = (
+				ABE0F37221BE20900098950D /* Table */,
+				ABE0F36C21BE20380098950D /* Info.plist */,
+			);
+			path = TableauExampleTests;
+			sourceTree = "<group>";
+		};
+		ABE0F37221BE20900098950D /* Table */ = {
+			isa = PBXGroup;
+			children = (
+				ABE0F37321BE24E20098950D /* Test Classes */,
+				ABE0F37B21BE30730098950D /* TableCellBindingMethods.swift */,
+				ABE0F36A21BE20380098950D /* TableDimensionTests.swift */,
+			);
+			path = Table;
+			sourceTree = "<group>";
+		};
+		ABE0F37321BE24E20098950D /* Test Classes */ = {
+			isa = PBXGroup;
+			children = (
+				ABE0F37421BE24F30098950D /* Cells.swift */,
+				ABE0F37921BE282A0098950D /* TableTestCase.swift */,
+			);
+			path = "Test Classes";
+			sourceTree = "<group>";
+		};
 		EBF40F86B284BBBC4E5ACCEB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				B5FEBC5088F0D7E30632BBD0 /* Pods_TableauExample.framework */,
+				FE17F9A4879165AF43849970 /* Pods_TableauExampleTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -242,18 +307,42 @@
 			productReference = 938132D420B6463000CBF8F6 /* TableauExample.app */;
 			productType = "com.apple.product-type.application";
 		};
+		ABE0F36721BE20380098950D /* TableauExampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ABE0F36F21BE20380098950D /* Build configuration list for PBXNativeTarget "TableauExampleTests" */;
+			buildPhases = (
+				4A88A49C742F30C459B1CBC0 /* [CP] Check Pods Manifest.lock */,
+				ABE0F36421BE20380098950D /* Sources */,
+				ABE0F36521BE20380098950D /* Frameworks */,
+				ABE0F36621BE20380098950D /* Resources */,
+				6CE8461F7BC77C06C9E8D09A /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				ABE0F36E21BE20380098950D /* PBXTargetDependency */,
+			);
+			name = TableauExampleTests;
+			productName = TableauExampleTests;
+			productReference = ABE0F36821BE20380098950D /* TableauExampleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		938132CC20B6463000CBF8F6 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0930;
+				LastSwiftUpdateCheck = 1000;
 				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = AaronBosnjak;
 				TargetAttributes = {
 					938132D320B6463000CBF8F6 = {
 						CreatedOnToolsVersion = 9.3.1;
+					};
+					ABE0F36721BE20380098950D = {
+						CreatedOnToolsVersion = 10.0;
+						TestTargetID = 938132D320B6463000CBF8F6;
 					};
 				};
 			};
@@ -271,6 +360,7 @@
 			projectRoot = "";
 			targets = (
 				938132D320B6463000CBF8F6 /* TableauExample */,
+				ABE0F36721BE20380098950D /* TableauExampleTests */,
 			);
 		};
 /* End PBXProject section */
@@ -289,6 +379,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		ABE0F36621BE20380098950D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -299,12 +396,14 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-TableauExample/Pods-TableauExample-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/RxAtomic/RxAtomic.framework",
 				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
 				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/Tableau/Tableau.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxAtomic.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Tableau.framework",
@@ -330,6 +429,58 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4A88A49C742F30C459B1CBC0 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-TableauExampleTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6CE8461F7BC77C06C9E8D09A /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-TableauExampleTests/Pods-TableauExampleTests-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/RxAtomic/RxAtomic.framework",
+				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
+				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/Tableau/Tableau.framework",
+				"${BUILT_PRODUCTS_DIR}/Nimble/Nimble.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxAtomic.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Tableau.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Nimble.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-TableauExampleTests/Pods-TableauExampleTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -359,7 +510,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		ABE0F36421BE20380098950D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ABE0F36B21BE20380098950D /* TableDimensionTests.swift in Sources */,
+				ABE0F37A21BE282A0098950D /* TableTestCase.swift in Sources */,
+				ABE0F37521BE24F30098950D /* Cells.swift in Sources */,
+				ABE0F37C21BE30730098950D /* TableCellBindingMethods.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		ABE0F36E21BE20380098950D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 938132D320B6463000CBF8F6 /* TableauExample */;
+			targetProxy = ABE0F36D21BE20380098950D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		938132E020B6463200CBF8F6 /* LaunchScreen.storyboard */ = {
@@ -501,7 +671,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.AaronBosnjak.TableauExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -521,8 +691,55 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.AaronBosnjak.TableauExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		ABE0F37021BE20380098950D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5AADC7CBA1D7A7674CACFA20 /* Pods-TableauExampleTests.debug.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = HE8Y2NA5B5;
+				INFOPLIST_FILE = TableauExampleTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aaronbosnjak.viewmodels.TableauExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TableauExample.app/TableauExample";
+			};
+			name = Debug;
+		};
+		ABE0F37121BE20380098950D /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 55D765C5FB109FA81BDD1D5A /* Pods-TableauExampleTests.release.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = HE8Y2NA5B5;
+				INFOPLIST_FILE = TableauExampleTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aaronbosnjak.viewmodels.TableauExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TableauExample.app/TableauExample";
 			};
 			name = Release;
 		};
@@ -543,6 +760,15 @@
 			buildConfigurations = (
 				938132E720B6463200CBF8F6 /* Debug */,
 				938132E820B6463200CBF8F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		ABE0F36F21BE20380098950D /* Build configuration list for PBXNativeTarget "TableauExampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ABE0F37021BE20380098950D /* Debug */,
+				ABE0F37121BE20380098950D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

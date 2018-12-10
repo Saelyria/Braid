@@ -4,7 +4,7 @@ import RxSwift
 import RxCocoa
 
 class NewsFeedViewController: UIViewController {
-    private let spinner = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+    private let spinner = UIActivityIndicatorView(style: .gray)
     private var binder: TableViewBinder!
     private let tableView = UITableView()
     
