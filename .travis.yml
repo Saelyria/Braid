@@ -7,3 +7,6 @@ language: objective-c
 xcode_project: TableauExample.xcodeproj
 xcode_scheme: TableauExampleTests
 xcode_destination: platform=iOS Simulator,OS=12.0,name=iPhone X
+
+before_install:
+- pod repo update
