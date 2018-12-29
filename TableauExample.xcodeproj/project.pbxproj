@@ -16,6 +16,7 @@
 		93C36A4820DAFF97006B7ECF /* SamplesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C36A4720DAFF97006B7ECF /* SamplesViewController.swift */; };
 		93C36A4A20DB02E0006B7ECF /* TitleDetailTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 93C36A4920DB02E0006B7ECF /* TitleDetailTableViewCell.xib */; };
 		AA8B7612901AEED60C395EB0 /* Pods_TableauExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5FEBC5088F0D7E30632BBD0 /* Pods_TableauExample.framework */; };
+		AB1CCB9C21D82FF300EB1CDE /* TableClosureCellBindingMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1CCB9B21D82FF300EB1CDE /* TableClosureCellBindingMethods.swift */; };
 		AB577B9C21759F6C00CD2363 /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577B9B21759F6C00CD2363 /* AccountService.swift */; };
 		AB577B9F2175A6EE00CD2363 /* CenterLabelTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577B9E2175A6EE00CD2363 /* CenterLabelTableViewCell.swift */; };
 		AB577BA2217655DD00CD2363 /* ArtistsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577BA1217655DD00CD2363 /* ArtistsViewController.swift */; };
@@ -75,6 +76,7 @@
 		9381335020B6EE2A00CBF8F6 /* TitleDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleDetailTableViewCell.swift; sourceTree = "<group>"; };
 		93C36A4720DAFF97006B7ECF /* SamplesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamplesViewController.swift; sourceTree = "<group>"; };
 		93C36A4920DB02E0006B7ECF /* TitleDetailTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TitleDetailTableViewCell.xib; sourceTree = "<group>"; };
+		AB1CCB9B21D82FF300EB1CDE /* TableClosureCellBindingMethods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableClosureCellBindingMethods.swift; sourceTree = "<group>"; };
 		AB577B9B21759F6C00CD2363 /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
 		AB577B9E2175A6EE00CD2363 /* CenterLabelTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterLabelTableViewCell.swift; sourceTree = "<group>"; };
 		AB577BA1217655DD00CD2363 /* ArtistsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistsViewController.swift; sourceTree = "<group>"; };
@@ -261,6 +263,7 @@
 			children = (
 				ABE0F37321BE24E20098950D /* Test Classes */,
 				ABE0F37B21BE30730098950D /* TableCellBindingMethods.swift */,
+				AB1CCB9B21D82FF300EB1CDE /* TableClosureCellBindingMethods.swift */,
 				ABE0F36A21BE20380098950D /* TableDimensionTests.swift */,
 			);
 			path = Table;
@@ -518,6 +521,7 @@
 				ABE0F37A21BE282A0098950D /* TableTestCase.swift in Sources */,
 				ABE0F37521BE24F30098950D /* Cells.swift in Sources */,
 				ABE0F37C21BE30730098950D /* TableCellBindingMethods.swift in Sources */,
+				AB1CCB9C21D82FF300EB1CDE /* TableClosureCellBindingMethods.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

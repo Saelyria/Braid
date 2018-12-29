@@ -80,7 +80,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     @discardableResult
     public override func bind<H>(
         headerType: H.Type,
-        viewModel: @autoclosure () -> H.ViewModel?)
+        viewModel: @escaping () -> H.ViewModel?)
         -> TableViewModelSingleSectionBinder<C, S, M>
         where H : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
     {
@@ -90,7 +90,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     
     @discardableResult
     public override func bind(
-        headerTitle: @autoclosure () -> String?)
+        headerTitle: @escaping () -> String?)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         super.bind(headerTitle: headerTitle)
@@ -100,7 +100,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     @discardableResult
     public override func bind<F>(
         footerType: F.Type,
-        viewModel: @autoclosure () -> F.ViewModel?)
+        viewModel: @escaping () -> F.ViewModel?)
         -> TableViewSingleSectionBinder<C, S>
         where F : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
     {
@@ -110,7 +110,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     
     @discardableResult
     public override func bind(
-        footerTitle: @autoclosure () -> String?)
+        footerTitle: @escaping () -> String?)
         -> TableViewSingleSectionBinder<C, S>
     {
         super.bind(footerTitle: footerTitle)

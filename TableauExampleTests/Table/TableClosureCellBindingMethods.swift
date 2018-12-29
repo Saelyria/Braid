@@ -2,9 +2,9 @@ import UIKit
 @testable import Tableau
 import Nimble
 
-// Cell binding test for non-RxSwift, non-updatable (i.e. not using closures) binding methods
+// Cell binding test for non-RxSwift, updatable (i.e. using closures) binding methods
 
-class TableCellBindingMethods: TableTestCase {
+class TableClosureCellBindingMethods: TableTestCase {
     enum Section: TableViewSection {
         case first
         case second
@@ -29,30 +29,30 @@ class TableCellBindingMethods: TableTestCase {
         var models: [Section: [String]] = [.first: [], .second: [], .third: [], .fourth: []]
         
         self.binder.onSection(.first)
-            .bind(cellType: TestCell.self, models: ["1", "2"])
+            .bind(cellType: TestCell.self, models: { ["1", "2"] })
             .onCellDequeue { row, cell, model in
                 dequeuedCells[.first]?.insert(cell, at: row)
                 models[.first]?.insert(model, at: row)
-            }
+        }
         
         self.binder.onSections(.second, .third)
-            .bind(cellType: TestCell.self, models: [
+            .bind(cellType: TestCell.self, models: {[
                 .second: ["3", "4"],
                 .third: ["5", "6"]
-            ])
+            ]})
             .onCellDequeue { section, row, cell, model in
                 dequeuedCells[section]?.insert(cell, at: row)
                 models[section]?.insert(model, at: row)
-            }
+        }
         
         self.binder.onAllOtherSections()
-            .bind(cellType: TestCell.self, models: [
+            .bind(cellType: TestCell.self, models: {[
                 .fourth: ["7", "8"]
-            ])
+            ]})
             .onCellDequeue { section, row, cell, model in
                 dequeuedCells[section]?.insert(cell, at: row)
                 models[section]?.insert(model, at: row)
-            }
+        }
         
         self.binder.finish()
         
@@ -101,17 +101,17 @@ class TableCellBindingMethods: TableTestCase {
         var viewModels: [Section: [TestViewModelCell.ViewModel?]] = [.first: [], .second: [], .third: [], .fourth: []]
         
         self.binder.onSection(.first)
-            .bind(cellType: TestViewModelCell.self, viewModels: [
+            .bind(cellType: TestViewModelCell.self, viewModels: {[
                 TestViewModelCell.ViewModel(id: "1"),
                 TestViewModelCell.ViewModel(id: "2")
-            ])
+            ]})
             .onCellDequeue { row, cell in
                 dequeuedCells[.first]?.insert(cell, at: row)
                 viewModels[.first]?.insert(cell.viewModel, at: row)
-            }
+        }
         
         self.binder.onSections(.second, .third)
-            .bind(cellType: TestViewModelCell.self, viewModels: [
+            .bind(cellType: TestViewModelCell.self, viewModels: {[
                 .second: [
                     TestViewModelCell.ViewModel(id: "3"),
                     TestViewModelCell.ViewModel(id: "4"),
@@ -120,23 +120,23 @@ class TableCellBindingMethods: TableTestCase {
                     TestViewModelCell.ViewModel(id: "5"),
                     TestViewModelCell.ViewModel(id: "6")
                 ]
-            ])
+            ]})
             .onCellDequeue { section, row, cell in
                 dequeuedCells[section]?.insert(cell, at: row)
                 viewModels[section]?.insert(cell.viewModel, at: row)
-            }
+        }
         
         self.binder.onAllOtherSections()
-            .bind(cellType: TestViewModelCell.self, viewModels: [
+            .bind(cellType: TestViewModelCell.self, viewModels: {[
                 .fourth: [
                     TestViewModelCell.ViewModel(id: "7"),
                     TestViewModelCell.ViewModel(id: "8")
                 ]
-            ])
+            ]})
             .onCellDequeue { section, row, cell in
                 dequeuedCells[section]?.insert(cell, at: row)
                 viewModels[section]?.insert(cell.viewModel, at: row)
-            }
+        }
         
         self.binder.finish()
         
@@ -187,35 +187,35 @@ class TableCellBindingMethods: TableTestCase {
         
         self.binder.onSection(.first)
             .bind(cellType: TestViewModelCell.self,
-                  models: ["1", "2"],
+                  models: {["1", "2"]},
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0) })
             .onCellDequeue { row, cell, model in
                 dequeuedCells[.first]?.insert(cell, at: row)
                 models[.first]?.insert(model, at: row)
                 viewModels[.first]?.insert(cell.viewModel, at: row)
-            }
+        }
         
         self.binder.onSections(.second, .third)
             .bind(cellType: TestViewModelCell.self,
-                  models: [
+                  models: {[
                     .second: ["3", "4"],
-                    .third: ["5", "6"] ],
+                    .third: ["5", "6"] ]},
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0) })
             .onCellDequeue { section, row, cell, model in
                 dequeuedCells[section]?.insert(cell, at: row)
                 models[section]?.insert(model, at: row)
                 viewModels[section]?.insert(cell.viewModel, at: row)
-            }
+        }
         
         self.binder.onAllOtherSections()
             .bind(cellType: TestViewModelCell.self,
-                  models: [.fourth: ["7", "8"] ],
+                  models: {[.fourth: ["7", "8"] ]},
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0) })
             .onCellDequeue { section, row, cell, model in
                 dequeuedCells[section]?.insert(cell, at: row)
                 models[section]?.insert(model, at: row)
                 viewModels[section]?.insert(cell.viewModel, at: row)
-            }
+        }
         
         self.binder.finish()
         
@@ -269,7 +269,7 @@ class TableCellBindingMethods: TableTestCase {
         expect(viewModels[.fourth]?[0]?.id).toEventually(equal("7"))
         expect(viewModels[.fourth]?[1]?.id).toEventually(equal("8"))
     }
-
+    
     /*
      Test the 'cell provider + model' binding chain method.
      */
@@ -281,44 +281,42 @@ class TableCellBindingMethods: TableTestCase {
         
         self.binder.onSection(.first)
             .bind(
-                models: ["1", "2"],
+                models: {["1", "2"]},
                 cellProvider: { table, row, model in
                     models[.first]?.insert(model, at: row)
                     return table.dequeue(TestCell.self)
-                })
+            })
             .onCellDequeue { row, cell, model in
                 expect(model).to(equal(models[.first]?[row]))
                 dequeuedCells[.first]?.insert(cell as! TestCell, at: row)
-            }
+        }
         
         self.binder.onSections(.second, .third)
             .bind(
-                models: [
+                models: {[
                     .second: ["3", "4"],
                     .third: ["5", "6"]
-                ],
+                ]},
                 cellProvider: { (table, section, row, model: String) in
                     models[section]?.insert(model, at: row)
                     return table.dequeue(TestCell.self)
-                })
+            })
             .onCellDequeue { section, row, cell, model in
                 expect(model).to(equal(models[section]?[row]))
                 dequeuedCells[section]?.insert(cell as! TestCell, at: row)
-            }
+        }
         
         self.binder.onAllOtherSections()
             .bind(
-                models: [
-                    .fourth: ["7", "8"],
-                ],
+                models: {[.fourth: ["7", "8"],]},
                 cellProvider: { (table, section, row, model: String) in
                     models[section]?.insert(model, at: row)
                     return table.dequeue(TestCell.self)
-                })
+            })
             .onCellDequeue { section, row, cell, model in
                 expect(model).to(equal(models[section]?[row]))
                 dequeuedCells[section]?.insert(cell as! TestCell, at: row)
-            }
+        }
         
         self.binder.finish()
         
@@ -368,26 +366,26 @@ class TableCellBindingMethods: TableTestCase {
         self.binder.onSection(.first)
             .bind(cellProvider: { table, row in
                 return table.dequeue(TestCell.self)
-            }, numberOfCells: 2)
+            }, numberOfCells: {2})
             .onCellDequeue { row, cell in
                 dequeuedCells[.first]?.insert(cell as! TestCell, at: row)
-            }
+        }
         
         self.binder.onSections(.second, .third)
             .bind(cellProvider: { table, section, row in
                 return table.dequeue(TestCell.self)
-            }, numberOfCells: [.second: 2, .third: 2])
+            }, numberOfCells: {[.second: 2, .third: 2]})
             .onCellDequeue { section, row, cell in
                 dequeuedCells[section]?.insert(cell as! TestCell, at: row)
-            }
+        }
         
         self.binder.onAllOtherSections()
             .bind(cellProvider: { table, section, row in
                 return table.dequeue(TestCell.self)
-            }, numberOfCells: [.fourth: 2])
+            }, numberOfCells: {[.fourth: 2]})
             .onCellDequeue { section, row, cell in
                 dequeuedCells[section]?.insert(cell as! TestCell, at: row)
-            }
+        }
         
         self.binder.finish()
         
