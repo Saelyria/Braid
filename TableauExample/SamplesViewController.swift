@@ -42,7 +42,7 @@ class SamplesViewController: UIViewController {
         self.binder = TableViewBinder(tableView: self.tableView)
         
         self.binder.onTable()
-            .bind(cellType: TitleDetailTableViewCell.self, viewModels: self.rows)
+            .bind(cellType: TitleDetailTableViewCell.self, viewModels: { self.rows })
             .onTapped { [unowned self] (row, cell) in
                 cell.setSelected(false, animated: true)
                 switch row {

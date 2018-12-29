@@ -292,6 +292,14 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
             self.tableView.reloadSections(indexSet, with: animation)
         }
     }
+    
+    public func refresh(section: S) {
+        
+    }
+    
+    public func refresh(sections: S...) {
+        
+    }
 
     /**
      Begins a binding chain whose handlers are used to provide data and respond to events for the given section.

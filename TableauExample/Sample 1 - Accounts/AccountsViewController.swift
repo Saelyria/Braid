@@ -29,7 +29,6 @@ class AccountsViewController: UIViewController {
         // 4.
         let tableView = UITableView(frame: self.view.frame, style: .grouped)
         tableView.register(CenterLabelTableViewCell.self)
-        tableView.register(SectionHeaderView.self)
         tableView.register(TitleDetailTableViewCell.self)
         self.view.addSubview(tableView)
         tableView.frame = self.view.frame
@@ -61,13 +60,14 @@ class AccountsViewController: UIViewController {
         
         // 10.
         self.binder.onSections(.checking, .savings, .other)
-            .bind(headerType: SectionHeaderView.self, viewModels: [
-                .checking: SectionHeaderView.ViewModel(title: "CHECKING"),
-                .savings: SectionHeaderView.ViewModel(title: "SAVINGS"),
-                .other: SectionHeaderView.ViewModel(title: "OTHER")])
+            .bind(headerTitles: { [
+                .checking: "CHECKING",
+                .savings: "SAVINGS",
+                .other: "OTHER"]
+            })
             // 11.
-            .bind(footerTitles: [
-                .other: "This section includes your investing and credit card accounts."])
+            .bind(footerTitles: {[
+                .other: "This section includes your investing and credit card accounts."]})
         
         // 12.
         self.binder.finish()

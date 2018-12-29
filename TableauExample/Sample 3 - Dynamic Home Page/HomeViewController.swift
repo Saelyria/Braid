@@ -73,9 +73,9 @@ class HomeViewController: UIViewController {
             .disposed(by: self.disposeBag)
         
         self.binder.onSection(.banner)
-            .bind(cellType: CenterLabelTableViewCell.self, viewModels: [
-                CenterLabelTableViewCell.ViewModel(text: "<Brand Name>. Shopping made easy.")
-            ])
+            .bind(cellType: CenterLabelTableViewCell.self, viewModels: {
+                [CenterLabelTableViewCell.ViewModel(text: "<Brand Name>. Shopping made easy.")]
+            })
         
         // 7.
         self.binder.onAllOtherSections()
