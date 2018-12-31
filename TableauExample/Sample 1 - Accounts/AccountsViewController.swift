@@ -60,14 +60,13 @@ class AccountsViewController: UIViewController {
         
         // 10.
         self.binder.onSections(.checking, .savings, .other)
-            .bind(headerTitles: { [
+            .bind(headerTitles: [
                 .checking: "CHECKING",
                 .savings: "SAVINGS",
-                .other: "OTHER"]
-            })
+                .other: "OTHER"])
             // 11.
-            .bind(footerTitles: {[
-                .other: "This section includes your investing and credit card accounts."]})
+            .bind(footerTitles: [
+                .other: "This section includes your investing and credit card accounts."])
         
         // 12.
         self.binder.finish()

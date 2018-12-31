@@ -631,10 +631,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<C, S>
         where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
-        self.binder.addHeaderDequeueBlock(headerType: headerType, affectedSections: self.affectedSectionScope)
-        self.binder.updateHeaderViewModels([self.section: viewModel], affectedSections: self.affectedSectionScope)
-        
-        return self
+        return self.bind(headerType: headerType, viewModel: { viewModel })
     }
     
     /**
@@ -674,10 +671,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         headerTitle: String?)
         -> TableViewSingleSectionBinder<C, S>
     {
-        self.binder.nextDataModel.headerTitleBound = true
-        self.binder.updateHeaderTitles([self.section: headerTitle], affectedSections: self.affectedSectionScope)
-        
-        return self
+        return self.bind(headerTitle: { headerTitle })
     }
     
     /**
@@ -696,6 +690,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<C, S>
     {
         self.binder.handlers.sectionHeaderTitleProviders[self.section] = headerTitle
+        self.binder.nextDataModel.uniquelyBoundHeaderSections.append(self.section)
         self.binder.nextDataModel.headerTitleBound = true
         self.binder.updateHeaderTitles([self.section: headerTitle()], affectedSections: self.affectedSectionScope)
         
@@ -717,10 +712,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<C, S>
         where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
-        self.binder.addFooterDequeueBlock(footerType: footerType, affectedSections: self.affectedSectionScope)
-        self.binder.updateFooterViewModels([self.section: viewModel], affectedSections: self.affectedSectionScope)
-        
-        return self
+        return self.bind(footerType: footerType, viewModel: { viewModel })
     }
     
     /**
@@ -760,10 +752,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         footerTitle: String?)
         -> TableViewSingleSectionBinder<C, S>
     {
-        self.binder.nextDataModel.footerTitleBound = true
-        self.binder.updateFooterTitles([self.section: footerTitle], affectedSections: self.affectedSectionScope)
-        
-        return self
+        return self.bind(footerTitle: { footerTitle })
     }
     
     /**
@@ -782,6 +771,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<C, S>
     {
         self.binder.handlers.sectionFooterTitleProviders[self.section] = footerTitle
+        self.binder.nextDataModel.uniquelyBoundFooterSections.append(self.section)
         self.binder.nextDataModel.footerTitleBound = true
         self.binder.updateFooterTitles([self.section: footerTitle()], affectedSections: self.affectedSectionScope)
         

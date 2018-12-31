@@ -102,7 +102,7 @@ internal extension SectionedTableViewBinder {
         self.update(fromDataIn: nonNilViewModels,
                     updatingProperty: &self.nextDataModel.sectionFooterViewModels,
                     affectedSections: affectedSections,
-                    dataType: .header)
+                    dataType: .footer)
     }
 }
 

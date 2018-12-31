@@ -10,5 +10,17 @@ class TestViewModelCell: UITableViewCell, ReuseIdentifiable, ViewModelBindable {
         let id: String
     }
     
-    var viewModel: TestViewModelCell.ViewModel?
+    var viewModel: ViewModel?
+}
+
+class TestHeaderFooter: UITableViewHeaderFooterView, ReuseIdentifiable, ViewModelBindable {
+    struct ViewModel {
+        let title: String
+    }
+    
+    var viewModel: ViewModel? {
+        didSet {
+            self.textLabel?.text = viewModel?.title
+        }
+    }
 }

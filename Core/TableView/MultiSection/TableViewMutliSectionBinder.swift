@@ -665,9 +665,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         headerTitles: [S: String])
         -> TableViewMutliSectionBinder<C, S>
     {
-        self.binder.nextDataModel.headerTitleBound = true
-        self.binder.updateHeaderTitles(headerTitles, affectedSections: self.affectedSectionScope)
-        return self
+        return self.bind(headerTitles: { headerTitles })
     }
     
     /**
@@ -686,6 +684,12 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         -> TableViewMutliSectionBinder<C, S>
     {
         self.binder.nextDataModel.headerTitleBound = true
+        switch self.affectedSectionScope {
+        case .forNamedSections(let sections):
+            self.binder.nextDataModel.uniquelyBoundHeaderSections.append(contentsOf: sections)
+        default: break
+        }
+        
         self.binder.updateHeaderTitles(headerTitles(), affectedSections: self.affectedSectionScope)
         return self
     }
@@ -709,11 +713,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         -> TableViewMutliSectionBinder<C, S>
         where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
-        let scope = self.affectedSectionScope
-        self.binder.addFooterDequeueBlock(footerType: footerType, affectedSections: self.affectedSectionScope)
-        self.binder.updateFooterViewModels(viewModels, affectedSections: scope)
-        
-        return self
+        return self.bind(footerType: footerType, viewModels: { viewModels })
     }
     
     /**
@@ -757,10 +757,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         footerTitles: [S: String])
         -> TableViewMutliSectionBinder<C, S>
     {
-        let scope = self.affectedSectionScope
-        self.binder.updateFooterTitles(footerTitles, affectedSections: scope)
-        
-        return self
+        return self.bind(footerTitles: { footerTitles })
     }
     
     /**
@@ -779,6 +776,11 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         -> TableViewMutliSectionBinder<C, S>
     {
         let scope = self.affectedSectionScope
+        switch self.affectedSectionScope {
+        case .forNamedSections(let sections):
+            self.binder.nextDataModel.uniquelyBoundFooterSections.append(contentsOf: sections)
+        default: break
+        }
         self.binder.updateFooterTitles(footerTitles(), affectedSections: scope)
         
         return self
