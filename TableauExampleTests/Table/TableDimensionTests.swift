@@ -35,7 +35,7 @@ class TableDimensionTests: TableTestCase {
             ])
             .dimensions(
                 .cellHeight { _, _ in 2 })
-        
+                
         self.binder.finish()
         
         expect(self.tableView.visibleCells.count).toEventually(equal(6))

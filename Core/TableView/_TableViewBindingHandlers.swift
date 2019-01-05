@@ -17,13 +17,8 @@ typealias HeaderFooterHeightBlock<S: TableViewSection> = (S) -> CGFloat
 class _TableViewBindingHandlers<S: TableViewSection> {
     // Cell handlers
     
-    // Closures to call to get cell models for non-Rx bound sections when the table view is refreshed.
-    lazy var sectionCellModelProviders: [S: () -> [Any]] = { [:] }()
-    var dynamicSectionCellModelProvider: (() -> [Any])?
-    
-    // Closures to call to get cell view models for non-Rx bound sections.
-    lazy var sectionCellViewModelProviders: [S: () -> [Any]] = { [:] }()
-    var dynamicSectionCellViewModelProvider: (() -> [Any])?
+    // Closures that will update the data on the binder's data model when 'refresh' is called
+    lazy var cellModelUpdaters: [() -> Void] = { [] }()
     
     // Closures to call to dequeue a cell in a section.
     lazy var sectionCellDequeueBlocks: [S: CellDequeueBlock<S>] = { [:] }()

@@ -17,10 +17,25 @@ internal extension SectionedTableViewBinder {
      - parameter affectedSections: The section scope affected by this update.
      */
     func updateCellModels(_ models: [S: [Any]]?, viewModels: [S: [Any]]?, affectedSections: SectionBindingScope<S>) {
-        guard !(models == nil && viewModels == nil) else {
+        guard let items = models ?? viewModels else {
             assertionFailure("Both the 'models' and 'view models' arrays were nil")
             return
         }
+        
+        // mark that the affected sections were updated via models and view model
+        let type: _TableViewDataModel<S>.CellDataType
+        if models != nil && viewModels != nil {
+            type = .modelsViewModels
+        } else if models != nil {
+            type = .models
+        } else {
+            type = .viewModels
+        }
+        let dataTypes: [S: _TableViewDataModel<S>.CellDataType] = items.mapValues { _ in type }
+        self.update(fromDataIn: dataTypes,
+                    updatingProperty: &self.nextDataModel.sectionCellDataType,
+                    affectedSections: affectedSections,
+                    dataType: .cell)
         
         if let models = models {
             self.update(fromDataIn: models,
@@ -43,6 +58,13 @@ internal extension SectionedTableViewBinder {
      - parameter affectedSections: The section scope affected by this update.
      */
     func updateNumberOfCells(_ numCells: [S: Int], affectedSections: SectionBindingScope<S>) {
+        // mark that the affected sections were updated via a 'number of cells'
+        let dataTypes: [S: _TableViewDataModel<S>.CellDataType] = numCells.mapValues { _ in .number }
+        self.update(fromDataIn: dataTypes,
+                    updatingProperty: &self.nextDataModel.sectionCellDataType,
+                    affectedSections: affectedSections,
+                    dataType: .cell)
+        
         self.update(fromDataIn: numCells,
                     updatingProperty: &self.nextDataModel.sectionNumberOfCells,
                     affectedSections: affectedSections,
@@ -102,7 +124,7 @@ internal extension SectionedTableViewBinder {
         self.update(fromDataIn: nonNilViewModels,
                     updatingProperty: &self.nextDataModel.sectionFooterViewModels,
                     affectedSections: affectedSections,
-                    dataType: .header)
+                    dataType: .footer)
     }
 }
 

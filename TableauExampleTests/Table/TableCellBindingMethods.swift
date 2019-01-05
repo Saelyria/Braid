@@ -17,6 +17,7 @@ class TableCellBindingMethods: TableTestCase {
     override func setUp() {
         super.setUp()
         self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
+        self.binder.setupForTesting()
     }
     
     /*

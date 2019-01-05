@@ -112,7 +112,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         // was not uniquely bound and there is an 'all sections' header dequeue block
         let wasBoundUniquely = self.dataModel.uniquelyBoundHeaderSections.contains(section)
         if self.binder.handlers.sectionHeaderDequeueBlocks[section] != nil
-        || (wasBoundUniquely && self.binder.handlers.dynamicSectionsHeaderDequeueBlock != nil) {
+        || (!wasBoundUniquely && self.binder.handlers.dynamicSectionsHeaderDequeueBlock != nil) {
             return nil
         }
         return self.dataModel.sectionHeaderTitles[section]
