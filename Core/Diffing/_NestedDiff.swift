@@ -83,10 +83,10 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
             to.itemOnStartIndex(advancedBy: $0.from.y)
         }
         
-        let elementDiff = try zip(zip(fromSections, toSections), matchingSectionTraces)
+        let elementDiff = zip(zip(fromSections, toSections), matchingSectionTraces)
             .flatMap { (args) -> [_NestedDiff.Element] in
-                let (sections, trace) = args
-                return try sections.0.diff(sections.1, isSame: isSameElement, isEqual: { lhs, rhs in
+                let (sections, trace) = args                
+                let elementsDiff: [_NestedDiff.Element]? = try? sections.0.diff(sections.1, isSame: isSameElement, isEqual: { lhs, rhs in
                     return isEqualElement(sections.0, lhs, rhs)
                 }).map { diffElement -> _NestedDiff.Element in
                     switch diffElement {
@@ -98,7 +98,13 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
                         return .updateElement(at, section: trace.from.y)
                     }
                 }
-        }
+                
+                if let diff = elementsDiff {
+                    return diff
+                } else {
+                    return []
+                }
+            }
         
         return _NestedDiff(elements: sectionDiff + elementDiff)
     }

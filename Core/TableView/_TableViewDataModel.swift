@@ -6,6 +6,13 @@ internal protocol _TableViewDataModelDelegate: AnyObject {
 }
 
 internal class _TableViewDataModel<S: TableViewSection> {
+    enum CellDataType {
+        case models
+        case viewModels
+        case modelsViewModels
+        case number
+    }
+    
     weak var delegate: SectionedTableViewBinder<S>?
     
     // The sections that were bound uniquely with either the `onSection` or `onSections` methods. This is used to
@@ -23,6 +30,8 @@ internal class _TableViewDataModel<S: TableViewSection> {
     var displayedSections: [S] = [] {
         didSet { self.delegate?.dataModelDidChange() }
     }
+    // The type of data used for data for the cells for the given sections (models, view models, or raw number of cells)
+    var sectionCellDataType: [S: CellDataType] = [:]
     // The number of cells to create for a section when the user manages dequeueing themselves.
     var sectionNumberOfCells: [S: Int] = [:] {
         didSet { self.delegate?.dataModelDidChange() }
@@ -133,12 +142,32 @@ extension _TableViewDataModel {
      */
     func asDiffableSectionModels() -> [SectionModel] {
         return self.displayedSections.map { (section) -> SectionModel in
-            // make sure to favour items that are diffable
+            // get the 'items' (be it view models, models, or the number of cells) that are used for cells for the
+            // section. Prefer whichever is diffable.
             var items: [Any]?
-            if let identifiableVMs = self.sectionCellViewModels as? [S: [CollectionIdentifiable]] {
+            
+            if self.sectionCellDataType[section] == .viewModels
+            || self.sectionCellDataType[section] == .modelsViewModels
+            && !(self.sectionCellModels is [S: [CollectionIdentifiable]]),
+            let identifiableVMs = self.sectionCellViewModels as? [S: [CollectionIdentifiable]] {
                 items = identifiableVMs[section]
-            } else if let identifiableMs = self.sectionCellModels as? [S: [CollectionIdentifiable]] {
+            }
+            
+            else if self.sectionCellDataType[section] == .models
+            || self.sectionCellDataType[section] == .modelsViewModels,
+            let identifiableMs = self.sectionCellModels as? [S: [CollectionIdentifiable]] {
                 items = identifiableMs[section]
+            }
+            
+            else if self.sectionCellDataType[section] == .number, let numCells = self.sectionNumberOfCells[section] {
+                // make an array of empty data for its count
+                for _ in 0..<numCells {
+                    items?.append(0)
+                }
+            }
+            
+            else {
+                items = self.sectionCellViewModels[section] ?? self.sectionCellModels[section]
             }
             
             return SectionModel(
@@ -167,7 +196,9 @@ extension _TableViewDataModel {
             },
             isEqualElement: { sectionModel, lhs, rhs in
                 return sectionModel.itemEqualityChecker?(lhs, rhs)
-        }) else { return nil }
+        }) else {
+            return nil
+        }
         
         // Reload sections whose header or footer were updated
         for section in other.headerFooterUpdatedSections.filter({ !other.cellUpdatedSections.contains($0) }) {
@@ -179,6 +210,22 @@ extension _TableViewDataModel {
         for section in other.cellUpdatedSections.filter({ other.delegate?.itemEqualityChecker(for: $0) == nil }) {
             guard let i = other.displayedSections.firstIndex(of: section) else { continue }
             diff.elements.append(.updateUndiffableSection(i))
+            
+            // For undiffable sections, perform inserts/deletes on the end of the section if the counts are different
+            if let lhs = selfSectionModels.first(where: { $0.section == section }),
+            let rhs = otherSectionModels.first(where: { $0.section == section }) {
+                if lhs.items.count < rhs.items.count {
+                    let difference = rhs.items.count - lhs.items.count
+                    for at in rhs.items.count - difference..<rhs.items.count {
+                        diff.elements.append(.insertElement(at, section: i))
+                    }
+                } else if lhs.items.count > rhs.items.count {
+                    let difference = lhs.items.count - rhs.items.count
+                    for at in lhs.items.count - difference..<lhs.items.count {
+                        diff.elements.append(.deleteElement(at, section: i))
+                    }
+                }
+            }
         }
         
         return diff

@@ -129,9 +129,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
-        self.binder.handlers.sectionCellViewModelProviders[self.section] = viewModels
-        self.binder.updateCellModels(
-            nil, viewModels: [self.section: viewModels()], affectedSections: self.affectedSectionScope)
+        let section = self.section
+        let scope = self.affectedSectionScope
+        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+            binder?.updateCellModels(nil, viewModels: [section: viewModels()], affectedSections: scope)
+        }
         
         return TableViewSingleSectionBinder<NC, S>(binder: self.binder, section: self.section)
     }
@@ -330,11 +332,13 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
-        self.binder.handlers.sectionCellModelProviders[self.section] = models
-        let _models = models()
-        let viewModels = [self.section: _models.map(mapToViewModels)]
-        self.binder.updateCellModels(
-            [self.section: _models], viewModels: viewModels, affectedSections: self.affectedSectionScope)
+        let section = self.section
+        let scope = self.affectedSectionScope
+        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+            let _models = models()
+            let viewModels = [section: _models.map(mapToViewModels)]
+            binder?.updateCellModels([section: _models], viewModels: viewModels, affectedSections: scope)
+        }
         
         return TableViewModelSingleSectionBinder<NC, S, NM>(binder: self.binder, section: self.section)
     }
@@ -432,10 +436,12 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         where NC: UITableViewCell & ReuseIdentifiable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
-        self.binder.handlers.sectionCellModelProviders[self.section] = models
-        let _models = models()
-        self.binder.updateCellModels(
-            [self.section: _models], viewModels: nil, affectedSections: self.affectedSectionScope)
+        let section = self.section
+        let scope = self.affectedSectionScope
+        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+            let _models = models()
+            binder?.updateCellModels([section: _models], viewModels: nil, affectedSections: scope)
+        }
         
         return TableViewModelSingleSectionBinder<NC, S, NM>(binder: self.binder, section: self.section)
     }
@@ -541,10 +547,13 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
             return cellProvider(table, row, models[row])
         }
         self.binder.addCellDequeueBlock(cellProvider: _cellProvider, affectedSections: self.affectedSectionScope)
-        let _models = models()
-        self.binder.updateCellModels(
-            [self.section: _models], viewModels: nil, affectedSections: self.affectedSectionScope)
-        
+        let section = self.section
+        let scope = self.affectedSectionScope
+        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+            let _models = models()
+            binder?.updateCellModels([section: _models], viewModels: nil, affectedSections: scope)
+        }
+
         return TableViewModelSingleSectionBinder<UITableViewCell, S, NM>(binder: self.binder, section: self.section)
     }
     
@@ -563,10 +572,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         numberOfCells: Int)
         -> TableViewSingleSectionBinder<UITableViewCell, S>
     {
-        self.binder.addCellDequeueBlock(cellProvider: cellProvider, affectedSections: self.affectedSectionScope)
-        self.binder.updateNumberOfCells([self.section: numberOfCells], affectedSections: self.affectedSectionScope)
-        
-        return TableViewSingleSectionBinder<UITableViewCell, S>(binder: self.binder, section: self.section)
+        return self.bind(cellProvider: cellProvider, numberOfCells: { numberOfCells })
     }
     
     /**
@@ -585,8 +591,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<UITableViewCell, S>
     {
         self.binder.addCellDequeueBlock(cellProvider: cellProvider, affectedSections: self.affectedSectionScope)
-        let numCells = numberOfCells()
-        self.binder.updateNumberOfCells([self.section: numCells], affectedSections: self.affectedSectionScope)
+        let section = self.section
+        let scope = self.affectedSectionScope
+        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+            binder?.updateNumberOfCells([section: numberOfCells()], affectedSections: scope)
+        }
         
         return TableViewSingleSectionBinder<UITableViewCell, S>(binder: self.binder, section: self.section)
     }

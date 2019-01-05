@@ -256,49 +256,10 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         self.sectionDisplayBehavior = sectionDisplayBehavior
     }
     
-    /**
-     Reloads the specified section with the given animation.
-     
-     - parameter section: The section to reload.
-     - parameter animation: The row animation to use to reload the section.
-    */
-    public func reload(section: S, withAnimation animation: UITableView.RowAnimation = .automatic) {
-        guard self.hasFinishedBinding else { return }
-        if let sectionToReloadIndex = self.displayedSections.index(of: section) {
-            let startIndex = self.displayedSections.startIndex
-            let sectionInt = startIndex.distance(to: sectionToReloadIndex)
-            let indexSet: IndexSet = [sectionInt]
-            self.tableView.reloadSections(indexSet, with: animation)
+    public func refresh() {
+        for updater in self.handlers.cellModelUpdaters {
+            updater()
         }
-    }
-    
-    /**
-     Reloads the specified sections with the given animation.
-     
-     - parameter sections: An array specifying the sections to reload.
-     - parameter animation: The row animation to use to reload the sections.
-    */
-    public func reload(sections: [S], withAnimation animation: UITableView.RowAnimation = .automatic) {
-        guard self.hasFinishedBinding else { return }
-        var indexSet: IndexSet = []
-        for section in sections {
-            if let sectionToReloadIndex = self.displayedSections.index(of: section) {
-                let startIndex = self.displayedSections.startIndex
-                let sectionInt = startIndex.distance(to: sectionToReloadIndex)
-                indexSet.update(with: sectionInt)
-            }
-        }
-        if !indexSet.isEmpty {
-            self.tableView.reloadSections(indexSet, with: animation)
-        }
-    }
-    
-    public func refresh(section: S) {
-        
-    }
-    
-    public func refresh(sections: S...) {
-        
     }
 
     /**
@@ -400,6 +361,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      after which point no further binding can be done on the table with the binder's `onSection` methods.
     */
     public func finish() {
+        self.refresh()
         self.applyDisplayedSectionBehavior()
         self.hasFinishedBinding = true
         

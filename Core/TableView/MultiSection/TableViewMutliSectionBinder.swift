@@ -120,7 +120,10 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
-        self.binder.updateCellModels(nil, viewModels: viewModels(), affectedSections: self.affectedSectionScope)
+        let scope = self.affectedSectionScope
+        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+            binder?.updateCellModels(nil, viewModels: viewModels(), affectedSections: scope)
+        }
         
         return TableViewMutliSectionBinder<NC, S>(binder: self.binder, sections: self.sections)
     }
@@ -327,12 +330,15 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
-        var viewModels: [S: [Any]] = [:]
-        let _models = models()
-        for (s, m) in _models {
-            viewModels[s] = m.map(mapToViewModels)
+        let scope = self.affectedSectionScope
+        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+            var viewModels: [S: [Any]] = [:]
+            let _models = models()
+            for (s, m) in _models {
+                viewModels[s] = m.map(mapToViewModels)
+            }
+            binder?.updateCellModels(_models, viewModels: viewModels, affectedSections: scope)
         }
-        self.binder.updateCellModels(_models, viewModels: viewModels, affectedSections: self.affectedSectionScope)
         
         return TableViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections)
     }
@@ -434,7 +440,10 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         where NC: UITableViewCell & ReuseIdentifiable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
-        self.binder.updateCellModels(models(), viewModels: nil, affectedSections: self.affectedSectionScope)
+        let scope = self.affectedSectionScope
+        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+            binder?.updateCellModels(models(), viewModels: nil, affectedSections: scope)
+        }
         
         return TableViewModelMultiSectionBinder<NC, S, NM>(binder: self.binder, sections: self.sections)
     }
@@ -545,7 +554,10 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
             return cellProvider(table, section, row, models[row])
         }
         self.binder.addCellDequeueBlock(cellProvider: _cellProvider, affectedSections: self.affectedSectionScope)
-        self.binder.updateCellModels(models(), viewModels: nil, affectedSections: self.affectedSectionScope)
+        let scope = self.affectedSectionScope
+        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+            binder?.updateCellModels(models(), viewModels: nil, affectedSections: scope)
+        }
         
         return TableViewModelMultiSectionBinder<UITableViewCell, S, NM>(binder: self.binder, sections: self.sections)
     }
@@ -567,10 +579,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         numberOfCells: [S: Int])
         -> TableViewMutliSectionBinder<UITableViewCell, S>
     {
-        self.binder.addCellDequeueBlock(cellProvider: cellProvider, affectedSections: self.affectedSectionScope)
-        self.binder.updateNumberOfCells(numberOfCells, affectedSections: self.affectedSectionScope)
-        
-        return TableViewMutliSectionBinder<UITableViewCell, S>(binder: self.binder, sections: self.sections)
+        return self.bind(cellProvider: cellProvider, numberOfCells: { numberOfCells })
     }
     
     /**
@@ -591,7 +600,10 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         -> TableViewMutliSectionBinder<UITableViewCell, S>
     {
         self.binder.addCellDequeueBlock(cellProvider: cellProvider, affectedSections: self.affectedSectionScope)
-        self.binder.updateNumberOfCells(numberOfCells(), affectedSections: self.affectedSectionScope)
+        let scope = self.affectedSectionScope
+        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+            binder?.updateNumberOfCells(numberOfCells(), affectedSections: scope)
+        }
         
         return TableViewMutliSectionBinder<UITableViewCell, S>(binder: self.binder, sections: self.sections)
     }
