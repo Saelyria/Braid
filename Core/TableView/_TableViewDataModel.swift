@@ -160,6 +160,7 @@ extension _TableViewDataModel {
             }
             
             else if self.sectionCellDataType[section] == .number, let numCells = self.sectionNumberOfCells[section] {
+                items = []
                 // make an array of empty data for its count
                 for _ in 0..<numCells {
                     items?.append(0)
