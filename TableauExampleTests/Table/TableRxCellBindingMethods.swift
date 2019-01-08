@@ -3,7 +3,7 @@ import UIKit
 import Nimble
 import RxSwift
 
-/// Cell binding test for non-RxSwift, updatable (i.e. using closures) binding methods
+/// Cell binding test for RxSwift binding methods
 
 class TableRxCellBindingMethods: TableTestCase {
     enum Section: TableViewSection {
