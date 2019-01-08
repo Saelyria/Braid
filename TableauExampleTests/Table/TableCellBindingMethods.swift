@@ -2,7 +2,7 @@ import UIKit
 @testable import Tableau
 import Nimble
 
-// Cell binding test for non-RxSwift, non-updatable (i.e. not using closures) binding methods
+/// Cell binding test for non-RxSwift, non-updatable (i.e. not using closures) binding methods
 
 class TableCellBindingMethods: TableTestCase {
     enum Section: TableViewSection {

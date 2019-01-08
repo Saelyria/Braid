@@ -253,11 +253,11 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (UITableView, _ section: Base.S, _ row: Int, _ model: NM) -> UITableViewCell,
-        models: Observable<[Base.S: [NM]]>)
+        models: Observable<[Base.S: [NM]]>,
+        cellProvider: @escaping (UITableView, _ section: Base.S, _ row: Int, _ model: NM) -> UITableViewCell)
         -> TableViewModelMultiSectionBinder<UITableViewCell, Base.S, NM>
     {
-        return self._bind(cellProvider: cellProvider, models: models)
+        return self._bind(models: models, cellProvider: cellProvider)
     }
     
     /**
@@ -268,20 +268,19 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
      use different cell types in the same section, the cell type is not known at compile-time, or you have some other
      particularly complex use cases.
      
+     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
+        the section.
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
      - parameter section: The section the closure should provide a cell for.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
-     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
-     the section. This dictionary does not need to contain a models array for each section being bound - sections not
-     present in the dictionary have no cells dequeued for them.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (UITableView, _ section: Base.S, _ row: Int, _ model: NM) -> UITableViewCell,
-        models: Observable<[Base.S: [NM]]>)
+        models: Observable<[Base.S: [NM]]>,
+        cellProvider: @escaping (UITableView, _ section: Base.S, _ row: Int, _ model: NM) -> UITableViewCell)
         -> TableViewModelMultiSectionBinder<UITableViewCell, Base.S, NM>
         where NM: Equatable & CollectionIdentifiable
     {
@@ -290,12 +289,12 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         }
         bindResult.binder.addCellEqualityChecker(
             itemType: NM.self, affectedSections: bindResult.affectedSectionScope)
-        return self._bind(cellProvider: cellProvider, models: models)
+        return self._bind(models: models, cellProvider: cellProvider)
     }
     
     private func _bind<NM>(
-        cellProvider: @escaping (UITableView, _ section: Base.S, _ row: Int, _ model: NM) -> UITableViewCell,
-        models: Observable<[Base.S: [NM]]>)
+        models: Observable<[Base.S: [NM]]>,
+        cellProvider: @escaping (UITableView, _ section: Base.S, _ row: Int, _ model: NM) -> UITableViewCell)
         -> TableViewModelMultiSectionBinder<UITableViewCell, Base.S, NM>
     {
         guard let bindResult = self.base as? TableViewMutliSectionBinder<Base.C, Base.S> else {
