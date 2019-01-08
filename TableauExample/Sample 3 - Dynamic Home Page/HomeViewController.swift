@@ -79,18 +79,20 @@ class HomeViewController: UIViewController {
         
         // 7.
         self.binder.onAllOtherSections()
-            .rx.bind(cellProvider: { (tableView, section: Section, row: Int, viewModel: CollectionIdentifiable) in
-                if let viewModel = viewModel as? TitleDetailTableViewCell.ViewModel {
-                    let cell = tableView.dequeue(TitleDetailTableViewCell.self)
-                    cell.viewModel = viewModel
-                    return cell
-                } else if let viewModel = viewModel as? ImageTitleSubtitleTableViewCell.ViewModel {
-                    let cell = tableView.dequeue(ImageTitleSubtitleTableViewCell.self)
-                    cell.viewModel = viewModel
-                    return cell
-                }
-                return UITableViewCell()
-            }, models: self.sectionCellViewModels)
+            .rx.bind(
+                models: self.sectionCellViewModels,
+                cellProvider: { (tableView, section: Section, row: Int, viewModel: CollectionIdentifiable) in
+                    if let viewModel = viewModel as? TitleDetailTableViewCell.ViewModel {
+                        let cell = tableView.dequeue(TitleDetailTableViewCell.self)
+                        cell.viewModel = viewModel
+                        return cell
+                    } else if let viewModel = viewModel as? ImageTitleSubtitleTableViewCell.ViewModel {
+                        let cell = tableView.dequeue(ImageTitleSubtitleTableViewCell.self)
+                        cell.viewModel = viewModel
+                        return cell
+                    }
+                    return UITableViewCell()
+            })
             .rx.bind(headerTitles: self.sectionHeaderTitles)
             .rx.bind(footerType: SectionHeaderView.self, viewModels: self.footerViewModels)
         

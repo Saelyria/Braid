@@ -259,20 +259,20 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      use different cell types in the same section, the cell type is not known at compile-time, or you have some other
      particularly complex use cases.
      
+     - parameter models: The models objects to bind to the dequeued cells for this section.
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
-     - parameter models: The models objects to bind to the dequeued cells for this section.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ tableView: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
-        models: Observable<[NM]>)
+        models: Observable<[NM]>,
+        cellProvider: @escaping (_ tableView: UITableView, _ row: Int, _ model: NM) -> UITableViewCell)
         -> TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>
     {
-        return self._bind(cellProvider: cellProvider, models: models)
+        return self._bind( models: models, cellProvider: cellProvider)
     }
     
     /**
@@ -283,17 +283,17 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      use different cell types in the same section, the cell type is not known at compile-time, or you have some other
      particularly complex use cases.
      
+     - parameter models: The models objects to bind to the dequeued cells for this section.
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
-     - parameter models: The models objects to bind to the dequeued cells for this section.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind<NM>(
-        cellProvider: @escaping (_ tableView: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
-        models: Observable<[NM]>)
+        models: Observable<[NM]>,
+        cellProvider: @escaping (_ tableView: UITableView, _ row: Int, _ model: NM) -> UITableViewCell)
         -> TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>
         where NM: Equatable & CollectionIdentifiable
     {
@@ -302,12 +302,12 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         }
         bindResult.binder.addCellEqualityChecker(
             itemType: NM.self, affectedSections: bindResult.affectedSectionScope)
-        return self._bind(cellProvider: cellProvider, models: models)
+        return self._bind(models: models, cellProvider: cellProvider)
     }
     
     private func _bind<NM>(
-        cellProvider: @escaping (_ tableView: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
-        models: Observable<[NM]>)
+        models: Observable<[NM]>,
+        cellProvider: @escaping (_ tableView: UITableView, _ row: Int, _ model: NM) -> UITableViewCell)
         -> TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>
     {
         guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {

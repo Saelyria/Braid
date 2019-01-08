@@ -16,6 +16,7 @@
 		93C36A4820DAFF97006B7ECF /* SamplesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93C36A4720DAFF97006B7ECF /* SamplesViewController.swift */; };
 		93C36A4A20DB02E0006B7ECF /* TitleDetailTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 93C36A4920DB02E0006B7ECF /* TitleDetailTableViewCell.xib */; };
 		AA8B7612901AEED60C395EB0 /* Pods_TableauExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5FEBC5088F0D7E30632BBD0 /* Pods_TableauExample.framework */; };
+		AB18252F21E4283F004FE239 /* TableRxCellBindingMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB18252E21E4283F004FE239 /* TableRxCellBindingMethods.swift */; };
 		AB1CCB9C21D82FF300EB1CDE /* TableClosureCellBindingMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1CCB9B21D82FF300EB1CDE /* TableClosureCellBindingMethods.swift */; };
 		AB1CCB9E21D8391A00EB1CDE /* TableHeaderFooterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1CCB9D21D8391A00EB1CDE /* TableHeaderFooterTests.swift */; };
 		AB577B9C21759F6C00CD2363 /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577B9B21759F6C00CD2363 /* AccountService.swift */; };
@@ -77,6 +78,7 @@
 		9381335020B6EE2A00CBF8F6 /* TitleDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleDetailTableViewCell.swift; sourceTree = "<group>"; };
 		93C36A4720DAFF97006B7ECF /* SamplesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamplesViewController.swift; sourceTree = "<group>"; };
 		93C36A4920DB02E0006B7ECF /* TitleDetailTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TitleDetailTableViewCell.xib; sourceTree = "<group>"; };
+		AB18252E21E4283F004FE239 /* TableRxCellBindingMethods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableRxCellBindingMethods.swift; sourceTree = "<group>"; };
 		AB1CCB9B21D82FF300EB1CDE /* TableClosureCellBindingMethods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableClosureCellBindingMethods.swift; sourceTree = "<group>"; };
 		AB1CCB9D21D8391A00EB1CDE /* TableHeaderFooterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableHeaderFooterTests.swift; sourceTree = "<group>"; };
 		AB577B9B21759F6C00CD2363 /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
@@ -266,6 +268,7 @@
 				ABE0F37321BE24E20098950D /* Test Classes */,
 				ABE0F37B21BE30730098950D /* TableCellBindingMethods.swift */,
 				AB1CCB9B21D82FF300EB1CDE /* TableClosureCellBindingMethods.swift */,
+				AB18252E21E4283F004FE239 /* TableRxCellBindingMethods.swift */,
 				AB1CCB9D21D8391A00EB1CDE /* TableHeaderFooterTests.swift */,
 				ABE0F36A21BE20380098950D /* TableDimensionTests.swift */,
 			);
@@ -521,6 +524,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AB1CCB9E21D8391A00EB1CDE /* TableHeaderFooterTests.swift in Sources */,
+				AB18252F21E4283F004FE239 /* TableRxCellBindingMethods.swift in Sources */,
 				ABE0F36B21BE20380098950D /* TableDimensionTests.swift in Sources */,
 				ABE0F37A21BE282A0098950D /* TableTestCase.swift in Sources */,
 				ABE0F37521BE24F30098950D /* Cells.swift in Sources */,
