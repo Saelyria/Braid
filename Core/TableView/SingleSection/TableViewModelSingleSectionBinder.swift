@@ -77,6 +77,19 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         return self
     }
     
+    // MARK: -
+    
+    @discardableResult
+    public override func bind<H>(
+        headerType: H.Type,
+        viewModel: H.ViewModel?)
+        -> TableViewModelSingleSectionBinder<C, S, M>
+        where H : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
+    {
+        super.bind(headerType: headerType, viewModel: viewModel)
+        return self
+    }
+    
     @discardableResult
     public override func bind<H>(
         headerType: H.Type,
@@ -85,6 +98,15 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         where H : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
     {
         super.bind(headerType: headerType, viewModel: viewModel)
+        return self
+    }
+    
+    @discardableResult
+    public override func bind(
+        headerTitle: String?)
+        -> TableViewModelSingleSectionBinder<C, S, M>
+    {
+        super.bind(headerTitle: headerTitle)
         return self
     }
     
@@ -100,8 +122,19 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     @discardableResult
     public override func bind<F>(
         footerType: F.Type,
+        viewModel: F.ViewModel?)
+        -> TableViewModelSingleSectionBinder<C, S, M>
+        where F : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
+    {
+        super.bind(footerType: footerType, viewModel: viewModel)
+        return self
+    }
+    
+    @discardableResult
+    public override func bind<F>(
+        footerType: F.Type,
         viewModel: @escaping () -> F.ViewModel?)
-        -> TableViewSingleSectionBinder<C, S>
+        -> TableViewModelSingleSectionBinder<C, S, M>
         where F : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
     {
         super.bind(footerType: footerType, viewModel: viewModel)
@@ -110,8 +143,17 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     
     @discardableResult
     public override func bind(
+        footerTitle: String?)
+        -> TableViewModelSingleSectionBinder<C, S, M>
+    {
+        super.bind(footerTitle: footerTitle)
+        return self
+    }
+    
+    @discardableResult
+    public override func bind(
         footerTitle: @escaping () -> String?)
-        -> TableViewSingleSectionBinder<C, S>
+        -> TableViewModelSingleSectionBinder<C, S, M>
     {
         super.bind(footerTitle: footerTitle)
         return self

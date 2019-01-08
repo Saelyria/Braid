@@ -63,7 +63,18 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     @discardableResult
     public override func bind<H>(
         headerType: H.Type,
-        viewModels: @escaping () -> [S : H.ViewModel])
+        viewModels: [S : H.ViewModel?])
+        -> TableViewModelMultiSectionBinder<C, S, M>
+        where H : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
+    {
+        super.bind(headerType: headerType, viewModels: viewModels)
+        return self
+    }
+    
+    @discardableResult
+    public override func bind<H>(
+        headerType: H.Type,
+        viewModels: @escaping () -> [S : H.ViewModel?])
         -> TableViewModelMultiSectionBinder<C, S, M>
         where H : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
     {
@@ -73,7 +84,16 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     
     @discardableResult
     public override func bind(
-        headerTitles: @escaping () -> [S : String])
+        headerTitles: [S : String?])
+        -> TableViewModelMultiSectionBinder<C, S, M>
+    {
+        super.bind(headerTitles: headerTitles)
+        return self
+    }
+    
+    @discardableResult
+    public override func bind(
+        headerTitles: @escaping () -> [S : String?])
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
         super.bind(headerTitles: headerTitles)
@@ -83,7 +103,18 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     @discardableResult
     public override func bind<F>(
         footerType: F.Type,
-        viewModels: @escaping () -> [S : F.ViewModel])
+        viewModels: [S : F.ViewModel?])
+        -> TableViewModelMultiSectionBinder<C, S, M>
+        where F : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
+    {
+        super.bind(footerType: footerType, viewModels: viewModels)
+        return self
+    }
+    
+    @discardableResult
+    public override func bind<F>(
+        footerType: F.Type,
+        viewModels: @escaping () -> [S : F.ViewModel?])
         -> TableViewModelMultiSectionBinder<C, S, M>
         where F : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
     {
@@ -93,7 +124,16 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     
     @discardableResult
     public override func bind(
-        footerTitles: @escaping () -> [S : String])
+        footerTitles: [S : String?])
+        -> TableViewModelMultiSectionBinder<C, S, M>
+    {
+        super.bind(footerTitles: footerTitles)
+        return self
+    }
+    
+    @discardableResult
+    public override func bind(
+        footerTitles: @escaping () -> [S : String?])
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
         super.bind(footerTitles: footerTitles)

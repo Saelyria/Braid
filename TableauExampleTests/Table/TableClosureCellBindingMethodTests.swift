@@ -1,11 +1,10 @@
 import UIKit
 @testable import Tableau
 import Nimble
-import RxSwift
 
-/// Cell binding test for RxSwift binding methods
+/// Cell binding test for non-RxSwift, updatable (i.e. using closures) binding methods
 
-class TableRxCellBindingMethods: TableTestCase {
+class TableClosureCellBindingMethodTests: TableTestCase {
     enum Section: TableViewSection {
         case first
         case second
@@ -30,14 +29,13 @@ class TableRxCellBindingMethods: TableTestCase {
         var dequeuedCells: [Section: [UITableViewCell]] = [.first: [], .second: [], .third: [], .fourth: []]
         var models: [Section: [String]] = [.first: [], .second: [], .third: [], .fourth: []]
         
-        let firstModels: BehaviorSubject<[String]> =  BehaviorSubject(value: ["1-1", "1-2"])
-        let secondThirdModels: BehaviorSubject<[Section: [String]]>
-            = BehaviorSubject(value: [.second: ["2-1", "2-2"], .third: ["3-1", "3-2"]])
-        let fourthModels: BehaviorSubject<[Section: [String]]>
-            = BehaviorSubject(value: [.fourth: ["4-1", "4-2"]])
+        var firstModels = ["1-1", "1-2"]
+        var secondModels = ["2-1", "2-2"]
+        var thirdModels = ["3-1", "3-2"]
+        var fourthModels = ["4-1", "4-2"]
         
         self.binder.onSection(.first)
-            .rx.bind(cellType: TestCell.self, models: firstModels.asObservable())
+            .bind(cellType: TestCell.self, models: { firstModels })
             .onCellDequeue { row, cell, model in
                 if dequeuedCells[.first]?.indices.contains(row) == false {
                     dequeuedCells[.first]?.insert(cell, at: row)
@@ -46,10 +44,13 @@ class TableRxCellBindingMethods: TableTestCase {
                     dequeuedCells[.first]?[row] = cell
                     models[.first]?[row] = model
                 }
-        }
+            }
         
         self.binder.onSections(.second, .third)
-            .rx.bind(cellType: TestCell.self, models: secondThirdModels)
+            .bind(cellType: TestCell.self, models: {[
+                .second: secondModels,
+                .third: thirdModels
+            ]})
             .onCellDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
@@ -58,10 +59,12 @@ class TableRxCellBindingMethods: TableTestCase {
                     dequeuedCells[section]?[row] = cell
                     models[section]?[row] = model
                 }
-        }
+            }
         
         self.binder.onAllOtherSections()
-            .rx.bind(cellType: TestCell.self, models: fourthModels)
+            .bind(cellType: TestCell.self, models: {[
+                .fourth: fourthModels
+            ]})
             .onCellDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
@@ -70,7 +73,7 @@ class TableRxCellBindingMethods: TableTestCase {
                     dequeuedCells[section]?[row] = cell
                     models[section]?[row] = model
                 }
-        }
+            }
         
         self.binder.onAnySection().cellHeight { _,_ in 2 }
         
@@ -111,12 +114,11 @@ class TableRxCellBindingMethods: TableTestCase {
         expect(models[.fourth]?[safe: 1]).toEventually(equal("4-2"))
         
         // update the models then refresh the table
-        firstModels.on(.next(["1-1", "1-2*", "1-3"]))
-        secondThirdModels.on(.next([
-            .second: ["2-1", "2-2*", "2-3"],
-            .third: ["3-1", "3-2*", "3-3"]
-        ]))
-        fourthModels.on(.next([.fourth: ["4-1", "4-2*", "4-3"]]))
+        firstModels = ["1-1", "1-2*", "1-3"]
+        secondModels = ["2-1", "2-2*", "2-3"]
+        thirdModels = ["3-1", "3-2*", "3-3"]
+        fourthModels = ["4-1", "4-2*", "4-3"]
+        self.binder.refresh()
         
         expect(self.tableView.visibleCells.count).toEventually(equal(12))
         
@@ -169,17 +171,13 @@ class TableRxCellBindingMethods: TableTestCase {
         var dequeuedCells: [Section: [TestViewModelCell]] = [.first: [], .second: [], .third: [], .fourth: []]
         var viewModels: [Section: [TestViewModelCell.ViewModel?]] = [.first: [], .second: [], .third: [], .fourth: []]
         
-        let firstModels: BehaviorSubject<[TestViewModelCell.ViewModel]>
-            = BehaviorSubject(value: ["1-1", "1-2"].map { TestViewModelCell.ViewModel(id: $0) })
-        let secondThirdModels: BehaviorSubject<[Section: [TestViewModelCell.ViewModel]]>
-            = BehaviorSubject(value: [.second: ["2-1", "2-2"].map { TestViewModelCell.ViewModel(id: $0) },
-                                      .third: ["3-1", "3-2"].map { TestViewModelCell.ViewModel(id: $0) }])
-        let fourthModels: BehaviorSubject<[Section: [TestViewModelCell.ViewModel]]>
-            = BehaviorSubject(value: [.fourth: ["4-1", "4-2"].map { TestViewModelCell.ViewModel(id: $0) }])
-
+        var firstModels: [TestViewModelCell.ViewModel] = ["1-1", "1-2"].map { TestViewModelCell.ViewModel(id: $0) }
+        var secondModels: [TestViewModelCell.ViewModel] = ["2-1", "2-2"].map { TestViewModelCell.ViewModel(id: $0) }
+        var thirdModels: [TestViewModelCell.ViewModel] = ["3-1", "3-2"].map { TestViewModelCell.ViewModel(id: $0) }
+        var fourthModels: [TestViewModelCell.ViewModel] = ["4-1", "4-2"].map { TestViewModelCell.ViewModel(id: $0) }
         
         self.binder.onSection(.first)
-            .rx.bind(cellType: TestViewModelCell.self, viewModels: firstModels)
+            .bind(cellType: TestViewModelCell.self, viewModels: { firstModels })
             .onCellDequeue { row, cell in
                 if dequeuedCells[.first]?.indices.contains(row) == false {
                     dequeuedCells[.first]?.insert(cell, at: row)
@@ -188,10 +186,13 @@ class TableRxCellBindingMethods: TableTestCase {
                     dequeuedCells[.first]?[row] = cell
                     viewModels[.first]?[row] = cell.viewModel
                 }
-        }
+            }
         
         self.binder.onSections(.second, .third)
-            .rx.bind(cellType: TestViewModelCell.self, viewModels: secondThirdModels)
+            .bind(cellType: TestViewModelCell.self, viewModels: {[
+                .second: secondModels,
+                .third: thirdModels
+            ]})
             .onCellDequeue { section, row, cell in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
@@ -200,10 +201,12 @@ class TableRxCellBindingMethods: TableTestCase {
                     dequeuedCells[section]?[row] = cell
                     viewModels[section]?[row] = cell.viewModel
                 }
-        }
+            }
         
         self.binder.onAllOtherSections()
-            .rx.bind(cellType: TestViewModelCell.self, viewModels: fourthModels)
+            .bind(cellType: TestViewModelCell.self, viewModels: {[
+                .fourth: fourthModels
+            ]})
             .onCellDequeue { section, row, cell in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
@@ -212,7 +215,7 @@ class TableRxCellBindingMethods: TableTestCase {
                     dequeuedCells[section]?[row] = cell
                     viewModels[section]?[row] = cell.viewModel
                 }
-        }
+            }
         
         self.binder.finish()
         
@@ -251,12 +254,11 @@ class TableRxCellBindingMethods: TableTestCase {
         expect(viewModels[.fourth]?[safe: 1]??.id).toEventually(equal("4-2"))
         
         // update the models then refresh the table
-        firstModels.on(.next(["1-1", "1-2*", "1-3"].map { TestViewModelCell.ViewModel(id: $0) }))
-        secondThirdModels.on(.next([
-            .second: ["2-1", "2-2*", "2-3"].map { TestViewModelCell.ViewModel(id: $0) },
-            .third: ["3-1", "3-2*", "3-3"].map { TestViewModelCell.ViewModel(id: $0) }
-        ]))
-        fourthModels.on(.next([.fourth: ["4-1", "4-2*", "4-3"].map { TestViewModelCell.ViewModel(id: $0) }]))
+        firstModels = ["1-1", "1-2*", "1-3"].map { TestViewModelCell.ViewModel(id: $0) }
+        secondModels = ["2-1", "2-2*", "2-3"].map { TestViewModelCell.ViewModel(id: $0) }
+        thirdModels = ["3-1", "3-2*", "3-3"].map { TestViewModelCell.ViewModel(id: $0) }
+        fourthModels = ["4-1", "4-2*", "4-3"].map { TestViewModelCell.ViewModel(id: $0) }
+        self.binder.refresh()
         
         expect(self.tableView.visibleCells.count).toEventually(equal(12))
         
@@ -310,15 +312,14 @@ class TableRxCellBindingMethods: TableTestCase {
         var models: [Section: [String]] = [.first: [], .second: [], .third: [], .fourth: []]
         var viewModels: [Section: [TestViewModelCell.ViewModel?]] = [.first: [], .second: [], .third: [], .fourth: []]
         
-        let firstModels: BehaviorSubject<[String]> =  BehaviorSubject(value: ["1-1", "1-2"])
-        let secondThirdModels: BehaviorSubject<[Section: [String]]>
-            = BehaviorSubject(value: [.second: ["2-1", "2-2"], .third: ["3-1", "3-2"]])
-        let fourthModels: BehaviorSubject<[Section: [String]]>
-            = BehaviorSubject(value: [.fourth: ["4-1", "4-2"]])
+        var firstModels = ["1-1", "1-2"]
+        var secondModels = ["2-1", "2-2"]
+        var thirdModels = ["3-1", "3-2"]
+        var fourthModels = ["4-1", "4-2"]
         
         self.binder.onSection(.first)
-            .rx.bind(cellType: TestViewModelCell.self,
-                  models: firstModels,
+            .bind(cellType: TestViewModelCell.self,
+                  models: { firstModels },
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0) })
             .onCellDequeue { row, cell, model in
                 if dequeuedCells[.first]?.indices.contains(row) == false {
@@ -330,11 +331,11 @@ class TableRxCellBindingMethods: TableTestCase {
                     models[.first]?[row] = model
                     viewModels[.first]?[row] = cell.viewModel
                 }
-        }
+            }
         
         self.binder.onSections(.second, .third)
-            .rx.bind(cellType: TestViewModelCell.self,
-                  models: secondThirdModels,
+            .bind(cellType: TestViewModelCell.self,
+                  models: {[.second: secondModels, .third: thirdModels ]},
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0) })
             .onCellDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
@@ -346,11 +347,11 @@ class TableRxCellBindingMethods: TableTestCase {
                     models[section]?[row] = model
                     viewModels[section]?[row] = cell.viewModel
                 }
-        }
+            }
         
         self.binder.onAllOtherSections()
-            .rx.bind(cellType: TestViewModelCell.self,
-                  models: fourthModels,
+            .bind(cellType: TestViewModelCell.self,
+                  models: { [.fourth: fourthModels ] },
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0) })
             .onCellDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
@@ -362,7 +363,7 @@ class TableRxCellBindingMethods: TableTestCase {
                     models[section]?[row] = model
                     viewModels[section]?[row] = cell.viewModel
                 }
-        }
+            }
         
         self.binder.finish()
         
@@ -416,12 +417,11 @@ class TableRxCellBindingMethods: TableTestCase {
         expect(models[.fourth]?[safe: 1]).toEventually(equal("4-2"))
         
         // update the models then refresh the table
-        firstModels.on(.next(["1-1", "1-2*", "1-3"]))
-        secondThirdModels.on(.next([
-            .second: ["2-1", "2-2*", "2-3"],
-            .third: ["3-1", "3-2*", "3-3"]
-        ]))
-        fourthModels.on(.next([.fourth: ["4-1", "4-2*", "4-3"]]))
+        firstModels = ["1-1", "1-2*", "1-3"]
+        secondModels = ["2-1", "2-2*", "2-3"]
+        thirdModels = ["3-1", "3-2*", "3-3"]
+        fourthModels = ["4-1", "4-2*", "4-3"]
+        self.binder.refresh()
         
         expect(self.tableView.visibleCells.count).toEventually(equal(12))
         
@@ -493,15 +493,14 @@ class TableRxCellBindingMethods: TableTestCase {
         var dequeuedCells: [Section: [TestCell]] = [.first: [], .second: [], .third: [], .fourth: []]
         var models: [Section: [String]] = [.first: [], .second: [], .third: [], .fourth: []]
         
-        let firstModels: BehaviorSubject<[String]> =  BehaviorSubject(value: ["1-1", "1-2"])
-        let secondThirdModels: BehaviorSubject<[Section: [String]]>
-            = BehaviorSubject(value: [.second: ["2-1", "2-2"], .third: ["3-1", "3-2"]])
-        let fourthModels: BehaviorSubject<[Section: [String]]>
-            = BehaviorSubject(value: [.fourth: ["4-1", "4-2"]])
+        var firstModels = ["1-1", "1-2"]
+        var secondModels = ["2-1", "2-2"]
+        var thirdModels = ["3-1", "3-2"]
+        var fourthModels = ["4-1", "4-2"]
         
         self.binder.onSection(.first)
-            .rx.bind(
-                models: firstModels,
+            .bind(
+                models: { firstModels },
                 cellProvider: { table, row, model in
                     if dequeuedCells[.first]?.indices.contains(row) == false {
                         models[.first]?.insert(model, at: row)
@@ -517,11 +516,11 @@ class TableRxCellBindingMethods: TableTestCase {
                 } else {
                     dequeuedCells[.first]?[row] = cell as! TestCell
                 }
-        }
+            }
         
         self.binder.onSections(.second, .third)
-            .rx.bind(
-                models: secondThirdModels,
+            .bind(
+                models: { [.second: secondModels, .third: thirdModels] },
                 cellProvider: { (table, section, row, model: String) in
                     if dequeuedCells[section]?.indices.contains(row) == false {
                         models[section]?.insert(model, at: row)
@@ -537,11 +536,11 @@ class TableRxCellBindingMethods: TableTestCase {
                 } else {
                     dequeuedCells[section]?[row] = cell as! TestCell
                 }
-        }
+            }
         
         self.binder.onAllOtherSections()
-            .rx.bind(
-                models: fourthModels,
+            .bind(
+                models: { [.fourth: fourthModels] },
                 cellProvider: { (table, section, row, model: String) in
                     if dequeuedCells[section]?.indices.contains(row) == false {
                         models[section]?.insert(model, at: row)
@@ -557,7 +556,7 @@ class TableRxCellBindingMethods: TableTestCase {
                 } else {
                     dequeuedCells[section]?[row] = cell as! TestCell
                 }
-        }
+            }
         
         self.binder.finish()
         
@@ -596,12 +595,11 @@ class TableRxCellBindingMethods: TableTestCase {
         expect(models[.fourth]?[safe: 1]).toEventually(equal("4-2"))
         
         // update the models then refresh the table
-        firstModels.on(.next(["1-1", "1-2*", "1-3"]))
-        secondThirdModels.on(.next([
-            .second: ["2-1", "2-2*", "2-3"],
-            .third: ["3-1", "3-2*", "3-3"]
-        ]))
-        fourthModels.on(.next([.fourth: ["4-1", "4-2*", "4-3"]]))
+        firstModels = ["1-1", "1-2*", "1-3"]
+        secondModels = ["2-1", "2-2*", "2-3"]
+        thirdModels = ["3-1", "3-2*", "3-3"]
+        fourthModels = ["4-1", "4-2*", "4-3"]
+        self.binder.refresh()
         
         expect(self.tableView.visibleCells.count).toEventually(equal(12))
         
@@ -653,16 +651,12 @@ class TableRxCellBindingMethods: TableTestCase {
         
         var dequeuedCells: [Section: [TestCell]] = [.first: [], .second: [], .third: [], .fourth: []]
         
-        let firstNumCells: BehaviorSubject<Int> = BehaviorSubject(value: 2)
-        let secondThirdNumCells: BehaviorSubject<[Section: Int]>
-            = BehaviorSubject(value: [.second: 2, .third: 2])
-        let fourthNumCells: BehaviorSubject<[Section: Int]>
-            = BehaviorSubject(value: [.fourth: 2])
+        var numberOfCells = 2
         
         self.binder.onSection(.first)
-            .rx.bind(cellProvider: { table, row in
+            .bind(cellProvider: { table, row in
                 return table.dequeue(TestCell.self)
-            }, numberOfCells: firstNumCells)
+            }, numberOfCells: { numberOfCells })
             .onCellDequeue { row, cell in
                 if dequeuedCells[.first]?.indices.contains(row) == false {
                     dequeuedCells[.first]?.insert(cell as! TestCell, at: row)
@@ -672,28 +666,28 @@ class TableRxCellBindingMethods: TableTestCase {
         }
         
         self.binder.onSections(.second, .third)
-            .rx.bind(cellProvider: { table, section, row in
+            .bind(cellProvider: { table, section, row in
                 return table.dequeue(TestCell.self)
-            }, numberOfCells: secondThirdNumCells)
+            }, numberOfCells: {[.second: numberOfCells, .third: numberOfCells]})
             .onCellDequeue { section, row, cell in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell as! TestCell, at: row)
                 } else {
                     dequeuedCells[section]?[row] = cell as! TestCell
                 }
-        }
+            }
         
         self.binder.onAllOtherSections()
-            .rx.bind(cellProvider: { table, section, row in
+            .bind(cellProvider: { table, section, row in
                 return table.dequeue(TestCell.self)
-            }, numberOfCells: fourthNumCells)
+            }, numberOfCells: {[.fourth: numberOfCells]})
             .onCellDequeue { section, row, cell in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell as! TestCell, at: row)
                 } else {
                     dequeuedCells[section]?[row] = cell as! TestCell
                 }
-        }
+            }
         
         self.binder.finish()
         
@@ -715,9 +709,8 @@ class TableRxCellBindingMethods: TableTestCase {
         expect(dequeuedCells[.fourth]?[0]).toEventually(be(self.tableView.visibleCells[6]))
         expect(dequeuedCells[.fourth]?[1]).toEventually(be(self.tableView.visibleCells[7]))
         
-        firstNumCells.on(.next(3))
-        secondThirdNumCells.on(.next([.second: 3, .third: 3]))
-        fourthNumCells.on(.next([.fourth: 3]))
+        numberOfCells = 3
+        self.binder.refresh()
         
         expect(self.tableView.visibleCells.count).toEventually(equal(12))
         

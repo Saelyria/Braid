@@ -257,7 +257,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     }
     
     public func refresh() {
-        for updater in self.handlers.cellModelUpdaters {
+        for updater in self.handlers.modelUpdaters {
             updater()
         }
     }
