@@ -78,6 +78,14 @@ internal extension SectionedTableViewBinder {
      - parameter affectedSections: The section scope affected by this update.
      */
     func updateHeaderTitles(_ titles: [S: String?], affectedSections: SectionBindingScope<S>) {
+        self.nextDataModel.headerTitleBound = true
+        
+        switch affectedSections {
+        case .forNamedSections(let sections):
+            self.nextDataModel.uniquelyBoundHeaderSections.append(contentsOf: sections)
+        default: break
+        }
+        
         let nonNilTitles: [S: String] = titles.filter { $0.value != nil }.mapValues { return $0! }
         self.update(fromDataIn: nonNilTitles,
                     updatingProperty: &self.nextDataModel.sectionHeaderTitles,
@@ -92,6 +100,8 @@ internal extension SectionedTableViewBinder {
      - parameter affectedSections: The section scope affected by this update.
      */
     func updateHeaderViewModels(_ viewModels: [S: Any?], affectedSections: SectionBindingScope<S>) {
+        self.nextDataModel.headerViewBound = true
+        
         let nonNilViewModels: [S: Any] = viewModels.filter { $0.value != nil }.mapValues { return $0! }
         self.update(fromDataIn: nonNilViewModels,
                     updatingProperty: &self.nextDataModel.sectionHeaderViewModels,
@@ -106,6 +116,14 @@ internal extension SectionedTableViewBinder {
      - parameter affectedSections: The section scope affected by this update.
      */
     func updateFooterTitles(_ titles: [S: String?], affectedSections: SectionBindingScope<S>) {
+        self.nextDataModel.footerTitleBound = true
+        
+        switch affectedSections {
+        case .forNamedSections(let sections):
+            self.nextDataModel.uniquelyBoundFooterSections.append(contentsOf: sections)
+        default: break
+        }
+        
         let nonNilTitles: [S: String] = titles.filter { $0.value != nil }.mapValues { return $0! }
         self.update(fromDataIn: nonNilTitles,
                     updatingProperty: &self.nextDataModel.sectionFooterTitles,
@@ -120,6 +138,8 @@ internal extension SectionedTableViewBinder {
      - parameter affectedSections: The section scope affected by this update.
      */
     func updateFooterViewModels(_ viewModels: [S: Any?], affectedSections: SectionBindingScope<S>) {
+        self.nextDataModel.footerViewBound = true
+        
         let nonNilViewModels: [S: Any] = viewModels.filter { $0.value != nil }.mapValues { return $0! }
         self.update(fromDataIn: nonNilViewModels,
                     updatingProperty: &self.nextDataModel.sectionFooterViewModels,

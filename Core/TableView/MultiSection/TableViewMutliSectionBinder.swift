@@ -692,14 +692,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind(
         headerTitles: @escaping () -> [S: String?])
         -> TableViewMutliSectionBinder<C, S>
-    {
-        self.binder.nextDataModel.headerTitleBound = true
-        switch self.affectedSectionScope {
-        case .forNamedSections(let sections):
-            self.binder.nextDataModel.uniquelyBoundHeaderSections.append(contentsOf: sections)
-        default: break
-        }
-        
+    {        
         let scope = self.affectedSectionScope
         self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
             binder?.updateHeaderTitles(headerTitles(), affectedSections: scope)

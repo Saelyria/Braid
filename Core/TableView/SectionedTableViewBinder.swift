@@ -361,6 +361,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      after which point no further binding can be done on the table with the binder's `onSection` methods.
     */
     public func finish() {
+        // make sure 'refresh' is always called first, especially before the 'data source delegate' is created
         self.refresh()
         self.applyDisplayedSectionBehavior()
         self.hasFinishedBinding = true
