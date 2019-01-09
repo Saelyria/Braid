@@ -121,7 +121,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         let scope = self.affectedSectionScope
-        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
             binder?.updateCellModels(nil, viewModels: viewModels(), affectedSections: scope)
         }
         
@@ -331,7 +331,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         let scope = self.affectedSectionScope
-        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
             var viewModels: [S: [Any]] = [:]
             let _models = models()
             for (s, m) in _models {
@@ -441,7 +441,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         let scope = self.affectedSectionScope
-        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
             binder?.updateCellModels(models(), viewModels: nil, affectedSections: scope)
         }
         
@@ -555,7 +555,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         }
         self.binder.addCellDequeueBlock(cellProvider: _cellProvider, affectedSections: self.affectedSectionScope)
         let scope = self.affectedSectionScope
-        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
             binder?.updateCellModels(models(), viewModels: nil, affectedSections: scope)
         }
         
@@ -601,7 +601,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     {
         self.binder.addCellDequeueBlock(cellProvider: cellProvider, affectedSections: self.affectedSectionScope)
         let scope = self.affectedSectionScope
-        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
             binder?.updateNumberOfCells(numberOfCells(), affectedSections: scope)
         }
         
@@ -625,15 +625,11 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     @discardableResult
     public func bind<H>(
         headerType: H.Type,
-        viewModels: [S: H.ViewModel])
+        viewModels: [S: H.ViewModel?])
         -> TableViewMutliSectionBinder<C, S>
         where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
-        let scope = self.affectedSectionScope
-        self.binder.addHeaderDequeueBlock(headerType: headerType, affectedSections: self.affectedSectionScope)
-        self.binder.updateHeaderViewModels(viewModels, affectedSections: scope)
-        
-        return self
+        return self.bind(headerType: headerType, viewModels: { viewModels })
     }
     
     /**
@@ -651,13 +647,15 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     @discardableResult
     public func bind<H>(
         headerType: H.Type,
-        viewModels: @escaping () -> [S: H.ViewModel])
+        viewModels: @escaping () -> [S: H.ViewModel?])
         -> TableViewMutliSectionBinder<C, S>
         where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
         let scope = self.affectedSectionScope
         self.binder.addHeaderDequeueBlock(headerType: headerType, affectedSections: self.affectedSectionScope)
-        self.binder.updateHeaderViewModels(viewModels(), affectedSections: scope)
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
+            binder?.updateHeaderViewModels(viewModels(), affectedSections: scope)
+        }
         
         return self
     }
@@ -674,7 +672,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
      */
     @discardableResult
     public func bind(
-        headerTitles: [S: String])
+        headerTitles: [S: String?])
         -> TableViewMutliSectionBinder<C, S>
     {
         return self.bind(headerTitles: { headerTitles })
@@ -692,17 +690,13 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
      */
     @discardableResult
     public func bind(
-        headerTitles: @escaping () -> [S: String])
+        headerTitles: @escaping () -> [S: String?])
         -> TableViewMutliSectionBinder<C, S>
-    {
-        self.binder.nextDataModel.headerTitleBound = true
-        switch self.affectedSectionScope {
-        case .forNamedSections(let sections):
-            self.binder.nextDataModel.uniquelyBoundHeaderSections.append(contentsOf: sections)
-        default: break
+    {        
+        let scope = self.affectedSectionScope
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
+            binder?.updateHeaderTitles(headerTitles(), affectedSections: scope)
         }
-        
-        self.binder.updateHeaderTitles(headerTitles(), affectedSections: self.affectedSectionScope)
         return self
     }
     
@@ -721,7 +715,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     @discardableResult
     public func bind<F>(
         footerType: F.Type,
-        viewModels: [S: F.ViewModel])
+        viewModels: [S: F.ViewModel?])
         -> TableViewMutliSectionBinder<C, S>
         where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
@@ -743,13 +737,15 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     @discardableResult
     public func bind<F>(
         footerType: F.Type,
-        viewModels: @escaping () -> [S: F.ViewModel])
+        viewModels: @escaping () -> [S: F.ViewModel?])
         -> TableViewMutliSectionBinder<C, S>
         where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
         let scope = self.affectedSectionScope
         self.binder.addFooterDequeueBlock(footerType: footerType, affectedSections: self.affectedSectionScope)
-        self.binder.updateFooterViewModels(viewModels(), affectedSections: scope)
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
+            binder?.updateFooterViewModels(viewModels(), affectedSections: scope)
+        }
         
         return self
     }
@@ -766,7 +762,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
      */
     @discardableResult
     public func bind(
-        footerTitles: [S: String])
+        footerTitles: [S: String?])
         -> TableViewMutliSectionBinder<C, S>
     {
         return self.bind(footerTitles: { footerTitles })
@@ -784,16 +780,18 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
      */
     @discardableResult
     public func bind(
-        footerTitles: @escaping () -> [S: String])
+        footerTitles: @escaping () -> [S: String?])
         -> TableViewMutliSectionBinder<C, S>
     {
-        let scope = self.affectedSectionScope
         switch self.affectedSectionScope {
         case .forNamedSections(let sections):
             self.binder.nextDataModel.uniquelyBoundFooterSections.append(contentsOf: sections)
         default: break
         }
-        self.binder.updateFooterTitles(footerTitles(), affectedSections: scope)
+        let scope = self.affectedSectionScope
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
+            binder?.updateFooterTitles(footerTitles(), affectedSections: scope)
+        }
         
         return self
     }

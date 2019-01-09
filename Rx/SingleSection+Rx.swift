@@ -405,13 +405,10 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
-        
-        bindResult.binder.nextDataModel.headerTitleBound = true
-        
+                
         let section = bindResult.section
         headerTitle
             .subscribeOn(MainScheduler.instance)
-            .distinctUntilChanged()
             .subscribe(onNext: { [weak binder = bindResult.binder] (title: String?) in
                 let scope: SectionBindingScope<Base.S> = .forNamedSections([section])
                 binder?.updateHeaderTitles([section: title], affectedSections: scope)
@@ -455,13 +452,10 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
-        
-        bindResult.binder.nextDataModel.footerTitleBound = true
-        
+                
         let section = bindResult.section
         footerTitle
             .subscribeOn(MainScheduler.instance)
-            .distinctUntilChanged()
             .subscribe(onNext: { [weak binder = bindResult.binder] (title: String?) in
                 let scope: SectionBindingScope<Base.S> = .forNamedSections([section])
                 binder?.updateFooterTitles([section: title], affectedSections: scope)

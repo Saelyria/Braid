@@ -131,7 +131,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         let section = self.section
         let scope = self.affectedSectionScope
-        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
             binder?.updateCellModels(nil, viewModels: [section: viewModels()], affectedSections: scope)
         }
         
@@ -334,7 +334,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         let section = self.section
         let scope = self.affectedSectionScope
-        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
             let _models = models()
             let viewModels = [section: _models.map(mapToViewModels)]
             binder?.updateCellModels([section: _models], viewModels: viewModels, affectedSections: scope)
@@ -438,7 +438,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         let section = self.section
         let scope = self.affectedSectionScope
-        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
             let _models = models()
             binder?.updateCellModels([section: _models], viewModels: nil, affectedSections: scope)
         }
@@ -549,7 +549,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         self.binder.addCellDequeueBlock(cellProvider: _cellProvider, affectedSections: self.affectedSectionScope)
         let section = self.section
         let scope = self.affectedSectionScope
-        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
             let _models = models()
             binder?.updateCellModels([section: _models], viewModels: nil, affectedSections: scope)
         }
@@ -593,7 +593,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         self.binder.addCellDequeueBlock(cellProvider: cellProvider, affectedSections: self.affectedSectionScope)
         let section = self.section
         let scope = self.affectedSectionScope
-        self.binder.handlers.cellModelUpdaters.append { [weak binder = self.binder] in
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
             binder?.updateNumberOfCells([section: numberOfCells()], affectedSections: scope)
         }
         
@@ -660,8 +660,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     {
         self.binder.handlers.sectionHeaderViewModelProviders[self.section] = viewModel
         self.binder.addHeaderDequeueBlock(headerType: headerType, affectedSections: self.affectedSectionScope)
-        self.binder.updateHeaderViewModels([self.section: viewModel()], affectedSections: self.affectedSectionScope)
-        
+        let scope = self.affectedSectionScope
+        let section = self.section
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
+            binder?.updateHeaderViewModels([section: viewModel()], affectedSections: scope)
+        }
         return self
     }
     
@@ -700,9 +703,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     {
         self.binder.handlers.sectionHeaderTitleProviders[self.section] = headerTitle
         self.binder.nextDataModel.uniquelyBoundHeaderSections.append(self.section)
-        self.binder.nextDataModel.headerTitleBound = true
-        self.binder.updateHeaderTitles([self.section: headerTitle()], affectedSections: self.affectedSectionScope)
-        
+        let scope = self.affectedSectionScope
+        let section = self.section
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
+            binder?.updateHeaderTitles([section: headerTitle()], affectedSections: scope)
+        }
         return self
     }
     
@@ -741,8 +746,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     {
         self.binder.handlers.sectionFooterViewModelProviders[self.section] = viewModel
         self.binder.addFooterDequeueBlock(footerType: footerType, affectedSections: self.affectedSectionScope)
-        self.binder.updateFooterViewModels([self.section: viewModel()], affectedSections: self.affectedSectionScope)
-        
+        let scope = self.affectedSectionScope
+        let section = self.section
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
+            binder?.updateFooterViewModels([section: viewModel()], affectedSections: scope)
+        }
         return self
     }
     
@@ -781,9 +789,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     {
         self.binder.handlers.sectionFooterTitleProviders[self.section] = footerTitle
         self.binder.nextDataModel.uniquelyBoundFooterSections.append(self.section)
-        self.binder.nextDataModel.footerTitleBound = true
-        self.binder.updateFooterTitles([self.section: footerTitle()], affectedSections: self.affectedSectionScope)
-        
+        let scope = self.affectedSectionScope
+        let section = self.section
+        self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
+            binder?.updateFooterTitles([section: footerTitle()], affectedSections: scope)
+        }
         return self
     }
     

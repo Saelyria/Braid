@@ -367,7 +367,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
     @discardableResult
     public func bind<H>(
         headerType: H.Type,
-        viewModels: Observable<[Base.S: H.ViewModel]>)
+        viewModels: Observable<[Base.S: H.ViewModel?]>)
         -> Base
         where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
@@ -380,7 +380,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         
         viewModels
             .subscribeOn(MainScheduler.instance)
-            .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [Base.S: H.ViewModel]) in
+            .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [Base.S: H.ViewModel?]) in
                 binder?.updateHeaderViewModels(viewModels, affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
@@ -397,8 +397,6 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         }
         let scope = bindResult.affectedSectionScope
         
-        bindResult.binder.nextDataModel.headerTitleBound = true
-        
         headerTitles
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (titles: [Base.S: String?]) in
@@ -414,7 +412,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
     @discardableResult
     public func bind<F>(
         footerType: F.Type,
-        viewModels: Observable<[Base.S: F.ViewModel]>)
+        viewModels: Observable<[Base.S: F.ViewModel?]>)
         -> Base
         where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
     {
@@ -427,7 +425,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
         
         viewModels
             .subscribeOn(MainScheduler.instance)
-            .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [Base.S: F.ViewModel]) in
+            .subscribe(onNext: { [weak binder = bindResult.binder] (viewModels: [Base.S: F.ViewModel?]) in
                 binder?.updateFooterViewModels(viewModels, affectedSections: scope)
             }).disposed(by: bindResult.binder.disposeBag)
         
@@ -443,9 +441,7 @@ public extension Reactive where Base: TableViewMutliSectionBinderProtocol {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
         let scope = bindResult.affectedSectionScope
-        
-        bindResult.binder.nextDataModel.footerTitleBound = true
-        
+                
         footerTitles
             .subscribeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak binder = bindResult.binder] (titles: [Base.S: String?]) in

@@ -35,7 +35,7 @@ class HomeViewController: UIViewController {
             dict[section] = section.title
         }) }
     }
-    private var footerViewModels: Observable<[Section: SectionHeaderView.ViewModel]> {
+    private var footerViewModels: Observable<[Section: SectionHeaderView.ViewModel?]> {
         return self.sections.map { $0.reduce(into: [:], { (dict, section) in
             if let title = section.footer {
                 dict[section] = SectionHeaderView.ViewModel(title: title)

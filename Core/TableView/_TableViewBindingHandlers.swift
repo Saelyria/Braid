@@ -18,7 +18,7 @@ class _TableViewBindingHandlers<S: TableViewSection> {
     // Cell handlers
     
     // Closures that will update the data on the binder's data model when 'refresh' is called
-    lazy var cellModelUpdaters: [() -> Void] = { [] }()
+    lazy var modelUpdaters: [() -> Void] = { [] }()
     
     // Closures to call to dequeue a cell in a section.
     lazy var sectionCellDequeueBlocks: [S: CellDequeueBlock<S>] = { [:] }()
