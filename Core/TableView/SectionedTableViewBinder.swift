@@ -289,14 +289,14 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      
      - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
      */
-    public func onSections(_ sections: S...) -> TableViewMutliSectionBinder<UITableViewCell, S> {
+    public func onSections(_ sections: S...) -> TableViewMultiSectionBinder<UITableViewCell, S> {
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
         guard sections.isEmpty == false else {
             fatalError("The given 'sections' array to begin a binding chain was empty.")
         }
-        return TableViewMutliSectionBinder<UITableViewCell, S>(binder: self, sections: sections)
+        return TableViewMultiSectionBinder<UITableViewCell, S>(binder: self, sections: sections)
     }
 
     /**
@@ -329,11 +329,11 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      
      - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
      */
-    public func onAllSections() -> TableViewMutliSectionBinder<UITableViewCell, S> {
+    public func onAllSections() -> TableViewMultiSectionBinder<UITableViewCell, S> {
         guard !self.hasFinishedBinding else {
             fatalError("This table view binder has finished binding - additional binding must occur before its `finish()` method is called.")
         }
-        return TableViewMutliSectionBinder<UITableViewCell, S>(binder: self, sections: nil)
+        return TableViewMultiSectionBinder<UITableViewCell, S>(binder: self, sections: nil)
     }
     
     /**
@@ -350,7 +350,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      
      - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
      */
-    public func onAllOtherSections() -> TableViewMutliSectionBinder<UITableViewCell, S> {
+    public func onAllOtherSections() -> TableViewMultiSectionBinder<UITableViewCell, S> {
         return self.onAllSections()
     }
     

@@ -8,7 +8,7 @@ import UIKit
  reference to this object should not be kept and should only be used in a binding chain.
  */
 public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSection, M>
-    : TableViewMutliSectionBinder<C, S>
+    : TableViewMultiSectionBinder<C, S>
 { 
     @discardableResult
     public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C, _ model: M) -> Void)

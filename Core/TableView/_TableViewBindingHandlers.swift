@@ -13,7 +13,7 @@ typealias CellHeightBlock<S: TableViewSection> = (S, Int) -> CGFloat
 /// A closure type that returns the height for a table header/footer when given a section.
 typealias HeaderFooterHeightBlock<S: TableViewSection> = (S) -> CGFloat
 
-typealias ViewEventEmittingHandler = (Int, UITableViewCell, _ event: Any) -> Void
+typealias ViewEventEmittingHandler<S: TableViewSection> = (S, Int, UITableViewCell, _ event: Any) -> Void
 
 /// An object that stores the various handlers the binder uses.
 class _TableViewBindingHandlers<S: TableViewSection> {
@@ -45,8 +45,8 @@ class _TableViewBindingHandlers<S: TableViewSection> {
     // Handlers for custom cell view events in a section. Each section has another dictionary under it where the key is
     // a string describing a cell type that has view events, and the value is the handler associated with it that is
     // called whenever a cell of that type in the section emits an event.
-    lazy var sectionViewEventHandlers: [S: [String: ViewEventEmittingHandler]] = { [:] }()
-    lazy var dynamicSectionViewEventHandler: [String: ViewEventEmittingHandler] = { [:] }()
+    lazy var sectionViewEventHandlers: [S: [String: ViewEventEmittingHandler<S>]] = { [:] }()
+    lazy var dynamicSectionViewEventHandler: [String: ViewEventEmittingHandler<S>] = { [:] }()
     
     // The prefetch behaviour for a section.
     lazy var sectionPrefetchBehavior: [S: PrefetchBehavior] = { [:] }()

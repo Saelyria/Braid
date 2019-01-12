@@ -4,7 +4,7 @@ import Tableau
 class TextViewTableViewCell: UITableViewCell, ViewEventEmitting, UINibInitable, ReuseIdentifiable {
     enum ViewEvent {
         case textEntryStarted
-        case textEntered(String)
+        case textEntered(text: String)
         case textEntryEnded
     }
     
@@ -36,7 +36,7 @@ extension TextViewTableViewCell: UITextViewDelegate {
     }
     
     func textViewDidChange(_ textView: UITextView) {
-        self.emit(event: .textEntered(textView.text))
+        self.emit(event: .textEntered(text: textView.text))
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {

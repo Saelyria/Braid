@@ -184,9 +184,9 @@
 				93C36A4720DAFF97006B7ECF /* SamplesViewController.swift */,
 				AB577B98217596AF00CD2363 /* Sample 1 - Accounts */,
 				AB577BA02176444000CD2363 /* Sample 2 - Artists & Songs */,
-				AB577BA82179662400CD2363 /* Sample 3 - Dynamic Home Page */,
+				ABC1AD1C21E6BF3E00BAC644 /* Sample 3 - Form */,
 				ABE0F35D21B49DC10098950D /* Sample 4 - News Feed */,
-				ABC1AD1C21E6BF3E00BAC644 /* Sample 5 - Form */,
+				AB577BA82179662400CD2363 /* Sample 5 - Dynamic Home Page */,
 				AB577B9D21759F8B00CD2363 /* Shared Views */,
 				9381334F20B6EDFA00CBF8F6 /* Resources */,
 				938132E320B6463200CBF8F6 /* Info.plist */,
@@ -237,7 +237,7 @@
 			path = "Sample 2 - Artists & Songs";
 			sourceTree = "<group>";
 		};
-		AB577BA82179662400CD2363 /* Sample 3 - Dynamic Home Page */ = {
+		AB577BA82179662400CD2363 /* Sample 5 - Dynamic Home Page */ = {
 			isa = PBXGroup;
 			children = (
 				AB577BD02183D70B00CD2363 /* README.md */,
@@ -247,17 +247,17 @@
 				AB577BD32183D8C200CD2363 /* Store.swift */,
 				ABE0F35721AD10340098950D /* Mocks */,
 			);
-			path = "Sample 3 - Dynamic Home Page";
+			path = "Sample 5 - Dynamic Home Page";
 			sourceTree = "<group>";
 		};
-		ABC1AD1C21E6BF3E00BAC644 /* Sample 5 - Form */ = {
+		ABC1AD1C21E6BF3E00BAC644 /* Sample 3 - Form */ = {
 			isa = PBXGroup;
 			children = (
 				ABC1AD1F21E7268100BAC644 /* Cells */,
 				ABC1AD1D21E6BF5200BAC644 /* FormViewController.swift */,
 				ABC1AD2421E87BCD00BAC644 /* FormData.swift */,
 			);
-			path = "Sample 5 - Form";
+			path = "Sample 3 - Form";
 			sourceTree = "<group>";
 		};
 		ABC1AD1F21E7268100BAC644 /* Cells */ = {

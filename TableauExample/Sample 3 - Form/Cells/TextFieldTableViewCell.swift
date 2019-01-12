@@ -4,7 +4,7 @@ import Tableau
 class TextFieldTableViewCell: UITableViewCell, ViewEventEmitting, UINibInitable, ReuseIdentifiable {
     enum ViewEvent {
         case textEntryStarted
-        case textEntered(String)
+        case textEntered(text: String)
         case textEntryEnded
     }
     

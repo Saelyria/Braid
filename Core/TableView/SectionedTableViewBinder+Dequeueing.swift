@@ -29,13 +29,13 @@ internal extension SectionedTableViewBinder {
                         eventCell.eventEmitHandler = { cell, event in
                             guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
                             let hashCellName = String(reflecting: type(of: eventCell))
-                            binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(indexPath.row, cell, event)
+                            binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, indexPath.row, cell, event)
                         }
                     } else {
                         eventCell.eventEmitHandler = { cell, event in
                             guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
                             let hashCellName = String(reflecting: type(of: eventCell))
-                            binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(indexPath.row, cell, event)
+                            binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, indexPath.row, cell, event)
                         }
                     }
                 }
@@ -72,13 +72,13 @@ internal extension SectionedTableViewBinder {
                         eventCell.eventEmitHandler = { cell, event in
                             guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
                             let hashCellName = String(reflecting: type(of: eventCell))
-                            binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(indexPath.row, cell, event)
+                            binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, indexPath.row, cell, event)
                         }
                     } else {
                         eventCell.eventEmitHandler = { cell, event in
                             guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
                             let hashCellName = String(reflecting: type(of: eventCell))
-                            binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(indexPath.row, cell, event)
+                            binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, indexPath.row, cell, event)
                         }
                     }
                 }
@@ -117,13 +117,13 @@ internal extension SectionedTableViewBinder {
                     eventCell.eventEmitHandler = { cell, event in
                         guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
                         let hashCellName = String(reflecting: type(of: eventCell))
-                        binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(indexPath.row, cell, event)
+                        binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, indexPath.row, cell, event)
                     }
                 } else {
                     eventCell.eventEmitHandler = { cell, event in
                         guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
                         let hashCellName = String(reflecting: type(of: eventCell))
-                        binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(indexPath.row, cell, event)
+                        binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, indexPath.row, cell, event)
                     }
                 }
             }
@@ -131,6 +131,24 @@ internal extension SectionedTableViewBinder {
             return cell
         }
         self.addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
+    }
+    
+    private func setEventCallback(onCell cell: UITableViewCell, section: S, row: Int) {
+        if let eventCell = cell as? UITableViewCell & AnyViewEventEmitting {
+            if self.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
+                eventCell.eventEmitHandler = { cell, event in
+                    guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
+                    let hashCellName = String(reflecting: type(of: eventCell))
+                    self.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, row, cell, event)
+                }
+            } else {
+                eventCell.eventEmitHandler = { cell, event in
+                    guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
+                    let hashCellName = String(reflecting: type(of: eventCell))
+                    self.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, row, cell, event)
+                }
+            }
+        }
     }
     
     /**
@@ -158,13 +176,13 @@ internal extension SectionedTableViewBinder {
                     eventCell.eventEmitHandler = { cell, event in
                         guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
                         let hashCellName = String(reflecting: type(of: eventCell))
-                        binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(indexPath.row, cell, event)
+                        binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, indexPath.row, cell, event)
                     }
                 } else {
                     eventCell.eventEmitHandler = { cell, event in
                         guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
                         let hashCellName = String(reflecting: type(of: eventCell))
-                        binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(indexPath.row, cell, event)
+                        binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, indexPath.row, cell, event)
                     }
                 }
             }
@@ -224,14 +242,36 @@ internal extension SectionedTableViewBinder {
         handler: @escaping (_ row: Int, _ cell: C, _ event: C.ViewEvent) -> Void,
         affectedSections: SectionBindingScope<S>)
     {
-        let unsafeHandler: (Int, UITableViewCell, Any) -> Void = { row, cell, event in
+        let unsafeHandler: (S, Int, UITableViewCell, Any) -> Void = { _, row, cell, event in
             guard let cell = cell as? C, let event = event as? C.ViewEvent else {
                 assertionFailure("Didn't get the expected cell or event type, something went awry!")
                 return
             }
             handler(row, cell, event)
         }
-        
+        self._addEventEmittingHandler(cellType: cellType, handler: unsafeHandler, affectedSections: affectedSections)
+    }
+    
+    func addEventEmittingHandler<C: UITableViewCell & ViewEventEmitting>(
+        cellType: C.Type,
+        handler: @escaping (_ section: S, _ row: Int, _ cell: C, _ event: C.ViewEvent) -> Void,
+        affectedSections: SectionBindingScope<S>)
+    {
+        let unsafeHandler: (S, Int, UITableViewCell, Any) -> Void = { section, row, cell, event in
+            guard let cell = cell as? C, let event = event as? C.ViewEvent else {
+                assertionFailure("Didn't get the expected cell or event type, something went awry!")
+                return
+            }
+            handler(section, row, cell, event)
+        }
+        self._addEventEmittingHandler(cellType: cellType, handler: unsafeHandler, affectedSections: affectedSections)
+    }
+    
+    private func _addEventEmittingHandler<C: UITableViewCell & ViewEventEmitting>(
+        cellType: C.Type,
+        handler: @escaping (S, Int, UITableViewCell, Any) -> Void,
+        affectedSections: SectionBindingScope<S>)
+    {
         let hashCellName = String(reflecting: cellType)
         switch affectedSections {
         case .forNamedSections(let sections):
@@ -239,10 +279,10 @@ internal extension SectionedTableViewBinder {
                 if self.handlers.sectionViewEventHandlers[section] == nil {
                     self.handlers.sectionViewEventHandlers[section] = [:]
                 }
-                self.handlers.sectionViewEventHandlers[section]?[hashCellName] = unsafeHandler
+                self.handlers.sectionViewEventHandlers[section]?[hashCellName] = handler
             }
         case .forAllUnnamedSections:
-            self.handlers.dynamicSectionViewEventHandler[hashCellName] = unsafeHandler
+            self.handlers.dynamicSectionViewEventHandler[hashCellName] = handler
         case .forAnySection:
             assertionFailure("Can't add event handling blocks for 'any section'")
         }

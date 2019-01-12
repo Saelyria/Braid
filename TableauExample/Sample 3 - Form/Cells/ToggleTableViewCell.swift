@@ -6,10 +6,18 @@ class ToggleTableViewCell: UITableViewCell, ViewEventEmitting, UINibInitable, Re
         case switchToggled(state: Bool)
     }
     
+    var isOn: Bool = false {
+        didSet {
+            guard self.toggle != nil else { return }
+            self.toggle.isOn = isOn
+        }
+    }
+    
     var title: String? {
         didSet {
             guard self.titleLabel != nil else { return }
-            self.titleLabel.text = title }
+            self.titleLabel.text = title
+        }
     }
     
     @IBOutlet private weak var toggle: UISwitch!
@@ -18,6 +26,7 @@ class ToggleTableViewCell: UITableViewCell, ViewEventEmitting, UINibInitable, Re
     override func prepareForReuse() {
         super.prepareForReuse()
         self.titleLabel.text = self.title
+        self.toggle.isOn = self.isOn
     }
     
     @IBAction private func switchToggled() {
