@@ -887,4 +887,35 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
             dimension.bindingFunc(self.binder, self.section)
         }
     }
+    
+    @discardableResult
+    public func onEvent<EventCell>(
+        from: EventCell.Type,
+        _ handler: @escaping (_ row: Int, _ cell: EventCell, _ event: EventCell.ViewEvent) -> Void)
+        -> TableViewSingleSectionBinder<C, S>
+        where EventCell: UITableViewCell & ViewEventEmitting
+    {
+        self.binder.addEventEmittingHandler(
+            cellType: EventCell.self, handler: handler, affectedSections: self.affectedSectionScope)
+        
+        return self
+    }
+    
+    public func assuming<M>(modelType: M.Type) -> TableViewModelSingleSectionBinder<C, S, M> {
+        return TableViewModelSingleSectionBinder(binder: self.binder, section: self.section)
+    }
+}
+
+public extension TableViewSingleSectionBinderProtocol where C: ViewEventEmitting {
+    @discardableResult
+    public func onEvent(
+        _ handler: @escaping (_ row: Int, _ cell: C, _ event: C.ViewEvent) -> Void)
+        -> TableViewSingleSectionBinder<C, S>
+    {
+        guard let sectionBinder = self as? TableViewSingleSectionBinder<C, S> else { fatalError() }
+        sectionBinder.binder.addEventEmittingHandler(
+            cellType: C.self, handler: handler, affectedSections: sectionBinder.affectedSectionScope)
+        
+        return sectionBinder
+    }
 }

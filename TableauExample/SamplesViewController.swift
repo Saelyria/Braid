@@ -29,6 +29,12 @@ class SamplesViewController: UIViewController {
             title: "Sample 4 - News Feed",
             subtitle: "A news feed demonstrating infinite scrolling with data prefetching.",
             detail: "",
+            accessoryType: .disclosureIndicator),
+        TitleDetailTableViewCell.ViewModel(
+            collectionId: "5",
+            title: "Sample 5 - Form",
+            subtitle: "A form view demonstrating use of custom cell events.",
+            detail: "",
             accessoryType: .disclosureIndicator)]
     
     override func viewDidLoad() {
@@ -54,6 +60,8 @@ class SamplesViewController: UIViewController {
                     self.navigationController?.pushViewController(HomeViewController(), animated: true)
                 case 3:
                     self.navigationController?.pushViewController(NewsFeedViewController(), animated: true)
+                case 4:
+                    self.navigationController?.pushViewController(FormViewController(), animated: true)
                 default: break
                 }
             }

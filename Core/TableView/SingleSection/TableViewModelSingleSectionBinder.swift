@@ -176,6 +176,39 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     @discardableResult
+    override public func onEvent<EventCell>(
+        from: EventCell.Type,
+        _ handler: @escaping (_ row: Int, _ cell: EventCell, _ event: EventCell.ViewEvent) -> Void)
+        -> TableViewModelSingleSectionBinder<C, S, M>
+        where EventCell: UITableViewCell & ViewEventEmitting
+    {
+        super.onEvent(from: from, handler)
+        return self
+    }
+    
+    @discardableResult
+    public func onEvent<EventCell>(
+        from: EventCell.Type,
+        _ handler: @escaping (_ row: Int, _ cell: EventCell, _ event: EventCell.ViewEvent, _ model: M) -> Void)
+        -> TableViewModelSingleSectionBinder<C, S, M>
+        where EventCell: UITableViewCell & ViewEventEmitting
+    {
+        let section = self.section
+        let modelHandler: (Int, UITableViewCell, Any) -> Void = { [weak binder = self.binder] row, cell, event in
+            guard let cell = cell as? EventCell, let event = event as? EventCell.ViewEvent,
+            let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
+                assertionFailure("ERROR: Cell, event, or model wasn't the right type; something went awry!")
+                return
+            }
+            handler(row, cell, event, model)
+        }
+        self.binder.addEventEmittingHandler(
+            cellType: EventCell.self, handler: modelHandler, affectedSections: self.affectedSectionScope)
+        
+        return self
+    }
+    
+    @discardableResult
     public func dimensions(_ dimensions: SingleSectionModelDimension<S, M>...)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
