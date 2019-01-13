@@ -809,12 +809,12 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      - parameter handler: The closure to be called whenever a cell is dequeued in one of the bound sections.
      - parameter section: The section in which a cell was dequeued.
      - parameter row: The row of the cell that was dequeued.
-     - parameter dequeuedCell: The cell that was dequeued that can now be configured.
+     - parameter cell: The cell that was dequeued that can now be configured.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C) -> Void)
+    public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ cell: C) -> Void)
         -> TableViewMultiSectionBinder<C, S>
     {
         let callback: CellDequeueCallback<S> = { (section: S, row: Int, cell: UITableViewCell) in
@@ -848,12 +848,12 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      - parameter handler: The closure to be called whenever a cell is tapped in the bound section.
      - parameter section: The section in which a cell was tapped.
      - parameter row: The row of the cell that was tapped.
-     - parameter tappedCell: The cell that was tapped.
+     - parameter cell: The cell that was tapped.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C) -> Void)
+    public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ cell: C) -> Void)
         -> TableViewMultiSectionBinder<C, S>
     {
         let callback: CellTapCallback<S> = { (section: S, row: Int, tappedCell: UITableViewCell) in
@@ -873,6 +873,36 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
             self.binder.handlers.dynamicSectionsCellTappedCallback = callback
         default: break
         }
+        
+        return self
+    }
+    
+    /**
+     Adds a handler to be called when a cell of the given type emits a custom view event.
+     
+     To use this method, the given cell type must conform to `ViewEventEmitting`. This protocol has the cell declare an
+     associated `ViewEvent` enum type whose cases define custom events that can be observed from the binding chain.
+     When a cell emits an event via its `emit(event:)` method, the handler given to this method is called with the
+     event and various other objects that allows the view controller to respond.
+     
+     - parameter cellType: The event-emitting cell type to observe events from.
+     - parameter handler: The closure to be called whenever a cell of the given cell type emits a custom event.
+     - parameter section: The section in which a cell emitted an event.
+     - parameter row: The row of the cell that emitted an event.
+     - parameter cell: The cell that emitted an event.
+     - paramter event: The custom event that the cell emitted.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func onEvent<EventCell>(
+        from: EventCell.Type,
+        _ handler: @escaping (_ section: S, _ row: Int, _ cell: EventCell, _ event: EventCell.ViewEvent) -> Void)
+        -> TableViewMultiSectionBinder<C, S>
+        where EventCell: UITableViewCell & ViewEventEmitting
+    {
+        self.binder.addEventEmittingHandler(
+            cellType: EventCell.self, handler: handler, affectedSections: self.affectedSectionScope)
         
         return self
     }
@@ -914,33 +944,17 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
         }
     }
     
-    @discardableResult
-    public func onEvent<EventCell>(
-        from: EventCell.Type,
-        _ handler: @escaping (_ section: S, _ row: Int, _ cell: EventCell, _ event: EventCell.ViewEvent) -> Void)
-        -> TableViewMultiSectionBinder<C, S>
-        where EventCell: UITableViewCell & ViewEventEmitting
-    {
-        self.binder.addEventEmittingHandler(
-            cellType: EventCell.self, handler: handler, affectedSections: self.affectedSectionScope)
-        
-        return self
-    }
-    
+    /**
+     Adds model type information to the binding chain.
+     
+     This method allows model type information to be assumed on any additional binding chains for a section after the
+     binding chain that originally declared the cell and model type. This method will cause a crash if the model type
+     originally bound to the section is not the same type or if the section was not setup with a model type.
+     
+     - returns: A section binder to continue the binding chain with that allows cast model types to be given to items in
+     its chain.
+     */
     public func assuming<M>(modelType: M.Type) -> TableViewModelMultiSectionBinder<C, S, M> {
         return TableViewModelMultiSectionBinder(binder: self.binder, sections: self.sections)
-    }
-}
-
-public extension TableViewMultiSectionBinder where C: ViewEventEmitting {
-    @discardableResult
-    public func onEvent(
-        _ handler: @escaping (_ section: S, _ row: Int, _ cell: C, _ event: C.ViewEvent) -> Void)
-        -> TableViewMultiSectionBinder<C, S>
-    {
-        self.binder.addEventEmittingHandler(
-            cellType: C.self, handler: handler, affectedSections: self.affectedSectionScope)
-        
-        return self
     }
 }

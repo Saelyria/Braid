@@ -5,6 +5,8 @@ internal protocol _TableViewDataModelDelegate: AnyObject {
     func dataModelDidChange()
 }
 
+/// An object that holds all the data for a table view at a given moment. Diffs can be generated between data model
+/// instances to animate table view changes.
 internal class _TableViewDataModel<S: TableViewSection> {
     enum CellDataType {
         case models

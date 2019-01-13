@@ -6,9 +6,6 @@ import UIKit
 internal extension SectionedTableViewBinder {
     /**
      Adds a dequeueing block to the binder for a view model-bindable cell for the given sections or 'any section'.
-     
-     - parameter headerType: The type of cell to be bound.
-     - parameter affectedSections: The section scope that this dequeueing block is used for.
      */
     func addCellDequeueBlock<C>(cellType: C.Type, affectedSections: SectionBindingScope<S>)
         where C: UITableViewCell & ViewModelBindable
@@ -19,15 +16,7 @@ internal extension SectionedTableViewBinder {
             if var cell = binder?.tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as? C,
             let viewModel = (binder?.currentDataModel.sectionCellViewModels[section] as? [C.ViewModel])?[indexPath.row] {
                 cell.viewModel = viewModel
-                
-                // call the 'on cell dequeue' callbacks
-                if binder?.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
-                    binder?.handlers.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
-                } else {
-                    binder?.handlers.dynamicSectionsCellDequeuedCallback?(section, indexPath.row, cell)
-                }
-                binder?.handlers.anySectionCellDequeuedCallback?(section, indexPath.row, cell)
-                
+                binder?.callOnCellDequeue(cell: cell, section: section, row: indexPath.row)
                 binder?.setEventCallback(onCell: cell, section: section, row: indexPath.row)
                 
                 return cell
@@ -36,14 +25,11 @@ internal extension SectionedTableViewBinder {
             return UITableViewCell()
         }
 
-        self.addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
+        self._addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
     }
     
     /**
      Adds a dequeueing block to the binder for a cell for the given sections or 'any section'.
-     
-     - parameter headerType: The type of cell to be bound.
-     - parameter affectedSections: The section scope that this dequeueing block is used for.
      */
     func addCellDequeueBlock<C: UITableViewCell>(
         cellType: C.Type, affectedSections: SectionBindingScope<S>)
@@ -52,13 +38,7 @@ internal extension SectionedTableViewBinder {
             let reuseIdentifier = (cellType as? ReuseIdentifiable.Type)?.reuseIdentifier
                 ?? cellType.classNameReuseIdentifier
             if let cell = binder?.tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as? C {
-                if binder?.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
-                    binder?.handlers.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
-                } else {
-                    binder?.handlers.dynamicSectionsCellDequeuedCallback?(section, indexPath.row, cell)
-                }
-                binder?.handlers.anySectionCellDequeuedCallback?(section, indexPath.row, cell)
-                
+                binder?.callOnCellDequeue(cell: cell, section: section, row: indexPath.row)
                 binder?.setEventCallback(onCell: cell, section: section, row: indexPath.row)
                 
                 return cell
@@ -67,14 +47,11 @@ internal extension SectionedTableViewBinder {
             return UITableViewCell()
         }
         
-        self.addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
+        self._addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
     }
     
     /**
      Adds a dequeueing block to the binder for a cell for the given sections or 'any section'.
-     
-     - parameter headerType: The type of cell to be bound.
-     - parameter affectedSections: The section scope that this dequeueing block is used for.
      */
     func addCellDequeueBlock(
         cellProvider: @escaping (_ table: UITableView, _ row: Int) -> UITableViewCell,
@@ -83,25 +60,16 @@ internal extension SectionedTableViewBinder {
         let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = self] (section, _, indexPath) in
             guard let table = binder?.tableView else { return UITableViewCell() }
             let cell = cellProvider(table, indexPath.row)
-            if binder?.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
-                binder?.handlers.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
-            } else {
-                binder?.handlers.dynamicSectionsCellDequeuedCallback?(section, indexPath.row, cell)
-            }
-            binder?.handlers.anySectionCellDequeuedCallback?(section, indexPath.row, cell)
-            
+            binder?.callOnCellDequeue(cell: cell, section: section, row: indexPath.row)
             binder?.setEventCallback(onCell: cell, section: section, row: indexPath.row)
             
             return cell
         }
-        self.addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
+        self._addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
     }
     
     /**
      Adds a dequeueing block to the binder for a cell for the given sections or 'any section'.
-     
-     - parameter headerType: The type of cell to be bound.
-     - parameter affectedSections: The section scope that this dequeueing block is used for.
      */
     func addCellDequeueBlock(
         cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int) -> UITableViewCell,
@@ -110,20 +78,25 @@ internal extension SectionedTableViewBinder {
         let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = self] (section, _, indexPath) in
             guard let table = binder?.tableView else { return UITableViewCell() }
             let cell = cellProvider(table, section, indexPath.row)
-            if binder?.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
-                binder?.handlers.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
-            } else {
-                binder?.handlers.dynamicSectionsCellDequeuedCallback?(section, indexPath.row, cell)
-            }
-            binder?.handlers.anySectionCellDequeuedCallback?(section, indexPath.row, cell)
-            
+            binder?.callOnCellDequeue(cell: cell, section: section, row: indexPath.row)
             binder?.setEventCallback(onCell: cell, section: section, row: indexPath.row)
             
             return cell
         }
-        self.addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
+        self._addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
     }
     
+    /// calls the `onCellDequeue` method appropriate to how the binding chain was setup
+    private func callOnCellDequeue(cell: UITableViewCell, section: S, row: Int) {
+        if self.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
+            self.handlers.sectionCellDequeuedCallbacks[section]?(section, row, cell)
+        } else {
+            self.handlers.dynamicSectionsCellDequeuedCallback?(section, row, cell)
+        }
+        self.handlers.anySectionCellDequeuedCallback?(section, row, cell)
+    }
+    
+    /// sets a callback handler that the cell will call in its `emit(event:)` method.
     private func setEventCallback(onCell cell: UITableViewCell, section: S, row: Int) {
         if let eventCell = cell as? UITableViewCell & AnyViewEventEmitting {
             if self.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
@@ -142,6 +115,10 @@ internal extension SectionedTableViewBinder {
         }
     }
     
+    // MARK: -
+    
+    /// Create and store an 'item equality checker' that the binder can use in its diffing to determine whether two
+    /// items in a section are equal according to the `Equatable` conformance
     func addCellEqualityChecker<I: Equatable & CollectionIdentifiable>(
         itemType: I.Type, affectedSections: SectionBindingScope<S>)
     {
@@ -164,29 +141,8 @@ internal extension SectionedTableViewBinder {
     }
     
     /**
-     Adds a dequeueing block to the binder for a view model-bindable header for the given sections or 'any section'.
-     
-     - parameter headerType: The type of header view to be bound.
-     - parameter affectedSections: The section scope that this dequeueing block is used for.
-     */
-    func addHeaderDequeueBlock<H: UITableViewHeaderFooterView & ViewModelBindable>(
-        headerType: H.Type, affectedSections: SectionBindingScope<S>)
-    {
-        self.addHeaderOrFooterDequeueBlock(type: headerType, isHeader: true, affectedSections: affectedSections)
-    }
-    
-    /**
-     Adds a dequeueing block to the binder for a view model-bindable footer for the given sections or 'any section'.
-     
-     - parameter footerType: The type of footer view to be bound.
-     - parameter affectedSections: The section scope that this dequeueing block is used for.
-     */
-    func addFooterDequeueBlock<F: UITableViewHeaderFooterView & ViewModelBindable>(
-        footerType: F.Type, affectedSections: SectionBindingScope<S>)
-    {
-        self.addHeaderOrFooterDequeueBlock(type: footerType, isHeader: false, affectedSections: affectedSections)
-    }
-    
+     Store the given callback handler for custom cell events for callback when it emits events
+    */
     func addEventEmittingHandler<C: UITableViewCell & ViewEventEmitting>(
         cellType: C.Type,
         handler: @escaping (_ row: Int, _ cell: C, _ event: C.ViewEvent) -> Void,
@@ -202,6 +158,9 @@ internal extension SectionedTableViewBinder {
         self._addEventEmittingHandler(cellType: cellType, handler: unsafeHandler, affectedSections: affectedSections)
     }
     
+    /**
+     Store the given callback handler for custom cell events for callback when it emits events
+     */
     func addEventEmittingHandler<C: UITableViewCell & ViewEventEmitting>(
         cellType: C.Type,
         handler: @escaping (_ section: S, _ row: Int, _ cell: C, _ event: C.ViewEvent) -> Void,
@@ -217,6 +176,28 @@ internal extension SectionedTableViewBinder {
         self._addEventEmittingHandler(cellType: cellType, handler: unsafeHandler, affectedSections: affectedSections)
     }
     
+    // MARK: -
+    
+    /**
+     Adds a dequeueing block to the binder for a view model-bindable header for the given sections or 'any section'.
+     */
+    func addHeaderDequeueBlock<H: UITableViewHeaderFooterView & ViewModelBindable>(
+        headerType: H.Type, affectedSections: SectionBindingScope<S>)
+    {
+        self._addHeaderOrFooterDequeueBlock(type: headerType, isHeader: true, affectedSections: affectedSections)
+    }
+    
+    /**
+     Adds a dequeueing block to the binder for a view model-bindable footer for the given sections or 'any section'.
+     */
+    func addFooterDequeueBlock<F: UITableViewHeaderFooterView & ViewModelBindable>(
+        footerType: F.Type, affectedSections: SectionBindingScope<S>)
+    {
+        self._addHeaderOrFooterDequeueBlock(type: footerType, isHeader: false, affectedSections: affectedSections)
+    }
+}
+
+private extension SectionedTableViewBinder {
     private func _addEventEmittingHandler<C: UITableViewCell & ViewEventEmitting>(
         cellType: C.Type,
         handler: @escaping (S, Int, UITableViewCell, Any) -> Void,
@@ -237,10 +218,8 @@ internal extension SectionedTableViewBinder {
             assertionFailure("Can't add event handling blocks for 'any section'")
         }
     }
-}
-
-private extension SectionedTableViewBinder {
-    func addDequeueBlock(_ cellDequeueBlock: @escaping CellDequeueBlock<S>, affectedSections: SectionBindingScope<S>) {
+    
+    func _addDequeueBlock(_ cellDequeueBlock: @escaping CellDequeueBlock<S>, affectedSections: SectionBindingScope<S>) {
         // Go over the parameters we were given and put the dequeue block in the right place on the binder
         switch affectedSections {
         case .forNamedSections(let sections):
@@ -259,7 +238,7 @@ private extension SectionedTableViewBinder {
         }
     }
     
-    func addHeaderOrFooterDequeueBlock<H: UITableViewHeaderFooterView & ViewModelBindable>(
+    func _addHeaderOrFooterDequeueBlock<H: UITableViewHeaderFooterView & ViewModelBindable>(
         type: H.Type, isHeader: Bool, affectedSections: SectionBindingScope<S>)
     {
         // Create the dequeue block
