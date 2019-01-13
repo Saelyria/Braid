@@ -11,12 +11,14 @@ internal extension SectionedTableViewBinder {
      - parameter affectedSections: The section scope that this dequeueing block is used for.
      */
     func addCellDequeueBlock<C>(cellType: C.Type, affectedSections: SectionBindingScope<S>)
-        where C: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+        where C: UITableViewCell & ViewModelBindable
     {
         let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = self] (section, tableView, indexPath) in
             if var cell = binder?.tableView.dequeueReusableCell(withIdentifier: C.reuseIdentifier, for: indexPath) as? C,
             let viewModel = (binder?.currentDataModel.sectionCellViewModels[section] as? [C.ViewModel])?[indexPath.row] {
                 cell.viewModel = viewModel
+                
+                // call the 'on cell dequeue' callbacks
                 if binder?.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
                     binder?.handlers.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
                 } else {
@@ -24,21 +26,7 @@ internal extension SectionedTableViewBinder {
                 }
                 binder?.handlers.anySectionCellDequeuedCallback?(section, indexPath.row, cell)
                 
-                if let eventCell = cell as? UITableViewCell & AnyViewEventEmitting {
-                    if binder?.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
-                        eventCell.eventEmitHandler = { cell, event in
-                            guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
-                            let hashCellName = String(reflecting: type(of: eventCell))
-                            binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, indexPath.row, cell, event)
-                        }
-                    } else {
-                        eventCell.eventEmitHandler = { cell, event in
-                            guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
-                            let hashCellName = String(reflecting: type(of: eventCell))
-                            binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, indexPath.row, cell, event)
-                        }
-                    }
-                }
+                binder?.setEventCallback(onCell: cell, section: section, row: indexPath.row)
                 
                 return cell
             }
@@ -55,7 +43,7 @@ internal extension SectionedTableViewBinder {
      - parameter headerType: The type of cell to be bound.
      - parameter affectedSections: The section scope that this dequeueing block is used for.
      */
-    func addCellDequeueBlock<C: UITableViewCell & ReuseIdentifiable>(
+    func addCellDequeueBlock<C: UITableViewCell>(
         cellType: C.Type, affectedSections: SectionBindingScope<S>)
     {
         let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = self] (section, tableView, indexPath) in
@@ -67,21 +55,7 @@ internal extension SectionedTableViewBinder {
                 }
                 binder?.handlers.anySectionCellDequeuedCallback?(section, indexPath.row, cell)
                 
-                if let eventCell = cell as? UITableViewCell & AnyViewEventEmitting {
-                    if binder?.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
-                        eventCell.eventEmitHandler = { cell, event in
-                            guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
-                            let hashCellName = String(reflecting: type(of: eventCell))
-                            binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, indexPath.row, cell, event)
-                        }
-                    } else {
-                        eventCell.eventEmitHandler = { cell, event in
-                            guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
-                            let hashCellName = String(reflecting: type(of: eventCell))
-                            binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, indexPath.row, cell, event)
-                        }
-                    }
-                }
+                binder?.setEventCallback(onCell: cell, section: section, row: indexPath.row)
                 
                 return cell
             }
@@ -112,43 +86,11 @@ internal extension SectionedTableViewBinder {
             }
             binder?.handlers.anySectionCellDequeuedCallback?(section, indexPath.row, cell)
             
-            if let eventCell = cell as? UITableViewCell & AnyViewEventEmitting {
-                if binder?.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
-                    eventCell.eventEmitHandler = { cell, event in
-                        guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
-                        let hashCellName = String(reflecting: type(of: eventCell))
-                        binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, indexPath.row, cell, event)
-                    }
-                } else {
-                    eventCell.eventEmitHandler = { cell, event in
-                        guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
-                        let hashCellName = String(reflecting: type(of: eventCell))
-                        binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, indexPath.row, cell, event)
-                    }
-                }
-            }
+            binder?.setEventCallback(onCell: cell, section: section, row: indexPath.row)
             
             return cell
         }
         self.addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
-    }
-    
-    private func setEventCallback(onCell cell: UITableViewCell, section: S, row: Int) {
-        if let eventCell = cell as? UITableViewCell & AnyViewEventEmitting {
-            if self.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
-                eventCell.eventEmitHandler = { cell, event in
-                    guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
-                    let hashCellName = String(reflecting: type(of: eventCell))
-                    self.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, row, cell, event)
-                }
-            } else {
-                eventCell.eventEmitHandler = { cell, event in
-                    guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
-                    let hashCellName = String(reflecting: type(of: eventCell))
-                    self.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, row, cell, event)
-                }
-            }
-        }
     }
     
     /**
@@ -171,25 +113,29 @@ internal extension SectionedTableViewBinder {
             }
             binder?.handlers.anySectionCellDequeuedCallback?(section, indexPath.row, cell)
             
-            if let eventCell = cell as? UITableViewCell & AnyViewEventEmitting {
-                if binder?.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
-                    eventCell.eventEmitHandler = { cell, event in
-                        guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
-                        let hashCellName = String(reflecting: type(of: eventCell))
-                        binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, indexPath.row, cell, event)
-                    }
-                } else {
-                    eventCell.eventEmitHandler = { cell, event in
-                        guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
-                        let hashCellName = String(reflecting: type(of: eventCell))
-                        binder?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, indexPath.row, cell, event)
-                    }
-                }
-            }
+            binder?.setEventCallback(onCell: cell, section: section, row: indexPath.row)
             
             return cell
         }
         self.addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
+    }
+    
+    private func setEventCallback(onCell cell: UITableViewCell, section: S, row: Int) {
+        if let eventCell = cell as? UITableViewCell & AnyViewEventEmitting {
+            if self.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
+                eventCell.eventEmitHandler = { cell, event in
+                    guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
+                    let hashCellName = String(reflecting: type(of: eventCell))
+                    self.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, row, cell, event)
+                }
+            } else {
+                eventCell.eventEmitHandler = { cell, event in
+                    guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
+                    let hashCellName = String(reflecting: type(of: eventCell))
+                    self.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, row, cell, event)
+                }
+            }
+        }
     }
     
     func addCellEqualityChecker<I: Equatable & CollectionIdentifiable>(
@@ -219,7 +165,7 @@ internal extension SectionedTableViewBinder {
      - parameter headerType: The type of header view to be bound.
      - parameter affectedSections: The section scope that this dequeueing block is used for.
      */
-    func addHeaderDequeueBlock<H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable>(
+    func addHeaderDequeueBlock<H: UITableViewHeaderFooterView & ViewModelBindable>(
         headerType: H.Type, affectedSections: SectionBindingScope<S>)
     {
         self.addHeaderOrFooterDequeueBlock(type: headerType, isHeader: true, affectedSections: affectedSections)
@@ -231,7 +177,7 @@ internal extension SectionedTableViewBinder {
      - parameter footerType: The type of footer view to be bound.
      - parameter affectedSections: The section scope that this dequeueing block is used for.
      */
-    func addFooterDequeueBlock<F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable>(
+    func addFooterDequeueBlock<F: UITableViewHeaderFooterView & ViewModelBindable>(
         footerType: F.Type, affectedSections: SectionBindingScope<S>)
     {
         self.addHeaderOrFooterDequeueBlock(type: footerType, isHeader: false, affectedSections: affectedSections)
@@ -309,7 +255,7 @@ private extension SectionedTableViewBinder {
         }
     }
     
-    func addHeaderOrFooterDequeueBlock<H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable>(
+    func addHeaderOrFooterDequeueBlock<H: UITableViewHeaderFooterView & ViewModelBindable>(
         type: H.Type, isHeader: Bool, affectedSections: SectionBindingScope<S>)
     {
         // Create the dequeue block

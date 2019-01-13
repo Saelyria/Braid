@@ -8,7 +8,7 @@ import RxSwift
  Nib file, so it must conform to UINibInitable. A table view binder uses this conformance to find the cell's Nib file so
  it can register it to the table view.
  */
-final class TitleDetailTableViewCell: UITableViewCell, ReuseIdentifiable, ViewModelBindable, UINibInitable {
+final class TitleDetailTableViewCell: UITableViewCell, ViewModelBindable, UINibInitable {
     /// The 'view model' for cells of this type. This view model conforms to `CollectionIdentifiable` so table binders
     /// can generate diffs for these cells (i.e. track insertions, deletions, and moves, and animate them on the table).
     struct ViewModel: CollectionIdentifiable, Equatable {

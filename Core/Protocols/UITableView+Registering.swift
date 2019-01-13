@@ -7,7 +7,7 @@ public extension UITableView {
      
      - parameter cellType: The cell to register to the table view.
     */
-    public func register<T:UITableViewCell & UINibInitable & ReuseIdentifiable>(_ cellType: T.Type) {
+    public func register<T:UITableViewCell & UINibInitable>(_ cellType: T.Type) {
         let nib = UINib(nibName: T.nibName, bundle: T.bundle)
         self.register(nib, forCellReuseIdentifier: T.reuseIdentifier)
     }
@@ -18,7 +18,7 @@ public extension UITableView {
      
      - parameter cellType: The cell to register to the table view.
     */
-    public func register<T: UITableViewCell & ReuseIdentifiable>(_ cellType: T.Type) {
+    public func register<T: UITableViewCell>(_ cellType: T.Type) {
         self.register(T.self, forCellReuseIdentifier: T.reuseIdentifier)
     }
     
@@ -30,7 +30,7 @@ public extension UITableView {
      - parameter headerFooterType: The header/footer view type to register to the table view.
     */
     public func register<T>(_ headerFooterType: T.Type)
-        where T: UITableViewHeaderFooterView & UINibInitable & ReuseIdentifiable
+        where T: UITableViewHeaderFooterView & UINibInitable
     {
         let nib = UINib(nibName: T.nibName, bundle: T.bundle)
         self.register(nib, forHeaderFooterViewReuseIdentifier: T.reuseIdentifier)
@@ -42,7 +42,7 @@ public extension UITableView {
      
      - parameter headerFooterType: The header/footer view type to register to the table view.
     */
-    public func register<T: UITableViewHeaderFooterView & ReuseIdentifiable>(_ headerFooterType: T.Type) {
+    public func register<T: UITableViewHeaderFooterView>(_ headerFooterType: T.Type) {
         self.register(T.self, forHeaderFooterViewReuseIdentifier: T.reuseIdentifier)
     }
     
@@ -54,7 +54,7 @@ public extension UITableView {
      
      - returns: A dequeued instance of the cell type.
     */
-    public func dequeue<T: UITableViewCell & ReuseIdentifiable>(_ cellType: T.Type) -> T {
+    public func dequeue<T: UITableViewCell>(_ cellType: T.Type) -> T {
         guard let cell = self.dequeueReusableCell(withIdentifier: T.reuseIdentifier) as? T else {
             fatalError("'\(String(describing: cellType))' was not registered to the table view with the reuse identifier '\(cellType.reuseIdentifier)'.")
         }
@@ -69,7 +69,7 @@ public extension UITableView {
      
      - returns: A dequeued instance of the header/footer view type.
     */
-    public func dequeue<T: UITableViewHeaderFooterView & ReuseIdentifiable>(_ headerFooterType: T.Type) -> T {
+    public func dequeue<T: UITableViewHeaderFooterView>(_ headerFooterType: T.Type) -> T {
         guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: T.reuseIdentifier) as? T else {
             fatalError("'\(String(describing: headerFooterType))' was not registered to the table view with the reuse identifier '\(headerFooterType.reuseIdentifier)'.")
         }

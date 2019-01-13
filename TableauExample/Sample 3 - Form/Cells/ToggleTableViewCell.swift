@@ -1,7 +1,7 @@
 import UIKit
 import Tableau
 
-class ToggleTableViewCell: UITableViewCell, ViewEventEmitting, UINibInitable, ReuseIdentifiable {
+class ToggleTableViewCell: UITableViewCell, ViewEventEmitting, UINibInitable {
     enum ViewEvent {
         case switchToggled(state: Bool)
     }

@@ -19,3 +19,7 @@ public extension ReuseIdentifiable {
         return String(describing: Self.self)
     }
 }
+
+extension UITableViewCell: ReuseIdentifiable { }
+extension UITableViewHeaderFooterView: ReuseIdentifiable { }
+extension UICollectionReusableView: ReuseIdentifiable { }

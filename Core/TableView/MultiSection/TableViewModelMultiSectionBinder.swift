@@ -58,6 +58,23 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
         return self
     }
     
+    @discardableResult
+    public func onEvent<EventCell>(
+        from cellType: EventCell.Type,
+        _ handler: @escaping (_ section: S, _ row: Int, _ cell: EventCell, _ event: EventCell.ViewEvent, _ model: M) -> Void)
+        -> TableViewModelMultiSectionBinder<C, S, M>
+        where EventCell: UITableViewCell & ViewEventEmitting
+    {
+        super.onEvent(from: cellType) { [weak binder = self.binder] section, row, cell, event in
+            guard let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
+                assertionFailure("ERROR: Cell or model wasn't the right type; something went awry!")
+                return
+            }
+            handler(section, row, cell, event, model)
+        }
+        return self
+    }
+    
     // MARK: -
     
     @discardableResult
@@ -65,7 +82,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
         headerType: H.Type,
         viewModels: [S : H.ViewModel?])
         -> TableViewModelMultiSectionBinder<C, S, M>
-        where H : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
+        where H : UITableViewHeaderFooterView & ViewModelBindable
     {
         super.bind(headerType: headerType, viewModels: viewModels)
         return self
@@ -76,7 +93,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
         headerType: H.Type,
         viewModels: @escaping () -> [S : H.ViewModel?])
         -> TableViewModelMultiSectionBinder<C, S, M>
-        where H : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
+        where H : UITableViewHeaderFooterView & ViewModelBindable
     {
         super.bind(headerType: headerType, viewModels: viewModels)
         return self
@@ -105,7 +122,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
         footerType: F.Type,
         viewModels: [S : F.ViewModel?])
         -> TableViewModelMultiSectionBinder<C, S, M>
-        where F : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
+        where F : UITableViewHeaderFooterView & ViewModelBindable
     {
         super.bind(footerType: footerType, viewModels: viewModels)
         return self
@@ -116,7 +133,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
         footerType: F.Type,
         viewModels: @escaping () -> [S : F.ViewModel?])
         -> TableViewModelMultiSectionBinder<C, S, M>
-        where F : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
+        where F : UITableViewHeaderFooterView & ViewModelBindable
     {
         super.bind(footerType: footerType, viewModels: viewModels)
         return self
@@ -143,7 +160,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     // MARK: -
     
     @discardableResult
-    public override func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C) -> Void)
+    public override func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ cell: C) -> Void)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
         super.onCellDequeue(handler)
@@ -151,7 +168,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     }
     
     @discardableResult
-    public override func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C) -> Void)
+    public override func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ cell: C) -> Void)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
         super.onTapped(handler)
@@ -163,6 +180,17 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
         self._dimensions(dimensions)
+        return self
+    }
+    
+    @discardableResult
+    public override func onEvent<EventCell>(
+        from cellType: EventCell.Type,
+        _ handler: @escaping (_ section: S, _ row: Int, _ cell: EventCell, _ event: EventCell.ViewEvent) -> Void)
+        -> TableViewModelMultiSectionBinder<C, S, M>
+        where EventCell: UITableViewCell & ViewEventEmitting
+    {
+        super.onEvent(from: cellType, handler)
         return self
     }
 }

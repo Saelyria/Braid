@@ -28,7 +28,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
      - returns: A section binder to continue the binding chain with.
     */
     @discardableResult
-    public func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C, _ model: M) -> Void)
+    public func onTapped(_ handler: @escaping (_ row: Int, _ cell: C, _ model: M) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         let section = self.section
@@ -60,7 +60,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onCellDequeue(_ handler: @escaping (_ row: Int, _ dequeuedCell: C, _ model: M) -> Void)
+    public func onCellDequeue(_ handler: @escaping (_ row: Int, _ cell: C, _ model: M) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         let section = self.section
@@ -77,6 +77,28 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         return self
     }
     
+    @discardableResult
+    public func onEvent<EventCell>(
+        from: EventCell.Type,
+        _ handler: @escaping (_ row: Int, _ cell: EventCell, _ event: EventCell.ViewEvent, _ model: M) -> Void)
+        -> TableViewModelSingleSectionBinder<C, S, M>
+        where EventCell: UITableViewCell & ViewEventEmitting
+    {
+        let section = self.section
+        let modelHandler: (Int, UITableViewCell, Any) -> Void = { [weak binder = self.binder] row, cell, event in
+            guard let cell = cell as? EventCell, let event = event as? EventCell.ViewEvent,
+                let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
+                    assertionFailure("ERROR: Cell, event, or model wasn't the right type; something went awry!")
+                    return
+            }
+            handler(row, cell, event, model)
+        }
+        self.binder.addEventEmittingHandler(
+            cellType: EventCell.self, handler: modelHandler, affectedSections: self.affectedSectionScope)
+        
+        return self
+    }
+    
     // MARK: -
     
     @discardableResult
@@ -84,7 +106,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         headerType: H.Type,
         viewModel: H.ViewModel?)
         -> TableViewModelSingleSectionBinder<C, S, M>
-        where H : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
+        where H : UITableViewHeaderFooterView & ViewModelBindable
     {
         super.bind(headerType: headerType, viewModel: viewModel)
         return self
@@ -95,7 +117,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         headerType: H.Type,
         viewModel: @escaping () -> H.ViewModel?)
         -> TableViewModelSingleSectionBinder<C, S, M>
-        where H : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
+        where H : UITableViewHeaderFooterView & ViewModelBindable
     {
         super.bind(headerType: headerType, viewModel: viewModel)
         return self
@@ -124,7 +146,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         footerType: F.Type,
         viewModel: F.ViewModel?)
         -> TableViewModelSingleSectionBinder<C, S, M>
-        where F : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
+        where F : UITableViewHeaderFooterView & ViewModelBindable
     {
         super.bind(footerType: footerType, viewModel: viewModel)
         return self
@@ -135,7 +157,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         footerType: F.Type,
         viewModel: @escaping () -> F.ViewModel?)
         -> TableViewModelSingleSectionBinder<C, S, M>
-        where F : UITableViewHeaderFooterView & ReuseIdentifiable & ViewModelBindable
+        where F : UITableViewHeaderFooterView & ViewModelBindable
     {
         super.bind(footerType: footerType, viewModel: viewModel)
         return self
@@ -160,7 +182,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     @discardableResult
-    override public func onCellDequeue(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void)
+    override public func onCellDequeue(_ handler: @escaping (_ row: Int, _ cell: C) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         super.onCellDequeue(handler)
@@ -168,7 +190,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     @discardableResult
-    override public func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C) -> Void)
+    override public func onTapped(_ handler: @escaping (_ row: Int, _ cell: C) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         super.onTapped(handler)
@@ -183,28 +205,6 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         where EventCell: UITableViewCell & ViewEventEmitting
     {
         super.onEvent(from: from, handler)
-        return self
-    }
-    
-    @discardableResult
-    public func onEvent<EventCell>(
-        from: EventCell.Type,
-        _ handler: @escaping (_ row: Int, _ cell: EventCell, _ event: EventCell.ViewEvent, _ model: M) -> Void)
-        -> TableViewModelSingleSectionBinder<C, S, M>
-        where EventCell: UITableViewCell & ViewEventEmitting
-    {
-        let section = self.section
-        let modelHandler: (Int, UITableViewCell, Any) -> Void = { [weak binder = self.binder] row, cell, event in
-            guard let cell = cell as? EventCell, let event = event as? EventCell.ViewEvent,
-            let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
-                assertionFailure("ERROR: Cell, event, or model wasn't the right type; something went awry!")
-                return
-            }
-            handler(row, cell, event, model)
-        }
-        self.binder.addEventEmittingHandler(
-            cellType: EventCell.self, handler: modelHandler, affectedSections: self.affectedSectionScope)
-        
         return self
     }
     

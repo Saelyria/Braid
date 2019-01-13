@@ -1,7 +1,7 @@
 import UIKit
 import Tableau
 
-class TextFieldTableViewCell: UITableViewCell, ViewEventEmitting, UINibInitable, ReuseIdentifiable {
+class TextFieldTableViewCell: UITableViewCell, ViewEventEmitting, UINibInitable {
     enum ViewEvent {
         case textEntryStarted
         case textEntered(text: String)

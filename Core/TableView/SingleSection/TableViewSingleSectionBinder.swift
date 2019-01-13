@@ -57,7 +57,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         cellType: NC.Type,
         viewModels: [NC.ViewModel])
         -> TableViewSingleSectionBinder<NC, S>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+        where NC: UITableViewCell & ViewModelBindable
     {
         return self._bind(cellType: cellType, viewModels: { viewModels })
     }
@@ -75,7 +75,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         cellType: NC.Type,
         viewModels: [NC.ViewModel])
         -> TableViewSingleSectionBinder<NC, S>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
+        where NC: UITableViewCell & ViewModelBindable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
@@ -96,7 +96,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         cellType: NC.Type,
         viewModels: @escaping () -> [NC.ViewModel])
         -> TableViewSingleSectionBinder<NC, S>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+        where NC: UITableViewCell & ViewModelBindable
     {
         return self._bind(cellType: cellType, viewModels: viewModels)
     }
@@ -115,7 +115,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         cellType: NC.Type,
         viewModels: @escaping () -> [NC.ViewModel])
         -> TableViewSingleSectionBinder<NC, S>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
+        where NC: UITableViewCell & ViewModelBindable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
@@ -126,7 +126,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         cellType: NC.Type,
         viewModels: @escaping () -> [NC.ViewModel])
         -> TableViewSingleSectionBinder<NC, S>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+        where NC: UITableViewCell & ViewModelBindable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         let section = self.section
@@ -155,7 +155,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         models: [NM],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+        where NC: UITableViewCell & ViewModelBindable
     {
         return self._bind(cellType: cellType, models: { models }, mapToViewModels: mapToViewModels)
     }
@@ -177,7 +177,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         models: [NM],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
+        where NC: UITableViewCell & ViewModelBindable, NM: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, models: { models }, mapToViewModels: mapToViewModels)
@@ -200,7 +200,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         models: [NM],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
+        where NC: UITableViewCell & ViewModelBindable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
@@ -224,7 +224,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         models: [NM],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable,
+        where NC: UITableViewCell & ViewModelBindable, NM: Equatable & CollectionIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
@@ -248,7 +248,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         models: @escaping () -> [NM],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+        where NC: UITableViewCell & ViewModelBindable
     {
         return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
@@ -270,7 +270,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         models: @escaping () -> [NM],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
+        where NC: UITableViewCell & ViewModelBindable, NM: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
@@ -293,7 +293,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         models: @escaping () -> [NM],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
+        where NC: UITableViewCell & ViewModelBindable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
@@ -317,7 +317,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         models: @escaping () -> [NM],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable,
+        where NC: UITableViewCell & ViewModelBindable, NM: Equatable & CollectionIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
@@ -329,7 +329,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         models: @escaping () -> [NM],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelSingleSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+        where NC: UITableViewCell & ViewModelBindable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         let section = self.section
@@ -359,7 +359,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         cellType: NC.Type,
         models: [NM])
         -> TableViewModelSingleSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ReuseIdentifiable
+        where NC: UITableViewCell
     {
         return self._bind(cellType: cellType, models: { models })
     }
@@ -380,7 +380,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         cellType: NC.Type,
         models: [NM])
         -> TableViewModelSingleSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
+        where NC: UITableViewCell, NM: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, models: { models })
@@ -402,7 +402,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         cellType: NC.Type,
         models: @escaping () -> [NM])
         -> TableViewModelSingleSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ReuseIdentifiable
+        where NC: UITableViewCell
     {
         return self._bind(cellType: cellType, models: models)
     }
@@ -423,7 +423,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         cellType: NC.Type,
         models: @escaping () -> [NM])
         -> TableViewModelSingleSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
+        where NC: UITableViewCell, NM: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, models: models)
@@ -433,7 +433,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         cellType: NC.Type,
         models: @escaping () -> [NM])
         -> TableViewModelSingleSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ReuseIdentifiable
+        where NC: UITableViewCell
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         let section = self.section
@@ -638,7 +638,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         headerType: H.Type,
         viewModel: H.ViewModel?)
         -> TableViewSingleSectionBinder<C, S>
-        where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+        where H: UITableViewHeaderFooterView & ViewModelBindable
     {
         return self.bind(headerType: headerType, viewModel: { viewModel })
     }
@@ -656,7 +656,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         headerType: H.Type,
         viewModel: @escaping () -> H.ViewModel?)
         -> TableViewSingleSectionBinder<C, S>
-        where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+        where H: UITableViewHeaderFooterView & ViewModelBindable
     {
         self.binder.handlers.sectionHeaderViewModelProviders[self.section] = viewModel
         self.binder.addHeaderDequeueBlock(headerType: headerType, affectedSections: self.affectedSectionScope)
@@ -724,7 +724,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         footerType: F.Type,
         viewModel: F.ViewModel?)
         -> TableViewSingleSectionBinder<C, S>
-        where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+        where F: UITableViewHeaderFooterView & ViewModelBindable
     {
         return self.bind(footerType: footerType, viewModel: { viewModel })
     }
@@ -742,7 +742,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         footerType: F.Type,
         viewModel: @escaping () -> F.ViewModel?)
         -> TableViewSingleSectionBinder<C, S>
-        where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+        where F: UITableViewHeaderFooterView & ViewModelBindable
     {
         self.binder.handlers.sectionFooterViewModelProviders[self.section] = viewModel
         self.binder.addFooterDequeueBlock(footerType: footerType, affectedSections: self.affectedSectionScope)
@@ -808,12 +808,12 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      
      - parameter handler: The closure to be called whenever a cell is dequeued in the bound section.
      - parameter row: The row of the cell that was dequeued.
-     - parameter dequeuedCell: The cell that was dequeued that can now be configured.
+     - parameter cell: The cell that was dequeued that can now be configured.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onCellDequeue(_ handler: @escaping (_ row: Int, _ dequeuedCell: C) -> Void)
+    public func onCellDequeue(_ handler: @escaping (_ row: Int, _ cell: C) -> Void)
         -> TableViewSingleSectionBinder<C, S>
     {
         let dequeueCallback: CellDequeueCallback<S> = { (_, row, cell) in
@@ -837,11 +837,11 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      
      - parameter handler: The closure to be called whenever a cell is tapped in the bound section.
      - parameter row: The row of the cell that was tapped.
-     - parameter tappedCell: The cell that was tapped.
+     - parameter cell: The cell that was tapped.
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onTapped(_ handler: @escaping (_ row: Int, _ tappedCell: C) -> Void)
+    public func onTapped(_ handler: @escaping (_ row: Int, _ cell: C) -> Void)
         -> TableViewSingleSectionBinder<C, S>
     {
         let tappedHandler: CellTapCallback<S> = { (_, row, cell) in
@@ -888,6 +888,9 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         }
     }
     
+    /**
+     
+     */
     @discardableResult
     public func onEvent<EventCell>(
         from: EventCell.Type,
@@ -901,21 +904,20 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         return self
     }
     
+    /**
+     
+    */
     public func assuming<M>(modelType: M.Type) -> TableViewModelSingleSectionBinder<C, S, M> {
         return TableViewModelSingleSectionBinder(binder: self.binder, section: self.section)
     }
 }
 
-public extension TableViewSingleSectionBinderProtocol where C: ViewEventEmitting {
+public extension TableViewSingleSectionBinder where C: ViewEventEmitting {
     @discardableResult
     public func onEvent(
         _ handler: @escaping (_ row: Int, _ cell: C, _ event: C.ViewEvent) -> Void)
         -> TableViewSingleSectionBinder<C, S>
     {
-        guard let sectionBinder = self as? TableViewSingleSectionBinder<C, S> else { fatalError() }
-        sectionBinder.binder.addEventEmittingHandler(
-            cellType: C.self, handler: handler, affectedSections: sectionBinder.affectedSectionScope)
-        
-        return sectionBinder
+        return self.onEvent(from: C.self, handler)
     }
 }

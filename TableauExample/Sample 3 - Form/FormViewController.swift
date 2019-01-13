@@ -24,7 +24,7 @@ class FormViewController: UIViewController {
             case textField(title: String, entry: TextFieldTableViewCell.TextFieldEntryType)
             case toggle(title: String, isOn: Bool)
             case textView(placeholder: String, numberOfLines: Int)
-        }        
+        }
     }
     
     // 3.
@@ -70,9 +70,9 @@ class FormViewController: UIViewController {
                 })
         
         // 5.
-        self.binder.onSection(.titleAndLocation)
+        self.binder.onSections(.titleAndLocation)
             .assuming(modelType: FormItem.self)
-            .onEvent(from: TextFieldTableViewCell.self) { [unowned self] _, cell, event, formItem in
+            .onEvent(from: TextFieldTableViewCell.self) { [unowned self] _, _, _, event, formItem in
                 switch (event, formItem) {
                 case (.textEntered(let text), .title):
                     self.formData.title = text
@@ -84,7 +84,8 @@ class FormViewController: UIViewController {
         
         // 6.
         self.binder.onSection(.time)
-            .onEvent(from: ToggleTableViewCell.self) { [unowned self] _, cell, event in
+            .assuming(modelType: FormItem.self)
+            .onEvent(from: ToggleTableViewCell.self) { [unowned self] _, _, event in
                 switch event {
                 case .switchToggled(let state):
                     self.formData.isAllDay = state
