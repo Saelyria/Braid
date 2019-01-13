@@ -14,7 +14,9 @@ internal extension SectionedTableViewBinder {
         where C: UITableViewCell & ViewModelBindable
     {
         let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = self] (section, tableView, indexPath) in
-            if var cell = binder?.tableView.dequeueReusableCell(withIdentifier: C.reuseIdentifier, for: indexPath) as? C,
+            let reuseIdentifier = (cellType as? ReuseIdentifiable.Type)?.reuseIdentifier
+                ?? cellType.classNameReuseIdentifier
+            if var cell = binder?.tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as? C,
             let viewModel = (binder?.currentDataModel.sectionCellViewModels[section] as? [C.ViewModel])?[indexPath.row] {
                 cell.viewModel = viewModel
                 
@@ -47,7 +49,9 @@ internal extension SectionedTableViewBinder {
         cellType: C.Type, affectedSections: SectionBindingScope<S>)
     {
         let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = self] (section, tableView, indexPath) in
-            if let cell = binder?.tableView.dequeueReusableCell(withIdentifier: C.reuseIdentifier, for: indexPath) as? C {
+            let reuseIdentifier = (cellType as? ReuseIdentifiable.Type)?.reuseIdentifier
+                ?? cellType.classNameReuseIdentifier
+            if let cell = binder?.tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as? C {
                 if binder?.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
                     binder?.handlers.sectionCellDequeuedCallbacks[section]?(section, indexPath.row, cell)
                 } else {
@@ -260,7 +264,9 @@ private extension SectionedTableViewBinder {
     {
         // Create the dequeue block
         let dequeueBlock: HeaderFooterDequeueBlock<S> = { [weak binder = self] (section, tableView) in
-            guard var view = tableView.dequeueReusableHeaderFooterView(withIdentifier: H.reuseIdentifier) as? H else {
+            let reuseIdentifier = (type as? ReuseIdentifiable.Type)?.reuseIdentifier
+                ?? type.classNameReuseIdentifier
+            guard var view = tableView.dequeueReusableHeaderFooterView(withIdentifier: reuseIdentifier) as? H else {
                 return nil
             }
             
