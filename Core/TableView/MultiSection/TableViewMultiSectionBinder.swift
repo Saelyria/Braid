@@ -1,7 +1,7 @@
 import UIKit
 
 /// Protocol that allows us to have Reactive extensions
-public protocol TableViewMutliSectionBinderProtocol {
+public protocol TableViewMultiSectionBinderProtocol {
     associatedtype C: UITableViewCell
     associatedtype S: TableViewSection
 }
@@ -13,8 +13,8 @@ public protocol TableViewMutliSectionBinderProtocol {
  number of methods that take a binding handler and give it to the original table view binder to store for callback. A
  reference to this object should not be kept and should only be used in a binding chain.
 */
-public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection>
-    : TableViewMutliSectionBinderProtocol
+public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection>
+    : TableViewMultiSectionBinderProtocol
 {
     internal let binder: SectionedTableViewBinder<S>
     internal let sections: [S]?
@@ -46,8 +46,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<NC>(
         cellType: NC.Type,
         viewModels: [S: [NC.ViewModel]])
-        -> TableViewMutliSectionBinder<NC, S>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+        -> TableViewMultiSectionBinder<NC, S>
+        where NC: UITableViewCell & ViewModelBindable
     {
         return self._bind(cellType: cellType, viewModels: { viewModels })
     }
@@ -65,8 +65,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<NC>(
         cellType: NC.Type,
         viewModels: [S: [NC.ViewModel]])
-        -> TableViewMutliSectionBinder<NC, S>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
+        -> TableViewMultiSectionBinder<NC, S>
+        where NC: UITableViewCell & ViewModelBindable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
@@ -86,8 +86,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<NC>(
         cellType: NC.Type,
         viewModels: @escaping () -> [S: [NC.ViewModel]])
-        -> TableViewMutliSectionBinder<NC, S>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+        -> TableViewMultiSectionBinder<NC, S>
+        where NC: UITableViewCell & ViewModelBindable
     {
         return self._bind(cellType: cellType, viewModels: viewModels)
     }
@@ -105,8 +105,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<NC>(
         cellType: NC.Type,
         viewModels: @escaping () -> [S: [NC.ViewModel]])
-        -> TableViewMutliSectionBinder<NC, S>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
+        -> TableViewMultiSectionBinder<NC, S>
+        where NC: UITableViewCell & ViewModelBindable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
@@ -116,8 +116,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     private func _bind<NC>(
         cellType: NC.Type,
         viewModels: @escaping () -> [S: [NC.ViewModel]])
-        -> TableViewMutliSectionBinder<NC, S>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+        -> TableViewMultiSectionBinder<NC, S>
+        where NC: UITableViewCell & ViewModelBindable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         let scope = self.affectedSectionScope
@@ -125,7 +125,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
             binder?.updateCellModels(nil, viewModels: viewModels(), affectedSections: scope)
         }
         
-        return TableViewMutliSectionBinder<NC, S>(binder: self.binder, sections: self.sections)
+        return TableViewMultiSectionBinder<NC, S>(binder: self.binder, sections: self.sections)
     }
     
     /**
@@ -146,7 +146,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         models: [S: [NM]],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+        where NC: UITableViewCell & ViewModelBindable
     {
         return self._bind(cellType: cellType, models: { models }, mapToViewModels: mapToViewModels)
     }
@@ -169,7 +169,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         models: [S: [NM]],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
+        where NC: UITableViewCell & ViewModelBindable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
@@ -194,7 +194,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         models: [S: [NM]],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
+        where NC: UITableViewCell & ViewModelBindable, NM: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, models: { models }, mapToViewModels: mapToViewModels)
@@ -218,7 +218,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         models: [S: [NM]],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable,
+        where NC: UITableViewCell & ViewModelBindable, NM: Equatable & CollectionIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
@@ -243,7 +243,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         models: @escaping () -> [S: [NM]],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+        where NC: UITableViewCell & ViewModelBindable
     {
         return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
     }
@@ -266,7 +266,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         models: @escaping () -> [S: [NM]],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable,
+        where NC: UITableViewCell & ViewModelBindable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
@@ -291,7 +291,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         models: @escaping () -> [S: [NM]],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
+        where NC: UITableViewCell & ViewModelBindable, NM: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, models: models, mapToViewModels: mapToViewModels)
@@ -315,7 +315,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         models: @escaping () -> [S: [NM]],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable,
+        where NC: UITableViewCell & ViewModelBindable, NM: Equatable & CollectionIdentifiable,
         NC.ViewModel: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NC.ViewModel.self, affectedSections: self.affectedSectionScope)
@@ -327,7 +327,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         models: @escaping () -> [S: [NM]],
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
         -> TableViewModelMultiSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ViewModelBindable & ReuseIdentifiable
+        where NC: UITableViewCell & ViewModelBindable
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         let scope = self.affectedSectionScope
@@ -360,7 +360,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         cellType: NC.Type,
         models: [S: [NM]])
         -> TableViewModelMultiSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ReuseIdentifiable
+        where NC: UITableViewCell
     {
         return self._bind(cellType: cellType, models: { models })
     }
@@ -382,7 +382,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         cellType: NC.Type,
         models: [S: [NM]])
         -> TableViewModelMultiSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
+        where NC: UITableViewCell, NM: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, models: { models })
@@ -405,7 +405,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         cellType: NC.Type,
         models: @escaping () -> [S: [NM]])
         -> TableViewModelMultiSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ReuseIdentifiable
+        where NC: UITableViewCell
     {
         return self._bind(cellType: cellType, models: models)
     }
@@ -427,7 +427,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         cellType: NC.Type,
         models: @escaping () -> [S: [NM]])
         -> TableViewModelMultiSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ReuseIdentifiable, NM: Equatable & CollectionIdentifiable
+        where NC: UITableViewCell, NM: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
         return self._bind(cellType: cellType, models: models)
@@ -437,7 +437,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         cellType: NC.Type,
         models: @escaping () -> [S: [NM]])
         -> TableViewModelMultiSectionBinder<NC, S, NM>
-        where NC: UITableViewCell & ReuseIdentifiable
+        where NC: UITableViewCell
     {
         self.binder.addCellDequeueBlock(cellType: cellType, affectedSections: self.affectedSectionScope)
         let scope = self.affectedSectionScope
@@ -577,7 +577,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind(
         cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int) -> UITableViewCell,
         numberOfCells: [S: Int])
-        -> TableViewMutliSectionBinder<UITableViewCell, S>
+        -> TableViewMultiSectionBinder<UITableViewCell, S>
     {
         return self.bind(cellProvider: cellProvider, numberOfCells: { numberOfCells })
     }
@@ -597,7 +597,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind(
         cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int) -> UITableViewCell,
         numberOfCells: @escaping () -> [S: Int])
-        -> TableViewMutliSectionBinder<UITableViewCell, S>
+        -> TableViewMultiSectionBinder<UITableViewCell, S>
     {
         self.binder.addCellDequeueBlock(cellProvider: cellProvider, affectedSections: self.affectedSectionScope)
         let scope = self.affectedSectionScope
@@ -605,7 +605,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
             binder?.updateNumberOfCells(numberOfCells(), affectedSections: scope)
         }
         
-        return TableViewMutliSectionBinder<UITableViewCell, S>(binder: self.binder, sections: self.sections)
+        return TableViewMultiSectionBinder<UITableViewCell, S>(binder: self.binder, sections: self.sections)
     }
     
     // MARK: -
@@ -626,8 +626,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<H>(
         headerType: H.Type,
         viewModels: [S: H.ViewModel?])
-        -> TableViewMutliSectionBinder<C, S>
-        where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+        -> TableViewMultiSectionBinder<C, S>
+        where H: UITableViewHeaderFooterView & ViewModelBindable
     {
         return self.bind(headerType: headerType, viewModels: { viewModels })
     }
@@ -648,8 +648,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<H>(
         headerType: H.Type,
         viewModels: @escaping () -> [S: H.ViewModel?])
-        -> TableViewMutliSectionBinder<C, S>
-        where H: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+        -> TableViewMultiSectionBinder<C, S>
+        where H: UITableViewHeaderFooterView & ViewModelBindable
     {
         let scope = self.affectedSectionScope
         self.binder.addHeaderDequeueBlock(headerType: headerType, affectedSections: self.affectedSectionScope)
@@ -673,7 +673,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     @discardableResult
     public func bind(
         headerTitles: [S: String?])
-        -> TableViewMutliSectionBinder<C, S>
+        -> TableViewMultiSectionBinder<C, S>
     {
         return self.bind(headerTitles: { headerTitles })
     }
@@ -691,7 +691,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     @discardableResult
     public func bind(
         headerTitles: @escaping () -> [S: String?])
-        -> TableViewMutliSectionBinder<C, S>
+        -> TableViewMultiSectionBinder<C, S>
     {        
         let scope = self.affectedSectionScope
         self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
@@ -716,8 +716,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<F>(
         footerType: F.Type,
         viewModels: [S: F.ViewModel?])
-        -> TableViewMutliSectionBinder<C, S>
-        where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+        -> TableViewMultiSectionBinder<C, S>
+        where F: UITableViewHeaderFooterView & ViewModelBindable
     {
         return self.bind(footerType: footerType, viewModels: { viewModels })
     }
@@ -738,8 +738,8 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     public func bind<F>(
         footerType: F.Type,
         viewModels: @escaping () -> [S: F.ViewModel?])
-        -> TableViewMutliSectionBinder<C, S>
-        where F: UITableViewHeaderFooterView & ViewModelBindable & ReuseIdentifiable
+        -> TableViewMultiSectionBinder<C, S>
+        where F: UITableViewHeaderFooterView & ViewModelBindable
     {
         let scope = self.affectedSectionScope
         self.binder.addFooterDequeueBlock(footerType: footerType, affectedSections: self.affectedSectionScope)
@@ -763,7 +763,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     @discardableResult
     public func bind(
         footerTitles: [S: String?])
-        -> TableViewMutliSectionBinder<C, S>
+        -> TableViewMultiSectionBinder<C, S>
     {
         return self.bind(footerTitles: { footerTitles })
     }
@@ -781,7 +781,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
     @discardableResult
     public func bind(
         footerTitles: @escaping () -> [S: String?])
-        -> TableViewMutliSectionBinder<C, S>
+        -> TableViewMultiSectionBinder<C, S>
     {
         switch self.affectedSectionScope {
         case .forNamedSections(let sections):
@@ -809,13 +809,13 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
      - parameter handler: The closure to be called whenever a cell is dequeued in one of the bound sections.
      - parameter section: The section in which a cell was dequeued.
      - parameter row: The row of the cell that was dequeued.
-     - parameter dequeuedCell: The cell that was dequeued that can now be configured.
+     - parameter cell: The cell that was dequeued that can now be configured.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C) -> Void)
-        -> TableViewMutliSectionBinder<C, S>
+    public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ cell: C) -> Void)
+        -> TableViewMultiSectionBinder<C, S>
     {
         let callback: CellDequeueCallback<S> = { (section: S, row: Int, cell: UITableViewCell) in
             guard let cell = cell as? C else {
@@ -848,13 +848,13 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
      - parameter handler: The closure to be called whenever a cell is tapped in the bound section.
      - parameter section: The section in which a cell was tapped.
      - parameter row: The row of the cell that was tapped.
-     - parameter tappedCell: The cell that was tapped.
+     - parameter cell: The cell that was tapped.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C) -> Void)
-        -> TableViewMutliSectionBinder<C, S>
+    public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ cell: C) -> Void)
+        -> TableViewMultiSectionBinder<C, S>
     {
         let callback: CellTapCallback<S> = { (section: S, row: Int, tappedCell: UITableViewCell) in
             guard let tappedCell = tappedCell as? C else {
@@ -873,6 +873,36 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
             self.binder.handlers.dynamicSectionsCellTappedCallback = callback
         default: break
         }
+        
+        return self
+    }
+    
+    /**
+     Adds a handler to be called when a cell of the given type emits a custom view event.
+     
+     To use this method, the given cell type must conform to `ViewEventEmitting`. This protocol has the cell declare an
+     associated `ViewEvent` enum type whose cases define custom events that can be observed from the binding chain.
+     When a cell emits an event via its `emit(event:)` method, the handler given to this method is called with the
+     event and various other objects that allows the view controller to respond.
+     
+     - parameter cellType: The event-emitting cell type to observe events from.
+     - parameter handler: The closure to be called whenever a cell of the given cell type emits a custom event.
+     - parameter section: The section in which a cell emitted an event.
+     - parameter row: The row of the cell that emitted an event.
+     - parameter cell: The cell that emitted an event.
+     - paramter event: The custom event that the cell emitted.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func onEvent<EventCell>(
+        from: EventCell.Type,
+        _ handler: @escaping (_ section: S, _ row: Int, _ cell: EventCell, _ event: EventCell.ViewEvent) -> Void)
+        -> TableViewMultiSectionBinder<C, S>
+        where EventCell: UITableViewCell & ViewEventEmitting
+    {
+        self.binder.addEventEmittingHandler(
+            cellType: EventCell.self, handler: handler, affectedSections: self.affectedSectionScope)
         
         return self
     }
@@ -903,7 +933,7 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
      - returns: A section binder to continue the binding chain with.
     */
     @discardableResult
-    public func dimensions(_ dimensions: MultiSectionDimension<S>...) -> TableViewMutliSectionBinder<C, S> {
+    public func dimensions(_ dimensions: MultiSectionDimension<S>...) -> TableViewMultiSectionBinder<C, S> {
         self._dimensions(dimensions)
         return self
     }
@@ -912,5 +942,19 @@ public class TableViewMutliSectionBinder<C: UITableViewCell, S: TableViewSection
         for dimension in dimensions {
             dimension.bindingFunc(self.binder, self.affectedSectionScope)
         }
+    }
+    
+    /**
+     Adds model type information to the binding chain.
+     
+     This method allows model type information to be assumed on any additional binding chains for a section after the
+     binding chain that originally declared the cell and model type. This method will cause a crash if the model type
+     originally bound to the section is not the same type or if the section was not setup with a model type.
+     
+     - returns: A section binder to continue the binding chain with that allows cast model types to be given to items in
+     its chain.
+     */
+    public func assuming<M>(modelType: M.Type) -> TableViewModelMultiSectionBinder<C, S, M> {
+        return TableViewModelMultiSectionBinder(binder: self.binder, sections: self.sections)
     }
 }

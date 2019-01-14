@@ -18,3 +18,9 @@ public protocol CollectionIdentifiable {
     /// A string that uniquely identifies this object among other objects in a table or collection view's data.
     var collectionId: String { get }
 }
+
+public extension CollectionIdentifiable where Self: RawRepresentable, Self.RawValue: Hashable {
+    public var collectionId: String {
+        return String(self.rawValue.hashValue)
+    }
+}

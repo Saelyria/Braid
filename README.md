@@ -1,12 +1,16 @@
 # Tableau
 
-Tableau is an RxSwift-compatible library for making your table and collection view setup routine smaller, more declarative, more type safe, and
-simply more fun that lets you switch from the tired data source / delegate routine to a cleaner function chain that reads like a sentence.
+Tableau is a library for making your table and collection view setup routine smaller, more declarative, more type safe, and simply more fun. It 
+includes support for automatically diffing and animating data on your tables, ability for cells to emit custom events, and support for RxSwift.
 
-To give you a quick idea of some of the key features of the library, here's a quick overview of how you'd setup a table view with it:
+## The basics
+
+With Tableau, you 'bind' information and functionality like data, cell types, and event handlers to your table on a per-section basis (or just to 
+the whole table if your table isn't sectioned). 
+
+For a sectioned table, we start by declaring an enum (or struct) that defines your sections and creating a 'binder' object:
 
 ```swift
-// First, define an enum (or struct!) that defines your sections...
 enum Section: TableViewSection {
     case first
     case second
@@ -14,52 +18,93 @@ enum Section: TableViewSection {
     case fourth
 }
 
-// ...define your data (support for observable Rx and non-Rx data!)...
-let firstSectionModels: Observable<[MyModel]> = ...
-let secondThirdSectionModels: Observable<[Section: [MyOtherModel]]> = ...
-
-// ...create a 'binder' object...
 let binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
+```
 
-// ...then start binding logic (kind of like a switch statement). 
-// You can bind logic to individual sections...
+Then, we start 'binding chains' to one or multiple sections, kind of like in a switch statement. Here, we'll make three 'binding chains' to add
+different data and handlers to the sections we just declared:
+
+```swift
+let myModels: [MyModel] = ...
+
 binder.onSection(.first)
-    .rx.bind(cellType: MyCustomTableViewCell.self, models: firstSectionModels)
-    .bind(headerTitle: "FIRST")
-    .onCellDequeue { (row: Int, cell: MyCustomTableViewCell, model: MyModel) in // (such type safety!)
-        // setup the 'cell' with the 'model'
+    .bind(headerTitle: "FIRST SECTION")
+    .bind(cellType: MyCustomTableViewCell.self, models: { myModels })
+    .onCellDequeue { (row: Int, cell: MyCustomTableViewCell, model: MyModel) in
+        // setup the dequeued 'cell' with the 'model'
     }
     .onCellTapped { (row, cell, model: MyModel) in
         // e.g. go to a detail view controller with the 'model'
     }
 
-// ...to multiple sections...
 binder.onSections(.second, .third)
-    .rx.bind(cellType: MyOtherTableViewCell.self, models: secondThirdSectionModels)
-    .onCellTapped { (section: Section, row: Int, cell: MyOtherTableViewCell, model: MyOtherModel) in
-        ...
+    .bind(cellType: MyOtherTableViewCell.self, models: { ... })
+    .onCellDequeue { (section: Section, row, cell, model) in
+        // setup the dequeued 'cell' with the 'model'
     }
     ...
     
-// ...to all (other unbound) sections...
 binder.onAllOtherSections()
     ...
-    
-// ...or bind shared logic for any section!
-binder.onAnySection()
-    .dimensions(
-        .cellHeight { UITableViewAutomaticDimension },
-        .estimatedCellHeight { 100 })
-
-binder.finish()
 ```
 
-This is much more legible and reads more like requirements you might get, and no more index bookkeeping for your model objects!
+By using binding chains, you can more clearly describe how your table views works in a way that reads more like the requirements you 
+receive, and you have type safety built-in by having cells and models safely cast (to types you give in the `bind(cellType:models:)` 
+method) and passed into the handlers added to each chain.
 
-You're a good developer, though - you look at that sample and think of all the limitations and edge cases you can run into with that (more than
-one cell or model type per section, custom header/footer view type, section data not known at compile time, infinite scroll...). Luckily, Tableau
-also scales easily with complexity and supports many more advanced features that cover cases like these, so you should never be so limited 
-by the library that you find yourself resorting to the regular UIKit 'data source / delegate' routine.
+## Custom cell events
+
+There are many types of handlers that can be added to a binding chain, like cell tapped handlers or handlers to provide dimensions like height.
+However, Tableau also gives you the ability for your cells to declare custom event enums on your cells that can be observed on your binding
+chains. This is done by conforming your cell to `ViewEventEmitting` and giving it a `ViewEvent` enum, like this:
+
+```swift
+class MyCustomTableViewCell: UITableViewCell, ViewEventEmitting {
+    enum ViewEvent {
+        case switchToggled(state: Bool)
+        case buttonPressed
+        case textEntered(text: String)
+    }
+    
+    @objc func onSwitchToggled(switch: UISwitch) {
+        self.emit(event: .switchToggled(state: switch.isOn)
+    }
+}
+```
+
+You can then observe for when cells emit events on a binding chain like this:
+
+```swift
+binder.onSection(.first)
+    .bind(cellType: MyCustomTableViewCell.self, models: { myModels })
+    .onEvent(from: MyCustomTableViewCell.self) { (row, cell, event, model: MyModel) in
+        switch event {
+        case .switchToggled(let state):
+            // update something in the model
+        case .buttonPressed:
+            // perform some action
+        case .textEntered(let text):
+            // update something in the model
+        }
+    }
+```
+
+## Diffing and animation
+
+Tableau supports deep diffing and automatic animation of your table when its data changes. Without doing anything special to your models,
+Tableau can already determine when (and which) sections update and run a basic count on the changes to apply 'reload', 'insert', and 'delete'
+animations on sections. 
+
+However, if you want it, the library also gives you more powerful and more fine-grained control over diffing by taking into account conformance
+to `Equatable` and `CollectionIdentifiable` on the models you bind to provide more precise 'reload', 'insert', and 'delete' animations, as 
+well as for tracking moves - all automatically!
+
+## Advanced features
+
+You're a good developer, though - you look at these samples and think of all the limitations and edge cases you can run into with that (more
+than one cell or model type per section, custom header/footer view type, section data not known at compile time, infinite scroll...). Luckily, 
+Tableau supports many more advanced features that cover cases like these and scales well with the complexity of your table, so you should 
+never be so limited by the library that you find yourself resorting to the regular UIKit 'data source/delegate' routine.
 
 Tableau is fully documented, including tutorials and working code samples (with documented walkthroughs!) in the 'TableauExample' Xcode 
 project in the repository. Available tutorials to get you familiar with Tableau are as follows:

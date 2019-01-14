@@ -1,11 +1,11 @@
 import UIKit
 import Tableau
 
-class TestCell: UITableViewCell, ReuseIdentifiable {
+class TestCell: UITableViewCell {
     
 }
 
-class TestViewModelCell: UITableViewCell, ReuseIdentifiable, ViewModelBindable {
+class TestViewModelCell: UITableViewCell, ViewModelBindable {
     struct ViewModel {
         let id: String
     }
@@ -13,7 +13,7 @@ class TestViewModelCell: UITableViewCell, ReuseIdentifiable, ViewModelBindable {
     var viewModel: ViewModel?
 }
 
-class TestHeaderFooter: UITableViewHeaderFooterView, ReuseIdentifiable, ViewModelBindable {
+class TestHeaderFooter: UITableViewHeaderFooterView, ViewModelBindable {
     struct ViewModel {
         let title: String
     }

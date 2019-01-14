@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="94" id="Wsf-Vi-2fb" customClass="TextViewTableViewCell" customModule="TableauExample" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="94"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Wsf-Vi-2fb" id="beU-12-8Tj">
+                <rect key="frame" x="0.0" y="0.0" width="375" height="93.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="4GI-n9-UmR">
+                        <rect key="frame" x="21" y="13" width="333" height="67.5"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                    </textView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Placeholder" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WrU-so-1fv">
+                        <rect key="frame" x="26" y="21" width="90.5" height="20.5"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="WrU-so-1fv" firstAttribute="top" secondItem="beU-12-8Tj" secondAttribute="topMargin" constant="10" id="5U6-yL-fjL"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="4GI-n9-UmR" secondAttribute="bottom" constant="2.5" id="Kba-E3-NG2"/>
+                    <constraint firstItem="4GI-n9-UmR" firstAttribute="top" secondItem="beU-12-8Tj" secondAttribute="topMargin" constant="2" id="VOr-e0-OE3"/>
+                    <constraint firstItem="WrU-so-1fv" firstAttribute="leading" secondItem="beU-12-8Tj" secondAttribute="leadingMargin" constant="10" id="kaK-o2-fm2"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="4GI-n9-UmR" secondAttribute="trailing" constant="5" id="pBT-Cl-XXN"/>
+                    <constraint firstItem="4GI-n9-UmR" firstAttribute="leading" secondItem="beU-12-8Tj" secondAttribute="leadingMargin" constant="5" id="roe-oz-4PJ"/>
+                    <constraint firstAttribute="bottomMargin" relation="greaterThanOrEqual" secondItem="WrU-so-1fv" secondAttribute="bottom" constant="10" id="wtv-fW-ldZ"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="placeholderLabel" destination="WrU-so-1fv" id="nX0-Ih-i5B"/>
+                <outlet property="textView" destination="4GI-n9-UmR" id="q1f-6z-HfC"/>
+            </connections>
+            <point key="canvasLocation" x="173.59999999999999" y="92.653673163418304"/>
+        </tableViewCell>
+    </objects>
+</document>
