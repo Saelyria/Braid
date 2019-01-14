@@ -2,14 +2,56 @@
 
 In most table views, we want to be able to update our data after binding. Tableau supports two ways to update data - for those using RxSwift,
 binders support the use of binding an Observable along with your cell or header/footer type that the binder will subscribe to to update the
-table. If you're not using RxSwift, Tableau provides the ability to create 'update' handlers at in your binding chains that you can store and call 
-with new data to update the table.
+table. If you're not using RxSwift, you give the binding chain a closure it can call to retrieve data (probably from a property on your view
+controller) then, when that data updates, call `refresh()` on the binder.
+
+## Without RxSwift
+
+Updating without RxSwift is done by passing a closure to the `bind(cellType:...)` methods that returns an array instead of just the array.
+
+Here's what that looks like:
+
+```swift
+var firstSectionModels: [MyModel] = ...
+var secondSectionModels: [MyModel] = ...
+var thirdSectionModels: [MyModel] = ...
+
+binder.onSection(.first)
+    .bind(
+        cellType: MyCell.self, 
+        models: { firstSectionModels }, 
+        updatedBy: &updateFirstSection)
+    .onDequeue { row, cell, model in
+        ...
+    }
+
+binder.onSections([.second, .third])
+    .bind(
+        cellType: MyOtherCell.self, 
+        models: {
+            [.second: secondSectionModels, .third: thirdSectionModels]
+        },
+        updatedBy: &updateSecondThirdSections)
+    ...
+```
+
+Then, when we want to update the sections, we simply call the `refresh()` method on the binder, then it will call these closures again and
+perform a diff in the current and previous data.
+
+We can do the same thing with header or footer titles - however unlikely it is that they do, but if they change, we can hook them up to a closure
+as well.
+
+```swift
+var headerTitle: String? = "INITIAL TITLE"
+
+binder.onSection(.first)
+    .bind(headerTitle: { headerTitle })
+```
 
 ## RxSwift
 
-We'll start with the RxSwift variant since it's not much different from the non-updating tables in the 'getting started' guide. We start a binding
-chain in the same way, except we call the `bind` method on the reactive extension (i.e. put an `.rx` in front of the method) and instead of 
-handing in just arrays or dictionaries, we pass in Observable arrays or dictionaries.
+When using RxSwift, we start a binding chain in the same way, except we call the `bind` method on the reactive extension (i.e. put an `.rx` in
+front of the method) and instead of handing in just arrays or dictionaries, we pass in observable arrays or dictionaries.
 
 ```swift
 let firstSectionModels: Observable<[MyModel]> = ...
@@ -17,7 +59,7 @@ let secondThirdSectionModels: Observable<[Section: [MyModel]]> = ...
 
 binder.onSection(.first)
     .rx.bind(cellType: MyCell.self, models: models)
-    .onCellDequeue { (row, cell, model) in 
+    .onDequeue { (row, cell, model) in 
         ...
     }
     ...
@@ -26,8 +68,7 @@ binder.onSections([.second, .third])
     .rx.bind(cellType: MyCell.self, models: secondThirdSectionModels)
     ...
 ```
-We can do the same thing with header or footer titles - however unlikely it is that they do, but if they change, we can hook them up to an 
-Observable as well.
+It's roughly the same syntax for updating section header/footer titles if you ever need to.
 
 ```swift
 let title: Observable<String?> = ...
@@ -38,63 +79,6 @@ binder.onSection(.someSection)
 
 The subscriptions are observed by the binder and are disposed of by an internal dispose bag on the binder. Observables are internally 
 observed on the main thread, so it should be pretty much plug-and-play.
-
-## Without RxSwift
-
-Bound tables can still be updated without RxSwift without too much hassle as well. Updating without RxSwift is done by passing a reference 
-to a closure that takes the model or view model type to the `bind(cellType:...)` methods. Typically, this will be a reference to a property 
-on your view controller. This reference is then set to a newly-created function that can be called to update the models or view models for the
-section(s).
-
-> If you haven't used reference pointers in Swift with `inout` arguments before, it'd be worth taking a quick pause here to read the 
-'In-Out Parameters' section in the [Swift docs related to functions](https://docs.swift.org/swift-book/LanguageGuide/Functions.html).
-
-Here's what that looks like:
-
-```swift
-var firstSectionModels: [MyModel] = ...
-var secondSectionModels: [MyModel] = ...
-var thirdSectionModels: [MyModel] = ...
-
-var updateFirstSection: ([MyModel]) -> Void
-var updateSecondThirdSections: ([Section: [MyModel]]) -> Void
-
-binder.onSection(.first)
-    .bind(cellType: MyCell.self, 
-          models: firstSectionModels, 
-          updatedBy: &updateFirstSection)
-    .onCellDequeue { row, cell, model in
-        ...
-    }
-    
-binder.onSections([.second, .third])
-    .bind(cellType: MyOtherCell.self, 
-          models: [
-            .second: secondSectionModels,
-            .third: thirdSectionModels],
-          updatedBy: &updateSecondThirdSections)
-    ...
-```
-Then, when we want to update the sections, we simply call these closures with new models. The end result ends up reading a lot like a normal
-function call on the view controller:
-
-```swift
-let newFirstSectionModels: [MyModel] = ...
-updateFirstSection(newFirstSectionModels)
-
-let newSecondSectionModels: [MyModel] = ...
-let newThirdSectionModels: [MyModel] = ...
-updateSecondThirdSections([.second: newSecondSectionModels, .third: newThirdSectionModels])
-```
-
-It's roughly the same syntax for updating section header/footer titles if you ever need to.
-
-```swift
-var updateFirstSectionTitle: (String?) -> Void
-
-binder.onSection(.first)
-    .bind(headerTitle: "INITIAL TITLE", updatedBy: &updateFirstSectionTitle)
-```
 
 ## Animating Updates
 

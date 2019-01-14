@@ -28,10 +28,10 @@ public class AnySectionBinder<S: TableViewSection> {
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: UITableViewCell) -> Void)
+    public func onDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: UITableViewCell) -> Void)
         -> AnySectionBinder<S>
     {
-        self.binder.handlers.anySectionCellDequeuedCallback = handler
+        self.binder.handlers.anySectionDequeuedCallback = handler
 
         return self
     }

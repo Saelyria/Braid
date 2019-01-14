@@ -98,7 +98,7 @@ class HomeViewController: UIViewController {
         
         // 8.
         self.binder.onAnySection()
-            .onCellDequeue { _, _, cell in
+            .onDequeue { _, _, cell in
                 cell.selectionStyle = .none
             }
         

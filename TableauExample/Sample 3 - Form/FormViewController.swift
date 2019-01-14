@@ -64,9 +64,10 @@ class FormViewController: UIViewController {
         // 4.
         self.binder.onAllSections()
             .bind(
-                models: { [unowned self] in return self.displayedFormItems },
                 cellProvider: { [unowned self] tableView, _, _, formItem in
                     return self.dequeueCell(forFormItem: formItem, tableView: tableView)
+                }, models: { [unowned self] in
+                    return self.displayedFormItems
                 })
         
         // 5.

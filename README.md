@@ -30,16 +30,16 @@ let myModels: [MyModel] = ...
 binder.onSection(.first)
     .bind(headerTitle: "FIRST SECTION")
     .bind(cellType: MyCustomTableViewCell.self, models: { myModels })
-    .onCellDequeue { (row: Int, cell: MyCustomTableViewCell, model: MyModel) in
+    .onDequeue { (row: Int, cell: MyCustomTableViewCell, model: MyModel) in
         // setup the dequeued 'cell' with the 'model'
     }
-    .onCellTapped { (row, cell, model: MyModel) in
+    .onTapped { (row, cell, model: MyModel) in
         // e.g. go to a detail view controller with the 'model'
     }
 
 binder.onSections(.second, .third)
     .bind(cellType: MyOtherTableViewCell.self, models: { ... })
-    .onCellDequeue { (section: Section, row, cell, model) in
+    .onDequeue { (section: Section, row, cell, model) in
         // setup the dequeued 'cell' with the 'model'
     }
     ...

@@ -47,7 +47,7 @@ public extension TableViewSection where Self: RawRepresentable, Self.RawValue: C
  let binder = TableViewBinder(tableView: tableView)
  binder.onTable()
     .bind(cellType: MyCell.self, models: cellModels)
-    .onCellDequeue { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
+    .onDequeue { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
         // called when a cell in section `one` is dequeued
     }
     .onTapped { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
@@ -119,7 +119,7 @@ public protocol SectionedTableViewBinderProtocol: AnyObject {
  let binder = RxSectionedTableViewBinder(tableView: tableView, sectionedBy: Section.self)
  binder.onSection(.one)
     .bind(cellType: MyCell.self, models: cellModels)
-    .onCellDequeue { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
+    .onDequeue { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
         // called when a cell in section `one` is dequeued
     }
     .onTapped { [unowned self] (row: Int, cell: MyCell, model: MyModel) in

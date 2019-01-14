@@ -138,18 +138,18 @@ Whatever works for you!
 
 ### Binding supplementary handlers
 
-The other main usage for the `onAnySection` method is for binding 'supplementary' handlers, especially for `onCellTapped`. Handlers like
-`onCellTapped` that are added on an `onAnySection` chain are called *in addition to handlers on more specific chains* instead of as a 
+The other main usage for the `onAnySection` method is for binding 'supplementary' handlers, especially for `onTapped`. Handlers like
+`onTapped` that are added on an `onAnySection` chain are called *in addition to handlers on more specific chains* instead of as a 
 fallback. So, in this example:
 
 ```swift
 binder.onSection(.first)
-    .onCellTapped { _, _ in
+    .onTapped { _, _ in
         // go to a new view controller, etc
     }
     
 binder.onAnySection()
-    .onCellTapped { _, _, _ in
+    .onTapped { _, _, _ in
         // do work for any cell being tapped (maybe log analytics?)
     }
 ```
@@ -158,10 +158,9 @@ Both handlers would be called if a cell is tapped in the `first` section. This a
 sections, and put more generic code (logging analytics, hiding a spinner, whatever other shared behaviour) in the `onAnySection` chain to
 reduce copy-pasta.
 
-And that's pretty much the gist of using `onAllSections` and `onAnySection`! There are a couple edge-case things you might run into that
-we'll talk about in the [tips, tricks, and FAQ](TipsTricksFAQ.md) page, but they're pretty rare. For now, we'd recommend playing around with
-these different binding chain methods (again, there are full implementations using them in the included example project!) and see how you can 
-describe your binding with them - they'll make a lot more sense once you've seen them in action.
+And that's pretty much the gist of using `onAllSections` and `onAnySection`! For now, we'd recommend playing around with these different
+binding chain methods (again, there are full implementations using them in the included example project!) and see how you can describe your 
+binding with them - they'll make a lot more sense once you've seen them in action.
 
 - [Getting Started](1-GettingStarted.md)
 - [Updating data](2-UpdatingData.md)

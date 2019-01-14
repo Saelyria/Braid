@@ -16,7 +16,7 @@ internal extension SectionedTableViewBinder {
             if var cell = binder?.tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as? C,
             let viewModel = (binder?.currentDataModel.sectionCellViewModels[section] as? [C.ViewModel])?[indexPath.row] {
                 cell.viewModel = viewModel
-                binder?.callOnCellDequeue(cell: cell, section: section, row: indexPath.row)
+                binder?.callonDequeue(cell: cell, section: section, row: indexPath.row)
                 binder?.setEventCallback(onCell: cell, section: section, row: indexPath.row)
                 
                 return cell
@@ -38,7 +38,7 @@ internal extension SectionedTableViewBinder {
             let reuseIdentifier = (cellType as? ReuseIdentifiable.Type)?.reuseIdentifier
                 ?? cellType.classNameReuseIdentifier
             if let cell = binder?.tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as? C {
-                binder?.callOnCellDequeue(cell: cell, section: section, row: indexPath.row)
+                binder?.callonDequeue(cell: cell, section: section, row: indexPath.row)
                 binder?.setEventCallback(onCell: cell, section: section, row: indexPath.row)
                 
                 return cell
@@ -60,7 +60,7 @@ internal extension SectionedTableViewBinder {
         let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = self] (section, _, indexPath) in
             guard let table = binder?.tableView else { return UITableViewCell() }
             let cell = cellProvider(table, indexPath.row)
-            binder?.callOnCellDequeue(cell: cell, section: section, row: indexPath.row)
+            binder?.callonDequeue(cell: cell, section: section, row: indexPath.row)
             binder?.setEventCallback(onCell: cell, section: section, row: indexPath.row)
             
             return cell
@@ -78,7 +78,7 @@ internal extension SectionedTableViewBinder {
         let cellDequeueBlock: CellDequeueBlock<S> = { [weak binder = self] (section, _, indexPath) in
             guard let table = binder?.tableView else { return UITableViewCell() }
             let cell = cellProvider(table, section, indexPath.row)
-            binder?.callOnCellDequeue(cell: cell, section: section, row: indexPath.row)
+            binder?.callonDequeue(cell: cell, section: section, row: indexPath.row)
             binder?.setEventCallback(onCell: cell, section: section, row: indexPath.row)
             
             return cell
@@ -86,14 +86,14 @@ internal extension SectionedTableViewBinder {
         self._addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
     }
     
-    /// calls the `onCellDequeue` method appropriate to how the binding chain was setup
-    private func callOnCellDequeue(cell: UITableViewCell, section: S, row: Int) {
+    /// calls the `onDequeue` method appropriate to how the binding chain was setup
+    private func callonDequeue(cell: UITableViewCell, section: S, row: Int) {
         if self.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
-            self.handlers.sectionCellDequeuedCallbacks[section]?(section, row, cell)
+            self.handlers.sectionDequeuedCallbacks[section]?(section, row, cell)
         } else {
             self.handlers.dynamicSectionsCellDequeuedCallback?(section, row, cell)
         }
-        self.handlers.anySectionCellDequeuedCallback?(section, row, cell)
+        self.handlers.anySectionDequeuedCallback?(section, row, cell)
     }
     
     /// sets a callback handler that the cell will call in its `emit(event:)` method.
@@ -228,11 +228,11 @@ private extension SectionedTableViewBinder {
                     assertionFailure("Section '\(section)' already has a cell type bound to it - re-binding not supported.")
                     return
                 }
-                self.handlers.sectionCellDequeueBlocks[section] = cellDequeueBlock
+                self.handlers.sectionDequeueBlocks[section] = cellDequeueBlock
             }
             self.nextDataModel.uniquelyBoundCellSections.append(contentsOf: sections)
         case .forAllUnnamedSections:
-            self.handlers.dynamicSectionCellDequeueBlock = cellDequeueBlock
+            self.handlers.dynamicSectionDequeueBlock = cellDequeueBlock
         case .forAnySection:
             assertionFailure("Can't add cell dequeue blocks for 'any section'")
         }
