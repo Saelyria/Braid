@@ -16,9 +16,9 @@ using RxSwift, each variant also has an overload where you can pass in an 'updat
 
 ### Cell type + models
 
-This method declares the given `UITableViewCell` type (that also conforms to `ReuseIdentifiable`) to be used for the section(s) being
-bound. It also declares that cells are dequeued according to the given array (or dictionary) of 'model' objects; one cell for each model. The
-cell type and model type are passed along down the chain for type safety and ability to have 'model' instances given to various handlers.
+This method declares the given `UITableViewCell` type to be used for the section(s) being bound. It also declares that cells are dequeued 
+according to the given array (or dictionary) of 'model' objects; one cell for each model. The cell type and model type are passed along down 
+the chain for type safety and ability to have 'model' instances given to various handlers.
 
 Examples of this cell binding method can be found in the [getting started](GettingStarted.md) tutorial, but it generally looks like this:
 
@@ -45,9 +45,9 @@ bound. It also declares that cells are dequeued according to the given array (or
 model.
 
 'View models' are a little different than 'models'. To use this method, the table view cell type declared must conform to a protocol called
-`ViewModelBindable` (along with `ReuseIdentifiable`, like the previous method). This 'view model bindable' protocol has a view class
-declare an associated `ViewModel` type that it can be setup with. These 'view models' should describe the cell's entire view state and are
-automatically bound to dequeued cells, so you don't need to include an `onCellDequeue` method when using view models.
+`ViewModelBindable`. This 'view model bindable' protocol has a view class declare an associated `ViewModel` type that it can be setup 
+with. These 'view models' should describe the cell's entire view state and are automatically bound to dequeued cells, so you don't need to 
+include an `onDequeue` method when using view models.
 
 This method is most often used for relatively static content that doesn't really have a raw 'model' object that you manipulate anywhere else, 
 like a 'banner' cell or cells in some kind of form. An example of its use can be found in the first sample ('Accounts') in the sample project to
@@ -156,9 +156,6 @@ binder.onTable()
     }, models: models)
     ...
 ```
-
-> The cell type returned from this is also a little more flexible in that it does not need to conform to `ReuseIdentifiable`. However, we 
-recommend that you add conformance as Tableau includes convenience methods like the above `dequeue(_:)` method.
 
 ### Cell provider + number of cells
 

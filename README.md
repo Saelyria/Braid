@@ -30,16 +30,16 @@ let myModels: [MyModel] = ...
 binder.onSection(.first)
     .bind(headerTitle: "FIRST SECTION")
     .bind(cellType: MyCustomTableViewCell.self, models: { myModels })
-    .onCellDequeue { (row: Int, cell: MyCustomTableViewCell, model: MyModel) in
+    .onDequeue { (row: Int, cell: MyCustomTableViewCell, model: MyModel) in
         // setup the dequeued 'cell' with the 'model'
     }
-    .onCellTapped { (row, cell, model: MyModel) in
+    .onTapped { (row, cell, model: MyModel) in
         // e.g. go to a detail view controller with the 'model'
     }
 
 binder.onSections(.second, .third)
     .bind(cellType: MyOtherTableViewCell.self, models: { ... })
-    .onCellDequeue { (section: Section, row, cell, model) in
+    .onDequeue { (section: Section, row, cell, model) in
         // setup the dequeued 'cell' with the 'model'
     }
     ...
@@ -48,15 +48,16 @@ binder.onAllOtherSections()
     ...
 ```
 
-By using binding chains, you can more clearly describe how your table views works in a way that reads more like the requirements you 
-receive, and you have type safety built-in by having cells and models safely cast (to types you give in the `bind(cellType:models:)` 
-method) and passed into the handlers added to each chain.
+By having tables setup using chains like this, you can more clearly describe how your table views work in a way that reads more like the 
+requirements you receive, and you have type safety built-in by having cells and models safely cast (to types you give in the
+`bind(cellType:models:)` method) and passed into the handlers added to each chain.
 
 ## Custom cell events
 
-There are many types of handlers that can be added to a binding chain, like cell tapped handlers or handlers to provide dimensions like height.
-However, Tableau also gives you the ability for your cells to declare custom event enums on your cells that can be observed on your binding
-chains. This is done by conforming your cell to `ViewEventEmitting` and giving it a `ViewEvent` enum, like this:
+Figuring out how to pass events like when a button is pressed or text is entered on a cell back up to your view controller is always a hassle 
+usually involving conformance to a bunch of different delegate protocols. To solve this, Tableau also gives you the ability for your cells to 
+declare custom event enums on your cells that can be observed on your binding chains. This is done by conforming your cell to the
+`ViewEventEmitting` protocol and giving it a `ViewEvent` enum, like this:
 
 ```swift
 class MyCustomTableViewCell: UITableViewCell, ViewEventEmitting {

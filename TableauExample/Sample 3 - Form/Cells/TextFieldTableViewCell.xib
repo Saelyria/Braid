@@ -29,6 +29,11 @@
                         <nil key="textColor"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <textInputTraits key="textInputTraits"/>
+                        <connections>
+                            <action selector="textEntered" destination="O2w-RB-JCL" eventType="editingChanged" id="xln-m5-cI2"/>
+                            <action selector="textEntryEnded" destination="O2w-RB-JCL" eventType="editingDidEnd" id="FnF-Vr-mWe"/>
+                            <action selector="textEntryStarted" destination="O2w-RB-JCL" eventType="editingDidBegin" id="mvE-vg-R2f"/>
+                        </connections>
                     </textField>
                 </subviews>
                 <constraints>

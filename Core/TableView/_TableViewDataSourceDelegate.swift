@@ -79,8 +79,8 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         
         // We can't fall back to the 'all sections' cell dequeue block - might expect a different cell type.
         let _dequeueBlock = (self.dataModel.uniquelyBoundCellSections.contains(section)) ?
-            self.binder.handlers.sectionCellDequeueBlocks[section] :
-            self.binder.handlers.dynamicSectionCellDequeueBlock
+            self.binder.handlers.sectionDequeueBlocks[section] :
+            self.binder.handlers.dynamicSectionDequeueBlock
         guard let dequeueBlock = _dequeueBlock else { return UITableViewCell() }
         
         let cell = dequeueBlock(section, tableView, indexPath)

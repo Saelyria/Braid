@@ -30,6 +30,8 @@ class ArtistsViewController: UIViewController {
         tableView.frame = self.view.frame
         tableView.tableFooterView = UIView()
         tableView.sectionFooterHeight = 0.0
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 40
         tableView.register(TitleDetailTableViewCell.self)
         
         self.binder = SectionedTableViewBinder(tableView: tableView, sectionedBy: Section.self)

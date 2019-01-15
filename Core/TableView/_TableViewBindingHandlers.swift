@@ -23,8 +23,8 @@ class _TableViewBindingHandlers<S: TableViewSection> {
     lazy var modelUpdaters: [() -> Void] = { [] }()
     
     // Closures to call to dequeue a cell in a section.
-    lazy var sectionCellDequeueBlocks: [S: CellDequeueBlock<S>] = { [:] }()
-    var dynamicSectionCellDequeueBlock: CellDequeueBlock<S>?
+    lazy var sectionDequeueBlocks: [S: CellDequeueBlock<S>] = { [:] }()
+    var dynamicSectionDequeueBlock: CellDequeueBlock<S>?
 
     // Closures to call to get the height for a cell in a section.
     lazy var sectionCellHeightBlocks: [S: CellHeightBlock<S>] = { [:] }()
@@ -112,7 +112,7 @@ class _TableViewBindingHandlers<S: TableViewSection> {
     var anySectionCellTappedCallback: CellTapCallback<S>?
 
     // Blocks to call when a cell is dequeued in a section.
-    lazy var sectionCellDequeuedCallbacks: [S: CellDequeueCallback<S>] = { [:] }()
+    lazy var sectionDequeuedCallbacks: [S: CellDequeueCallback<S>] = { [:] }()
     var dynamicSectionsCellDequeuedCallback: CellDequeueCallback<S>?
-    var anySectionCellDequeuedCallback: CellDequeueCallback<S>?
+    var anySectionDequeuedCallback: CellDequeueCallback<S>?
 }

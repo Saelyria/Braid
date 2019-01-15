@@ -51,7 +51,7 @@ These are the most complicated objects. In a binding chain, there are at least t
 the binding, and especially if you're binding multiple sections at once), with the first one being the return value of the 'table binder's 
 `onSection` method and its variants. Each time you add a function call onto the binding chain, one of these objects is returned (either newly 
 created or they return themselves) so you can continue the chain using one of its methods. All of the main binding methods - 
-`onCellDequeue`, `onTapped`, `bind(cellType:models)`, etc. are the methods of these objects. As the binding chain is created, more type
+`onDequeue`, `onTapped`, `bind(cellType:models)`, etc. are the methods of these objects. As the binding chain is created, more type
 information is given (e.g. the cell type, the model type, etc), which is 'stored' via generic types in these objects. 
 
 This is best explained by just walking through a binding chain. To start, we call the `onSection` method of our table binder, which returns the

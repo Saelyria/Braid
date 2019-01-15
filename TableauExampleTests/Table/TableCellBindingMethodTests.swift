@@ -34,7 +34,7 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onSection(.first)
             .bind(cellType: TestCell.self, models: ["1-1"])
-            .onCellDequeue { row, cell, model in
+            .onDequeue { row, cell, model in
                 dequeuedCells[.first]?.insert(cell, at: row)
                 models[.first]?.insert(model, at: row)
             }
@@ -44,7 +44,7 @@ class TableCellBindingMethodTests: TableTestCase {
                 .second: ["2-1", "2-2"],
                 .third: ["3-1", "3-2", "3-3"]
             ])
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 dequeuedCells[section]?.insert(cell, at: row)
                 models[section]?.insert(model, at: row)
             }
@@ -53,7 +53,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .bind(cellType: TestCell.self, models: [
                 .fourth: ["4-1", "4-2", "4-3", "4-4",]
             ])
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 dequeuedCells[section]?.insert(cell, at: row)
                 models[section]?.insert(model, at: row)
             }
@@ -113,7 +113,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .bind(cellType: TestViewModelCell.self, viewModels: [
                 TestViewModelCell.ViewModel(id: "1-1"),
             ])
-            .onCellDequeue { row, cell in
+            .onDequeue { row, cell in
                 dequeuedCells[.first]?.insert(cell, at: row)
                 viewModels[.first]?.insert(cell.viewModel, at: row)
             }
@@ -131,7 +131,7 @@ class TableCellBindingMethodTests: TableTestCase {
 
                 ]
             ])
-            .onCellDequeue { section, row, cell in
+            .onDequeue { section, row, cell in
                 dequeuedCells[section]?.insert(cell, at: row)
                 viewModels[section]?.insert(cell.viewModel, at: row)
             }
@@ -145,7 +145,7 @@ class TableCellBindingMethodTests: TableTestCase {
                     TestViewModelCell.ViewModel(id: "4-4")
                 ]
             ])
-            .onCellDequeue { section, row, cell in
+            .onDequeue { section, row, cell in
                 dequeuedCells[section]?.insert(cell, at: row)
                 viewModels[section]?.insert(cell.viewModel, at: row)
             }
@@ -206,7 +206,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .bind(cellType: TestViewModelCell.self,
                   models: ["1-1",],
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0) })
-            .onCellDequeue { row, cell, model in
+            .onDequeue { row, cell, model in
                 dequeuedCells[.first]?.insert(cell, at: row)
                 models[.first]?.insert(model, at: row)
                 viewModels[.first]?.insert(cell.viewModel, at: row)
@@ -218,7 +218,7 @@ class TableCellBindingMethodTests: TableTestCase {
                     .second: ["2-1", "2-2"],
                     .third: ["3-1", "3-2", "3-3"] ],
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0) })
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 dequeuedCells[section]?.insert(cell, at: row)
                 models[section]?.insert(model, at: row)
                 viewModels[section]?.insert(cell.viewModel, at: row)
@@ -228,7 +228,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .bind(cellType: TestViewModelCell.self,
                   models: [.fourth: ["4-1", "4-2", "4-3", "4-4"] ],
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0) })
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 dequeuedCells[section]?.insert(cell, at: row)
                 models[section]?.insert(model, at: row)
                 viewModels[section]?.insert(cell.viewModel, at: row)
@@ -305,41 +305,38 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onSection(.first)
             .bind(
-                models: ["1-1"],
                 cellProvider: { table, row, model in
                     models[.first]?.insert(model, at: row)
                     return table.dequeue(TestCell.self)
-                })
-            .onCellDequeue { row, cell, model in
+                }, models: ["1-1"])
+            .onDequeue { row, cell, model in
                 expect(model).to(equal(models[.first]?[row]))
                 dequeuedCells[.first]?.insert(cell as! TestCell, at: row)
             }
         
         self.binder.onSections(.second, .third)
             .bind(
-                models: [
-                    .second: ["2-1", "2-2"],
-                    .third: ["3-1", "3-2", "3-3"]
-                ],
                 cellProvider: { (table, section, row, model: String) in
                     models[section]?.insert(model, at: row)
                     return table.dequeue(TestCell.self)
-                })
-            .onCellDequeue { section, row, cell, model in
+                }, models: [
+                    .second: ["2-1", "2-2"],
+                    .third: ["3-1", "3-2", "3-3"]
+                ])
+            .onDequeue { section, row, cell, model in
                 expect(model).to(equal(models[section]?[row]))
                 dequeuedCells[section]?.insert(cell as! TestCell, at: row)
             }
         
         self.binder.onAllOtherSections()
             .bind(
-                models: [
-                    .fourth: ["4-1", "4-2", "4-3", "4-4"],
-                ],
                 cellProvider: { (table, section, row, model: String) in
                     models[section]?.insert(model, at: row)
                     return table.dequeue(TestCell.self)
-                })
-            .onCellDequeue { section, row, cell, model in
+                }, models: [
+                    .fourth: ["4-1", "4-2", "4-3", "4-4"],
+                ])
+            .onDequeue { section, row, cell, model in
                 expect(model).to(equal(models[section]?[row]))
                 dequeuedCells[section]?.insert(cell as! TestCell, at: row)
             }
@@ -398,7 +395,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .bind(cellProvider: { table, row in
                 return table.dequeue(TestCell.self)
             }, numberOfCells: 1)
-            .onCellDequeue { row, cell in
+            .onDequeue { row, cell in
                 dequeuedCells[.first]?.insert(cell as! TestCell, at: row)
             }
         
@@ -406,7 +403,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .bind(cellProvider: { table, section, row in
                 return table.dequeue(TestCell.self)
             }, numberOfCells: [.second: 2, .third: 3])
-            .onCellDequeue { section, row, cell in
+            .onDequeue { section, row, cell in
                 dequeuedCells[section]?.insert(cell as! TestCell, at: row)
             }
         
@@ -414,7 +411,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .bind(cellProvider: { table, section, row in
                 return table.dequeue(TestCell.self)
             }, numberOfCells: [.fourth: 4])
-            .onCellDequeue { section, row, cell in
+            .onDequeue { section, row, cell in
                 dequeuedCells[section]?.insert(cell as! TestCell, at: row)
             }
         
@@ -459,7 +456,7 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onSection(.first)
             .bind(cellType: TestCell.self, models: { firstModels })
-            .onCellDequeue { row, cell, model in
+            .onDequeue { row, cell, model in
                 if dequeuedCells[.first]?.indices.contains(row) == false {
                     dequeuedCells[.first]?.insert(cell, at: row)
                     models[.first]?.insert(model, at: row)
@@ -474,7 +471,7 @@ class TableCellBindingMethodTests: TableTestCase {
                 .second: secondModels,
                 .third: thirdModels
                 ]})
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     models[section]?.insert(model, at: row)
@@ -488,7 +485,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .bind(cellType: TestCell.self, models: {[
                 .fourth: fourthModels
                 ]})
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     models[section]?.insert(model, at: row)
@@ -601,7 +598,7 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onSection(.first)
             .bind(cellType: TestViewModelCell.self, viewModels: { firstModels })
-            .onCellDequeue { row, cell in
+            .onDequeue { row, cell in
                 if dequeuedCells[.first]?.indices.contains(row) == false {
                     dequeuedCells[.first]?.insert(cell, at: row)
                     viewModels[.first]?.insert(cell.viewModel, at: row)
@@ -616,7 +613,7 @@ class TableCellBindingMethodTests: TableTestCase {
                 .second: secondModels,
                 .third: thirdModels
                 ]})
-            .onCellDequeue { section, row, cell in
+            .onDequeue { section, row, cell in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     viewModels[section]?.insert(cell.viewModel, at: row)
@@ -630,7 +627,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .bind(cellType: TestViewModelCell.self, viewModels: {[
                 .fourth: fourthModels
                 ]})
-            .onCellDequeue { section, row, cell in
+            .onDequeue { section, row, cell in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     viewModels[section]?.insert(cell.viewModel, at: row)
@@ -744,7 +741,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .bind(cellType: TestViewModelCell.self,
                   models: { firstModels },
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0) })
-            .onCellDequeue { row, cell, model in
+            .onDequeue { row, cell, model in
                 if dequeuedCells[.first]?.indices.contains(row) == false {
                     dequeuedCells[.first]?.insert(cell, at: row)
                     models[.first]?.insert(model, at: row)
@@ -760,7 +757,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .bind(cellType: TestViewModelCell.self,
                   models: {[.second: secondModels, .third: thirdModels ]},
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0) })
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     models[section]?.insert(model, at: row)
@@ -776,7 +773,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .bind(cellType: TestViewModelCell.self,
                   models: { [.fourth: fourthModels ] },
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0) })
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     models[section]?.insert(model, at: row)
@@ -923,7 +920,6 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onSection(.first)
             .bind(
-                models: { firstModels },
                 cellProvider: { table, row, model in
                     if dequeuedCells[.first]?.indices.contains(row) == false {
                         models[.first]?.insert(model, at: row)
@@ -931,8 +927,8 @@ class TableCellBindingMethodTests: TableTestCase {
                         models[.first]?[row] = model
                     }
                     return table.dequeue(TestCell.self)
-            })
-            .onCellDequeue { row, cell, model in
+                }, models: { firstModels })
+            .onDequeue { row, cell, model in
                 expect(model).to(equal(models[.first]?[row]))
                 if dequeuedCells[.first]?.indices.contains(row) == false {
                     dequeuedCells[.first]?.insert(cell as! TestCell, at: row)
@@ -943,7 +939,6 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onSections(.second, .third)
             .bind(
-                models: { [.second: secondModels, .third: thirdModels] },
                 cellProvider: { (table, section, row, model: String) in
                     if dequeuedCells[section]?.indices.contains(row) == false {
                         models[section]?.insert(model, at: row)
@@ -951,8 +946,8 @@ class TableCellBindingMethodTests: TableTestCase {
                         models[section]?[row] = model
                     }
                     return table.dequeue(TestCell.self)
-            })
-            .onCellDequeue { section, row, cell, model in
+                }, models: { [.second: secondModels, .third: thirdModels] })
+            .onDequeue { section, row, cell, model in
                 expect(model).to(equal(models[section]?[row]))
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell as! TestCell, at: row)
@@ -963,7 +958,6 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onAllOtherSections()
             .bind(
-                models: { [.fourth: fourthModels] },
                 cellProvider: { (table, section, row, model: String) in
                     if dequeuedCells[section]?.indices.contains(row) == false {
                         models[section]?.insert(model, at: row)
@@ -971,8 +965,8 @@ class TableCellBindingMethodTests: TableTestCase {
                         models[section]?[row] = model
                     }
                     return table.dequeue(TestCell.self)
-            })
-            .onCellDequeue { section, row, cell, model in
+            }, models: { [.fourth: fourthModels] })
+            .onDequeue { section, row, cell, model in
                 expect(model).to(equal(models[section]?[row]))
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell as! TestCell, at: row)
@@ -1080,7 +1074,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .bind(cellProvider: { table, row in
                 return table.dequeue(TestCell.self)
             }, numberOfCells: { numberOfCells })
-            .onCellDequeue { row, cell in
+            .onDequeue { row, cell in
                 if dequeuedCells[.first]?.indices.contains(row) == false {
                     dequeuedCells[.first]?.insert(cell as! TestCell, at: row)
                 } else {
@@ -1092,7 +1086,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .bind(cellProvider: { table, section, row in
                 return table.dequeue(TestCell.self)
             }, numberOfCells: {[.second: numberOfCells, .third: numberOfCells]})
-            .onCellDequeue { section, row, cell in
+            .onDequeue { section, row, cell in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell as! TestCell, at: row)
                 } else {
@@ -1104,7 +1098,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .bind(cellProvider: { table, section, row in
                 return table.dequeue(TestCell.self)
             }, numberOfCells: {[.fourth: numberOfCells]})
-            .onCellDequeue { section, row, cell in
+            .onDequeue { section, row, cell in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell as! TestCell, at: row)
                 } else {
@@ -1176,7 +1170,7 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onSection(.first)
             .rx.bind(cellType: TestCell.self, models: firstModels.asObservable())
-            .onCellDequeue { row, cell, model in
+            .onDequeue { row, cell, model in
                 if dequeuedCells[.first]?.indices.contains(row) == false {
                     dequeuedCells[.first]?.insert(cell, at: row)
                     models[.first]?.insert(model, at: row)
@@ -1188,7 +1182,7 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onSections(.second, .third)
             .rx.bind(cellType: TestCell.self, models: secondThirdModels)
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     models[section]?.insert(model, at: row)
@@ -1200,7 +1194,7 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onAllOtherSections()
             .rx.bind(cellType: TestCell.self, models: fourthModels)
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     models[section]?.insert(model, at: row)
@@ -1318,7 +1312,7 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onSection(.first)
             .rx.bind(cellType: TestViewModelCell.self, viewModels: firstModels)
-            .onCellDequeue { row, cell in
+            .onDequeue { row, cell in
                 if dequeuedCells[.first]?.indices.contains(row) == false {
                     dequeuedCells[.first]?.insert(cell, at: row)
                     viewModels[.first]?.insert(cell.viewModel, at: row)
@@ -1330,7 +1324,7 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onSections(.second, .third)
             .rx.bind(cellType: TestViewModelCell.self, viewModels: secondThirdModels)
-            .onCellDequeue { section, row, cell in
+            .onDequeue { section, row, cell in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     viewModels[section]?.insert(cell.viewModel, at: row)
@@ -1342,7 +1336,7 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onAllOtherSections()
             .rx.bind(cellType: TestViewModelCell.self, viewModels: fourthModels)
-            .onCellDequeue { section, row, cell in
+            .onDequeue { section, row, cell in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     viewModels[section]?.insert(cell.viewModel, at: row)
@@ -1458,7 +1452,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .rx.bind(cellType: TestViewModelCell.self,
                      models: firstModels,
                      mapToViewModels: { TestViewModelCell.ViewModel(id: $0) })
-            .onCellDequeue { row, cell, model in
+            .onDequeue { row, cell, model in
                 if dequeuedCells[.first]?.indices.contains(row) == false {
                     dequeuedCells[.first]?.insert(cell, at: row)
                     models[.first]?.insert(model, at: row)
@@ -1474,7 +1468,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .rx.bind(cellType: TestViewModelCell.self,
                      models: secondThirdModels,
                      mapToViewModels: { TestViewModelCell.ViewModel(id: $0) })
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     models[section]?.insert(model, at: row)
@@ -1490,7 +1484,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .rx.bind(cellType: TestViewModelCell.self,
                      models: fourthModels,
                      mapToViewModels: { TestViewModelCell.ViewModel(id: $0) })
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     models[section]?.insert(model, at: row)
@@ -1639,7 +1633,6 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onSection(.first)
             .rx.bind(
-                models: firstModels,
                 cellProvider: { table, row, model in
                     if dequeuedCells[.first]?.indices.contains(row) == false {
                         models[.first]?.insert(model, at: row)
@@ -1647,8 +1640,8 @@ class TableCellBindingMethodTests: TableTestCase {
                         models[.first]?[row] = model
                     }
                     return table.dequeue(TestCell.self)
-            })
-            .onCellDequeue { row, cell, model in
+                }, models: firstModels)
+            .onDequeue { row, cell, model in
                 expect(model).to(equal(models[.first]?[row]))
                 if dequeuedCells[.first]?.indices.contains(row) == false {
                     dequeuedCells[.first]?.insert(cell as! TestCell, at: row)
@@ -1668,7 +1661,7 @@ class TableCellBindingMethodTests: TableTestCase {
                     }
                     return table.dequeue(TestCell.self)
             })
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 expect(model).to(equal(models[section]?[row]))
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell as! TestCell, at: row)
@@ -1688,7 +1681,7 @@ class TableCellBindingMethodTests: TableTestCase {
                     }
                     return table.dequeue(TestCell.self)
             })
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 expect(model).to(equal(models[section]?[row]))
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell as! TestCell, at: row)
@@ -1801,7 +1794,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .rx.bind(cellProvider: { table, row in
                 return table.dequeue(TestCell.self)
             }, numberOfCells: firstNumCells)
-            .onCellDequeue { row, cell in
+            .onDequeue { row, cell in
                 if dequeuedCells[.first]?.indices.contains(row) == false {
                     dequeuedCells[.first]?.insert(cell as! TestCell, at: row)
                 } else {
@@ -1813,7 +1806,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .rx.bind(cellProvider: { table, section, row in
                 return table.dequeue(TestCell.self)
             }, numberOfCells: secondThirdNumCells)
-            .onCellDequeue { section, row, cell in
+            .onDequeue { section, row, cell in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell as! TestCell, at: row)
                 } else {
@@ -1825,7 +1818,7 @@ class TableCellBindingMethodTests: TableTestCase {
             .rx.bind(cellProvider: { table, section, row in
                 return table.dequeue(TestCell.self)
             }, numberOfCells: fourthNumCells)
-            .onCellDequeue { section, row, cell in
+            .onDequeue { section, row, cell in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell as! TestCell, at: row)
                 } else {

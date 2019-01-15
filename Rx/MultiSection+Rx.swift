@@ -172,7 +172,7 @@ public extension Reactive where Base: TableViewMultiSectionBinderProtocol {
      When using this method, you pass in an observable array of your raw models for each section in a dictionary. Each
      section being bound to must have an observable array of models in the dictionary. From there, the binder will
      handle dequeuing of your cells based on the observable models array for each section. It is also expected that,
-     when using this method, you will also use an `onCellDequeue` event handler to configure the cell, where you are
+     when using this method, you will also use an `onDequeue` event handler to configure the cell, where you are
      given the model and the dequeued cell.
      */
     @discardableResult
@@ -192,7 +192,7 @@ public extension Reactive where Base: TableViewMultiSectionBinderProtocol {
      When using this method, you pass in an observable array of your raw models for each section in a dictionary. Each
      section being bound to must have an observable array of models in the dictionary. From there, the binder will
      handle dequeuing of your cells based on the observable models array for each section. It is also expected that,
-     when using this method, you will also use an `onCellDequeue` event handler to configure the cell, where you are
+     when using this method, you will also use an `onDequeue` event handler to configure the cell, where you are
      given the model and the dequeued cell.
      */
     @discardableResult

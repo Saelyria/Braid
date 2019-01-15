@@ -346,7 +346,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
     /**
      Bind the given cell type to the declared section, creating a cell for each item in the given array of models.
      
-     When using this method, it is expected that you also provide a handler to the `onCellDequeue` method to bind the
+     When using this method, it is expected that you also provide a handler to the `onDequeue` method to bind the
      model to the cell manually.
      
      - parameter cellType: The class of the header to bind.
@@ -368,7 +368,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
     /**
      Bind the given cell type to the declared section, creating a cell for each item in the given array of models.
      
-     When using this method, it is expected that you also provide a handler to the `onCellDequeue` method to bind the
+     When using this method, it is expected that you also provide a handler to the `onDequeue` method to bind the
      model to the cell manually.
      
      - parameter cellType: The class of the header to bind.
@@ -391,7 +391,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
     /**
      Bind the given cell type to the declared section, creating a cell for each item in the given array of models.
      
-     When using this method, it is expected that you also provide a handler to the `onCellDequeue` method to bind the
+     When using this method, it is expected that you also provide a handler to the `onDequeue` method to bind the
      model to the cell manually.
      
      - parameter cellType: The class of the header to bind.
@@ -413,7 +413,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
     /**
      Bind the given cell type to the declared section, creating a cell for each item in the given array of models.
      
-     When using this method, it is expected that you also provide a handler to the `onCellDequeue` method to bind the
+     When using this method, it is expected that you also provide a handler to the `onDequeue` method to bind the
      model to the cell manually.
      
      - parameter cellType: The class of the header to bind.
@@ -452,46 +452,46 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      Bind a custom handler that will provide table view cells for the declared sections, created according to the given
      models.
      
-     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
-        the section.
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
      - parameter section: The section the closure should provide a cell for.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
+     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
+        the section.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind<NM>(
-        models: [S: [NM]],
-        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int, _ model: NM) -> UITableViewCell)
+        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
+        models: [S: [NM]])
         -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
     {
-        return self._bind(models: { models }, cellProvider: cellProvider)
+        return self._bind(cellProvider: cellProvider, models: { models })
     }
     
     /**
      Bind a custom handler that will provide table view cells for the declared sections, created according to the given
      models.
      
-     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
-        the section.
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
      - parameter section: The section the closure should provide a cell for.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
+     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
+        the section.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind<NM>(
-        models: [S: [NM]],
-        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int, _ model: NM) -> UITableViewCell)
+        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
+        models: [S: [NM]])
         -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
         where NM: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
-        return self._bind(models: { models }, cellProvider: cellProvider)
+        return self._bind(cellProvider: cellProvider, models: { models })
     }
 
     
@@ -499,51 +499,51 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      Bind a custom handler that will provide table view cells for the declared sections, created according to the given
      models.
      
-     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
-        the section.
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
      - parameter section: The section the closure should provide a cell for.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
+     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
+        the section.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind<NM>(
-        models: @escaping () -> [S: [NM]],
-        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int, _ model: NM) -> UITableViewCell)
+        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
+        models: @escaping () -> [S: [NM]])
         -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
     {
-        return self._bind(models: models, cellProvider: cellProvider)
+        return self._bind(cellProvider: cellProvider, models: models)
     }
     
     /**
      Bind a custom handler that will provide table view cells for the declared sections, created according to the given
      models.
      
-     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
-        the section.
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
      - parameter section: The section the closure should provide a cell for.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
+     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
+        the section.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind<NM>(
-        models: @escaping () -> [S: [NM]],
-        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int, _ model: NM) -> UITableViewCell)
+        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
+        models: @escaping () -> [S: [NM]])
         -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
         where NM: Equatable & CollectionIdentifiable
     {
         self.binder.addCellEqualityChecker(itemType: NM.self, affectedSections: self.affectedSectionScope)
-        return self._bind(models: models, cellProvider: cellProvider)
+        return self._bind(cellProvider: cellProvider, models: models)
     }
     
     private func _bind<NM>(
-        models: @escaping () -> [S: [NM]],
-        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int, _ model: NM) -> UITableViewCell)
+        cellProvider: @escaping (_ table: UITableView, _ section: S, _ row: Int, _ model: NM) -> UITableViewCell,
+        models: @escaping () -> [S: [NM]])
         -> TableViewModelMultiSectionBinder<UITableViewCell, S, NM>
     {
         let _cellProvider: (UITableView, S, Int) -> UITableViewCell
@@ -814,7 +814,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ cell: C) -> Void)
+    public func onDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ cell: C) -> Void)
         -> TableViewMultiSectionBinder<C, S>
     {
         let callback: CellDequeueCallback<S> = { (section: S, row: Int, cell: UITableViewCell) in
@@ -828,7 +828,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
         switch self.affectedSectionScope {
         case .forNamedSections(let sections):
             for section in sections {
-                self.binder.handlers.sectionCellDequeuedCallbacks[section] = callback
+                self.binder.handlers.sectionDequeuedCallbacks[section] = callback
             }
         case .forAllUnnamedSections:
             self.binder.handlers.dynamicSectionsCellDequeuedCallback = callback

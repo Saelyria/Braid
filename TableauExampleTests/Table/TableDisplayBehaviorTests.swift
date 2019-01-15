@@ -36,7 +36,7 @@ class TableDisplayBehaviorTests: TableTestCase {
         
         self.binder.onSection(.first)
             .bind(cellType: TestCell.self, models: { firstModels })
-            .onCellDequeue { row, cell, model in
+            .onDequeue { row, cell, model in
                 if dequeuedCells[.first]?.indices.contains(row) == false {
                     dequeuedCells[.first]?.insert(cell, at: row)
                     models[.first]?.insert(model, at: row)
@@ -51,7 +51,7 @@ class TableDisplayBehaviorTests: TableTestCase {
                 .second: secondModels,
                 .third: thirdModels
             ]})
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     models[section]?.insert(model, at: row)
@@ -63,7 +63,7 @@ class TableDisplayBehaviorTests: TableTestCase {
         
         self.binder.onAllOtherSections()
             .bind(cellType: TestCell.self, models: { [.fourth: fourthModels] })
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     models[section]?.insert(model, at: row)
@@ -160,7 +160,7 @@ class TableDisplayBehaviorTests: TableTestCase {
             .bind(headerTitle: { firstHeader })
             .bind(cellType: TestCell.self, models: { firstModels })
             .bind(footerTitle: { firstFooter })
-            .onCellDequeue { row, cell, model in
+            .onDequeue { row, cell, model in
                 if dequeuedCells[.first]?.indices.contains(row) == false {
                     dequeuedCells[.first]?.insert(cell, at: row)
                     models[.first]?.insert(model, at: row)
@@ -177,7 +177,7 @@ class TableDisplayBehaviorTests: TableTestCase {
                 .third: thirdModels
             ]})
             .bind(footerTitles: { [.second: secondFooter, .third: thirdFooter ]})
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     models[section]?.insert(model, at: row)
@@ -191,7 +191,7 @@ class TableDisplayBehaviorTests: TableTestCase {
             .bind(headerTitles: { [.fourth: fourthHeader]})
             .bind(cellType: TestCell.self, models: { [.fourth: fourthModels] })
             .bind(footerTitles: { [.fourth: fourthFooter]})
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     models[section]?.insert(model, at: row)
@@ -335,7 +335,7 @@ class TableDisplayBehaviorTests: TableTestCase {
             .bind(headerTitle: { firstHeader })
             .bind(cellType: TestCell.self, models: { firstModels })
             .bind(footerTitle: { firstFooter })
-            .onCellDequeue { row, cell, model in
+            .onDequeue { row, cell, model in
                 if dequeuedCells[.first]?.indices.contains(row) == false {
                     dequeuedCells[.first]?.insert(cell, at: row)
                     models[.first]?.insert(model, at: row)
@@ -352,7 +352,7 @@ class TableDisplayBehaviorTests: TableTestCase {
                 .third: thirdModels
                 ]})
             .bind(footerTitles: { [.second: secondFooter, .third: thirdFooter ]})
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     models[section]?.insert(model, at: row)
@@ -366,7 +366,7 @@ class TableDisplayBehaviorTests: TableTestCase {
             .bind(headerTitles: { [.fourth: fourthHeader]})
             .bind(cellType: TestCell.self, models: { [.fourth: fourthModels] })
             .bind(footerTitles: { [.fourth: fourthFooter]})
-            .onCellDequeue { section, row, cell, model in
+            .onDequeue { section, row, cell, model in
                 if dequeuedCells[section]?.indices.contains(row) == false {
                     dequeuedCells[section]?.insert(cell, at: row)
                     models[section]?.insert(model, at: row)

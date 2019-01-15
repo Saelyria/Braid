@@ -38,15 +38,18 @@ let people = [
 Perfect. On our table, we want to display people with a custom cell type - here, we'll define a `MyCustomTableViewCell` cell type to use.  
 
 ```swift
-class MyCustomTableViewCell: UITableViewCell, ReuseIdentifiable {
+class MyCustomTableViewCell: UITableViewCell {
     let titleLabel = UILabel()
 }
 ```
 
-For demo purposes, we won't implement much on it - just pretend that we've setup the `titleLabel` in an `awakeFromNib` or in the `init`. 
-One key thing here is that we've made our cell conform to the protocol `ReuseIdentifiable`. This is a Tableau protocol with one 
-requirement: a static `reuseIdentifier` property that returns what reuse identifier to use for dequeueing instances of this cell. If we don't 
-explicitly provide this property, a default string of the class name is used. That's fine for our purposes.
+For demo purposes, we won't implement much on it - just pretend that we've setup the `titleLabel` in the `init(frame:)` method. We can
+then register the cell on the table view with an included '`register(_:)` method added on `UITableView` that will take care of reuse
+identifiers for us:
+
+```swift
+tableView.register(MyCustomTableViewCell.self)
+```
 
 Now we have our models and the cell type we want to represent them - the role of the binder now is to make a connection between them. We 
 do this by declaring that 'on the table, bind my custom cell type using these given models', like this:
@@ -58,25 +61,29 @@ binder.onTable()
 
 This is the start of what's called a 'binding chain' in Tableau. Binding chains are chained function calls where we add behaviour to the binder. 
 This includes binding handlers for various events (e.g. when a cell is tapped or dequeued) as well as binding cell heights or headers or footers 
-to the table. New handlers are added to the chain by simply including them after the last item in the chain.
+to the table (you can also define custom events you can add to a binding chain, but that's for a later tutorial). New handlers are added to the 
+chain by simply including them after the last item in the chain.
 
 Typically, we want to start our binding chains with one of the cell binding methods. Here, we've used the 'model' binding method, which takes
 as arguments the cell type we want to use and an array of 'model' objects (of any type we specify) that cells will be dequeued for. The main
 reason we prefer to call the cell binding method early in the chain is that this type information - the cell type and the 'model' type - are passed
 along the binding chain, and allow us to have cell and model instances safely cast to these types later, as we'll see in the next step.
 
-Next, we'll want to add an 'on cell dequeue' handler to this chain be called whenever the binder dequeues a cell so we can set it up. This 
+> Note that this is one of a few different binding methods for cells - there are other types that allow you to dequeue cells based on an
+associated view model type or to bind a closure that will create them for binding chains that use multiple cell types.
+
+Next, we'll want to add an 'on cell dequeue' handler to this chain to be called whenever the binder dequeues a cell so we can set it up. This 
 handler will be passed in the cell and 'person' object the cell was dequeued for.
 
 ```swift
 binder.onTable()
     .bind(cellType: MyCustomTableViewCell.self, models: people)
-    .onCellDequeue { (row: Int, cell: MyCustomTableViewCell, person: Person) in
+    .onDequeue { (row: Int, cell: MyCustomTableViewCell, person: Person) in
         cell.titleLabel.text = person.name
     }
 ```
 Notice how the passed in `cell` and `person` objects are the type that we specified in the cell binding method. If we had added the
-`onCellDequeue` method to the chain before the `bind(cellType:models)` method, this type information wouldn't have been available,
+`onDequeue` method to the chain before the `bind(cellType:models)` method, this type information wouldn't have been available,
 and the passed-in cell would have just been a `UITableViewCell` and we wouldn't have been able to have the `person` object passed in at
 all.
 
@@ -86,7 +93,7 @@ just add an 'on tapped' handler like this:
 ```swift
 binder.onTable()
     .bind(cellType: MyCustomTableViewCell.self, models: people)
-    .onCellDequeue { (row: Int, cell: MyCustomTableViewCell, person: Person) in
+    .onDequeue { (row: Int, cell: MyCustomTableViewCell, person: Person) in
         cell.titleLabel.text = person.name
     }
     .onTapped { (row: Int, cell: MyCustomTableViewCell, person: Person) in
@@ -107,6 +114,17 @@ binder.finish()
 ```
 
 And that's pretty much it - the binder will then create two cells and populate them with the two `Person` objects.
+
+### A note about dequeueing, reuse identifiers, and nibs
+
+By default, Tableau will register cells to the table using the string name of their class name. So, the `MyCustomTableViewCell` would be 
+registered by default under the reuse identifier `"MyCustomTableViewCell"`. If you want to use a custom reuse identifier, you can have your
+cell conform to `ReuseIdentifiable` and provide a `static let reuseIdentifier: String` property that Tableau will use instead.
+
+If your cell uses a nib file, you should also have your cell conform to `UINibInitable`, which allows you to declare various properties (namely
+`nibName`) that lets Tableau register and dequeue instances of the cell using the nib. This protocol provides default values for these properties
+that assume the nib file is 1) in the same bundle as the conforming class, and 2) is named the same as the class. So, if these are both true,
+you simply need to add `UINibInitable` as one of the protocols that your cell conforms to, then it's good to go - no implementation required!
 
 ## Sectioned table views
 
@@ -147,14 +165,14 @@ let undecided = [
 ```
 
 Perfect. Now, we have two different cells we want to use - a normal cell for 'friends' and 'undecided', and a special cell type for cells in our 
-'enemy' section that draws a red 'X' over it. (we'll assume that these cell classes have been defined somewhere else and conform to
-`ReuseIdentifiable`). We'll setup the 'enemies' section first.
+'enemy' section that draws a red 'X' over it. (we'll assume that these cell classes have been defined somewhere else). We'll setup the 
+'enemies' section first.
 
 ```swift
 binder.onSection(.enemies)
     .bind(cellType: EnemyTableViewCell.self, models: enemies)
     .bind(headerTitle: "ENEMIES")
-    .onCellDequeue { (row: Int, cell: EnemyTableViewCell, person: Person) in
+    .onDequeue { (row: Int, cell: EnemyTableViewCell, person: Person) in
         // setup cell
     }
     .onTapped { (row: Int, cell: EnemyTableViewCell, person: Person) in
@@ -180,7 +198,7 @@ binder.onSections([.friends, .undecided])
         .friends: "FRIENDS",
         .undecided: "NOT SURE YET"
     ])
-    .onCellDequeue { (section: Section, row: Int, cell: MyTableViewCell, person: Person) in
+    .onDequeue { (section: Section, row: Int, cell: MyTableViewCell, person: Person) in
         // setup cell
     }
     .onTapped { (section: Section, row: Int, cell: MyTableViewCell, person: Person) in
@@ -191,7 +209,7 @@ binder.onSections([.friends, .undecided])
 As you can see, binding two sections at once is basically the same - the only difference is that for cell models, we pass in a dictionary where
 the key is a section and the value is an array of the models for that section. Each binding chain applies the handlers and data bound to it only 
 to the sections it was started with. So, in the first binding chain, the `EnemyTableViewCell` is only used in the 'enemies' section, and the
-associated `onCellDequeue` and `onTapped` handlers are only called when cells are dequeued or tapped in this section. Likewise, with the 
+associated `onDequeue` and `onTapped` handlers are only called when cells are dequeued or tapped in this section. Likewise, with the 
 next binding chain, the `MyTableViewCell` type is only used in the 'friends' and 'undecided' sections, with its associated handlers only being 
 called for cells in those sections. Neat, huh?
 

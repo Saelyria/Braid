@@ -60,7 +60,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onCellDequeue(_ handler: @escaping (_ row: Int, _ cell: C, _ model: M) -> Void)
+    public func onDequeue(_ handler: @escaping (_ row: Int, _ cell: C, _ model: M) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         let section = self.section
@@ -72,7 +72,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
             handler(row, cell, model)
         }
         
-        self.binder.handlers.sectionCellDequeuedCallbacks[section] = dequeueCallback
+        self.binder.handlers.sectionDequeuedCallbacks[section] = dequeueCallback
         
         return self
     }
@@ -199,10 +199,10 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     @discardableResult
-    override public func onCellDequeue(_ handler: @escaping (_ row: Int, _ cell: C) -> Void)
+    override public func onDequeue(_ handler: @escaping (_ row: Int, _ cell: C) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
-        super.onCellDequeue(handler)
+        super.onDequeue(handler)
         return self
     }
     

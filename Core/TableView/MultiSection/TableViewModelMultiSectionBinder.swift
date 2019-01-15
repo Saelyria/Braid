@@ -66,7 +66,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C, _ model: M) -> Void)
+    public func onDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C, _ model: M) -> Void)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
         let dequeueCallback: CellDequeueCallback<S> = { [weak binder = self.binder] (section, row, cell) in
@@ -80,7 +80,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
         
         if let sections = self.sections {
             for section in sections {
-                self.binder.handlers.sectionCellDequeuedCallbacks[section] = dequeueCallback
+                self.binder.handlers.sectionDequeuedCallbacks[section] = dequeueCallback
             }
         } else {
             self.binder.handlers.dynamicSectionsCellDequeuedCallback = dequeueCallback
@@ -209,10 +209,10 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     // MARK: -
     
     @discardableResult
-    public override func onCellDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ cell: C) -> Void)
+    public override func onDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ cell: C) -> Void)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
-        super.onCellDequeue(handler)
+        super.onDequeue(handler)
         return self
     }
     

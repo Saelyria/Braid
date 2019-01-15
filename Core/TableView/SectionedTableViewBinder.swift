@@ -47,7 +47,7 @@ public extension TableViewSection where Self: RawRepresentable, Self.RawValue: C
  let binder = TableViewBinder(tableView: tableView)
  binder.onTable()
     .bind(cellType: MyCell.self, models: cellModels)
-    .onCellDequeue { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
+    .onDequeue { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
         // called when a cell in section `one` is dequeued
     }
     .onTapped { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
@@ -119,7 +119,7 @@ public protocol SectionedTableViewBinderProtocol: AnyObject {
  let binder = RxSectionedTableViewBinder(tableView: tableView, sectionedBy: Section.self)
  binder.onSection(.one)
     .bind(cellType: MyCell.self, models: cellModels)
-    .onCellDequeue { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
+    .onDequeue { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
         // called when a cell in section `one` is dequeued
     }
     .onTapped { [unowned self] (row: Int, cell: MyCell, model: MyModel) in
@@ -220,6 +220,11 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         }
     }
     
+    // we need to ensure that event emit handlers are called after table updates in case the cells are removed, so
+    // have both made into operations that we can create dependencies between
+    var tableUpdateOperation: Operation?
+    var viewEventOperations: [Operation] = []
+    
 #if RX_TABLEAU
     let disposeBag = DisposeBag()
     let displayedSectionsSubject = BehaviorSubject<[S]>(value: [])
@@ -254,6 +259,15 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     {
         self.tableView = tableView
         self.sectionDisplayBehavior = sectionDisplayBehavior
+    }
+    
+    deinit {
+        // clean up the 'view emit handlers' assigned to any view emittign cells on the table to avoid retain cycles
+        for view in self.tableView.subviews {
+            if let view = view as? AnyViewEventEmitting {
+                view.eventEmitHandler = nil
+            }
+        }
     }
     
     public func refresh() {
@@ -443,10 +457,11 @@ extension SectionedTableViewBinder: _TableViewDataModelDelegate {
      made in different lines of code) to be batched and animated together.
     */
     func dataModelDidChange() {
-        guard self.hasFinishedBinding, !self.hasRefreshQueued else { return }
+        guard self.hasFinishedBinding, !self.hasRefreshQueued else { return }        
+
         self.hasRefreshQueued = true
         
-        DispatchQueue.main.async { [weak self] in
+        let tableUpdateOp = BlockOperation(block: { [weak self] in
             guard let self = self else { return }
             
             self.applyDisplayedSectionBehavior()
@@ -481,8 +496,17 @@ extension SectionedTableViewBinder: _TableViewDataModelDelegate {
                 self.tableView.reloadData()
             }
             
+            self.tableUpdateOperation = nil
             self.hasRefreshQueued = false
+        })
+        
+        for eventOperation in self.viewEventOperations {
+            if !eventOperation.dependencies.contains(tableUpdateOp) {
+                eventOperation.addDependency(tableUpdateOp)
+            }
         }
+        self.tableUpdateOperation = tableUpdateOp
+        OperationQueue.main.addOperation(tableUpdateOp)
     }
 }
 

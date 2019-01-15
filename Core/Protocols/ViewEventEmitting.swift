@@ -16,7 +16,10 @@ public protocol ViewEventEmitting: AnyViewEventEmitting {
 
 public extension ViewEventEmitting {
     /**
-     Emits the given event up to the cell's binder, then to the cell's view controller, if it is observing the event.
+     Emits the given event up to the cell's binder.
+     
+     This method will propagate the emitted event through the binder to any `onEvent(from:_:)` handlers in a binding
+     chain in this cell's view controller. This method will do nothing if the cell is not visible.
      
      - parameter event: The event to emit to the cell's view controller.
     */

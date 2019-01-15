@@ -16,7 +16,15 @@ class TextFieldTableViewCell: UITableViewCell, ViewEventEmitting, UINibInitable 
     }
     
     var entryType: TextFieldEntryType = .keyboard {
-        didSet {  }
+        didSet {
+            guard self.textField != nil else { return }
+            switch self.entryType {
+            case .datePicker, .timePicker, .picker:
+                self.textField.tintColor = .clear
+            default:
+                self.textField.tintColor = .blue
+            }
+        }
     }
     var title: String? {
         didSet {
@@ -31,5 +39,23 @@ class TextFieldTableViewCell: UITableViewCell, ViewEventEmitting, UINibInitable 
     override func prepareForReuse() {
         super.prepareForReuse()
         self.titleLabel.text = self.title
+        switch self.entryType {
+        case .datePicker, .timePicker, .picker:
+            self.textField.tintColor = .clear
+        default:
+            self.textField.tintColor = .blue
+        }
+    }
+    
+    @IBAction private func textEntryStarted() {
+        self.emit(event: .textEntryStarted)
+    }
+    
+    @IBAction private func textEntered() {
+        self.emit(event: .textEntered(text: self.textField.text ?? ""))
+    }
+    
+    @IBAction private func textEntryEnded() {
+        self.emit(event: .textEntryEnded)
     }
 }

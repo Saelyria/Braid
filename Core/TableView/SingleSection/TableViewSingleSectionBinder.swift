@@ -346,7 +346,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     /**
      Bind the given cell type to the declared section, creating a cell for each item in the given array of models.
      
-     When using this method, it is expected that you also provide a handler to the `onCellDequeue` method to bind the
+     When using this method, it is expected that you also provide a handler to the `onDequeue` method to bind the
      model to the cell manually.
      
      - parameter cellType: The class of the header to bind.
@@ -367,7 +367,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     /**
      Bind the given cell type to the declared section, creating a cell for each item in the given array of models.
      
-     When using this method, it is expected that you also provide a handler to the `onCellDequeue` method to bind the
+     When using this method, it is expected that you also provide a handler to the `onDequeue` method to bind the
      model to the cell manually.
      
      - parameter cellType: The class of the header to bind.
@@ -389,7 +389,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     /**
      Bind the given cell type to the declared section, creating a cell for each item in the given array of models.
 
-     When using this method, it is expected that you also provide a handler to the `onCellDequeue` method to bind the
+     When using this method, it is expected that you also provide a handler to the `onDequeue` method to bind the
      model to the cell manually.
      
      - parameter cellType: The class of the header to bind.
@@ -410,7 +410,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     /**
      Bind the given cell type to the declared section, creating a cell for each item in the given array of models.
      
-     When using this method, it is expected that you also provide a handler to the `onCellDequeue` method to bind the
+     When using this method, it is expected that you also provide a handler to the `onDequeue` method to bind the
      model to the cell manually.
      
      - parameter cellType: The class of the header to bind.
@@ -450,18 +450,18 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      Bind a custom handler that will provide table view cells for the declared section, created according to the given
      models.
      
-     - parameter models: The models objects to bind to the dequeued cells for this section.
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
      - parameter table: The table view to dequeue the cell on.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
+     - parameter models: The models objects to bind to the dequeued cells for this section.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind<NM>(
-        models: [NM],
-        cellProvider: @escaping (_ table: UITableView, _ row: Int, _ model: NM) -> UITableViewCell)
+        cellProvider: @escaping (_ table: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
+        models: [NM])
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
     {
         return self._bind(cellProvider: cellProvider, models: { models })
@@ -471,18 +471,18 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      Bind a custom handler that will provide table view cells for the declared section, created according to the given
      models.
      
-     - parameter models: The models objects to bind to the dequeued cells for this section.
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
      - parameter table: The table view to dequeue the cell on.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
+     - parameter models: The models objects to bind to the dequeued cells for this section.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind<NM>(
-        models: [NM],
-        cellProvider: @escaping (_ table: UITableView, _ row: Int, _ model: NM) -> UITableViewCell)
+        cellProvider: @escaping (_ table: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
+        models: [NM])
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
         where NM: Equatable & CollectionIdentifiable
     {
@@ -494,18 +494,18 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      Bind a custom handler that will provide table view cells for the declared section, created according to the given
      models.
 
-     - parameter models: The models objects to bind to the dequeued cells for this section.
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
      - parameter table: The table view to dequeue the cell on.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
+     - parameter models: The models objects to bind to the dequeued cells for this section.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind<NM>(
-        models: @escaping () -> [NM],
-        cellProvider: @escaping (_ table: UITableView, _ row: Int, _ model: NM) -> UITableViewCell)
+        cellProvider: @escaping (_ table: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
+        models: @escaping () -> [NM])
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
     {
         return self._bind(cellProvider: cellProvider, models: models)
@@ -515,18 +515,18 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      Bind a custom handler that will provide table view cells for the declared section, created according to the given
      models.
      
-     - parameter models: The models objects to bind to the dequeued cells for this section.
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
      - parameter table: The table view to dequeue the cell on.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
+     - parameter models: The models objects to bind to the dequeued cells for this section.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind<NM>(
-        models: @escaping () -> [NM],
-        cellProvider: @escaping (_ table: UITableView, _ row: Int, _ model: NM) -> UITableViewCell)
+        cellProvider: @escaping (_ table: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
+        models: @escaping () -> [NM])
         -> TableViewModelSingleSectionBinder<UITableViewCell, S, NM>
         where NM: Equatable & CollectionIdentifiable
     {
@@ -813,7 +813,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onCellDequeue(_ handler: @escaping (_ row: Int, _ cell: C) -> Void)
+    public func onDequeue(_ handler: @escaping (_ row: Int, _ cell: C) -> Void)
         -> TableViewSingleSectionBinder<C, S>
     {
         let dequeueCallback: CellDequeueCallback<S> = { (_, row, cell) in
@@ -824,7 +824,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
             handler(row, cell)
         }
         
-        self.binder.handlers.sectionCellDequeuedCallbacks[self.section] = dequeueCallback
+        self.binder.handlers.sectionDequeuedCallbacks[self.section] = dequeueCallback
         return self
     }
     
