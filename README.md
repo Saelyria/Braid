@@ -3,12 +3,12 @@
 Tableau is a library for making your table and collection view setup routine smaller, more declarative, more type safe, and simply more fun. It 
 includes support for automatically diffing and animating data on your tables, ability for cells to emit custom events, and support for RxSwift.
 
-## The basics
+## A quick intro
 
-With Tableau, you 'bind' information and functionality like data, cell types, and event handlers to your table on a per-section basis (or just to 
-the whole table if your table isn't sectioned). 
+With Tableau, you 'bind' information and functionality like data, cell types (or closures that provide cells), and event handlers to your table on a 
+per-section basis (or just to the whole table if your table isn't sectioned). 
 
-For a sectioned table, we start by declaring an enum (or struct) that defines your sections and creating a 'binder' object:
+For a sectioned table, we start by declaring an enum (or struct) that defines your sections and create a 'binder' object:
 
 ```swift
 enum Section: TableViewSection {
@@ -25,7 +25,7 @@ Then, we start 'binding chains' to one or multiple sections, kind of like in a s
 different data and handlers to the sections we just declared:
 
 ```swift
-let myModels: [MyModel] = ...
+var myModels: [MyModel] = ...
 
 binder.onSection(.first)
     .bind(headerTitle: "FIRST SECTION")
@@ -38,23 +38,35 @@ binder.onSection(.first)
     }
 
 binder.onSections(.second, .third)
-    .bind(cellType: MyOtherTableViewCell.self, models: { ... })
-    .onDequeue { (section: Section, row, cell, model) in
-        // setup the dequeued 'cell' with the 'model'
-    }
+    .bind(headerTitles: [.second: "SECOND SECTION", .third: "THIRD SECTION"])
+    .bind(cellProvider: { (tableView, section, row, model: MyOtherModel) -> UITableViewCell in 
+        if ... {
+            return tableView.dequeue(MyOtherTableViewCell.self)
+        } else {
+            return tableView.dequeue(MyCustomTableViewCell.self)
+        }
+    }, models: { () -> [MyOtherModel]
+        ...
+    })
+    .dimensions(
+        .cellHeight { section, row, model in 
+            return UITableViewAutomaticDimension 
+        },
+        .estimatedCellHeight { _, _ in 120 })
     ...
     
 binder.onAllOtherSections()
+    .bind(cellType: MyOtherOtherTableViewCell.self, viewModels: { ... })
     ...
 ```
 
-By having tables setup using chains like this, you can more clearly describe how your table views work in a way that reads more like the 
-requirements you receive, and you have type safety built-in by having cells and models safely cast (to types you give in the
-`bind(cellType:models:)` method) and passed into the handlers added to each chain.
+Cells are automatically dequeued for given 'model' arrays, and bound model and cell types are remembered and passed to other handlers on
+the binding chain. By having tables setup using chains like this, you can more clearly describe how your table views work in a way that reads
+more like the requirements you receive.
 
 ## Custom cell events
 
-Figuring out how to pass events like when a button is pressed or text is entered on a cell back up to your view controller is always a hassle 
+Figuring out how to pass events like when a button is pressed or text is entered on a cell back up to your view controller is always a hassle, 
 usually involving conformance to a bunch of different delegate protocols. To solve this, Tableau also gives you the ability for your cells to 
 declare custom event enums on your cells that can be observed on your binding chains. This is done by conforming your cell to the
 `ViewEventEmitting` protocol and giving it a `ViewEvent` enum, like this:
