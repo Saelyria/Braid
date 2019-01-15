@@ -177,9 +177,9 @@ binder.onSection(.someSection)
 
 Neat, huh? This ends up being considerably shorter, less error-prone, and much faster than having done the same thing with more traditional
 methods. What's more, if we wanted to be able to dynamically insert, rearrange, or change form items based on the value of other form items,
-we can use Tableau's powerful diffing to do the heavy lifting for us. If we were to just add `Int` as a raw value of our `FormItem` and make it 
-conform to `CollectionIdentifiable` (which will provide a default `collectionId` property for diffing since `FormItem` will automatically 
-conform to `Hashable`) like this:
+we can use Tableau's powerful diffing to do the heavy lifting for us. All we have to do is just add `Int` as a raw value of our `FormItem` and 
+make it conform to `CollectionIdentifiable` (which will provide a default `collectionId` property for diffing since `FormItem` will 
+automatically conform to `Hashable`) like this:
 
 ```swift
 enum FormItem: Int, CollectionIdentifable {
