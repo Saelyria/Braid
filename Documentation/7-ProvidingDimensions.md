@@ -63,7 +63,7 @@ And for a multi-section binding chain:
 - [Getting Started](1-GettingStarted.md)
 - [Updating data](2-UpdatingData.md)
 - [Other data binding methods](3-DataBindingMethods.md)
-- [Custom cell events](4-CustomCellEvents)
+- [Custom cell events](4-CustomCellEvents.md)
 - [Hiding, showing, and ordering sections automatically](5-SectionDisplayBehaviour.md)
 - [Binding chain scopes](6-AdvancedBindingChains.md)
 - **Providing dimensions**
