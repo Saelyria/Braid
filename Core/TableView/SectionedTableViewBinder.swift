@@ -256,6 +256,15 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         self.sectionDisplayBehavior = sectionDisplayBehavior
     }
     
+    deinit {
+        // clean up the 'view emit handlers' assigned to any view emittign cells on the table to avoid retain cycles
+        for view in self.tableView.subviews {
+            if let view = view as? AnyViewEventEmitting {
+                view.eventEmitHandler = nil
+            }
+        }
+    }
+    
     public func refresh() {
         for updater in self.handlers.modelUpdaters {
             updater()
