@@ -81,8 +81,9 @@ be shown that should be returned sorted.
 - [Getting Started](1-GettingStarted.md)
 - [Updating data](2-UpdatingData.md)
 - [Other data binding methods](3-DataBindingMethods.md)
+- [Custom cell events](4-CustomCellEvents)
 - **Hiding, showing, and ordering sections automatically**
-- [Binding chain scopes](5-AdvancedBindingChains.md)
-- [Providing dimensions](6-ProvidingDimensions.md)
-- [Tips, tricks, and FAQ](7-TipsTricksFAQ.md)
-- [How it works](8-HowItWorks.md)
+- [Binding chain scopes](6-AdvancedBindingChains.md)
+- [Providing dimensions](7-ProvidingDimensions.md)
+- [Tips, tricks, and FAQ](8-TipsTricksFAQ.md)
+- [How Tableau works](9-HowItWorks.md)

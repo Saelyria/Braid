@@ -23,19 +23,22 @@
          location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/3-DataBindingMethods.md">
       </FileRef>
       <FileRef
-         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/4-SectionDisplayBehaviour.md">
+         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/4-CustomCellEvents.md">
       </FileRef>
       <FileRef
-         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/5-AdvancedBindingChains.md">
+         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/5-SectionDisplayBehaviour.md">
       </FileRef>
       <FileRef
-         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/6-ProvidingDimensions.md">
+         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/6-AdvancedBindingChains.md">
       </FileRef>
       <FileRef
-         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/7-TipsTricksFAQ.md">
+         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/7-ProvidingDimensions.md">
       </FileRef>
       <FileRef
-         location = "container:/Users/aaronbosnjak/Developer/Tableau/Documentation/8-HowItWorks.md">
+         location = "group:/Users/aaronbosnjak/Developer/Tableau/Documentation/8-TipsTricksFAQ.md">
+      </FileRef>
+      <FileRef
+         location = "container:/Users/aaronbosnjak/Developer/Tableau/Documentation/9-HowItWorks.md">
       </FileRef>
    </Group>
    <FileRef

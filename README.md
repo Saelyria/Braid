@@ -113,10 +113,12 @@ project in the repository. Available tutorials to get you familiar with Tableau 
 - [Getting started](Documentation/1-GettingStarted.md)
 - [Updating data](Documentation/2-UpdatingData.md)
 - [Other data binding methods](Documentation/3-DataBindingMethods.md)
-- [Hiding, showing, and ordering sections automatically](Documentation/4-SectionDisplayBehaviour.md)
-- [Providing dimensions (cell height, header height, etc.)](Documentation/6-ProvidingDimensions.md)
-- [Tips, tricks, and FAQ](Documentation/7-TipsTricksFAQ.md)
-- [How it works](Documentation/8-HowItWorks.md)
+- [Custom cell events](Documentation/4-CustomCellEvents)
+- [Hiding, showing, and ordering sections automatically](Documentation/5-SectionDisplayBehaviour.md)
+- [Binding chain scopes](Documentation/6-AdvancedBindingChains.md)
+- [Providing dimensions (cell height, header height, etc.)](Documentation/7-ProvidingDimensions.md)
+- [Tips, tricks, and FAQ](Documentation/8-TipsTricksFAQ.md)
+- [How Tableau works](Documentation/9-HowItWorks.md)
 
 ## Installation
 

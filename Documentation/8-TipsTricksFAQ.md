@@ -122,8 +122,9 @@ then diffing is done with whichever of the two is 'diffable'. If both are 'diffa
 - [Getting Started](1-GettingStarted.md)
 - [Updating data](2-UpdatingData.md)
 - [Other data binding methods](3-DataBindingMethods.md)
-- [Hiding, showing, and ordering sections automatically](4-SectionDisplayBehaviour.md)
-- [Binding chain scopes](5-AdvancedBindingChains.md)
-- [Providing dimensions](6-ProvidingDimensions.md)
+- [Custom cell events](4-CustomCellEvents)
+- [Hiding, showing, and ordering sections automatically](5-SectionDisplayBehaviour.md)
+- [Binding chain scopes](6-AdvancedBindingChains.md)
+- [Providing dimensions](7-ProvidingDimensions.md)
 - **Tips, tricks, and FAQ**
-- [How it works](8-HowItWorks.md)
+- [How Tableau works](9-HowItWorks.md)
