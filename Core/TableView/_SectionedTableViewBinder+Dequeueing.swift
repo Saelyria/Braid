@@ -101,21 +101,31 @@ internal extension SectionedTableViewBinder {
         if let eventCell = cell as? UITableViewCell & AnyViewEventEmitting {
             if self.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
                 eventCell.eventEmitHandler = { [weak self] cell, event in
-                    DispatchQueue.main.async {
+                    let eventEmitOperation = BlockOperation(block: {
                         guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
                         guard self?.tableView.visibleCells.contains(cell) == true else { return }
                         let hashCellName = String(reflecting: type(of: eventCell))
                         self?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, row, cell, event)
+                    })
+                    if let tableUpdateOperation = self?.tableUpdateOperation {
+                        eventEmitOperation.addDependency(tableUpdateOperation)
                     }
+                    self?.viewEventOperations.append(eventEmitOperation)
+                    OperationQueue.main.addOperation(eventEmitOperation)
                 }
             } else {
                 eventCell.eventEmitHandler = { [weak self] cell, event in
-                    DispatchQueue.main.async {
+                    let eventEmitOperation = BlockOperation(block: {
                         guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
                         guard self?.tableView.visibleCells.contains(cell) == true else { return }
                         let hashCellName = String(reflecting: type(of: eventCell))
                         self?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, row, cell, event)
+                    })
+                    if let tableUpdateOperation = self?.tableUpdateOperation {
+                        eventEmitOperation.addDependency(tableUpdateOperation)
                     }
+                    self?.viewEventOperations.append(eventEmitOperation)
+                    OperationQueue.main.addOperation(eventEmitOperation)
                 }
             }
         }

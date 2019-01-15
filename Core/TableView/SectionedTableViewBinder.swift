@@ -220,6 +220,11 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         }
     }
     
+    // we need to ensure that event emit handlers are called after table updates in case the cells are removed, so
+    // have both made into operations that we can create dependencies between
+    var tableUpdateOperation: Operation?
+    var viewEventOperations: [Operation] = []
+    
 #if RX_TABLEAU
     let disposeBag = DisposeBag()
     let displayedSectionsSubject = BehaviorSubject<[S]>(value: [])
@@ -456,39 +461,52 @@ extension SectionedTableViewBinder: _TableViewDataModelDelegate {
 
         self.hasRefreshQueued = true
         
-        self.applyDisplayedSectionBehavior()
-        let update: CollectionUpdate
-        
-        if let diff = self.currentDataModel.diff(from: self.nextDataModel) {
-            self.createNextDataModel()
-            update = CollectionUpdate(diff: diff)
-        } else {
-            self.createNextDataModel()
-            let sections: IndexSet = IndexSet(self.currentDataModel.displayedSections.enumerated().map { i, _ in i })
-            update = CollectionUpdate(undiffableSectionUpdates: sections)
-        }
-        
-        if let delegate = self.updateDelegate {
-            delegate.animate(updates: update, on: self.tableView)
-        } else if self.animateChanges {
-            self.tableView.beginUpdates()
-            self.tableView.deleteRows(at: update.itemDeletions, with: self.rowDeletionAnimation)
-            self.tableView.insertRows(at: update.itemInsertions, with: self.rowInsertionAnimation)
-            update.itemMoves.forEach { self.tableView.moveRow(at: $0.from, to: $0.to) }
-            self.tableView.deleteSections(update.sectionDeletions, with: self.sectionDeletionAnimation)
-            self.tableView.insertSections(update.sectionInsertions, with: self.sectionInsertionAnimation)
-            update.sectionMoves.forEach { self.tableView.moveSection($0.from, toSection: $0.to) }
-            self.tableView.endUpdates()
+        let tableUpdateOp = BlockOperation(block: { [weak self] in
+            guard let self = self else { return }
             
-            self.tableView.reloadRows(at: update.itemUpdates, with: self.rowUpdateAnimation)
-            self.tableView.reloadSections(update.sectionUpdates, with: self.sectionUpdateAnimation)
-            self.tableView.reloadSections(update.sectionHeaderFooterUpdates, with: self.sectionHeaderFooterUpdateAnimation)
-            self.tableView.reloadSections(update.undiffableSectionUpdates, with: self.undiffableSectionUpdateAnimation)
-        } else {
-            self.tableView.reloadData()
-        }
+            self.applyDisplayedSectionBehavior()
+            let update: CollectionUpdate
+            
+            if let diff = self.currentDataModel.diff(from: self.nextDataModel) {
+                self.createNextDataModel()
+                update = CollectionUpdate(diff: diff)
+            } else {
+                self.createNextDataModel()
+                let sections: IndexSet = IndexSet(self.currentDataModel.displayedSections.enumerated().map { i, _ in i })
+                update = CollectionUpdate(undiffableSectionUpdates: sections)
+            }
+            
+            if let delegate = self.updateDelegate {
+                delegate.animate(updates: update, on: self.tableView)
+            } else if self.animateChanges {
+                self.tableView.beginUpdates()
+                self.tableView.deleteRows(at: update.itemDeletions, with: self.rowDeletionAnimation)
+                self.tableView.insertRows(at: update.itemInsertions, with: self.rowInsertionAnimation)
+                update.itemMoves.forEach { self.tableView.moveRow(at: $0.from, to: $0.to) }
+                self.tableView.deleteSections(update.sectionDeletions, with: self.sectionDeletionAnimation)
+                self.tableView.insertSections(update.sectionInsertions, with: self.sectionInsertionAnimation)
+                update.sectionMoves.forEach { self.tableView.moveSection($0.from, toSection: $0.to) }
+                self.tableView.endUpdates()
+                
+                self.tableView.reloadRows(at: update.itemUpdates, with: self.rowUpdateAnimation)
+                self.tableView.reloadSections(update.sectionUpdates, with: self.sectionUpdateAnimation)
+                self.tableView.reloadSections(update.sectionHeaderFooterUpdates, with: self.sectionHeaderFooterUpdateAnimation)
+                self.tableView.reloadSections(update.undiffableSectionUpdates, with: self.undiffableSectionUpdateAnimation)
+            } else {
+                self.tableView.reloadData()
+            }
+            
+            self.tableUpdateOperation = nil
+            self.hasRefreshQueued = false
+        })
         
-        self.hasRefreshQueued = false
+        for eventOperation in self.viewEventOperations {
+            if !eventOperation.dependencies.contains(tableUpdateOp) {
+                eventOperation.addDependency(tableUpdateOp)
+            }
+        }
+        self.tableUpdateOperation = tableUpdateOp
+        OperationQueue.main.addOperation(tableUpdateOp)
     }
 }
 
