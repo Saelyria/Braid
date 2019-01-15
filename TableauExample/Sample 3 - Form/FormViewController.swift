@@ -15,8 +15,11 @@ class FormViewController: UIViewController {
         case location
         case isAllDay
         case date
+        case datePicker
         case startTime
+        case startTimePicker
         case endTime
+        case endTimePicker
         case url
         case notes
         
@@ -24,15 +27,27 @@ class FormViewController: UIViewController {
             case textField(title: String, entry: TextFieldTableViewCell.TextFieldEntryType)
             case toggle(title: String, isOn: Bool)
             case textView(placeholder: String, numberOfLines: Int)
+            case datePicker(includeTime: Bool)
         }
     }
     
     // 3.
     private var displayedFormItems: [Section: [FormItem]] {
         let titleLocationItems: [FormItem] = [.title, .location]
-        let timeItems: [FormItem] = (self.formData.isAllDay) ?
+        var timeItems: [FormItem] = (self.formData.isAllDay) ?
             [.isAllDay, .date]
             : [.isAllDay, .date, .startTime, .endTime]
+        if let activeFormItem = self.activeFormItem {
+            switch activeFormItem {
+            case .date:
+                timeItems.insert(.datePicker, at: timeItems.index(after: timeItems.firstIndex(of: .date)!))
+            case .startTime:
+                timeItems.insert(.startTimePicker, at: timeItems.index(after: timeItems.firstIndex(of: .startTime)!))
+            case .endTime:
+                timeItems.insert(.endTimePicker, at: timeItems.index(after: timeItems.firstIndex(of: .endTime)!))
+            default: break
+            }
+        }
         let notesItems: [FormItem] = [.url, .notes]
         
         return [
@@ -46,6 +61,8 @@ class FormViewController: UIViewController {
     // 4.
     private var formData = FormData()
     
+    private var activeFormItem: FormItem?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -56,6 +73,7 @@ class FormViewController: UIViewController {
         tableView.register(ToggleTableViewCell.self)
         tableView.register(TextFieldTableViewCell.self)
         tableView.register(TextViewTableViewCell.self)
+        tableView.register(DatePickerTableViewCell.self)
         self.view.addSubview(tableView)
         
         self.binder = SectionedTableViewBinder(tableView: tableView, sectionedBy: Section.self)
@@ -90,8 +108,21 @@ class FormViewController: UIViewController {
                 switch event {
                 case .switchToggled(let state):
                     self.formData.isAllDay = state
+                    self.activeFormItem = nil
                     self.binder.refresh()
                 }
+            }
+            .onEvent(from: TextFieldTableViewCell.self) { [unowned self] _, _, event, formItem in
+                switch event {
+                case .textEntryStarted:
+                    self.activeFormItem = formItem
+                case .textEntryEnded:
+                    if self.activeFormItem == formItem {
+                        self.activeFormItem = nil
+                    }
+                default: return
+                }
+                self.binder.refresh()
             }
         
         // 7.
@@ -129,6 +160,10 @@ class FormViewController: UIViewController {
             cellModel = .textView(placeholder: "URL", numberOfLines: 1)
         case .notes:
             cellModel = .textView(placeholder: "Notes", numberOfLines: 5)
+        case .datePicker:
+            cellModel = .datePicker(includeTime: false)
+        case .startTimePicker, .endTimePicker:
+            cellModel = .datePicker(includeTime: true)
         }
         
         switch cellModel {
@@ -145,6 +180,10 @@ class FormViewController: UIViewController {
             let cell = tableView.dequeue(ToggleTableViewCell.self)
             cell.isOn = isOn
             cell.title = title
+            return cell
+        case .datePicker(let includeTime):
+            let cell = tableView.dequeue(DatePickerTableViewCell.self)
+            cell.datePickerMode = includeTime ? .time : .date
             return cell
         }
     }

@@ -100,16 +100,22 @@ internal extension SectionedTableViewBinder {
     private func setEventCallback(onCell cell: UITableViewCell, section: S, row: Int) {
         if let eventCell = cell as? UITableViewCell & AnyViewEventEmitting {
             if self.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
-                eventCell.eventEmitHandler = { cell, event in
-                    guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
-                    let hashCellName = String(reflecting: type(of: eventCell))
-                    self.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, row, cell, event)
+                eventCell.eventEmitHandler = { [weak self] cell, event in
+                    DispatchQueue.main.async {
+                        guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
+                        guard self?.tableView.visibleCells.contains(cell) == true else { return }
+                        let hashCellName = String(reflecting: type(of: eventCell))
+                        self?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, row, cell, event)
+                    }
                 }
             } else {
-                eventCell.eventEmitHandler = { cell, event in
-                    guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
-                    let hashCellName = String(reflecting: type(of: eventCell))
-                    self.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, row, cell, event)
+                eventCell.eventEmitHandler = { [weak self] cell, event in
+                    DispatchQueue.main.async {
+                        guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
+                        guard self?.tableView.visibleCells.contains(cell) == true else { return }
+                        let hashCellName = String(reflecting: type(of: eventCell))
+                        self?.handlers.sectionViewEventHandlers[section]?[hashCellName]?(section, row, cell, event)
+                    }
                 }
             }
         }
