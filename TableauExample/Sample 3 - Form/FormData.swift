@@ -5,6 +5,7 @@ class FormData {
     var location: String?
     
     var isAllDay: Bool = false
+    var date: Date?
     var startTime: Date?
     var endTime: Date?
     

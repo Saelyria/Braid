@@ -1,6 +1,7 @@
 import UIKit
 import Tableau
 
+// 1.
 class TextFieldTableViewCell: UITableViewCell, ViewEventEmitting, UINibInitable {
     enum ViewEvent {
         case textEntryStarted
@@ -8,44 +9,8 @@ class TextFieldTableViewCell: UITableViewCell, ViewEventEmitting, UINibInitable 
         case textEntryEnded
     }
     
-    enum TextFieldEntryType {
-        case keyboard
-        case picker(from: [String])
-        case datePicker
-        case timePicker
-    }
-    
-    var entryType: TextFieldEntryType = .keyboard {
-        didSet {
-            guard self.textField != nil else { return }
-            switch self.entryType {
-            case .datePicker, .timePicker, .picker:
-                self.textField.tintColor = .clear
-            default:
-                self.textField.tintColor = .blue
-            }
-        }
-    }
-    var title: String? {
-        didSet {
-            guard self.titleLabel != nil else { return }
-            self.titleLabel.text = title
-        }
-    }
-    
-    @IBOutlet private weak var titleLabel: UILabel!
-    @IBOutlet private weak var textField: UITextField!
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        self.titleLabel.text = self.title
-        switch self.entryType {
-        case .datePicker, .timePicker, .picker:
-            self.textField.tintColor = .clear
-        default:
-            self.textField.tintColor = .blue
-        }
-    }
+    @IBOutlet private(set) weak var titleLabel: UILabel!
+    @IBOutlet private(set) weak var textField: UITextField!
     
     @IBAction private func textEntryStarted() {
         self.emit(event: .textEntryStarted)
