@@ -5,14 +5,136 @@ internal protocol _TableViewDataModelDelegate: AnyObject {
     func dataModelDidChange()
 }
 
-/// An object that holds all the data for a table view at a given moment. Diffs can be generated between data model
-/// instances to animate table view changes.
-internal class _TableViewDataModel<S: TableViewSection> {
+internal class SectionModel<S: TableViewSection>: Collection {
     enum CellDataType {
         case models
         case viewModels
         case modelsViewModels
         case number
+    }
+    
+    typealias Index = Int
+    
+    let section: S
+    
+    var headerTitle: String? = nil {
+        didSet { self.onUpdate?() }
+    }
+    var headerViewModel: Any? = nil {
+        didSet { self.onUpdate?() }
+    }
+    var items: [TableViewItem] = [] {
+        didSet {
+//            let viewModels: [Any] = self.items.map { $0.viewModel }.compactMap { $0 }
+//            let models: [Any] = self.items.map { $0.model }.compactMap { $0 }
+//
+//            if self.cellDataType == .viewModels
+//            || self.cellDataType == .modelsViewModels
+//            && !(models is [CollectionIdentifiable]),
+//            let identifiableVMs = viewModels as? [CollectionIdentifiable] {
+//                self.diffableItems = identifiableVMs
+//            } else if self.cellDataType == .models
+//            || self.cellDataType == .modelsViewModels,
+//            let identifiableMs = models as? [CollectionIdentifiable] {
+//                self.diffableItems = identifiableMs
+//            } else if self.cellDataType == .number {
+//                self.diffableItems = self.items
+//            } else {
+//                self.diffableItems = (viewModels.isEmpty) ? models : viewModels
+//            }
+
+            self.onUpdate?()
+        }
+    }
+    var footerTitle: String? = nil {
+        didSet { self.onUpdate?() }
+    }
+    var footerViewModel: Any? = nil {
+        didSet { self.onUpdate?() }
+    }
+    
+    var cellDataType: CellDataType = .models
+    
+    fileprivate var itemEqualityChecker: ((Any, Any) -> Bool?)? = nil
+    fileprivate var onUpdate: (() -> Void)?
+    
+    fileprivate init(section: S) {
+        self.section = section
+    }
+    
+    var startIndex: Int {
+        return items.startIndex
+    }
+    
+    var endIndex: Int {
+        return items.endIndex
+    }
+    
+    subscript(i: Int) -> Any {
+        let item = items[i]
+
+        // get the 'items' (be it view models, models, or the number of cells) that are used for cells for the
+        // section. Prefer whichever is diffable.
+        if self.cellDataType == .viewModels
+        || self.cellDataType == .modelsViewModels
+        && !(item.model is CollectionIdentifiable),
+        let viewModel = item.viewModel as? CollectionIdentifiable {
+            return viewModel
+        } else if self.cellDataType == .models
+        || self.cellDataType == .modelsViewModels,
+        let model = item.model as? CollectionIdentifiable {
+            return model
+        } else if self.cellDataType == .number {
+            return item
+        } else {
+            return item.viewModel ?? item.model ?? item
+        }
+    }
+    
+    func index(after i: Int) -> Int {
+        return items.index(after: i)
+    }
+}
+
+internal struct TableViewItem {
+    var isNumberPlaceholder: Bool
+    var model: Any?
+    var viewModel: Any?
+}
+
+/// An object that holds all the data for a table view at a given moment. Diffs can be generated between data model
+/// instances to animate table view changes.
+internal class _TableViewDataModel<S: TableViewSection> {
+    private var sectionModels: [SectionModel<S>] = [] {
+        didSet { self.delegate?.dataModelDidChange() }
+    }
+    
+    /**
+     Returns the section model for the given section. If one does not already exist, one will be created.
+    */
+    func sectionModel(for section: S) -> SectionModel<S> {
+        if let sectionModel = self.sectionModels.first(where: { $0.section == section }) {
+            return sectionModel
+        }
+        let sectionModel = SectionModel(section: section)
+        sectionModel.itemEqualityChecker = self.delegate?.itemEqualityChecker(for: section)
+        sectionModel.onUpdate = { [weak self] in
+            self?.delegate?.dataModelDidChange()
+        }
+        self.sectionModels.append(sectionModel)
+        return sectionModel
+    }
+    
+    /**
+     Returns the item for the given row and section.
+    */
+    func item(inSection section: S, row: Int) -> TableViewItem? {
+        let model = self.sectionModels.first { $0.section == section }
+        if model?.items.indices.contains(row) == true {
+            return model?.items[row]
+        } else {
+            return nil
+        }
     }
     
     weak var delegate: SectionedTableViewBinder<S>?
@@ -32,36 +154,6 @@ internal class _TableViewDataModel<S: TableViewSection> {
     var displayedSections: [S] = [] {
         didSet { self.delegate?.dataModelDidChange() }
     }
-    // The type of data used for data for the cells for the given sections (models, view models, or raw number of cells)
-    var sectionCellDataType: [S: CellDataType] = [:]
-    // The number of cells to create for a section when the user manages dequeueing themselves.
-    var sectionNumberOfCells: [S: Int] = [:] {
-        didSet { self.delegate?.dataModelDidChange() }
-    }
-    // The view models for the cells for a section.
-    var sectionCellViewModels: [S: [Any]] = [:] {
-        didSet { self.delegate?.dataModelDidChange() }
-    }
-    // The raw models for the cells for a section.
-    var sectionCellModels: [S: [Any]] = [:] {
-        didSet { self.delegate?.dataModelDidChange() }
-    }
-    // The view models for the headers for a section.
-    var sectionHeaderViewModels: [S: Any] = [:] {
-        didSet { self.delegate?.dataModelDidChange() }
-    }
-    // The view models for the footers for a section.
-    var sectionFooterViewModels: [S: Any] = [:] {
-        didSet { self.delegate?.dataModelDidChange() }
-    }
-    // Titles for the footers for a section.
-    var sectionFooterTitles: [S: String] = [:] {
-        didSet { self.delegate?.dataModelDidChange() }
-    }
-    // Titles for the headers for a section.
-    var sectionHeaderTitles: [S: String] = [:] {
-        didSet { self.delegate?.dataModelDidChange() }
-    }
 
     // Sections whose cell data was just updated. This is set by the binder.
     var cellUpdatedSections: Set<S> = []
@@ -70,19 +162,20 @@ internal class _TableViewDataModel<S: TableViewSection> {
     
     // Returns a set containing all sections that have cell data bound.
     var sectionsWithCellData: Set<S> {
-        let numCells = Set(self.sectionNumberOfCells.filter { $0.value > 0 }.keys)
-        let models = self.sectionCellModels.filter { !$0.value.isEmpty }.keys
-        let viewModels = self.sectionCellViewModels.filter { !$0.value.isEmpty }.keys
-        return numCells.union(models).union(viewModels)
+        return Set(self.sectionModels.filter { sectionModel -> Bool in
+            return sectionModel.items.count > 0
+        }.map { $0.section })
     }
     
     // Returns a set of sections that have any kind of data in them (cells, headers, or footers).
     var sectionsWithData: Set<S> {
-        let headerModels = self.sectionHeaderViewModels.keys
-        let footerModels = self.sectionFooterViewModels.keys
-        let headerTitles = self.sectionHeaderTitles.keys
-        let footerTitles = self.sectionFooterTitles.keys
-        return self.sectionsWithCellData.union(headerModels).union(footerModels).union(headerTitles).union(footerTitles)
+        return Set(self.sectionModels.filter { sectionModel -> Bool in
+            return sectionModel.items.count > 0
+                || sectionModel.headerTitle != nil
+                || sectionModel.headerViewModel != nil
+                || sectionModel.footerTitle != nil
+                || sectionModel.footerViewModel != nil
+        }.map { $0.section })
     }
     
     init() { }
@@ -97,97 +190,24 @@ internal class _TableViewDataModel<S: TableViewSection> {
         self.footerTitleBound = other.footerTitleBound
         self.footerViewBound = other.footerViewBound
         self.displayedSections = other.displayedSections
-        self.sectionCellViewModels = other.sectionCellViewModels
-        self.sectionCellModels = other.sectionCellModels
-        self.sectionHeaderViewModels = other.sectionHeaderViewModels
-        self.sectionHeaderTitles = other.sectionHeaderTitles
-        self.sectionFooterViewModels = other.sectionFooterViewModels
-        self.sectionFooterTitles = other.sectionFooterTitles
+        self.sectionModels = other.sectionModels
+        for sectionModel in self.sectionModels {
+            sectionModel.onUpdate = { [weak self] in
+                self?.delegate?.dataModelDidChange()
+            }
+        }
     }
 }
 
 extension _TableViewDataModel {
-    internal class SectionModel: Collection {
-        typealias Index = Int
-        
-        let section: S
-        let items: [Any]
-        let itemEqualityChecker: ((Any, Any) -> Bool?)?
-        
-        init(section: S, items: [Any], itemEqualityChecker: ((Any, Any) -> Bool?)?) {
-            self.section = section
-            self.items = items
-            self.itemEqualityChecker = itemEqualityChecker
-        }
-        
-        var startIndex: Int {
-            return items.startIndex
-        }
-        
-        var endIndex: Int {
-            return items.endIndex
-        }
-        
-        subscript(i: Int) -> Any {
-            return items[i]
-        }
-        
-        func index(after i: Int) -> Int {
-            return items.index(after: i)
-        }
-    }
-    
-    /**
-     Maps the data model to an array of diffable section models that can be used with Differ to animate changes on the
-     table view. Returns nil if the data is not diffable (i.e. one or more of its data arrays did not contain models
-     that conformed to `CollectionIdentifiable`).
-     */
-    func asDiffableSectionModels() -> [SectionModel] {
-        return self.displayedSections.map { (section) -> SectionModel in
-            // get the 'items' (be it view models, models, or the number of cells) that are used for cells for the
-            // section. Prefer whichever is diffable.
-            var items: [Any]?
-            
-            if self.sectionCellDataType[section] == .viewModels
-            || self.sectionCellDataType[section] == .modelsViewModels
-            && !(self.sectionCellModels is [S: [CollectionIdentifiable]]),
-            let identifiableVMs = self.sectionCellViewModels as? [S: [CollectionIdentifiable]] {
-                items = identifiableVMs[section]
-            }
-            
-            else if self.sectionCellDataType[section] == .models
-            || self.sectionCellDataType[section] == .modelsViewModels,
-            let identifiableMs = self.sectionCellModels as? [S: [CollectionIdentifiable]] {
-                items = identifiableMs[section]
-            }
-            
-            else if self.sectionCellDataType[section] == .number, let numCells = self.sectionNumberOfCells[section] {
-                items = []
-                // make an array of empty data for its count
-                for _ in 0..<numCells {
-                    items?.append(0)
-                }
-            }
-            
-            else {
-                items = self.sectionCellViewModels[section] ?? self.sectionCellModels[section]
-            }
-            
-            return SectionModel(
-                section: section,
-                items: items ?? [],
-                itemEqualityChecker: self.delegate?.itemEqualityChecker(for: section))
-        }
-    }
-    
     /**
      Creates a Differ 'nested extended diff' object from this data model and the 'other' given model. Returns nil if the
      data is not diffable (i.e. one or more of its data arrays did not contain models that conformed to
      `CollectionIdentifiable`).
      */
     func diff(from other: _TableViewDataModel<S>) -> _NestedExtendedDiff? {
-        let selfSectionModels = self.asDiffableSectionModels()
-        let otherSectionModels = other.asDiffableSectionModels()
+        let selfSectionModels = self.sectionModels.filter { self.displayedSections.contains($0.section) }
+        let otherSectionModels = other.sectionModels.filter { other.displayedSections.contains($0.section) }
         guard var diff = try? selfSectionModels.nestedExtendedDiff(
             to: otherSectionModels,
             isSameSection: { $0.section == $1.section },

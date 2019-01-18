@@ -318,10 +318,10 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
         
         let _cellProvider: (UITableView, Base.S, Int) -> UITableViewCell
         _cellProvider = { [weak binder = bindResult.binder] (tableView, section, row) in
-            guard let models = binder?.currentDataModel.sectionCellModels[section] as? [NM] else {
+            guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? NM else {
                 fatalError("Model type wasn't as expected, something went awry!")
             }
-            return cellProvider(tableView, row, models[row])
+            return cellProvider(tableView, row, model)
         }
         bindResult.binder.addCellDequeueBlock(cellProvider: _cellProvider, affectedSections: scope)
         

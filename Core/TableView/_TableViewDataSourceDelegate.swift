@@ -58,20 +58,12 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        return self.binder.currentDataModel.displayedSections.count
+        return self.dataModel.displayedSections.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let section = self.dataModel.displayedSections[section]
-        if let models = self.dataModel.sectionCellModels[section] {
-            return models.count
-        } else if let viewModels = self.dataModel.sectionCellViewModels[section] {
-            return viewModels.count
-        } else if let numCells = self.dataModel.sectionNumberOfCells[section] {
-            return numCells
-        } else {
-            return 0
-        }
+        return self.dataModel.sectionModel(for: section).items.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -115,7 +107,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         || (!wasBoundUniquely && self.binder.handlers.dynamicSectionsHeaderDequeueBlock != nil) {
             return nil
         }
-        return self.dataModel.sectionHeaderTitles[section]
+        return self.dataModel.sectionModel(for: section).headerTitle
     }
     
     func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
@@ -128,7 +120,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         || (!wasBoundUniquely && self.binder.handlers.dynamicSectionsFooterDequeueBlock != nil) {
             return nil
         }
-        return self.dataModel.sectionFooterTitles[section]
+        return self.dataModel.sectionModel(for: section).footerTitle
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection sectionInt: Int) -> UIView? {

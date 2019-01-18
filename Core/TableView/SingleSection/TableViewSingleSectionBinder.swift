@@ -541,10 +541,10 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     {
         let _cellProvider: (UITableView, S, Int) -> UITableViewCell
         _cellProvider = { [weak binder = self.binder] (table, section, row) -> UITableViewCell in
-            guard let models = binder?.currentDataModel.sectionCellModels[section] as? [NM] else {
+            guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? NM else {
                 fatalError("Model type wasn't as expected, something went awry!")
             }
-            return cellProvider(table, row, models[row])
+            return cellProvider(table, row, model)
         }
         self.binder.addCellDequeueBlock(cellProvider: _cellProvider, affectedSections: self.affectedSectionScope)
         let section = self.section

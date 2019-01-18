@@ -40,7 +40,7 @@ public class SingleSectionModelDimension<S: TableViewSection, M>: SingleSectionD
     {
         return SingleSectionModelDimension(bindingFunc: { (binder, section) in
             binder.handlers.sectionCellHeightBlocks[section] = { (_, row: Int) in
-                guard let model = binder.currentDataModel.sectionCellModels[section]?[row] as? M else {
+                guard let model = binder.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                     fatalError("Didn't get the right model type - something went awry!")
                 }
                 return handler(row, model)
@@ -65,7 +65,7 @@ public class SingleSectionModelDimension<S: TableViewSection, M>: SingleSectionD
     {
         return SingleSectionModelDimension(bindingFunc: { (binder, section) in
             binder.handlers.sectionEstimatedCellHeightBlocks[section] = { (_, row: Int) in
-                guard let model = binder.currentDataModel.sectionCellModels[section]?[row] as? M else {
+                guard let model = binder.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                     fatalError("Didn't get the right model type - something went awry!")
                 }
                 return handler(row, model)

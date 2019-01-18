@@ -33,7 +33,8 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     {
         let section = self.section
         let tappedHandler: CellTapCallback<S> = {  [weak binder = self.binder] (_, row, cell) in
-            guard let cell = cell as? C, let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
+            guard let cell = cell as? C,
+            let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                 assertionFailure("ERROR: Cell or model wasn't the right type; something went awry!")
                 return
             }
@@ -65,7 +66,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     {
         let section = self.section
         let dequeueCallback: CellDequeueCallback<S> = { [weak binder = self.binder] (_, row, cell) in
-            guard let cell = cell as? C, let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
+            guard let cell = cell as? C, let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                 assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
                 return
             }
@@ -104,7 +105,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         let section = self.section
         let modelHandler: (Int, UITableViewCell, Any) -> Void = { [weak binder = self.binder] row, cell, event in
             guard let cell = cell as? EventCell, let event = event as? EventCell.ViewEvent,
-                let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
+                let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                     assertionFailure("ERROR: Cell, event, or model wasn't the right type; something went awry!")
                     return
             }
