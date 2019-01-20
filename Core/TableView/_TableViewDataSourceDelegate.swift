@@ -154,7 +154,8 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         let section = self.dataModel.displayedSections[indexPath.section]
         
         guard let cell = tableView.cellForRow(at: indexPath) else { return }
-        let callback = (self.dataModel.uniquelyBoundCellSections.contains(section)) ?
+        let callback = (self.dataModel.uniquelyBoundCellSections.contains(section)
+        || self.binder.handlers.sectionCellTappedCallbacks[section] != nil) ?
             self.binder.handlers.sectionCellTappedCallbacks[section] :
             self.binder.handlers.dynamicSectionsCellTappedCallback
         callback?(section, indexPath.row, cell)

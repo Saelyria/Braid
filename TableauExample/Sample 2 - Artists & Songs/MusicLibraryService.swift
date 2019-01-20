@@ -101,7 +101,7 @@ class MusicLibraryService {
     
     func getArtists() -> Observable<[String: [Artist]]> {
         return Observable.create({ observer in
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(1500)) {
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(1000)) {
                 var artists: [Artist] = []
                 for _ in 0..<self.allArtists.count / 5 * 4 {
                     let i = Int.random(in: 0..<self.allArtists.count)
