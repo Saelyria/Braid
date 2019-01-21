@@ -18,7 +18,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="397" height="120.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <datePicker contentMode="scaleToFill" verticalCompressionResistancePriority="999" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="J9d-U0-c2Q">
+                    <datePicker contentMode="scaleToFill" verticalCompressionResistancePriority="500" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="J9d-U0-c2Q">
                         <rect key="frame" x="0.0" y="0.0" width="397" height="120.5"/>
                         <date key="date" timeIntervalSinceReferenceDate="569141004.71631598">
                             <!--2019-01-14 06:43:24 +0000-->

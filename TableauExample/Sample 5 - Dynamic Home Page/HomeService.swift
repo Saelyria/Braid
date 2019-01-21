@@ -25,7 +25,7 @@ class HomeService {
                 content = parsedContent
             }
             
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(1500)) {
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(1000)) {
                 observer.onNext(content)
                 observer.onCompleted()
             }

@@ -8,24 +8,12 @@ class TextViewTableViewCell: UITableViewCell, ViewEventEmitting, UINibInitable {
         case textEntryEnded
     }
     
-    var placeholder: String? {
-        didSet {
-            guard self.placeholderLabel != nil else { return }
-            self.placeholderLabel.text = placeholder
-        }
-    }
-    
-    @IBOutlet private weak var placeholderLabel: UILabel!
-    @IBOutlet private weak var textView: UITextView!
+    @IBOutlet private(set) weak var placeholderLabel: UILabel!
+    @IBOutlet private(set) weak var textView: UITextView!
     
     override func awakeFromNib() {
         super.awakeFromNib()
         self.textView.delegate = self
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        self.placeholderLabel.text = self.placeholder
     }
 }
 

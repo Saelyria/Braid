@@ -13,11 +13,10 @@ the 'accounts' sample. Similarly, this view controller uses RxSwift to do much o
 recommended before continuing.
 
 > Before reading through this, it's also recommended that you take a quick look through these tutorials:
-- [Getting started](../../Documentation/GettingStarted.md)
-- [Updating data](../../Documentation/UpdatingData.md)
-- [Hiding, showing, and ordering sections automatically](../../Documentation/SectionDisplayBehaviour.md)
-- [Using view models](../../Documentation/UsingViewModels.md)
-- [Advanced binding chains](../../Documentation/AdvancedBindingChains.md)
+- [Getting started](../../Documentation/1-GettingStarted.md)
+- [Updating data](../../Documentation/2-UpdatingData.md)
+- [Hiding, showing, and ordering sections automatically](../../Documentation/5-SectionDisplayBehaviour.md)
+- [Advanced binding chains](../../Documentation/6-AdvancedBindingChains.md)
 
 ## Walkthrough
 

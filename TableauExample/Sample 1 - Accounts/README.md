@@ -13,10 +13,9 @@ demonstrating Tableau's ability to auto-animate changes. This view controller us
 framework is highly recommended before continuing.
 
 > Before reading through this, it's also recommended that you take a quick look through these tutorials:
-- [Getting started](../../Documentation/GettingStarted.md)
-- [Updating data](../../Documentation/UpdatingData.md)
-- [Hiding, showing, and ordering sections automatically](../../Documentation/SectionDisplayBehaviour.md)
-- [Using view models](../../Documentation/UsingViewModels.md)
+- [Getting started](../../Documentation/1-GettingStarted.md)
+- [Updating data](../../Documentation/2-UpdatingData.md)
+- [Hiding, showing, and ordering sections automatically](../../Documentation/5-SectionDisplayBehaviour.md)
 
 ## Walkthrough
 

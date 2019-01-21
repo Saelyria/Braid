@@ -26,7 +26,7 @@
                     </label>
                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" textAlignment="right" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="O9D-UK-mkK">
                         <rect key="frame" x="92" y="38.5" width="326" height="21"/>
-                        <nil key="textColor"/>
+                        <color key="textColor" red="1" green="0.62352941179999999" blue="0.25882352939999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <textInputTraits key="textInputTraits"/>
                         <connections>

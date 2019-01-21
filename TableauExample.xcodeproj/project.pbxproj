@@ -34,12 +34,13 @@
 		AB5D696D21E95DC200386B8D /* TextFieldTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB5D696C21E95DC200386B8D /* TextFieldTableViewCell.xib */; };
 		AB5D696F21E95DD200386B8D /* TextViewTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB5D696E21E95DD200386B8D /* TextViewTableViewCell.xib */; };
 		AB86C3BF2141718C00FA4945 /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */; };
+		ABA89D5B21EEC07000033093 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = ABA89D5A21EEC07000033093 /* README.md */; };
+		ABB46A1521F2ACC6009A00A2 /* FormItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46A1421F2ACC6009A00A2 /* FormItem.swift */; };
 		ABC1AD1921E6BE2400BAC644 /* ToggleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC1AD1821E6BE2400BAC644 /* ToggleTableViewCell.swift */; };
 		ABC1AD1B21E6BE7E00BAC644 /* ToggleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABC1AD1A21E6BE7D00BAC644 /* ToggleTableViewCell.xib */; };
 		ABC1AD1E21E6BF5200BAC644 /* FormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC1AD1D21E6BF5200BAC644 /* FormViewController.swift */; };
 		ABC1AD2121E7269500BAC644 /* TextFieldTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC1AD2021E7269500BAC644 /* TextFieldTableViewCell.swift */; };
 		ABC1AD2321E811B100BAC644 /* TextViewTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC1AD2221E811B100BAC644 /* TextViewTableViewCell.swift */; };
-		ABC1AD2521E87BCD00BAC644 /* FormData.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC1AD2421E87BCD00BAC644 /* FormData.swift */; };
 		ABE0F35921AE3F7F0098950D /* ImageTitleSubtitleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = ABE0F35821AE3F7F0098950D /* ImageTitleSubtitleTableViewCell.xib */; };
 		ABE0F35F21B49DD90098950D /* NewsFeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE0F35E21B49DD90098950D /* NewsFeedViewController.swift */; };
 		ABE0F36121B4AA830098950D /* NewsFeedService.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE0F36021B4AA830098950D /* NewsFeedService.swift */; };
@@ -109,12 +110,13 @@
 		AB5D696C21E95DC200386B8D /* TextFieldTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextFieldTableViewCell.xib; sourceTree = "<group>"; };
 		AB5D696E21E95DD200386B8D /* TextViewTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextViewTableViewCell.xib; sourceTree = "<group>"; };
 		AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
+		ABA89D5A21EEC07000033093 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		ABB46A1421F2ACC6009A00A2 /* FormItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormItem.swift; sourceTree = "<group>"; };
 		ABC1AD1821E6BE2400BAC644 /* ToggleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleTableViewCell.swift; sourceTree = "<group>"; };
 		ABC1AD1A21E6BE7D00BAC644 /* ToggleTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ToggleTableViewCell.xib; sourceTree = "<group>"; };
 		ABC1AD1D21E6BF5200BAC644 /* FormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormViewController.swift; sourceTree = "<group>"; };
 		ABC1AD2021E7269500BAC644 /* TextFieldTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldTableViewCell.swift; sourceTree = "<group>"; };
 		ABC1AD2221E811B100BAC644 /* TextViewTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewTableViewCell.swift; sourceTree = "<group>"; };
-		ABC1AD2421E87BCD00BAC644 /* FormData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormData.swift; sourceTree = "<group>"; };
 		ABE0F35821AE3F7F0098950D /* ImageTitleSubtitleTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageTitleSubtitleTableViewCell.xib; sourceTree = "<group>"; };
 		ABE0F35E21B49DD90098950D /* NewsFeedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsFeedViewController.swift; sourceTree = "<group>"; };
 		ABE0F36021B4AA830098950D /* NewsFeedService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsFeedService.swift; sourceTree = "<group>"; };
@@ -257,9 +259,10 @@
 		ABC1AD1C21E6BF3E00BAC644 /* Sample 3 - Form */ = {
 			isa = PBXGroup;
 			children = (
+				ABA89D5A21EEC07000033093 /* README.md */,
 				ABC1AD1F21E7268100BAC644 /* Cells */,
 				ABC1AD1D21E6BF5200BAC644 /* FormViewController.swift */,
-				ABC1AD2421E87BCD00BAC644 /* FormData.swift */,
+				ABB46A1421F2ACC6009A00A2 /* FormItem.swift */,
 			);
 			path = "Sample 3 - Form";
 			sourceTree = "<group>";
@@ -431,6 +434,7 @@
 				938132E220B6463200CBF8F6 /* LaunchScreen.storyboard in Resources */,
 				938132DF20B6463200CBF8F6 /* Assets.xcassets in Resources */,
 				AB577BCD2183D5C100CD2363 /* mock-home-response.json in Resources */,
+				ABA89D5B21EEC07000033093 /* README.md in Resources */,
 				AB5D696D21E95DC200386B8D /* TextFieldTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -550,6 +554,7 @@
 				ABC1AD1921E6BE2400BAC644 /* ToggleTableViewCell.swift in Sources */,
 				AB577BAC2179838B00CD2363 /* MusicLibraryService.swift in Sources */,
 				ABC1AD1E21E6BF5200BAC644 /* FormViewController.swift in Sources */,
+				ABB46A1521F2ACC6009A00A2 /* FormItem.swift in Sources */,
 				938132DA20B6463000CBF8F6 /* AccountsViewController.swift in Sources */,
 				ABC1AD2321E811B100BAC644 /* TextViewTableViewCell.swift in Sources */,
 				AB5C715921EC6583006DC4B0 /* DatePickerTableViewCell.swift in Sources */,
@@ -562,7 +567,6 @@
 				AB577BAA2179665400CD2363 /* HomeViewController.swift in Sources */,
 				AB577BD42183D8C200CD2363 /* Store.swift in Sources */,
 				AB577B9C21759F6C00CD2363 /* AccountService.swift in Sources */,
-				ABC1AD2521E87BCD00BAC644 /* FormData.swift in Sources */,
 				AB577BC52181105500CD2363 /* HomeService.swift in Sources */,
 				AB577B9F2175A6EE00CD2363 /* CenterLabelTableViewCell.swift in Sources */,
 				93C36A4820DAFF97006B7ECF /* SamplesViewController.swift in Sources */,

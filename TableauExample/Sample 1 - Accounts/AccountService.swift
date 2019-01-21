@@ -50,7 +50,7 @@ class AccountsService {
     
     func getAccounts() -> Observable<[Account]> {
         return Observable.create({ observer in
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(1500)) {
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(1000)) {
                 
                 observer.onNext(self.responses[self.i])
                 observer.onCompleted()
