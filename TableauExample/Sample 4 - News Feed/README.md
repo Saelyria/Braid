@@ -7,9 +7,9 @@ This sample is a mock news feed view controller that pulls mock data from the `N
 table. Most of the sample is done the same as previous samples, so we'll keep the walkthrough for it fairly short. 
 
 > Before reading through this, it's also recommended that you take a quick look through these tutorials:
-- [Getting started](https://github.com/Saelyria/Tableau/tree/master/Documentation/1-GettingStarted.md)
-- [Updating data](https://github.com/Saelyria/Tableau/tree/master/Documentation/2-UpdatingData.md)
-- [Hiding, showing, and ordering sections automatically](https://github.com/Saelyria/Tableau/tree/master/Documentation/5-SectionDisplayBehaviour.md)
+- [Getting started](../../Documentation/1-GettingStarted.md)
+- [Updating data](../../Documentation/2-UpdatingData.md)
+- [Hiding, showing, and ordering sections automatically](../../Documentation/5-SectionDisplayBehaviour.md)
 
 ## Walkthrough
 

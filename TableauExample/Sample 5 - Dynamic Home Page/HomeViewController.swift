@@ -3,13 +3,12 @@ import RxCocoa
 import RxSwift
 
 class HomeViewController: UIViewController {
-    // 1.
+    // 3.
     struct Section: TableViewSection, CollectionIdentifiable {
         let collectionId: String
         let title: String?
         let footer: String?
         
-        // 2.
         static let banner = Section(collectionId: "banner", title: nil, footer: nil)
     }
     
@@ -18,9 +17,9 @@ class HomeViewController: UIViewController {
     
     private let disposeBag = DisposeBag()
     
-    // 3.
+    // 4.
     private let sectionContent = BehaviorRelay<[HomePageSectionContent]>(value: [])
-    private var sectionCellViewModels: Observable<[Section: [CollectionIdentifiable]]> {
+    private var sectionCellViewModels: Observable<[Section: [Any]]> {
         return self.sectionContent.map { $0.reduceToSectionCellViewModels() }
     }
     private var sections: Observable<[Section]> {
@@ -47,15 +46,6 @@ class HomeViewController: UIViewController {
         super.viewDidLoad()
         self.title = "Home"
         
-        self.setupTableView()
-        
-        // 4.
-        HomeService.shared.getHomePage()
-            .bind(to: self.sectionContent)
-            .disposed(by: self.disposeBag)
-    }
-    
-    private func setupTableView() {
         self.tableView = UITableView(frame: self.view.frame, style: .grouped)
         self.view.addSubview(self.tableView)
         self.tableView.allowsSelection = false
@@ -73,16 +63,16 @@ class HomeViewController: UIViewController {
             .bind(to: self.binder.rx.displayedSections)
             .disposed(by: self.disposeBag)
         
+        // 7.
         self.binder.onSection(.banner)
             .bind(cellType: CenterLabelTableViewCell.self, viewModels: {
                 [CenterLabelTableViewCell.ViewModel(text: "<Brand Name>. Shopping made easy.")]
             })
         
-        // 7.
+        // 8.
         self.binder.onAllOtherSections()
             .rx.bind(
-                models: self.sectionCellViewModels,
-                cellProvider: { (tableView, section: Section, row: Int, viewModel: CollectionIdentifiable) in
+                cellProvider: { (tableView, section: Section, row: Int, viewModel: Any) in
                     if let viewModel = viewModel as? TitleDetailTableViewCell.ViewModel {
                         let cell = tableView.dequeue(TitleDetailTableViewCell.self)
                         cell.viewModel = viewModel
@@ -93,11 +83,16 @@ class HomeViewController: UIViewController {
                         return cell
                     }
                     return UITableViewCell()
-            })
+                }, models: self.sectionCellViewModels)
             .rx.bind(headerTitles: self.sectionHeaderTitles)
             .rx.bind(footerType: SectionHeaderView.self, viewModels: self.footerViewModels)
         
         self.binder.finish()
+        
+        // 4.
+        HomeService.shared.getHomePage()
+            .bind(to: self.sectionContent)
+            .disposed(by: self.disposeBag)
     }
 }
 
@@ -106,7 +101,7 @@ class HomeViewController: UIViewController {
 private extension Array where Element == HomePageSectionContent {
     /// Reduces an array of 'home page section content' objects into a dictionary of home view sections and cell view
     /// models for those sections.
-    func reduceToSectionCellViewModels() -> [HomeViewController.Section: [CollectionIdentifiable]] {
+    func reduceToSectionCellViewModels() -> [HomeViewController.Section: [Any]] {
         return self.reduce(into: [:], { (dict, sectionContent) in
             let section = HomeViewController.Section(
                 collectionId: sectionContent.title,
@@ -125,7 +120,7 @@ private extension HomePageSectionContent.Models {
     }()
     
     /// Maps the 'store' and 'product' models in a 'home page section content' into cell view models.
-    func mapToCellModels() -> [CollectionIdentifiable] {
+    func mapToCellModels() -> [Any] {
         switch self {
         case .stores(let stores):
             let titleDetailVMs = stores.map { (store: Store) in

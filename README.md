@@ -122,15 +122,15 @@ never be so limited by the library that you find yourself resorting to the regul
 Tableau is fully documented, including tutorials and working code samples (with documented walkthroughs!) in the 'TableauExample' Xcode 
 project in the repository. Available tutorials to get you familiar with Tableau are as follows:
 
-- [Getting started](Documentation/1-GettingStarted.md)
-- [Updating data](Documentation/2-UpdatingData.md)
-- [Other data binding methods](Documentation/3-DataBindingMethods.md)
-- [Custom cell events](Documentation/4-CustomCellEvents)
-- [Hiding, showing, and ordering sections automatically](Documentation/5-SectionDisplayBehaviour.md)
-- [Binding chain scopes](Documentation/6-AdvancedBindingChains.md)
-- [Providing dimensions (cell height, header height, etc.)](Documentation/7-ProvidingDimensions.md)
-- [Tips, tricks, and FAQ](Documentation/8-TipsTricksFAQ.md)
-- [How Tableau works](Documentation/9-HowItWorks.md)
+- [Getting started](https://github.com/Saelyria/Tableau/tree/master/Documentation/1-GettingStarted.md)
+- [Updating data](https://github.com/Saelyria/Tableau/tree/master/Documentation/2-UpdatingData.md)
+- [Other data binding methods](https://github.com/Saelyria/Tableau/tree/master/Documentation/3-DataBindingMethods.md)
+- [Custom cell events](https://github.com/Saelyria/Tableau/tree/master/Documentation/4-CustomCellEvents)
+- [Hiding, showing, and ordering sections automatically](https://github.com/Saelyria/Tableau/tree/master/Documentation/5-SectionDisplayBehaviour.md)
+- [Binding chain scopes](https://github.com/Saelyria/Tableau/tree/master/Documentation/6-AdvancedBindingChains.md)
+- [Providing dimensions (cell height, header height, etc.)](https://github.com/Saelyria/Tableau/tree/master/Documentation/7-ProvidingDimensions.md)
+- [Tips, tricks, and FAQ](https://github.com/Saelyria/Tableau/tree/master/Documentation/8-TipsTricksFAQ.md)
+- [How Tableau works](https://github.com/Saelyria/Tableau/tree/master/Documentation/9-HowItWorks.md)
 
 ## Installation
 
