@@ -58,6 +58,7 @@ class HomeViewController: UIViewController {
     private func setupTableView() {
         self.tableView = UITableView(frame: self.view.frame, style: .grouped)
         self.view.addSubview(self.tableView)
+        self.tableView.allowsSelection = false
         self.tableView.register(CenterLabelTableViewCell.self)
         self.tableView.register(TitleDetailTableViewCell.self)
         self.tableView.register(ImageTitleSubtitleTableViewCell.self)
@@ -95,12 +96,6 @@ class HomeViewController: UIViewController {
             })
             .rx.bind(headerTitles: self.sectionHeaderTitles)
             .rx.bind(footerType: SectionHeaderView.self, viewModels: self.footerViewModels)
-        
-        // 8.
-        self.binder.onAnySection()
-            .onDequeue { _, _, cell in
-                cell.selectionStyle = .none
-            }
         
         self.binder.finish()
     }
@@ -144,7 +139,7 @@ private extension HomePageSectionContent.Models {
                     collectionId: product.title,
                     title: product.title,
                     subtitle: HomePageSectionContent.Models.priceFormatter.string(from: NSNumber(value: product.price)),
-                    image: nil)
+                    image: UIImage(named: "placeholder")!)
             }
             return imageTitleViewModels
         }

@@ -111,6 +111,7 @@
 		AB5D696E21E95DD200386B8D /* TextViewTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextViewTableViewCell.xib; sourceTree = "<group>"; };
 		AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
 		ABA89D5A21EEC07000033093 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		ABB2841221F55E8C0041E84A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		ABB46A1421F2ACC6009A00A2 /* FormItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormItem.swift; sourceTree = "<group>"; };
 		ABC1AD1821E6BE2400BAC644 /* ToggleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleTableViewCell.swift; sourceTree = "<group>"; };
 		ABC1AD1A21E6BE7D00BAC644 /* ToggleTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ToggleTableViewCell.xib; sourceTree = "<group>"; };
@@ -293,6 +294,7 @@
 		ABE0F35D21B49DC10098950D /* Sample 4 - News Feed */ = {
 			isa = PBXGroup;
 			children = (
+				ABB2841221F55E8C0041E84A /* README.md */,
 				ABE0F35E21B49DD90098950D /* NewsFeedViewController.swift */,
 				ABE0F36021B4AA830098950D /* NewsFeedService.swift */,
 				ABE0F36221B4AB2D0098950D /* news-items.json */,
