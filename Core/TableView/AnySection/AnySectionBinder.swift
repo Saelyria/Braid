@@ -23,12 +23,12 @@ public class AnySectionBinder<S: TableViewSection> {
      - parameter handler: The closure to be called whenever a cell is dequeued in one of the bound sections.
      - parameter section: The section in which a cell was dequeued.
      - parameter row: The row of the cell that was dequeued.
-     - parameter dequeuedCell: The cell that was dequeued that can now be configured.
+     - parameter cell: The cell that was dequeued that can now be configured.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: UITableViewCell) -> Void)
+    public func onDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ cell: UITableViewCell) -> Void)
         -> AnySectionBinder<S>
     {
         self.binder.handlers.anySectionDequeuedCallback = handler
@@ -45,12 +45,12 @@ public class AnySectionBinder<S: TableViewSection> {
      - parameter handler: The closure to be called whenever a cell is tapped in the bound section.
      - parameter section: The section in which a cell was tapped.
      - parameter row: The row of the cell that was tapped.
-     - parameter tappedCell: The cell that was tapped.
+     - parameter cell: The cell that was tapped.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: UITableViewCell) -> Void)
+    public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ cell: UITableViewCell) -> Void)
         -> AnySectionBinder<S>
     {
         self.binder.handlers.anySectionCellTappedCallback = handler

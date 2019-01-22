@@ -32,7 +32,8 @@ public class SingleSectionModelDimension<S: TableViewSection, M>: SingleSectionD
      - parameter handler: The closure to be called that will return the height for cells in the section.
      - parameter row: The row of the cell to provide the height for.
      - parameter model: The model for the cell to provide the height for.
-     - returns: A section binder to continue the binding chain with.
+     
+     - returns: The argument to a 'dimensions' call.
      */
     @discardableResult
     public class func cellHeight(_ handler: @escaping (_ row: Int, _ model: M) -> CGFloat)
@@ -57,7 +58,8 @@ public class SingleSectionModelDimension<S: TableViewSection, M>: SingleSectionD
      - parameter handler: The closure to be called that will return the estimated height for cells in the section.
      - parameter row: The row of the cell to provide the estimated height for.
      - parameter model: The model for the cell to provide the height for.
-     - returns: A section binder to continue the binding chain with.
+     
+     - returns: The argument to a 'dimensions' call.
      */
     @discardableResult
     public class func estimatedCellHeight(_ handler: @escaping (_ row: Int, _ model: M) -> CGFloat)

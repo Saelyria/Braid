@@ -15,14 +15,14 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
      
      The handler is called whenever a cell in the section is tapped, passing in the row and cell that was tapped, along
      with the raw model object associated with the cell. The cell will be safely cast to the cell type bound to the
-     section if this method is called in a chain after the `bind(cellType:viewModels:)` method.
+     section if this method is called in a chain after the a cell binding method method.
      
-     Note that this `onTapped` variation with the raw model object is only available if the `bind(cellType:models:)`
-     method was used to bind the cell type to the section.
+     Note that this `onTapped` variation with the raw model object is only available if a cell binding method that takes
+     a model type was used to bind the cell type to the section.
      
      - parameter handler: The closure to be called whenever a cell is tapped in the bound section.
      - parameter row: The row of the cell that was tapped.
-     - parameter tappedCell: The cell that was tapped.
+     - parameter cell: The cell that was tapped.
      - parameter model: The model object that the cell was dequeued to represent in the table.
      
      - returns: A section binder to continue the binding chain with.
@@ -49,8 +49,8 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
      
      The handler is called whenever a cell in the section is dequeued, passing in the row, the dequeued cell, and the
      model object that the cell was dequeued to represent. The cell will be cast to the cell type bound to the section
-     if this method is called in a chain after the `bind(cellType:viewModels:)` method. This method can be used to
-     perform any additional configuration of the cell.
+     if this method is called in a chain after a cell binding method. This method can be used to perform any additional
+     configuration of the cell.
      
      - parameter handler: The closure to be called whenever a cell is dequeued in the bound section.
      - parameter row: The row of the cell that was dequeued.
@@ -89,7 +89,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
      - parameter handler: The closure to be called whenever a cell of the given cell type emits a custom event.
      - parameter row: The row of the cell that emitted an event.
      - parameter cell: The cell that emitted an event.
-     - paramter event: The custom event that the cell emitted.
+     - parameter event: The custom event that the cell emitted.
      - parameter model: The model object that the cell was dequeued to represent in the table.
      
      - returns: A section binder to continue the binding chain with.
@@ -113,6 +113,34 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         self.binder.addEventEmittingHandler(
             cellType: EventCell.self, handler: modelHandler, affectedSections: self.affectedSectionScope)
         
+        return self
+    }
+    
+    /**
+     Add handlers for various dimensions of cells for the section being bound.
+     
+     This method is called with handlers that provide dimensions like cell or header heights and estimated heights. The
+     various handlers are made with the static functions on `MultiSectionDimension`. A typical dimension-binding call
+     looks something like this:
+     
+     ```
+     binder.onSection(.first)
+        .dimensions(
+            .cellHeight { row, model in UITableViewAutomaticDimension },
+            .estimatedCellHeight { row, model in 100 },
+            .headerHeight { _ in 50 })
+     ```
+     
+     - parameter dimensions: A variadic list of dimensions bound for the section being bound. These 'dimension' objects
+        are returned from the various dimension-binding static functions on `SingleSectionModelDimension`.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func dimensions(_ dimensions: SingleSectionModelDimension<S, M>...)
+        -> TableViewModelSingleSectionBinder<C, S, M>
+    {
+        self._dimensions(dimensions)
         return self
     }
     
@@ -226,7 +254,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     @discardableResult
-    public func dimensions(_ dimensions: SingleSectionModelDimension<S, M>...)
+    override public func dimensions(_ dimensions: SingleSectionDimension<S>...)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         self._dimensions(dimensions)

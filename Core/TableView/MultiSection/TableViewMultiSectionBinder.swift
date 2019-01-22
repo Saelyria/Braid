@@ -77,8 +77,8 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      Bind the given cell type to the declared sections, creating them based on the view models from a given array.
      
      - parameter cellType: The class of the header to bind.
-     - parameter viewModels: A dictionary where the key is a section and the value are the view models for the cells
-        created for the section.
+     - parameter viewModels: A closure that will return a dictionary where the key is a section and the value are the
+        view models for the cells created for the section.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -96,8 +96,8 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      Bind the given cell type to the declared sections, creating them based on the view models from a given array.
      
      - parameter cellType: The class of the header to bind.
-     - parameter viewModels: A dictionary where the key is a section and the value are the view models for the cells
-        created for the section.
+     - parameter viewModels: A closure that will return a dictionary where the key is a section and the value are the
+        view models for the cells created for the section.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -230,8 +230,8 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      array of models mapped to view models by a given function.
 
      - parameter cellType: The class of the header to bind.
-     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
-        the section.
+     - parameter models: A closure that will return a dictionary where the key is a section and the value are the models
+        for the cells created for the section.
      - parameter mapToViewModel: A function that, when given a model from a `models` array, will create a view model for
         the associated cell using the data from the model object.
      
@@ -253,8 +253,8 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      array of models mapped to view models by a given function.
      
      - parameter cellType: The class of the header to bind.
-     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
-        the section.
+     - parameter models: A closure that will return a dictionary where the key is a section and the value are the models
+        for the cells created for the section.
      - parameter mapToViewModel: A function that, when given a model from a `models` array, will create a view model for
         the associated cell using the data from the model object.
      
@@ -278,8 +278,8 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      array of models mapped to view models by a given function.
 
      - parameter cellType: The class of the header to bind.
-     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
-        the section.
+     - parameter models: A closure that will return a dictionary where the key is a section and the value are the models
+        for the cells created for the section.
      - parameter mapToViewModel: A function that, when given a model from a `models` array, will create a view model for
         the associated cell using the data from the model object.
      
@@ -302,8 +302,8 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      array of models mapped to view models by a given function.
 
      - parameter cellType: The class of the header to bind.
-     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
-        the section.
+     - parameter models: A closure that will return a dictionary where the key is a section and the value are the models
+        for the cells created for the section.
      - parameter mapToViewModel: A function that, when given a model from a `models` array, will create a view model for
         the associated cell using the data from the model object.
      
@@ -395,8 +395,8 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      model to the cell manually.
      
      - parameter cellType: The class of the header to bind.
-     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
-        the section.
+     - parameter models: A closure that will return a dictionary where the key is a section and the value are the models
+        for the cells created for the section.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -417,8 +417,8 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      model to the cell manually.
      
      - parameter cellType: The class of the header to bind.
-     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
-        the section.
+     - parameter models: A closure that will return a dictionary where the key is a section and the value are the models
+        for the cells created for the section.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -453,6 +453,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      models.
      
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter table: The table view to dequeue the cell on.
      - parameter section: The section the closure should provide a cell for.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
@@ -475,6 +476,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      models.
      
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter table: The table view to dequeue the cell on.
      - parameter section: The section the closure should provide a cell for.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
@@ -500,11 +502,12 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      models.
      
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter table: The table view to dequeue the cell on.
      - parameter section: The section the closure should provide a cell for.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
-     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
-        the section.
+     - parameter models: A closure that will return a dictionary where the key is a section and the value are the models
+        for the cells created for the section.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -522,11 +525,12 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      models.
      
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter table: The table view to dequeue the cell on.
      - parameter section: The section the closure should provide a cell for.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
-     - parameter models: A dictionary where the key is a section and the value are the models for the cells created for
-        the section.
+     - parameter models: A closure that will return a dictionary where the key is a section and the value are the models
+        for the cells created for the section.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -567,6 +571,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      to create.
      
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter table: The table view to dequeue the cell on.
      - parameter section: The section the closure should provide a cell for.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter numberOfCells: The number of cells to create for each section using the provided closure.
@@ -587,9 +592,11 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      to create.
      
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter table: The table view to dequeue the cell on.
      - parameter section: The section the closure should provide a cell for.
      - parameter row: The row in the section the closure should provide a cell for.
-     - parameter numberOfCells: The number of cells to create for each section using the provided closure.
+     - parameter numberOfCells: A closure that will return the number of cells to create for each section using the
+        provided closure.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -639,8 +646,8 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      binder. The view must conform to `ViewModelBindable` and `ReuseIdentifiable` to be compatible.
      
      - parameter headerType: The class of the header to bind.
-     - parameter viewModels: A dictionary where the key is a section and the value is the header view model for the
-        header created for the section.
+     - parameter viewModels: A closure that will return a dictionary where the key is a section and the value is the
+        header view model for the header created for the section.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -666,7 +673,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      This method will provide the given titles as the titles for the iOS native section headers. If you have bound a
      custom header type to the table view using the `bind(headerType:viewModels:)` method, this method will do nothing.
      
-     - parameter titles: A dictionary where the key is a section and the value is the title for the section.
+     - parameter headerTitles: A dictionary where the key is a section and the value is the title for the section.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -684,7 +691,8 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      This method will provide the given titles as the titles for the iOS native section headers. If you have bound a
      custom header type to the table view using the `bind(headerType:viewModels:)` method, this method will do nothing.
      
-     - parameter titles: A dictionary where the key is a section and the value is the title for the section.
+     - parameter headerTitles: A closure that will return a dictionary where the key is a section and the value is the
+        title for the section.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -729,8 +737,8 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      binder. The view must conform to `ViewModelBindable` and `ReuseIdentifiable` to be compatible.
      
      - parameter footerType: The class of the header to bind.
-     - parameter viewModels: A dictionary where the key is a section and the value is the footer view model for the
-        footer created for the section.
+     - parameter viewModels: A closure that will return a dictionary where the key is a section and the value is the
+        footer view model for the footer created for the section.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -756,7 +764,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      This method will provide the given titles as the titles for the iOS native section footers. If you have bound a
      custom footer type to the table view using the `bind(footerType:viewModels:)` method, this method will do nothing.
      
-     - parameter titles: A dictionary where the key is a section and the value is the title for the footer section.
+     - parameter footerTitles: A dictionary where the key is a section and the value is the title for the footer section.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -774,7 +782,8 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      This method will provide the given titles as the titles for the iOS native section footers. If you have bound a
      custom footer type to the table view using the `bind(footerType:viewModels:)` method, this method will do nothing.
      
-     - parameter titles: A dictionary where the key is a section and the value is the title for the footer section.
+     - parameter footerTitles: A closure that will return a dictionary where the key is a section and the value is the
+        title for the footer section.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -890,13 +899,13 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      - parameter section: The section in which a cell emitted an event.
      - parameter row: The row of the cell that emitted an event.
      - parameter cell: The cell that emitted an event.
-     - paramter event: The custom event that the cell emitted.
+     - parameter event: The custom event that the cell emitted.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func onEvent<EventCell>(
-        from: EventCell.Type,
+        from cellType: EventCell.Type,
         _ handler: @escaping (_ section: S, _ row: Int, _ cell: EventCell, _ event: EventCell.ViewEvent) -> Void)
         -> TableViewMultiSectionBinder<C, S>
         where EventCell: UITableViewCell & ViewEventEmitting
@@ -951,8 +960,10 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      binding chain that originally declared the cell and model type. This method will cause a crash if the model type
      originally bound to the section is not the same type or if the section was not setup with a model type.
      
+     - parameter modelType: The type of the models that were bound to the sections on another binding chain.
+     
      - returns: A section binder to continue the binding chain with that allows cast model types to be given to items in
-     its chain.
+        its chain.
      */
     public func assuming<M>(modelType: M.Type) -> TableViewModelMultiSectionBinder<C, S, M> {
         return TableViewModelMultiSectionBinder(binder: self.binder, sections: self.sections)
