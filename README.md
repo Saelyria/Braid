@@ -68,8 +68,8 @@ more like the requirements you receive.
 
 Figuring out how to pass events like when a button is pressed or text is entered on a cell back up to your view controller is always a hassle, 
 usually involving conformance to a bunch of different delegate protocols. To solve this, Tableau also gives you the ability for your cells to 
-declare custom event enums on your cells that can be observed on your binding chains. This is done by conforming your cell to the
-`ViewEventEmitting` protocol and giving it a `ViewEvent` enum, like this:
+declare custom event enums that can be observed on your binding chains. This is done by conforming your cell to the `ViewEventEmitting` 
+protocol and giving it a `ViewEvent` enum, like this:
 
 ```swift
 class MyCustomTableViewCell: UITableViewCell, ViewEventEmitting {

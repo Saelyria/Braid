@@ -175,7 +175,7 @@ binder.onTable()
 - [Getting Started](1-GettingStarted.md)
 - [Updating data](2-UpdatingData.md)
 - **Other data binding methods**
-- [Custom cell events](4-CustomCellEvents)
+- [Custom cell events](4-CustomCellEvents.md)
 - [Hiding, showing, and ordering sections automatically](5-SectionDisplayBehaviour.md)
 - [Binding chain scopes](6-AdvancedBindingChains.md)
 - [Providing dimensions](7-ProvidingDimensions.md)
