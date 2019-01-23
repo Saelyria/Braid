@@ -73,7 +73,7 @@ class TableDisplayBehaviorTests: TableTestCase {
                 }
             }
         
-        self.binder.onAnySection().cellHeight { _,_ in 2 }
+        self.binder.onAnySection().dimensions(.cellHeight { _,_ in 2 })
         
         self.binder.finish()
         
@@ -202,9 +202,10 @@ class TableDisplayBehaviorTests: TableTestCase {
             }
         
         self.binder.onAnySection()
-            .cellHeight { _,_ in 2 }
-            .headerHeight { _ in 1 }
-            .footerHeight { _ in 1 }
+            .dimensions(
+                .cellHeight { _, _ in 2 },
+                .headerHeight { _ in 1 },
+                .footerHeight { _ in 1 })
         
         self.binder.finish()
         
@@ -377,9 +378,10 @@ class TableDisplayBehaviorTests: TableTestCase {
         }
         
         self.binder.onAnySection()
-            .cellHeight { _,_ in 2 }
-            .headerHeight { _ in 1 }
-            .footerHeight { _ in 1 }
+            .dimensions(
+                .cellHeight { _, _ in 2 },
+                .headerHeight { _ in 1 },
+                .footerHeight { _ in 1 })
         
         self.binder.finish()
         
