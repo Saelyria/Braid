@@ -124,6 +124,34 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
         return self
     }
     
+    /**
+     Add handlers for various dimensions of cells for the section being bound.
+     
+     This method is called with handlers that provide dimensions like cell or header heights and estimated heights. The
+     various handlers are made with the static functions on `MultiSectionDimension`. A typical dimension-binding call
+     looks something like this:
+     
+     ```
+     binder.onSections(.first, .second)
+        .dimensions(
+            .cellHeight { section, row, model in UITableViewAutomaticDimension },
+            .estimatedCellHeight { _, _, _ in 100 },
+            .headerHeight { _ in 50 })
+     ```
+     
+     - parameter dimensions: A variadic list of dimensions bound for the section being bound. These 'dimension' objects
+     are returned from the various dimension-binding static functions on `SingleSectionModelDimension`.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func dimensions(_ dimensions: MultiSectionModelDimension<S, M>...)
+        -> TableViewModelMultiSectionBinder<C, S, M>
+    {
+        self._dimensions(dimensions)
+        return self
+    }
+    
     // MARK: -
     
     @discardableResult
@@ -236,7 +264,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     }
     
     @discardableResult
-    public func dimensions(_ dimensions: MultiSectionModelDimension<S, M>...)
+    override public func dimensions(_ dimensions: MultiSectionDimension<S>...)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
         self._dimensions(dimensions)

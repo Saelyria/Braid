@@ -926,14 +926,14 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      ```
      binder.onSections(.first, .second)
         .dimensions(
-            .cellHeight { UITableViewAutomaticDimension },
+            .cellHeight { _, _ in UITableViewAutomaticDimension },
             .estimatedCellHeight { section, row in
                  switch section {
                  case .first: return 120
                  case .second: return 100
                  }
             },
-            .headerHeight { 50 })
+            .headerHeight { _ in 50 })
      ```
      
      - parameter dimensions: A variadic list of dimensions bound for the sections being bound. These 'dimension' objects
