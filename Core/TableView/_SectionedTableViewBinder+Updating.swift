@@ -208,7 +208,7 @@ private extension SectionedTableViewBinder {
              the 'current' (i.e. the ref to the dictionary of data on the current 'next data model') and the 'new' (to
              add any new sections not accounted for), which then has the 'uniquely bound sections' subtracted from it.
              */
-            var sectionsToIterate: Set<S> = self.currentDataModel.sectionsWithData
+            var sectionsToIterate: Set<S> = Set(self.currentDataModel.sectionModels.map { $0.section })
             sectionsToIterate.formUnion(new.keys)
             
             let uniquelyBoundSections: [S]
@@ -221,7 +221,7 @@ private extension SectionedTableViewBinder {
             sectionsToIterate.subtract(uniquelyBoundSections)
             for section in sectionsToIterate {
                 guard uniquelyBoundSections.contains(section) == false else { continue }
-                guard let newValue = new[section] else { continue }
+                let newValue = new[section] ?? resetValue
                 let sectionModel = self.nextDataModel.sectionModel(for: section)
                 sectionModel[keyPath: keyPath] = newValue
             }
