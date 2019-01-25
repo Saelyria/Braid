@@ -464,9 +464,20 @@ extension SectionedTableViewBinder: _TableViewDataModelDelegate {
         let tableUpdateOp = BlockOperation(block: { [weak self] in
             guard let self = self else { return }
             
-            self.applyDisplayedSectionBehavior()
-            let update: CollectionUpdate
+            defer {
+                self.tableUpdateOperation = nil
+                self.hasRefreshQueued = false
+            }
             
+            self.applyDisplayedSectionBehavior()
+            
+            if !self.animateChanges {
+                self.createNextDataModel()
+                self.tableView.reloadData()
+                return
+            }
+            
+            let update: CollectionUpdate
             if let diff = self.currentDataModel.diff(from: self.nextDataModel) {
                 self.createNextDataModel()
                 update = CollectionUpdate(diff: diff)
@@ -478,7 +489,7 @@ extension SectionedTableViewBinder: _TableViewDataModelDelegate {
 
             if let delegate = self.updateDelegate {
                 delegate.animate(updates: update, on: self.tableView)
-            } else if self.animateChanges {
+            } else {
                 self.tableView.beginUpdates()
                 self.tableView.deleteRows(at: update.itemDeletions, with: self.rowDeletionAnimation)
                 self.tableView.insertRows(at: update.itemInsertions, with: self.rowInsertionAnimation)
@@ -492,12 +503,7 @@ extension SectionedTableViewBinder: _TableViewDataModelDelegate {
                 self.tableView.reloadSections(update.sectionUpdates, with: self.sectionUpdateAnimation)
                 self.tableView.reloadSections(update.sectionHeaderFooterUpdates, with: self.sectionHeaderFooterUpdateAnimation)
                 self.tableView.reloadSections(update.undiffableSectionUpdates, with: self.undiffableSectionUpdateAnimation)
-            } else {
-                self.tableView.reloadData()
             }
-            
-            self.tableUpdateOperation = nil
-            self.hasRefreshQueued = false
         })
         
         for eventOperation in self.viewEventOperations {

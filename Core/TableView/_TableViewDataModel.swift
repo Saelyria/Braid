@@ -5,96 +5,6 @@ internal protocol _TableViewDataModelDelegate: AnyObject {
     func dataModelDidChange()
 }
 
-internal class SectionModel<S: TableViewSection>: Collection {
-    enum CellDataType {
-        case models
-        case viewModels
-        case modelsViewModels
-        case number
-    }
-    
-    typealias Index = Int
-    
-    let section: S
-    
-    var headerTitle: String? = nil {
-        didSet { self.onUpdate?() }
-    }
-    var headerViewModel: Any? = nil {
-        didSet { self.onUpdate?() }
-    }
-    var items: [TableViewItem] = [] {
-        didSet {
-            self.onUpdate?()
-        }
-    }
-    var footerTitle: String? = nil {
-        didSet { self.onUpdate?() }
-    }
-    var footerViewModel: Any? = nil {
-        didSet { self.onUpdate?() }
-    }
-    
-    var cellDataType: CellDataType = .models
-    
-    fileprivate var itemEqualityChecker: ((Any, Any) -> Bool?)? = nil
-    fileprivate var onUpdate: (() -> Void)?
-    
-    fileprivate init(section: S) {
-        self.section = section
-    }
-    
-    fileprivate init(from other: SectionModel<S>) {
-        self.headerTitle = other.headerTitle
-        self.headerViewModel = other.headerViewModel
-        self.cellDataType = other.cellDataType
-        self.items = other.items
-        self.footerTitle = other.footerTitle
-        self.footerViewModel = other.footerViewModel
-        self.itemEqualityChecker = other.itemEqualityChecker
-        self.section = other.section
-    }
-    
-    var startIndex: Int {
-        return items.startIndex
-    }
-    
-    var endIndex: Int {
-        return items.endIndex
-    }
-    
-    subscript(i: Int) -> Any {
-        let item = items[i]
-
-        // get the 'items' (be it view models, models, or the number of cells) that are used for cells for the
-        // section. Prefer whichever is diffable.
-        if self.cellDataType == .viewModels
-        || self.cellDataType == .modelsViewModels
-        && !(item.model is CollectionIdentifiable),
-        let viewModel = item.viewModel as? CollectionIdentifiable {
-            return viewModel
-        } else if self.cellDataType == .models
-        || self.cellDataType == .modelsViewModels,
-        let model = item.model as? CollectionIdentifiable {
-            return model
-        } else if self.cellDataType == .number {
-            return item
-        } else {
-            return item.viewModel ?? item.model ?? item
-        }
-    }
-    
-    func index(after i: Int) -> Int {
-        return items.index(after: i)
-    }
-}
-
-internal struct TableViewItem {
-    var isNumberPlaceholder: Bool
-    var model: Any?
-    var viewModel: Any?
-}
-
 /// An object that holds all the data for a table view at a given moment. Diffs can be generated between data model
 /// instances to animate table view changes.
 internal class _TableViewDataModel<S: TableViewSection> {
@@ -247,3 +157,95 @@ extension _TableViewDataModel {
         return diff
     }
 }
+
+internal class SectionModel<S: TableViewSection> {
+    enum CellDataType {
+        case models
+        case viewModels
+        case modelsViewModels
+        case number
+    }
+    
+    
+    let section: S
+    
+    var headerTitle: String? = nil {
+        didSet { self.onUpdate?() }
+    }
+    var headerViewModel: Any? = nil {
+        didSet { self.onUpdate?() }
+    }
+    var items: [TableViewItem] = [] {
+        didSet { self.onUpdate?() }
+    }
+    var footerTitle: String? = nil {
+        didSet { self.onUpdate?() }
+    }
+    var footerViewModel: Any? = nil {
+        didSet { self.onUpdate?() }
+    }
+    
+    var cellDataType: CellDataType = .models
+    
+    fileprivate var itemEqualityChecker: ((Any, Any) -> Bool?)? = nil
+    fileprivate var onUpdate: (() -> Void)?
+    
+    fileprivate init(section: S) {
+        self.section = section
+    }
+    
+    fileprivate init(from other: SectionModel<S>) {
+        self.headerTitle = other.headerTitle
+        self.headerViewModel = other.headerViewModel
+        self.cellDataType = other.cellDataType
+        self.items = other.items
+        self.footerTitle = other.footerTitle
+        self.footerViewModel = other.footerViewModel
+        self.itemEqualityChecker = other.itemEqualityChecker
+        self.section = other.section
+    }
+}
+
+extension SectionModel: Collection {
+    typealias Index = Int
+
+    subscript(i: Int) -> Any {
+        let item = items[i]
+        
+        // get the 'items' (be it view models, models, or the number of cells) that are used for cells for the
+        // section. Prefer whichever is diffable.
+        if self.cellDataType == .viewModels
+            || self.cellDataType == .modelsViewModels
+            && !(item.model is CollectionIdentifiable),
+            let viewModel = item.viewModel as? CollectionIdentifiable {
+            return viewModel
+        } else if self.cellDataType == .models
+            || self.cellDataType == .modelsViewModels,
+            let model = item.model as? CollectionIdentifiable {
+            return model
+        } else if self.cellDataType == .number {
+            return item
+        } else {
+            return item.viewModel ?? item.model ?? item
+        }
+    }
+    
+    var startIndex: Int {
+        return items.startIndex
+    }
+    
+    var endIndex: Int {
+        return items.endIndex
+    }
+    
+    func index(after i: Int) -> Int {
+        return items.index(after: i)
+    }
+}
+
+internal struct TableViewItem {
+    var isNumberPlaceholder: Bool
+    var model: Any?
+    var viewModel: Any?
+}
+
