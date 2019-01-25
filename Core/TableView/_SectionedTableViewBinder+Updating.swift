@@ -35,12 +35,7 @@ internal extension SectionedTableViewBinder {
         for (section, cellDataType) in dataTypes {
             self.nextDataModel.sectionModel(for: section).cellDataType = cellDataType
         }
-//        self.update(fromDataIn: dataTypes,
-//                    resettingMissingSectionsWith: .models,
-//                    updatingKeyPath: \SectionModel<S>.cellDataType,
-//                    affectedSections: affectedSections,
-//                    dataType: .cell)
-        
+
         var items: [S: [TableViewItem]] = [:]
         if let models = models, let viewModels = viewModels {
             items = models.reduce(into: [:]) { result, value in
@@ -56,9 +51,6 @@ internal extension SectionedTableViewBinder {
             items = viewModels.mapValues { _viewModels in
                 return _viewModels.map { TableViewItem(isNumberPlaceholder: false, model: nil, viewModel: $0) }
             }
-        }
-        items.forEach { (key, value) in
-            print("\(key): \(value.count)\n")
         }
         
         self.update(fromDataIn: items,
@@ -79,11 +71,7 @@ internal extension SectionedTableViewBinder {
         for section in numCells.keys {
             self.nextDataModel.sectionModel(for: section).cellDataType = .number
         }
-//        self.update(fromDataIn: dataTypes,
-//                    updatingKeyPath: \SectionModel<S>.cellDataType,
-//                    affectedSections: affectedSections,
-//                    dataType: .cell)
-        
+
         let items: [S: [TableViewItem]] = numCells.mapValues { numberOfCells in
             return (0..<numberOfCells).map { _ in
                 return TableViewItem(isNumberPlaceholder: true, model: nil, viewModel: nil)
@@ -111,7 +99,6 @@ internal extension SectionedTableViewBinder {
         default: break
         }
         
-//        let nonNilTitles: [S: String] = titles.filter { $0.value != nil }.mapValues { return $0! }
         self.update(fromDataIn: titles,
                     resettingMissingSectionsWith: nil,
                     updatingKeyPath: \SectionModel<S>.headerTitle,
@@ -128,7 +115,6 @@ internal extension SectionedTableViewBinder {
     func updateHeaderViewModels(_ viewModels: [S: Any?], affectedSections: SectionBindingScope<S>) {
         self.nextDataModel.headerViewBound = true
         
-//        let nonNilViewModels: [S: Any] = viewModels.filter { $0.value != nil }.mapValues { return $0! }
         self.update(fromDataIn: viewModels,
                     resettingMissingSectionsWith: nil,
                     updatingKeyPath: \SectionModel<S>.headerViewModel,
@@ -151,7 +137,6 @@ internal extension SectionedTableViewBinder {
         default: break
         }
         
-//        let nonNilTitles: [S: String] = titles.filter { $0.value != nil }.mapValues { return $0! }
         self.update(fromDataIn: titles,
                     resettingMissingSectionsWith: nil,
                     updatingKeyPath: \SectionModel<S>.footerTitle,
@@ -252,95 +237,5 @@ private extension SectionedTableViewBinder {
         case .forAnySection:
             assertionFailure("Data binding not supported for 'any section' - internal error")
         }
-
-        
-//        for section in new.keys {
-//            if let sectionModel = self.nextDataModel.sectionModelsForSections[section] {
-//                if let newValue = new[section] {
-//                    sectionModel[keyPath: keyPath] = newValue
-//                }
-//            } else {
-//                let sectionModel = SectionModel(section: section)
-//                if let newValue = new[section] {
-//                    sectionModel[keyPath: keyPath] = newValue
-//                }
-//            }
-//        }
     }
-    
-    /**
-     Updates a dictionary on the binder's `nextDataModel` to the given values for the given section.
-     
-     - parameter new: The dictionary containing values to update the 'next data model' with.
-     - parameter current: A pointer to the dictionary property on the binder's `nextDataModel` that gets updated
-        with the values from the 'new' dictionary.
-     - parameter affectedSections: The section scope affected by this update.
-     - parameter dataType: The type of data being updated (cell, header, or footer).
-    */
-    /*
-    func update<V>(
-        fromDataIn new: [S: V],
-        updatingProperty current: inout [S: V],
-        affectedSections: SectionBindingScope<S>,
-        dataType: DataUpdateType)
-    {
-        switch affectedSections {
-        case .forNamedSections(let sections):
-            // If the new values are for specific named sections, simply iterate over the given sections and set the
-            // value for the section in the reference to the 'current' data model to the data for the section in 'new'.
-            for section in sections {
-                current[section] = new[section]
-            }
-            
-            // mark either the cells or header/footers for the affected sections as dirty so they're reloaded
-            switch dataType {
-            case .cell:
-                self.nextDataModel.cellUpdatedSections = self.nextDataModel.cellUpdatedSections.union(sections)
-            case .header, .footer:
-                self.nextDataModel.headerFooterUpdatedSections =
-                    self.nextDataModel.headerFooterUpdatedSections.union(sections)
-            }
-        
-        case .forAllUnnamedSections:
-            /*
-             If we're binding for dynamic, unnamed sections, we assume that the data in the 'new' dict given is the
-             'state of the table' for any section not explicitly bound with the 'onSection' or 'onSections' methods. So,
-             if a models/VMs array isn't included for a section in the titles/VMs dict, that section doesn't have any
-             cells.
-             
-             Because explicitly bound sections have priority, we don't want to overwrite the models/VMs for a section
-             that wasn't given if that section *was* bound uniquely by name. So, we create a 'sections to iterate' set
-             of all the sections to update data for from the 'updateDict' object. This set is the union of the keys on
-             the 'current' (i.e. the ref to the dictionary of data on the current 'next data model') and the 'new' (to
-             add any new sections not accounted for), which then has the 'uniquely bound sections' subtracted from it.
-             */
-            var sectionsToIterate = Set<S>(current.keys)
-            sectionsToIterate.formUnion(new.keys)
-            
-            let uniquelyBoundSections: [S]
-            switch dataType {
-            case .cell: uniquelyBoundSections = self.nextDataModel.uniquelyBoundCellSections
-            case .header: uniquelyBoundSections = self.nextDataModel.uniquelyBoundHeaderSections
-            case .footer: uniquelyBoundSections = self.nextDataModel.uniquelyBoundFooterSections
-            }
-            
-            sectionsToIterate.subtract(uniquelyBoundSections)
-            for section in sectionsToIterate {
-                guard uniquelyBoundSections.contains(section) == false else { continue }
-                current[section] = new[section]
-            }
-            
-            // mark either the cells or header/footers for the affected sections as dirty so they're reloaded
-            switch dataType {
-            case .cell:
-                self.nextDataModel.cellUpdatedSections = self.nextDataModel.cellUpdatedSections.union(sectionsToIterate)
-            case .header, .footer:
-                self.nextDataModel.headerFooterUpdatedSections =
-                    self.nextDataModel.headerFooterUpdatedSections.union(sectionsToIterate)
-            }
-        case .forAnySection:
-            assertionFailure("Data binding not supported for 'any section' - internal error")
-        }
-    }
- */
 }

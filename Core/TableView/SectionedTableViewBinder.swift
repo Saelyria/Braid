@@ -475,7 +475,7 @@ extension SectionedTableViewBinder: _TableViewDataModelDelegate {
                 let sections: IndexSet = IndexSet(self.currentDataModel.displayedSections.enumerated().map { i, _ in i })
                 update = CollectionUpdate(undiffableSectionUpdates: sections)
             }
-            
+
             if let delegate = self.updateDelegate {
                 delegate.animate(updates: update, on: self.tableView)
             } else if self.animateChanges {

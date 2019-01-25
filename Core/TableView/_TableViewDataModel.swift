@@ -25,24 +25,6 @@ internal class SectionModel<S: TableViewSection>: Collection {
     }
     var items: [TableViewItem] = [] {
         didSet {
-//            let viewModels: [Any] = self.items.map { $0.viewModel }.compactMap { $0 }
-//            let models: [Any] = self.items.map { $0.model }.compactMap { $0 }
-//
-//            if self.cellDataType == .viewModels
-//            || self.cellDataType == .modelsViewModels
-//            && !(models is [CollectionIdentifiable]),
-//            let identifiableVMs = viewModels as? [CollectionIdentifiable] {
-//                self.diffableItems = identifiableVMs
-//            } else if self.cellDataType == .models
-//            || self.cellDataType == .modelsViewModels,
-//            let identifiableMs = models as? [CollectionIdentifiable] {
-//                self.diffableItems = identifiableMs
-//            } else if self.cellDataType == .number {
-//                self.diffableItems = self.items
-//            } else {
-//                self.diffableItems = (viewModels.isEmpty) ? models : viewModels
-//            }
-
             self.onUpdate?()
         }
     }
@@ -60,6 +42,17 @@ internal class SectionModel<S: TableViewSection>: Collection {
     
     fileprivate init(section: S) {
         self.section = section
+    }
+    
+    fileprivate init(from other: SectionModel<S>) {
+        self.headerTitle = other.headerTitle
+        self.headerViewModel = other.headerViewModel
+        self.cellDataType = other.cellDataType
+        self.items = other.items
+        self.footerTitle = other.footerTitle
+        self.footerViewModel = other.footerViewModel
+        self.itemEqualityChecker = other.itemEqualityChecker
+        self.section = other.section
     }
     
     var startIndex: Int {
@@ -105,7 +98,7 @@ internal struct TableViewItem {
 /// An object that holds all the data for a table view at a given moment. Diffs can be generated between data model
 /// instances to animate table view changes.
 internal class _TableViewDataModel<S: TableViewSection> {
-    private var sectionModels: [SectionModel<S>] = [] {
+    private(set) var sectionModels: [SectionModel<S>] = [] {
         didSet { self.delegate?.dataModelDidChange() }
     }
     
@@ -190,7 +183,7 @@ internal class _TableViewDataModel<S: TableViewSection> {
         self.footerTitleBound = other.footerTitleBound
         self.footerViewBound = other.footerViewBound
         self.displayedSections = other.displayedSections
-        self.sectionModels = other.sectionModels
+        self.sectionModels = other.sectionModels.map { SectionModel(from: $0) }
         for sectionModel in self.sectionModels {
             sectionModel.onUpdate = { [weak self] in
                 self?.delegate?.dataModelDidChange()
@@ -206,8 +199,8 @@ extension _TableViewDataModel {
      `CollectionIdentifiable`).
      */
     func diff(from other: _TableViewDataModel<S>) -> _NestedExtendedDiff? {
-        let selfSectionModels = self.sectionModels.filter { self.displayedSections.contains($0.section) }
-        let otherSectionModels = other.sectionModels.filter { other.displayedSections.contains($0.section) }
+        let selfSectionModels = self.displayedSections.map { self.sectionModel(for: $0) }
+        let otherSectionModels = other.displayedSections.map { other.sectionModel(for: $0) }
         guard var diff = try? selfSectionModels.nestedExtendedDiff(
             to: otherSectionModels,
             isSameSection: { $0.section == $1.section },

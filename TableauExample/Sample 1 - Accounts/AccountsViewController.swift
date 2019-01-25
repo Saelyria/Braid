@@ -35,6 +35,7 @@ class AccountsViewController: UIViewController {
         
         // 5.
         self.binder = SectionedTableViewBinder(tableView: tableView, sectionedBy: Section.self)
+//        self.binder.animateChanges = false
         
         // 6.
         self.binder.sectionDisplayBehavior = .hidesSectionsWithNoCellData

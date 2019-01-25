@@ -61,8 +61,8 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         return self.dataModel.displayedSections.count
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let section = self.dataModel.displayedSections[section]
+    func tableView(_ tableView: UITableView, numberOfRowsInSection sectionInt: Int) -> Int {
+        let section = self.dataModel.displayedSections[sectionInt]
         return self.dataModel.sectionModel(for: section).items.count
     }
     
@@ -169,7 +169,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection sectionInt: Int) -> CGFloat {
-        let section = self.binder.currentDataModel.displayedSections[sectionInt]
+        let section = self.dataModel.displayedSections[sectionInt]
         
         var _heightBlock: HeaderFooterHeightBlock<S>?
         if self.dataModel.uniquelyBoundHeaderSections.contains(section) {
@@ -185,7 +185,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection sectionInt: Int) -> CGFloat {
-        let section = self.binder.currentDataModel.displayedSections[sectionInt]
+        let section = self.dataModel.displayedSections[sectionInt]
         
         var _heightBlock: HeaderFooterHeightBlock<S>?
         if self.dataModel.uniquelyBoundFooterSections.contains(section) {
@@ -201,7 +201,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
 
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        let section = self.binder.currentDataModel.displayedSections[indexPath.section]
+        let section = self.dataModel.displayedSections[indexPath.section]
         
         var _heightBlock: CellHeightBlock<S>?
         if self.dataModel.uniquelyBoundCellSections.contains(section) {
@@ -217,7 +217,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
 
     func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection sectionInt: Int) -> CGFloat {
-        let section = self.binder.currentDataModel.displayedSections[sectionInt]
+        let section = self.dataModel.displayedSections[sectionInt]
         
         var _heightBlock: HeaderFooterHeightBlock<S>?
         if self.dataModel.uniquelyBoundHeaderSections.contains(section) {
@@ -233,7 +233,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
 
     func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection sectionInt: Int) -> CGFloat {
-        let section = self.binder.currentDataModel.displayedSections[sectionInt]
+        let section = self.dataModel.displayedSections[sectionInt]
         
         var _heightBlock: HeaderFooterHeightBlock<S>?
         if self.dataModel.uniquelyBoundFooterSections.contains(section) {
