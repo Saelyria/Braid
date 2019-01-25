@@ -33,12 +33,6 @@ public extension TableViewSection where Self: RawRepresentable, Self.RawValue: C
  type and observable models bound to it via the `bind(cellType:models:)` method. This method should be called shortly
  after the data binder and table view are setup (likely in `viewDidLoad`).
  
- Model objects passed into the `bind` method are RxSwift `Observable`s, to which the data binder will subscribe and
- automatically refresh the section with the updated data. Being a simple `Observable`, this data source can be a
- `Variable` array on the view controller, or can even be the `Observable` result of a network call. Every time the data
- source observable updates, the data binder will use the `count` of the data source's array to dequeue cells of
- `cellType` and bind the data to the cells.
- 
  Using a table view binder is done with chaining function calls. A typical setup would look something like this:
  
  ```
@@ -54,26 +48,35 @@ public extension TableViewSection where Self: RawRepresentable, Self.RawValue: C
         // called when a cell in section `one` is tapped
     }
  ```
- 
- `UITableViewCell`s need to conform to a few different protocols (whose conformance can be as simple as declaring
- conformance) to be compatible with a data binder. Specifically, they must at least conform to `ReuseIdentifiable` and
- `ViewModelBindable`, and should conform to `UINibInitable` if they are meant to be created from a Nib.
  */
 public class TableViewBinder {
     private let _sectionBinder: SectionedTableViewBinder<_SingleSection>
     
-    /**
-     Instantiate a new table view binder for the given table view.
-     */
+    /// Instantiate a new table view binder for the given table view.
     public required init(tableView: UITableView) {
         self._sectionBinder = SectionedTableViewBinder(tableView: tableView, sectionedBy: _SingleSection.self)
         self._sectionBinder.displayedSections = [.table]
     }
     
-    /// Starts binding on the table.
+    /**
+     Begins a binding chain whose handlers are used to provide data and respond to events for the whole table.
+    
+     This method must be called before the binder's `finish` method is called, and a reference to the given 'section
+     binder' object should not be kept.
+     
+     - returns: A 'section binder' object used to begin binding handlers to the table.
+    */
     public func onTable() -> TableViewSingleSectionBinder<UITableViewCell, _SingleSection> {
         return TableViewSingleSectionBinder<UITableViewCell, _SingleSection>(
             binder: self._sectionBinder, section: .table)
+    }
+    
+    /**
+     Has the binder call all bound model- or view model-providing closures bound to its sections and apply the new data
+     to the table. This method does not need to be used for binders that use RxSwift.
+     */
+    public func refresh() {
+        self._sectionBinder.refresh()
     }
     
     /**
@@ -141,21 +144,27 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
             case manuallyManaged
         }
         
-        /// The table binder will automatically hide sections when there are no cell items for it regardless of whether
-        /// a header/footer is bound for the section. The associated value for this behavior is a function that, given
-        /// the array of sections the binder has calculated will be shown, returns these sections in the correct order.
+        /**
+         The table binder will automatically hide sections when there are no cell items for it regardless of whether a
+         header/footer is bound for the section. The associated value for this behavior is a function that, given the
+         array of sections the binder has calculated will be shown, returns these sections in the correct order.
+        */
         public static func hidesSectionsWithNoCellData(orderingWith: @escaping ([S]) -> [S]) -> SectionDisplayBehavior {
             return SectionDisplayBehavior(behavior: .hidesSectionsWithNoCellData, orderingFunction: orderingWith)
         }
-        /// The table binder will automatically hide sections when there are no cell and no header/footer items for it.
-        /// This behavior means that a section will still be shown if it has a header or footer, even when it has no
-        /// cells to show. The associated value for this behavior is a function that, given the array of sections the
-        /// binder has calculated will be shown, returns these sections in the correct order.
+        /**
+         The table binder will automatically hide sections when there are no cell and no header/footer items for it.
+         This behavior means that a section will still be shown if it has a header or footer, even when it has no cells
+         to show. The associated value for this behavior is a function that, given the array of sections the binder has
+         calculated will be shown, returns these sections in the correct order.
+        */
         public static func hidesSectionsWithNoData(orderingWith: @escaping ([S]) -> [S]) -> SectionDisplayBehavior {
             return SectionDisplayBehavior(behavior: .hidesSectionsWithNoData, orderingFunction: orderingWith)
         }
-        /// The table binder will only display sections manually set in its `displayedSections` property, in the order
-        /// they appear in.
+        /**
+         The table binder will only display sections manually set in its `displayedSections` property, in the order they
+         appear there.
+        */
         public static var manuallyManaged: SectionDisplayBehavior {
             return SectionDisplayBehavior(behavior: .manuallyManaged, orderingFunction: nil)
         }
@@ -165,7 +174,8 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     }
     
     /// The table view's displayed sections. This array can be changed or reordered at any time to dynamically update
-    /// the displayed sections on the table view. Setting this property queues a table view animation.
+    /// the displayed sections on the table view if the section display behavior is set to 'manually managed'. Setting
+    /// this property queues a table view animation.
     public var displayedSections: [S] {
         get {
             return self.currentDataModel.displayedSections
@@ -270,6 +280,10 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
         }
     }
     
+    /**
+     Has the binder call all bound model- or view model-providing closures bound to its sections and apply the new data
+     to the table. This method does not need to be used for binders that use RxSwift.
+    */
     public func refresh() {
         for updater in self.handlers.modelUpdaters {
             updater()
@@ -299,7 +313,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
      This method must be called before the binder's `finish` method is called, and a reference to the given 'section
      binder' object should not be kept.
      
-     - parameter section: An array of sections to begin binding common handlers to.
+     - parameter section: An array of sections to begin binding handlers to.
      
      - returns: A 'multi-section binder' object used to begin binding handlers to the given sections.
      */

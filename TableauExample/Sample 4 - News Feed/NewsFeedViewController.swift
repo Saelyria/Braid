@@ -9,7 +9,7 @@ class NewsFeedViewController: UIViewController {
     private let tableView = UITableView()
     
     private let disposeBag = DisposeBag()
- 
+    // 1.
     private let newsItems = BehaviorRelay<[NewsItem]>(value: [])
     
     override func viewDidLoad() {
@@ -22,6 +22,7 @@ class NewsFeedViewController: UIViewController {
         
         self.binder = TableViewBinder(tableView: self.tableView)
         
+        // 2.
         self.binder.onTable()
             .rx.bind(cellType: TitleDetailTableViewCell.self,
                      models: self.newsItems.asObservable(),
@@ -33,6 +34,7 @@ class NewsFeedViewController: UIViewController {
                             detail: ($0.isAd) ? "Ad" : nil,
                             accessoryType: .none)
                     })
+            // 3.
             .prefetch(when: .cellsFromEnd(1)) { [unowned self] (startingIndex) in
                 self.fetchNew(startingFrom: startingIndex)
             }
@@ -45,7 +47,6 @@ class NewsFeedViewController: UIViewController {
     }
     
     private func fetchNew(startingFrom index: Int) {
-        
         NewsFeedService.shared.getNewsFeed(startingFrom: index, numberOfItems: 8)
             .map { new in
                 var merged = self.newsItems.value

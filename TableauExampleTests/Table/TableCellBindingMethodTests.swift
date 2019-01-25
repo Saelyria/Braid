@@ -495,7 +495,7 @@ class TableCellBindingMethodTests: TableTestCase {
                 }
         }
         
-        self.binder.onAnySection().cellHeight { _,_ in 2 }
+        self.binder.onAnySection().dimensions(.cellHeight { _,_ in 2 })
         
         self.binder.finish()
         
@@ -1204,7 +1204,7 @@ class TableCellBindingMethodTests: TableTestCase {
                 }
         }
         
-        self.binder.onAnySection().cellHeight { _,_ in 2 }
+        self.binder.onAnySection().dimensions(.cellHeight { _,_ in 2 })
         
         self.binder.finish()
         
@@ -1652,7 +1652,6 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onSections(.second, .third)
             .rx.bind(
-                models: secondThirdModels,
                 cellProvider: { (table, section, row, model: String) in
                     if dequeuedCells[section]?.indices.contains(row) == false {
                         models[section]?.insert(model, at: row)
@@ -1660,7 +1659,7 @@ class TableCellBindingMethodTests: TableTestCase {
                         models[section]?[row] = model
                     }
                     return table.dequeue(TestCell.self)
-            })
+                }, models: secondThirdModels)
             .onDequeue { section, row, cell, model in
                 expect(model).to(equal(models[section]?[row]))
                 if dequeuedCells[section]?.indices.contains(row) == false {
@@ -1672,7 +1671,6 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onAllOtherSections()
             .rx.bind(
-                models: fourthModels,
                 cellProvider: { (table, section, row, model: String) in
                     if dequeuedCells[section]?.indices.contains(row) == false {
                         models[section]?.insert(model, at: row)
@@ -1680,7 +1678,7 @@ class TableCellBindingMethodTests: TableTestCase {
                         models[section]?[row] = model
                     }
                     return table.dequeue(TestCell.self)
-            })
+                }, models: fourthModels)
             .onDequeue { section, row, cell, model in
                 expect(model).to(equal(models[section]?[row]))
                 if dequeuedCells[section]?.indices.contains(row) == false {
