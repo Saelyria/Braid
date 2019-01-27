@@ -1,6 +1,6 @@
 # Tableau
 
-Tableau is a library for making your table and collection view setup routine smaller, more declarative, more type safe, and simply more fun. It 
+Tableau is a feature-packed library for making your table view setup routine smaller, more declarative, more type safe, and simply more fun. It 
 includes support for automatically diffing and animating data on your tables, ability for cells to emit custom events, and support for RxSwift.
 
 ## A quick intro
@@ -21,14 +21,15 @@ enum Section: TableViewSection {
 let binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
 ```
 
-Then, we start 'binding chains' to one or multiple sections, kind of like in a switch statement. Here, we'll make three 'binding chains' to add
-different data and handlers to the sections we just declared:
+Then, we start 'binding chains' to one or multiple sections, kind of like in a switch statement. Binding chains are how we bind data (cell type,
+model type, event handlers, etc) to our table. Here, we'll make three 'binding chains' to demonstrate how to bind one (or multiple!) cell and
+model type(s) to our sections, along with how to add header titles and cell heights.
 
 ```swift
 var myModels: [MyModel] = ...
 
 binder.onSection(.first)
-    .bind(headerTitle: "FIRST SECTION")
+    .bind(headerTitle: "FIRST")
     .bind(cellType: MyCustomTableViewCell.self, models: { myModels })
     .onDequeue { (row: Int, cell: MyCustomTableViewCell, model: MyModel) in
         // setup the dequeued 'cell' with the 'model'
@@ -38,31 +39,32 @@ binder.onSection(.first)
     }
 
 binder.onSections(.second, .third)
-    .bind(headerTitles: [.second: "SECOND SECTION", .third: "THIRD SECTION"])
-    .bind(cellProvider: { (tableView, section, row, model: MyOtherModel) -> UITableViewCell in 
-        if ... {
+    .bind(headerTitles: [.second: "SECOND", .third: "THIRD"])
+    .bind(cellProvider: { (tableView, section, row, model: Any) -> UITableViewCell in 
+        if let model = model as? Int {
             return tableView.dequeue(MyOtherTableViewCell.self)
-        } else {
+        } else if let model = model as? String {
             return tableView.dequeue(MyCustomTableViewCell.self)
         }
-    }, models: { () -> [MyOtherModel]
         ...
+    }, models: { () -> [Section: [Any]]
+        return [.second: [1, "hello", 67, 42], .third: [81, 7, "world"]
     })
-    .dimensions(
-        .cellHeight { section, row, model in 
-            return UITableViewAutomaticDimension 
-        },
-        .estimatedCellHeight { _, _ in 120 })
     ...
     
 binder.onAllOtherSections()
     .bind(cellType: MyOtherOtherTableViewCell.self, viewModels: { ... })
     ...
+    
+binder.finish()
 ```
 
 Cells are automatically dequeued for given 'model' arrays, and bound model and cell types are remembered and passed to other handlers on
-the binding chain. By having tables setup using chains like this, you can more clearly describe how your table views work in a way that reads
-more like the requirements you receive.
+the binding chain. You also don't need to do any bookkeeping to remember which section refers to which integer - you can dynamically
+remove or rearrange the displayed sections of a binder, and it'll internally keep track of where named sections moved on the table. 
+
+Table views are also very easy to update - just call `refresh` on the binder when the data we give to `models` closures changes and it'll diff
+and animate the changes.
 
 ## Custom cell events
 
@@ -110,7 +112,8 @@ animations on sections.
 
 However, if you want it, the library also gives you more powerful and more fine-grained control over diffing by taking into account conformance
 to `Equatable` and `CollectionIdentifiable` on the models you bind to provide more precise 'reload', 'insert', and 'delete' animations, as 
-well as for tracking moves - all automatically!
+well as for tracking moves.  This 'tiered diffing' is done on a section-by-section basis, so if the models on one section conform to these 
+protocols but the models for another don't, Tableau can still do more advanced diffing just for the former section.
 
 ## Advanced features
 
@@ -132,9 +135,11 @@ project in the repository. Available tutorials to get you familiar with Tableau 
 - [Tips, tricks, and FAQ](https://github.com/Saelyria/Tableau/tree/master/Documentation/8-TipsTricksFAQ.md)
 - [How Tableau works](https://github.com/Saelyria/Tableau/tree/master/Documentation/9-HowItWorks.md)
 
+> Collection view support and ability to bind cells by name like sections for form-style tables are on the way!
+
 ## Installation
 
-Tableau (will be) available through [CocoaPods](http://cocoapods.org). To install it, simply add the following line to your Podfile:
+Tableau is available through [CocoaPods](http://cocoapods.org). To install it, simply add the following line to your Podfile:
 
 ```ruby
 pod 'Tableau'
