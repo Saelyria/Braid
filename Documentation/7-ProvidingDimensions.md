@@ -1,6 +1,6 @@
 #  Providing dimensions (cell height, header height, etc.)
 
-Tableau has very concise syntax for supplying dimensions like header, footer, or cell height. Dimensions are added by providing a 
+Braid has very concise syntax for supplying dimensions like header, footer, or cell height. Dimensions are added by providing a 
 `dimensions` item to a binding chain, which is then given all the dimensions you want to supply, like this:
 
 ```swift
@@ -68,4 +68,4 @@ And for a multi-section binding chain:
 - [Binding chain scopes](6-AdvancedBindingChains.md)
 - **Providing dimensions**
 - [Tips, tricks, and FAQ](8-TipsTricksFAQ.md)
-- [How Tableau works](9-HowItWorks.md)
+- [How Braid works](9-HowItWorks.md)

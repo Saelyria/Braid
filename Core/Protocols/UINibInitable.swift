@@ -3,7 +3,7 @@ import UIKit
 /**
  A protocol describing an object that can be initialized from a `UINib`.
  
- Tableau uses the properties of this protocol when registering cell or view types to table/collection views.
+ Braid uses the properties of this protocol when registering cell or view types to table/collection views.
  */
 public protocol UINibInitable: AnyObject {
     /// The file name of the Nib file containing this class. Defaults to the name of the conforming type if not

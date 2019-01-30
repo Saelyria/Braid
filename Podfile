@@ -1,23 +1,23 @@
 platform :ios, '9.0'
 
-workspace 'Tableau'
+workspace 'Braid'
 
-target 'TableauExample' do
-  project 'TableauExample'
+target 'BraidExample' do
+  project 'BraidExample'
   use_frameworks!
   
-  pod 'Tableau/Rx', :path => '.'
-#  pod 'Tableau', :path => '.'
+  pod 'Braid/Rx', :path => '.'
+#  pod 'Braid', :path => '.'
   pod 'RxCocoa', '~> 4.4'
   pod 'RxSwift', '~> 4.4'
 end
 
-target 'TableauExampleTests' do
-    project 'TableauExample'
+target 'BraidExampleTests' do
+    project 'BraidExample'
     use_frameworks!
     
-    pod 'Tableau/Rx', :path => '.'
-    #  pod 'Tableau', :path => '.'
+    pod 'Braid/Rx', :path => '.'
+    #  pod 'Braid', :path => '.'
     pod 'RxCocoa', '~> 4.4'
     pod 'RxSwift', '~> 4.4'
     pod 'Nimble', '~> 7'

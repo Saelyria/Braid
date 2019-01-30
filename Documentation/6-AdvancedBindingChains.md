@@ -6,7 +6,7 @@ There are a few different methods you can use to start a binding chain. We've al
 - `onSections(_:)` - begins a binding chain that affects multiple named sections
 
 These two are pretty straightforward - whatever handlers or data you bind to them are only used for the section(s) you explicitly declare. 
-However, Tableau also provides a couple others that, while a little trickier to grasp, are very powerful. These methods are:
+However, Braid also provides a couple others that, while a little trickier to grasp, are very powerful. These methods are:
 
 - `onAllSections()` / `onAllOtherSections()` - begins a binding chain for all sections not uniquely bound by name with one of the 
     previously mentioned methods (or for sections whose 'names' are not necessarily known at compile time).
@@ -72,7 +72,7 @@ This binding chain method is particularly useful when used with a `struct` secti
 solve a use case like a home or product page where their content is pre-sectioned in a network response. In this case, we don't know what the
 sections are at compile time (maybe the titles/what data/what type of view is used is given to us in the network response).
 
-> The second ('Artists & Songs') and third (Home Page) examples in the 'TableauExample' included in this workspace are both full, working 
+> The second ('Artists & Songs') and third (Home Page) examples in the 'BraidExample' included in this workspace are both full, working 
 implementations of using dynamic sections using a `struct` instead of an `enum` in case you prefer to learn by example.
 
 ## 'On any section'
@@ -132,7 +132,7 @@ As you can see, any values provided for dimensions in more specific chains (any 
 before values provided from `onAnySection`.
 
 > Note that this previous example is fairly contrived to demonstrate this 'fallback' behaviour, so the dimension binding logic is a little all over the
-place. Tableau gives you the flexibility to describe binding in many ways (whatever ends up being the most legible to you), so you could do
+place. Braid gives you the flexibility to describe binding in many ways (whatever ends up being the most legible to you), so you could do
 the same work by, for example, putting all your 'dimension' binding code under `onAnySection` and switching on the passed-in `section`. 
 Whatever works for you!
 
@@ -170,4 +170,4 @@ binding with them - they'll make a lot more sense once you've seen them in actio
 - **Binding chain scopes**
 - [Providing dimensions](7-ProvidingDimensions.md)
 - [Tips, tricks, and FAQ](8-TipsTricksFAQ.md)
-- [How Tableau works](9-HowItWorks.md)
+- [How Braid works](9-HowItWorks.md)

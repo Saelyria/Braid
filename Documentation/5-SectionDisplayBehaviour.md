@@ -57,7 +57,7 @@ enum Section: TableViewSection, Comparable {
 binder.sectionDisplayBehaviour = .hidesSectionsWithNoCellData
 ```
 
-If your enum is backed by a comparable raw value (e.g. `Int` or `String`), Tableau provides a default `<` comparison function based on its
+If your enum is backed by a comparable raw value (e.g. `Int` or `String`), Braid provides a default `<` comparison function based on its
 raw value as well. So, for example, a default implementation of `<` is provided that orders them based on the case order in this enum:
 
 ```swift
@@ -86,4 +86,4 @@ be shown that should be returned sorted.
 - [Binding chain scopes](6-AdvancedBindingChains.md)
 - [Providing dimensions](7-ProvidingDimensions.md)
 - [Tips, tricks, and FAQ](8-TipsTricksFAQ.md)
-- [How Tableau works](9-HowItWorks.md)
+- [How Braid works](9-HowItWorks.md)
