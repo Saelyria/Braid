@@ -19,7 +19,7 @@ import Foundation
  of its view model type, the view should then update the appropriate labels/image views/etc with the data on the view
  model.
  
- Tableau can use this associated 'view model' type to setup your 'view model bindable' cells/views for you when you use
+ Braid can use this associated 'view model' type to setup your 'view model bindable' cells/views for you when you use
  the `bind(cellType:viewModels:)` or `bind(cellType:models:mapToViewModelWith:)` methods so that you don't have to write
  your own model binding code in an `onDequeue` handler.
  */

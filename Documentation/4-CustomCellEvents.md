@@ -5,7 +5,7 @@ things like button presses, text entry in a text field, toggling of a switch, pi
 events from the cell back up to the table view is often not very elegant, usually involving multiple delegate protocols or by holding a reference 
 to specific cells. Code like this runs into problems when cells get reused on your table and generally involves a lot of index path bookkeeping.
 
-To help solve this problem, Tableau gives cells the ability to declare a custom `ViewEvent` enum whose cases it can emit up to its view
+To help solve this problem, Braid gives cells the ability to declare a custom `ViewEvent` enum whose cases it can emit up to its view
 controller through handlers on a binding chain.
 
 ## Setting up the cell
@@ -177,7 +177,7 @@ binder.onSection(.someSection)
 
 Neat, huh? This ends up being considerably shorter, less error-prone, and much faster than having done the same thing with more traditional
 methods. What's more, if we wanted to be able to dynamically insert, rearrange, or change form items based on the value of other form items,
-we can use Tableau's powerful diffing to do the heavy lifting for us. All we have to do is just add `Int` as a raw value of our `FormItem` and 
+we can use Braid's powerful diffing to do the heavy lifting for us. All we have to do is just add `Int` as a raw value of our `FormItem` and 
 make it conform to `CollectionIdentifiable` (which will provide a default `collectionId` property for diffing since `FormItem` will 
 automatically conform to `Hashable`) like this:
 
@@ -199,4 +199,4 @@ from the iOS Calendar app, including animations like this where form items chang
 - [Binding chain scopes](6-AdvancedBindingChains.md)
 - [Providing dimensions](7-ProvidingDimensions.md)
 - [Tips, tricks, and FAQ](8-TipsTricksFAQ.md)
-- [How Tableau works](9-HowItWorks.md)
+- [How Braid works](9-HowItWorks.md)

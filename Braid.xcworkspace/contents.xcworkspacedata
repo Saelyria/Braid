@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:/Users/aaronbosnjak/Developer/Braid/Braid.podspec">
+   </FileRef>
+   <FileRef
+      location = "group:LICENSE">
+   </FileRef>
+   <FileRef
+      location = "group:README.md">
+   </FileRef>
+   <Group
+      location = "group:Documentation"
+      name = "Documentation">
+      <FileRef
+         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/1-GettingStarted.md">
+      </FileRef>
+      <FileRef
+         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/2-UpdatingData.md">
+      </FileRef>
+      <FileRef
+         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/3-DataBindingMethods.md">
+      </FileRef>
+      <FileRef
+         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/4-CustomCellEvents.md">
+      </FileRef>
+      <FileRef
+         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/5-SectionDisplayBehaviour.md">
+      </FileRef>
+      <FileRef
+         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/6-AdvancedBindingChains.md">
+      </FileRef>
+      <FileRef
+         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/7-ProvidingDimensions.md">
+      </FileRef>
+      <FileRef
+         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/8-TipsTricksFAQ.md">
+      </FileRef>
+      <FileRef
+         location = "container:/Users/aaronbosnjak/Developer/Braid/Documentation/9-HowItWorks.md">
+      </FileRef>
+   </Group>
+   <FileRef
+      location = "group:/Users/aaronbosnjak/Developer/Braid/Braid.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:/Users/aaronbosnjak/Developer/Braid/BraidExample.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Pods/Pods.xcodeproj">
+   </FileRef>
+</Workspace>

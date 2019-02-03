@@ -1,6 +1,6 @@
-# How Tableau Works
+# How Braid Works
 
-Hey! Whether you're looking to contribute or just want to know how Tableau works under the hood, this file's the right place to start. I like to 
+Hey! Whether you're looking to contribute or just want to know how Braid works under the hood, this file's the right place to start. I like to 
 think the code is easy enough to understand on its own, but I'm sure there's a bunch of stuff there that's a little mucky. Diving into this code is 
 also a dive into some pretty tricky stuff about Swift's generics system, so if you're not already familiar with stuff like the `associatedtype` 
 keyword, that'd be a good place to start before continuing. It's super interesting stuff and Swift has a *very* powerful generics system, so it's 
@@ -24,7 +24,7 @@ class type is `_TableViewDataSourceDelegate`. That's pretty much it.
 ## The 'table data model'
 
 This object is the collection of view models/models/title strings/etc. that represents a 'data state' of a table view. Its properties are a series of
-dictionaries and arrays that stores the data the table view displays. Table data models are used with the Differ library that Tableau has as a 
+dictionaries and arrays that stores the data the table view displays. Table data models are used with the Differ library that Braid has as a 
 CocoaPods dependency to animate changes in data on the table view. The concrete class for this object type is the  `_TableViewDataModel`.
 
 ## The 'table binder'
@@ -76,7 +76,7 @@ titles.
 
 ## RxSwift integration
 
-RxSwift is added with extensions on `Reactive` in the RxSwift subspec of Tableau. It adds methods to the section binders to allow their
+RxSwift is added with extensions on `Reactive` in the RxSwift subspec of Braid. It adds methods to the section binders to allow their
 'bind cell type' methods to be given `Observable` model/view model arrays, and works in basically the same way as their vanilla counterparts.
 Only real weird thing is that, when the Rx subspec is included in the project, there's a Swift flag named `RX_TABLEAU` that gets defined that
 adds stuff like a dispose bag to the table binder to save its section binders' subscriptions.
@@ -92,4 +92,4 @@ an idea of what's going on, and can maybe open a pull request with some features
 - [Binding chain scopes](6-AdvancedBindingChains.md)
 - [Providing dimensions](7-ProvidingDimensions.md)
 - [Tips, tricks, and FAQ](8-TipsTricksFAQ.md)
-- **How Tableau works**
+- **How Braid works**

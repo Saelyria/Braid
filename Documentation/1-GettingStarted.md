@@ -1,11 +1,11 @@
 # Getting Started
 
-If you're just discovering Tableau, this is the place to start. Here, we're going to walk you through setting a table view - first a section-less one,
+If you're just discovering Braid, this is the place to start. Here, we're going to walk you through setting a table view - first a section-less one,
 then one that uses sections.
 
 ## A simple, section-less table view
 
-To start, we'll get familiar with a few of the main concepts when using Tableau - the *binder* and the *binding chain*.
+To start, we'll get familiar with a few of the main concepts when using Braid - the *binder* and the *binding chain*.
 
 First, we'll make a new table view and a 'table view binder'. This 'binder' object will act as an intermediary between your table view and 
 your controller. The idea is to describe sections, cells, and model types (and where to find these models) to the binder, then it performs the 
@@ -13,7 +13,7 @@ work of dequeueing cells from this data while giving you the ability to bind var
 are made just by initializing one with a reference to the table view they will bind, like this:
 
 ```swift
-import Tableau
+import Braid
 
 let tableView = UITableView()
 let binder = TableViewBinder(tableView: tableView)
@@ -59,7 +59,7 @@ binder.onTable()
     .bind(cellType: MyCustomTableViewCell.self, models: people)
 ```
 
-This is the start of what's called a 'binding chain' in Tableau. Binding chains are chained function calls where we add behaviour to the binder. 
+This is the start of what's called a 'binding chain' in Braid. Binding chains are chained function calls where we add behaviour to the binder. 
 This includes binding handlers for various events (e.g. when a cell is tapped or dequeued) as well as binding cell heights or headers or footers 
 to the table (you can also define custom events you can add to a binding chain, but that's for a later tutorial). New handlers are added to the 
 chain by simply including them after the last item in the chain.
@@ -117,18 +117,18 @@ And that's pretty much it - the binder will then create two cells and populate t
 
 ### A note about dequeueing, reuse identifiers, and nibs
 
-By default, Tableau will register cells to the table using the string name of their class name. So, the `MyCustomTableViewCell` would be 
+By default, Braid will register cells to the table using the string name of their class name. So, the `MyCustomTableViewCell` would be 
 registered by default under the reuse identifier `"MyCustomTableViewCell"`. If you want to use a custom reuse identifier, you can have your
-cell conform to `ReuseIdentifiable` and provide a `static let reuseIdentifier: String` property that Tableau will use instead.
+cell conform to `ReuseIdentifiable` and provide a `static let reuseIdentifier: String` property that Braid will use instead.
 
 If your cell uses a nib file, you should also have your cell conform to `UINibInitable`, which allows you to declare various properties (namely
-`nibName`) that lets Tableau register and dequeue instances of the cell using the nib. This protocol provides default values for these properties
+`nibName`) that lets Braid register and dequeue instances of the cell using the nib. This protocol provides default values for these properties
 that assume the nib file is 1) in the same bundle as the conforming class, and 2) is named the same as the class. So, if these are both true,
 you simply need to add `UINibInitable` as one of the protocols that your cell conforms to, then it's good to go - no implementation required!
 
 ## Sectioned table views
 
-Many of the table views we work with use sections. When using Tableau, sections can be defined either with an enum or a struct that 
+Many of the table views we work with use sections. When using Braid, sections can be defined either with an enum or a struct that 
 conforms to `TableViewSection`. Let's say we're building a table that has three sections of `Person` objects - one section for friends, one
 section for enemies, and one section for people you aren't sure of yet. To start, we'll define a 'section model' enum like so:
 
@@ -224,7 +224,7 @@ binder.displayedSections = [.friends, .enemies, .undecided]
 When we get into dynamic data in other tutorials, we'll introduce the other 'section display behaviours' that let the binder hide sections for us
 automatically when they're empty. For now, we'll leave this, call the binder's `finish()` method, and we're good to go!
 
-With that, you should be pretty much up to speed to start playing around with Tableau. Other tutorials are available on the repo to get you 
+With that, you should be pretty much up to speed to start playing around with Braid. Other tutorials are available on the repo to get you 
 started with other features, like updating data on your bound table views, setting up your models so it can be animated for changes, using 
 dynamic sections, other types of cell binding methods that give you more control over dequeueing, and more. 
 
@@ -236,7 +236,7 @@ dynamic sections, other types of cell binding methods that give you more control
 - [Binding chain scopes](6-AdvancedBindingChains.md)
 - [Providing dimensions](7-ProvidingDimensions.md)
 - [Tips, tricks, and FAQ](8-TipsTricksFAQ.md)
-- [How Tableau works](9-HowItWorks.md)
+- [How Braid works](9-HowItWorks.md)
 
-If you'd prefer to poke around some working examples, there are working samples in the `TableauExample` Xcode project you can run to see 
+If you'd prefer to poke around some working examples, there are working samples in the `BraidExample` Xcode project you can run to see 
 the end result.
