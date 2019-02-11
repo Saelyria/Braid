@@ -552,10 +552,10 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
     {
         let _cellProvider: (UITableView, S, Int) -> UITableViewCell
         _cellProvider = { [weak binder = self.binder] (_ table, _ section, _ row) -> UITableViewCell in
-            guard let models = binder?.currentDataModel.sectionCellModels[section] as? [NM] else {
+            guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? NM else {
                 fatalError("Model type wasn't as expected, something went awry!")
             }
-            return cellProvider(table, section, row, models[row])
+            return cellProvider(table, section, row, model)
         }
         self.binder.addCellDequeueBlock(cellProvider: _cellProvider, affectedSections: self.affectedSectionScope)
         let scope = self.affectedSectionScope

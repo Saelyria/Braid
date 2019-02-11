@@ -14,7 +14,7 @@ internal extension SectionedTableViewBinder {
             let reuseIdentifier = (cellType as? ReuseIdentifiable.Type)?.reuseIdentifier
                 ?? cellType.classNameReuseIdentifier
             if var cell = binder?.tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath) as? C,
-            let viewModel = (binder?.currentDataModel.sectionCellViewModels[section] as? [C.ViewModel])?[indexPath.row] {
+            let viewModel = binder?.currentDataModel.item(inSection: section, row: indexPath.row)?.viewModel as? C.ViewModel {
                 cell.viewModel = viewModel
                 binder?.callonDequeue(cell: cell, section: section, row: indexPath.row)
                 binder?.setEventCallback(onCell: cell, section: section, row: indexPath.row)
@@ -265,10 +265,10 @@ private extension SectionedTableViewBinder {
                 return nil
             }
             
-            if isHeader, let viewModel = binder?.currentDataModel.sectionHeaderViewModels[section] as? H.ViewModel {
+            if isHeader, let viewModel = binder?.currentDataModel.sectionModel(for: section).headerViewModel as? H.ViewModel {
                 view.viewModel = viewModel
                 return view
-            } else if !isHeader, let viewModel = binder?.currentDataModel.sectionFooterViewModels[section] as? H.ViewModel {
+            } else if !isHeader, let viewModel = binder?.currentDataModel.sectionModel(for: section).footerViewModel as? H.ViewModel {
                 view.viewModel = viewModel
                 return view
             }

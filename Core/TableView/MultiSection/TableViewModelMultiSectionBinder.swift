@@ -31,7 +31,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     {
         let tappedHandler: CellTapCallback<S> = {  [weak binder = self.binder] (section, row, cell) in
             guard let cell = cell as? C,
-            let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
+            let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                 assertionFailure("ERROR: Cell or model wasn't the right type; something went awry!")
                 return
             }
@@ -71,7 +71,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     {
         let dequeueCallback: CellDequeueCallback<S> = { [weak binder = self.binder] (section, row, cell) in
             guard let cell = cell as? C,
-            let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
+            let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                 assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
                 return
             }
@@ -115,7 +115,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
         where EventCell: UITableViewCell & ViewEventEmitting
     {
         super.onEvent(from: cellType) { [weak binder = self.binder] section, row, cell, event in
-            guard let model = binder?.currentDataModel.sectionCellModels[section]?[row] as? M else {
+            guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                 assertionFailure("ERROR: Cell or model wasn't the right type; something went awry!")
                 return
             }

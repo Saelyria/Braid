@@ -17,13 +17,13 @@ internal extension SectionedTableViewBinder {
      - parameter affectedSections: The section scope affected by this update.
      */
     func updateCellModels(_ models: [S: [Any]]?, viewModels: [S: [Any]]?, affectedSections: SectionBindingScope<S>) {
-        guard let items = models ?? viewModels else {
+        guard let modelsOrViewModels = models ?? viewModels else {
             assertionFailure("Both the 'models' and 'view models' arrays were nil")
             return
         }
         
         // mark that the affected sections were updated via models and view model
-        let type: _TableViewDataModel<S>.CellDataType
+        let type: _TableViewSectionDataModel<S>.CellDataType
         if models != nil && viewModels != nil {
             type = .modelsViewModels
         } else if models != nil {
@@ -31,24 +31,33 @@ internal extension SectionedTableViewBinder {
         } else {
             type = .viewModels
         }
-        let dataTypes: [S: _TableViewDataModel<S>.CellDataType] = items.mapValues { _ in type }
-        self.update(fromDataIn: dataTypes,
-                    updatingProperty: &self.nextDataModel.sectionCellDataType,
+        let dataTypes: [S: _TableViewSectionDataModel<S>.CellDataType] = modelsOrViewModels.mapValues { _ in type }
+        for (section, cellDataType) in dataTypes {
+            self.nextDataModel.sectionModel(for: section).cellDataType = cellDataType
+        }
+
+        var items: [S: [_TableViewItemModel]] = [:]
+        if let models = models, let viewModels = viewModels {
+            items = models.reduce(into: [:]) { result, value in
+                let (section, _models) = value
+                guard let _viewModels = viewModels[section] else { fatalError("something weird weird") }
+                result[section] = zip(_models, _viewModels).map { _TableViewItemModel(isNumberPlaceholder: false, model: $0, viewModel: $1) }
+            }
+        } else if let models = models {
+            items = models.mapValues { _models in
+                return _models.map { _TableViewItemModel(isNumberPlaceholder: false, model: $0, viewModel: nil) }
+            }
+        } else if let viewModels = viewModels {
+            items = viewModels.mapValues { _viewModels in
+                return _viewModels.map { _TableViewItemModel(isNumberPlaceholder: false, model: nil, viewModel: $0) }
+            }
+        }
+        
+        self.update(fromDataIn: items,
+                    resettingMissingSectionsWith: [],
+                    updatingKeyPath: \_TableViewSectionDataModel<S>.items,
                     affectedSections: affectedSections,
                     dataType: .cell)
-        
-        if let models = models {
-            self.update(fromDataIn: models,
-                        updatingProperty: &self.nextDataModel.sectionCellModels,
-                        affectedSections: affectedSections,
-                        dataType: .cell)
-        }
-        if let viewModels = viewModels {
-            self.update(fromDataIn: viewModels,
-                        updatingProperty: &self.nextDataModel.sectionCellViewModels,
-                        affectedSections: affectedSections,
-                        dataType: .cell)
-        }
     }
     
     /**
@@ -59,14 +68,18 @@ internal extension SectionedTableViewBinder {
      */
     func updateNumberOfCells(_ numCells: [S: Int], affectedSections: SectionBindingScope<S>) {
         // mark that the affected sections were updated via a 'number of cells'
-        let dataTypes: [S: _TableViewDataModel<S>.CellDataType] = numCells.mapValues { _ in .number }
-        self.update(fromDataIn: dataTypes,
-                    updatingProperty: &self.nextDataModel.sectionCellDataType,
-                    affectedSections: affectedSections,
-                    dataType: .cell)
-        
-        self.update(fromDataIn: numCells,
-                    updatingProperty: &self.nextDataModel.sectionNumberOfCells,
+        for section in numCells.keys {
+            self.nextDataModel.sectionModel(for: section).cellDataType = .number
+        }
+
+        let items: [S: [_TableViewItemModel]] = numCells.mapValues { numberOfCells in
+            return (0..<numberOfCells).map { _ in
+                return _TableViewItemModel(isNumberPlaceholder: true, model: nil, viewModel: nil)
+            }
+        }
+        self.update(fromDataIn: items,
+                    resettingMissingSectionsWith: [],
+                    updatingKeyPath: \_TableViewSectionDataModel<S>.items,
                     affectedSections: affectedSections,
                     dataType: .cell)
     }
@@ -86,9 +99,9 @@ internal extension SectionedTableViewBinder {
         default: break
         }
         
-        let nonNilTitles: [S: String] = titles.filter { $0.value != nil }.mapValues { return $0! }
-        self.update(fromDataIn: nonNilTitles,
-                    updatingProperty: &self.nextDataModel.sectionHeaderTitles,
+        self.update(fromDataIn: titles,
+                    resettingMissingSectionsWith: nil,
+                    updatingKeyPath: \_TableViewSectionDataModel<S>.headerTitle,
                     affectedSections: affectedSections,
                     dataType: .header)
     }
@@ -102,9 +115,9 @@ internal extension SectionedTableViewBinder {
     func updateHeaderViewModels(_ viewModels: [S: Any?], affectedSections: SectionBindingScope<S>) {
         self.nextDataModel.headerViewBound = true
         
-        let nonNilViewModels: [S: Any] = viewModels.filter { $0.value != nil }.mapValues { return $0! }
-        self.update(fromDataIn: nonNilViewModels,
-                    updatingProperty: &self.nextDataModel.sectionHeaderViewModels,
+        self.update(fromDataIn: viewModels,
+                    resettingMissingSectionsWith: nil,
+                    updatingKeyPath: \_TableViewSectionDataModel<S>.headerViewModel,
                     affectedSections: affectedSections,
                     dataType: .header)
     }
@@ -124,9 +137,9 @@ internal extension SectionedTableViewBinder {
         default: break
         }
         
-        let nonNilTitles: [S: String] = titles.filter { $0.value != nil }.mapValues { return $0! }
-        self.update(fromDataIn: nonNilTitles,
-                    updatingProperty: &self.nextDataModel.sectionFooterTitles,
+        self.update(fromDataIn: titles,
+                    resettingMissingSectionsWith: nil,
+                    updatingKeyPath: \_TableViewSectionDataModel<S>.footerTitle,
                     affectedSections: affectedSections,
                     dataType: .footer)
     }
@@ -142,7 +155,8 @@ internal extension SectionedTableViewBinder {
         
         let nonNilViewModels: [S: Any] = viewModels.filter { $0.value != nil }.mapValues { return $0! }
         self.update(fromDataIn: nonNilViewModels,
-                    updatingProperty: &self.nextDataModel.sectionFooterViewModels,
+                    resettingMissingSectionsWith: nil,
+                    updatingKeyPath: \_TableViewSectionDataModel<S>.footerViewModel,
                     affectedSections: affectedSections,
                     dataType: .footer)
     }
@@ -155,18 +169,10 @@ private extension SectionedTableViewBinder {
         case footer
     }
     
-    /**
-     Updates a dictionary on the binder's `nextDataModel` to the given values for the given section.
-     
-     - parameter new: The dictionary containing values to update the 'next data model' with.
-     - parameter current: A pointer to the dictionary property on the binder's `nextDataModel` that gets updated
-        with the values from the 'new' dictionary.
-     - parameter affectedSections: The section scope affected by this update.
-     - parameter dataType: The type of data being updated (cell, header, or footer).
-    */
     func update<V>(
         fromDataIn new: [S: V],
-        updatingProperty current: inout [S: V],
+        resettingMissingSectionsWith resetValue: V,
+        updatingKeyPath keyPath: ReferenceWritableKeyPath<_TableViewSectionDataModel<S>, V>,
         affectedSections: SectionBindingScope<S>,
         dataType: DataUpdateType)
     {
@@ -175,7 +181,9 @@ private extension SectionedTableViewBinder {
             // If the new values are for specific named sections, simply iterate over the given sections and set the
             // value for the section in the reference to the 'current' data model to the data for the section in 'new'.
             for section in sections {
-                current[section] = new[section]
+                let newValue = new[section] ?? resetValue
+                let sectionModel = self.nextDataModel.sectionModel(for: section)
+                sectionModel[keyPath: keyPath] = newValue
             }
             
             // mark either the cells or header/footers for the affected sections as dirty so they're reloaded
@@ -186,7 +194,7 @@ private extension SectionedTableViewBinder {
                 self.nextDataModel.headerFooterUpdatedSections =
                     self.nextDataModel.headerFooterUpdatedSections.union(sections)
             }
-        
+            
         case .forAllUnnamedSections:
             /*
              If we're binding for dynamic, unnamed sections, we assume that the data in the 'new' dict given is the
@@ -200,7 +208,7 @@ private extension SectionedTableViewBinder {
              the 'current' (i.e. the ref to the dictionary of data on the current 'next data model') and the 'new' (to
              add any new sections not accounted for), which then has the 'uniquely bound sections' subtracted from it.
              */
-            var sectionsToIterate = Set<S>(current.keys)
+            var sectionsToIterate: Set<S> = Set(self.currentDataModel.sectionModels.map { $0.section })
             sectionsToIterate.formUnion(new.keys)
             
             let uniquelyBoundSections: [S]
@@ -213,7 +221,9 @@ private extension SectionedTableViewBinder {
             sectionsToIterate.subtract(uniquelyBoundSections)
             for section in sectionsToIterate {
                 guard uniquelyBoundSections.contains(section) == false else { continue }
-                current[section] = new[section]
+                let newValue = new[section] ?? resetValue
+                let sectionModel = self.nextDataModel.sectionModel(for: section)
+                sectionModel[keyPath: keyPath] = newValue
             }
             
             // mark either the cells or header/footers for the affected sections as dirty so they're reloaded

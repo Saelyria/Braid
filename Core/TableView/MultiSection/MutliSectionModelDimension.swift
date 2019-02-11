@@ -34,7 +34,7 @@ public class MultiSectionModelDimension<S: TableViewSection, M>: MultiSectionDim
     {
         return MultiSectionModelDimension(bindingFunc: { (binder, affectedSections) in
             let storedHandler: (S, Int) -> CGFloat = { section, row in
-                guard let model = binder.currentDataModel.sectionCellModels[section]?[row] as? M else {
+                guard let model = binder.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                     fatalError("Didn't get the right model type, something went awry!")
                 }
                 return handler(section, row, model)
@@ -72,7 +72,7 @@ public class MultiSectionModelDimension<S: TableViewSection, M>: MultiSectionDim
     {
         return MultiSectionModelDimension(bindingFunc: { (binder, affectedSections) in
             let storedHandler: (S, Int) -> CGFloat = { section, row in
-                guard let model = binder.currentDataModel.sectionCellModels[section]?[row] as? M else {
+                guard let model = binder.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                     fatalError("Didn't get the right model type, something went awry!")
                 }
                 return handler(section, row, model)
