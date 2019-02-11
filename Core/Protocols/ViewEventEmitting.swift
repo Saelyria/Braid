@@ -5,9 +5,10 @@ import UIKit
  
  Table or collection view cells that conform to this protocol are able to declare an associated `ViewEvent` enum type
  that describes events the cell can emit to its view controller. These events could be things like text entry in a text
- field, the toggling of a switch, or the tapping of a button inside the cell. When a cell would like to emit one of its
- events, it calls its `emit(event:)` method. The emitted event will be relayed to the `onEvent(from:_:)` method if it
- has been added to a binding chain in the view controller.
+ field, the toggling of a switch, or the tapping of a button inside the cell.
+ 
+ When a cell would like to emit one of its events, it calls its `emit(event:)` method. The emitted event will be relayed
+ to the `onEvent(from:_:)` method if it has been added to a binding chain in the view controller.
  */
 public protocol ViewEventEmitting: AnyViewEventEmitting {
     /// A type whose instances are events that the view can emit.

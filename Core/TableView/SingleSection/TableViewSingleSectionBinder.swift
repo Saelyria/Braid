@@ -6,7 +6,7 @@ import UIKit
 public enum PrefetchBehavior {
     /// The default UIKit behaviour. If this is used, the binder will use a `UITableViewDataSourcePrefetching`
     /// conformance to determine when to indicate that data should be prefetched.
-    case tableViewDecides
+//    case tableViewDecides
     /// The binder will incidate that data should be prefetched when the table is the given number of cells away
     /// from the end of the section.
     case cellsFromEnd(Int)
@@ -145,7 +145,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter cellType: The class of the header to bind.
      - parameter models: The model objects to bind to the dequeued cells for this section.
      - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
-     for the associated cell using the data from the model object.
+        for the associated cell using the data from the model object.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -167,7 +167,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter cellType: The class of the header to bind.
      - parameter models: The model objects to bind to the dequeued cells for this section.
      - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
-     for the associated cell using the data from the model object.
+        for the associated cell using the data from the model object.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -190,7 +190,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter cellType: The class of the header to bind.
      - parameter models: The model objects to bind to the dequeued cells for this section.
      - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
-     for the associated cell using the data from the model object.
+        for the associated cell using the data from the model object.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -214,7 +214,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter cellType: The class of the header to bind.
      - parameter models: The model objects to bind to the dequeued cells for this section.
      - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
-     for the associated cell using the data from the model object.
+        for the associated cell using the data from the model object.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -236,7 +236,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      array of models mapped to view models by a given function.
      
      - parameter cellType: The class of the header to bind.
-     - parameter models: The model objects to bind to the dequeued cells for this section.
+     - parameter models: A closure that will return the model objects to bind to the dequeued cells for this section.
      - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
         for the associated cell using the data from the model object.
      
@@ -258,7 +258,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      array of models mapped to view models by a given function.
 
      - parameter cellType: The class of the header to bind.
-     - parameter models: The model objects to bind to the dequeued cells for this section.
+     - parameter models: A closure that will return the model objects to bind to the dequeued cells for this section.
      - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
         for the associated cell using the data from the model object.
      
@@ -281,7 +281,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      array of models mapped to view models by a given function.
  
      - parameter cellType: The class of the header to bind.
-     - parameter models: The model objects to bind to the dequeued cells for this section.
+     - parameter models: A closure that will return the model objects to bind to the dequeued cells for this section.
      - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
         for the associated cell using the data from the model object.
      
@@ -305,7 +305,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      array of models mapped to view models by a given function.
      
      - parameter cellType: The class of the header to bind.
-     - parameter models: The model objects to bind to the dequeued cells for this section.
+     - parameter models: A closure that will return the model objects to bind to the dequeued cells for this section.
      - parameter mapToViewModel: A function that, when given a model from the `models` array, will create a view model
         for the associated cell using the data from the model object.
      
@@ -393,7 +393,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      model to the cell manually.
      
      - parameter cellType: The class of the header to bind.
-     - parameter models: The models objects to bind to the dequeued cells for this section.
+     - parameter models: A closure that will return the models objects to bind to the dequeued cells for this section.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -414,7 +414,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      model to the cell manually.
      
      - parameter cellType: The class of the header to bind.
-     - parameter models: The models objects to bind to the dequeued cells for this section.
+     - parameter models: A closure that will return the models objects to bind to the dequeued cells for this section.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -498,7 +498,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter table: The table view to dequeue the cell on.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
-     - parameter models: The models objects to bind to the dequeued cells for this section.
+     - parameter models: A closure that will return the models objects to bind to the dequeued cells for this section.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -519,7 +519,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter table: The table view to dequeue the cell on.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter model: The model the cell is dequeued for.
-     - parameter models: The models objects to bind to the dequeued cells for this section.
+     - parameter models: A closure that will return the models objects to bind to the dequeued cells for this section.
      
      - returns: A section binder to continue the binding chain with.
      */
@@ -561,6 +561,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      Bind a custom handler that will provide table view cells for the section, along with the number of cells to create.
      
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter table: The table view to dequeue the cell on.
      - parameter row: The row in the section the closure should provide a cell for.
      - parameter numberOfCells: The number of cells to create for the section using the provided closure.
      
@@ -568,7 +569,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func bind(
-        cellProvider: @escaping (UITableView, _ row: Int) -> UITableViewCell,
+        cellProvider: @escaping (_ table: UITableView, _ row: Int) -> UITableViewCell,
         numberOfCells: Int)
         -> TableViewSingleSectionBinder<UITableViewCell, S>
     {
@@ -579,14 +580,16 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      Bind a custom handler that will provide table view cells for the section, along with the number of cells to create.
      
      - parameter cellProvider: A closure that is used to dequeue cells for the section.
+     - parameter table: The table view to dequeue the cell on.
      - parameter row: The row in the section the closure should provide a cell for.
-     - parameter numberOfCells: The number of cells to create for the section using the provided closure.
+     - parameter numberOfCells: A closure that will return the number of cells to create for the section using the
+        provided closure.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func bind(
-        cellProvider: @escaping (UITableView, _ row: Int) -> UITableViewCell,
+        cellProvider: @escaping (_ table: UITableView, _ row: Int) -> UITableViewCell,
         numberOfCells: @escaping () -> Int)
         -> TableViewSingleSectionBinder<UITableViewCell, S>
     {
@@ -608,7 +611,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      section'. The binder will call the given 'prefetch handler' (according to the given behaviour) when new data should
      be prefetched.
      
-     - parameter prefetchBehaviour: A behavior indicating when a data prefetch should start.
+     - parameter prefetchBehaviour: A behavior indicating when a data prefetch should start. Defaults to 'when there are
+        two cells left in before the end of the section'.
      - parameter prefetchHandler: A closure called that should prefetch new data for the section.
      - parameter startingIndex: The starting index from which data should be fetched for.
     */
@@ -869,13 +873,13 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter handler: The closure to be called whenever a cell of the given cell type emits a custom event.
      - parameter row: The row of the cell that emitted an event.
      - parameter cell: The cell that emitted an event.
-     - paramter event: The custom event that the cell emitted.
+     - parameter event: The custom event that the cell emitted.
      
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
     public func onEvent<EventCell>(
-        from: EventCell.Type,
+        from cellType: EventCell.Type,
         _ handler: @escaping (_ row: Int, _ cell: EventCell, _ event: EventCell.ViewEvent) -> Void)
         -> TableViewSingleSectionBinder<C, S>
         where EventCell: UITableViewCell & ViewEventEmitting
@@ -924,6 +928,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      This method allows model type information to be assumed on any additional binding chains for a section after the
      binding chain that originally declared the cell and model type. This method will cause a crash if the model type
      originally bound to the section is not the same type or if the section was not setup with a model type.
+     
+     - parameter modelType: The type of the models that were bound to the section on another binding chain.
      
      - returns: A section binder to continue the binding chain with that allows cast model types to be given to items in
         its chain.

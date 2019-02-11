@@ -1,21 +1,21 @@
 PODS:
+  - Braid/Core (0.1.0)
+  - Braid/Rx (0.1.0):
+    - Braid/Core
+    - RxCocoa (~> 4.4)
+    - RxSwift (~> 4.4)
   - Nimble (7.3.1)
   - RxAtomic (4.4.0)
   - RxCocoa (4.4.0):
     - RxSwift (~> 4.0)
   - RxSwift (4.4.0):
     - RxAtomic (~> 4.4)
-  - Tableau/Core (1.0.0)
-  - Tableau/Rx (1.0.0):
-    - RxCocoa (~> 4.4)
-    - RxSwift (~> 4.4)
-    - Tableau/Core
 
 DEPENDENCIES:
+  - Braid/Rx (from `.`)
   - Nimble (~> 7)
   - RxCocoa (~> 4.4)
   - RxSwift (~> 4.4)
-  - Tableau/Rx (from `.`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -25,16 +25,16 @@ SPEC REPOS:
     - RxSwift
 
 EXTERNAL SOURCES:
-  Tableau:
+  Braid:
     :path: "."
 
 SPEC CHECKSUMS:
+  Braid: ba5a9c0a24187d6a0a866e2a50ed3c4499b4a06b
   Nimble: 04f732da099ea4d153122aec8c2a88fd0c7219ae
   RxAtomic: eacf60db868c96bfd63320e28619fe29c179656f
   RxCocoa: df63ebf7b9a70d6b4eeea407ed5dd4efc8979749
   RxSwift: 5976ecd04fc2fefd648827c23de5e11157faa973
-  Tableau: 4758a7a0432da78a8a4163b86ec4c74ca0a91420
 
-PODFILE CHECKSUM: 7224111d0051ad189ec9e9607125dc8e9fea5ad1
+PODFILE CHECKSUM: 946cd700d4abfa43afacc9fb7edcb0e09ea8786b
 
 COCOAPODS: 1.5.3

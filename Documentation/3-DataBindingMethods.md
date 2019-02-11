@@ -2,7 +2,7 @@
 
 ## Cells
 
-Tableau offers a number of different methods that you can use to bind cells and data to your table view. The cell binding variants (roughly in 
+Braid offers a number of different methods that you can use to bind cells and data to your table view. The cell binding variants (roughly in 
 order of 'granularity of control') are:
 
 - `bind(cellType:models:)` (cell type + models)
@@ -175,9 +175,9 @@ binder.onTable()
 - [Getting Started](1-GettingStarted.md)
 - [Updating data](2-UpdatingData.md)
 - **Other data binding methods**
-- [Custom cell events](4-CustomCellEvents)
+- [Custom cell events](4-CustomCellEvents.md)
 - [Hiding, showing, and ordering sections automatically](5-SectionDisplayBehaviour.md)
 - [Binding chain scopes](6-AdvancedBindingChains.md)
 - [Providing dimensions](7-ProvidingDimensions.md)
 - [Tips, tricks, and FAQ](8-TipsTricksFAQ.md)
-- [How Tableau works](9-HowItWorks.md)
+- [How Braid works](9-HowItWorks.md)

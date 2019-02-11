@@ -4,8 +4,8 @@
 
 osx_image: xcode10.1
 language: objective-c
-xcode_workspace: Tableau.xcworkspace
-xcode_scheme: TableauExample
+xcode_workspace: Braid.xcworkspace
+xcode_scheme: BraidExample
 xcode_destination: platform=iOS Simulator,OS=12.0,name=iPhone X
 
 before_install:

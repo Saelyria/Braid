@@ -15,8 +15,8 @@ public class SingleSectionDimension<S: TableViewSection> {
      
      - parameter handler: The closure to be called that will return the height for cells in the section.
      - parameter row: The row of the cell to provide the height for.
-     - parameter model: The model the cell at the given row to provide the height for.
-     - returns: A section binder to continue the binding chain with.
+     
+     - returns: The argument to a 'dimensions' call.
      */
     @discardableResult
     public class func cellHeight(_ handler: @escaping (_ row: Int) -> CGFloat) -> SingleSectionDimension<S> {
@@ -35,7 +35,8 @@ public class SingleSectionDimension<S: TableViewSection> {
      
      - parameter handler: The closure to be called that will return the estimated height for cells in the section.
      - parameter row: The row of the cell to provide the estimated height for.
-     - returns: A section binder to continue the binding chain with.
+     
+     - returns: The argument to a 'dimensions' call.
      */
     @discardableResult
     public class func estimatedCellHeight(_ handler: @escaping (_ row: Int) -> CGFloat)
@@ -52,7 +53,8 @@ public class SingleSectionDimension<S: TableViewSection> {
      Adds a callback handler to provide the height for the section header in the declared section.
      
      - parameter handler: The closure to be called that will return the height for the section header.
-     - returns: A section binder to continue the binding chain with.
+     
+     - returns: The argument to a 'dimensions' call.
      */
     @discardableResult
     public class func headerHeight(_ handler: @escaping () -> CGFloat) -> SingleSectionDimension<S> {
@@ -67,7 +69,8 @@ public class SingleSectionDimension<S: TableViewSection> {
      Adds a callback handler to provide the estimated height for the section header in the declared section.
      
      - parameter handler: The closure to be called that will return the estimated height for the section header.
-     - returns: A section binder to continue the binding chain with.
+     
+     - returns: The argument to a 'dimensions' call.
      */
     @discardableResult
     public class func estimatedHeaderHeight(_ handler: @escaping () -> CGFloat) -> SingleSectionDimension<S> {
@@ -82,7 +85,8 @@ public class SingleSectionDimension<S: TableViewSection> {
      Adds a callback handler to provide the height for the section footer in the declared section.
      
      - parameter handler: The closure to be called that will return the height for the section footer.
-     - returns: A section binder to continue the binding chain with.
+     
+     - returns: The argument to a 'dimensions' call.
      */
     @discardableResult
     public class func footerHeight(_ handler: @escaping () -> CGFloat) -> SingleSectionDimension<S> {
@@ -97,7 +101,8 @@ public class SingleSectionDimension<S: TableViewSection> {
      Adds a callback handler to provide the estimated height for the section footer in the declared section.
      
      - parameter handler: The closure to be called that will return the estimated height for the section footer.
-     - returns: A section binder to continue the binding chain with.
+     
+     - returns: The argument to a 'dimensions' call.
      */
     @discardableResult
     public class func estimatedFooterHeight(_ handler: @escaping () -> CGFloat) -> SingleSectionDimension<S> {

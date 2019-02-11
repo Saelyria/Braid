@@ -70,7 +70,8 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         let section = self.dataModel.displayedSections[indexPath.section]
         
         // We can't fall back to the 'all sections' cell dequeue block - might expect a different cell type.
-        let _dequeueBlock = (self.dataModel.uniquelyBoundCellSections.contains(section)) ?
+        let _dequeueBlock = (self.dataModel.uniquelyBoundCellSections.contains(section)
+        || self.binder.handlers.sectionDequeueBlocks[section] != nil) ?
             self.binder.handlers.sectionDequeueBlocks[section] :
             self.binder.handlers.dynamicSectionDequeueBlock
         guard let dequeueBlock = _dequeueBlock else { return UITableViewCell() }
@@ -92,7 +93,6 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
                 if indexPath.row == numItemsInSection - num {
                     self.binder.handlers.sectionPrefetchHandlers[section]?(indexPath.row)
                 }
-            default: break
             }
         }
     }
@@ -146,7 +146,8 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         let section = self.dataModel.displayedSections[indexPath.section]
         
         guard let cell = tableView.cellForRow(at: indexPath) else { return }
-        let callback = (self.dataModel.uniquelyBoundCellSections.contains(section)) ?
+        let callback = (self.dataModel.uniquelyBoundCellSections.contains(section)
+        || self.binder.handlers.sectionCellTappedCallbacks[section] != nil) ?
             self.binder.handlers.sectionCellTappedCallbacks[section] :
             self.binder.handlers.dynamicSectionsCellTappedCallback
         callback?(section, indexPath.row, cell)

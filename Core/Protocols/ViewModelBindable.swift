@@ -5,7 +5,7 @@ import Foundation
  
  View types that are 'view model bindable' declare a `ViewModel` associated type. This type should have properties for
  the various view data on the view - for example, a cell that is 'view model bindable' that has a title, subtitle, and
- detail labe might declare its `ViewModel` type to be this:
+ detail label might declare its `ViewModel` type to be this:
  
  ```
  struct ViewModel {
@@ -19,13 +19,20 @@ import Foundation
  of its view model type, the view should then update the appropriate labels/image views/etc with the data on the view
  model.
  
- Tableau can use this associated 'view model' type to setup your 'view model bindable' cells/views for you when you use
- the `bind(cellType:viewModels:)` or `bind(cellType:models:mapToViewModelWith:)` methods.
+ Braid can use this associated 'view model' type to setup your 'view model bindable' cells/views for you when you use
+ the `bind(cellType:viewModels:)` or `bind(cellType:models:mapToViewModelWith:)` methods so that you don't have to write
+ your own model binding code in an `onDequeue` handler.
  */
 public protocol ViewModelBindable {
     /// The type that this object's view model must be.
     associatedtype ViewModel
     
-    /// The view model supplied to the `ViewModelBindable` instance.
+    /**
+     The view model supplied to the `ViewModelBindable` instance.
+     
+     Generally, a 'view model bindable' cell will add a `didSet` block to this property so that when a new view model
+     instance is assigned to this property, the cell can set the values from the view model to its appropriate view
+     items.
+    */
     var viewModel: ViewModel? { get set }
 }

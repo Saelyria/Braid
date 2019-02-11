@@ -2,7 +2,7 @@
 
 - [Help! My table isn't showing anything!](#no-show)
 - [Assuming model type across chains](#splitting-binding)
-- [Does Tableau batch data updates?](#update-batching)
+- [Does Braid batch data updates?](#update-batching)
 - [Only one (or none) of the data types in my table view is diffable. Can I still have it animate?](#partial-diffing)
 - [If I use both models and view models for my section, how is diffing done?](#viewmodel-model-diffing)
 
@@ -10,7 +10,7 @@
 Help! My table isn't showing anything!
 </h3>
 
-First, ensure you've called the `finish()` method at the end of all your binding chains. Tableau needs you to be explicit about when you
+First, ensure you've called the `finish()` method at the end of all your binding chains. Braid needs you to be explicit about when you
 finish setting up a binder so that it can appropriately set up and assign a data source/delegate object to the table view.
 
 Next, if you're using a sectioned table, ensure that the [section display behaviour](4-SectionDisplayBehaviour.md) you have assigned to it is 
@@ -58,11 +58,11 @@ binder.onSections(.first, .second)
 
 This can also be useful if you choose to break up a particularly long binding chain into multiple ones. Just make sure that when you're 
 assuming the model type that you did previously setup all the sections affected by that chain with the given model type - improper assumption
-of model type is programmer error that Tableau does a `fatalError` for.
+of model type is programmer error that Braid does a `fatalError` for.
 
 
 <h3 name="update-batching">
-Does Tableau batch data updates?
+Does Braid batch data updates?
 </h3>
 
 Yes. Whenever a table or collection view binder detects that data has changed, it 'queues' a diff/update animation for the next frame of the
@@ -77,8 +77,8 @@ If none of your models are 'diffable' (i.e. conform to `CollectionIdentifiable` 
 `reloadSections` method of `UITableView`, using its assigned `undiffableSectionUpdateAnimation` to animate. The binder will
 also perform insertion and deletion animations to the end of the section if it detects that the number of items changed.
 
-If you don't want animations, you can always set a binder's `animateChanges` to false. However, *Tableau doesn't require that all data in the 
-table be 'diffable' for some level of animation to be applied*. Tableau can generate diffs on a section-by-section basis if you use different 
+If you don't want animations, you can always set a binder's `animateChanges` to false. However, *Braid doesn't require that all data in the 
+table be 'diffable' for some level of animation to be applied*. Braid can generate diffs on a section-by-section basis if you use different 
 model/cell types in different sections. So if, for example, we had a setup like this where the model used for one section was 'diffable' but the 
 other wasn't:
 
@@ -117,14 +117,14 @@ If I use both models and view models for my section, how is diffing done?
 </h3>
 
 If you use models mapped to view models for cells in a section using the `bind(cellType:models:mapToViewModels:)` method,
-then diffing is done with whichever of the two is 'diffable'. If both are 'diffable', then Tableau favours using the view models to diff with.
+then diffing is done with whichever of the two is 'diffable'. If both are 'diffable', then Braid favours using the view models to diff with.
 
 - [Getting Started](1-GettingStarted.md)
 - [Updating data](2-UpdatingData.md)
 - [Other data binding methods](3-DataBindingMethods.md)
-- [Custom cell events](4-CustomCellEvents)
+- [Custom cell events](4-CustomCellEvents.md)
 - [Hiding, showing, and ordering sections automatically](5-SectionDisplayBehaviour.md)
 - [Binding chain scopes](6-AdvancedBindingChains.md)
 - [Providing dimensions](7-ProvidingDimensions.md)
 - **Tips, tricks, and FAQ**
-- [How Tableau works](9-HowItWorks.md)
+- [How Braid works](9-HowItWorks.md)

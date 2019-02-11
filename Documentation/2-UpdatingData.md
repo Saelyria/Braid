@@ -1,6 +1,6 @@
 #  Updating Data
 
-In most table views, we want to be able to update our data after binding. Tableau supports two ways to update data - for those using RxSwift,
+In most table views, we want to be able to update our data after binding. Braid supports two ways to update data - for those using RxSwift,
 binders support the use of binding an Observable along with your cell or header/footer type that the binder will subscribe to to update the
 table. If you're not using RxSwift, you give the binding chain a closure it can call to retrieve data (probably from a property on your view
 controller) then, when that data updates, call `refresh()` on the binder.
@@ -82,7 +82,7 @@ observed on the main thread, so it should be pretty much plug-and-play.
 
 ## Animating Updates
 
-Tableau includes support for automatically creating diffs when data for cells or sections is updated as well as for automatically animating diffs 
+Braid includes support for automatically creating diffs when data for cells or sections is updated as well as for automatically animating diffs 
 in data with UIKit's native table view animations. Enabling this feature is voluntary, and simply requires conformance to a couple protocols on
 the data you want to be diffable. At a minimum, your data type must conform to the `CollectionIdentifiable` protocol to track moves, 
 inserts, and deletes. The `CollectionIdentifiable` protocol has only one requirement: a `collectionId` string property, which should
@@ -101,16 +101,16 @@ unique for this diff to work properly - it marks the 'identity' of the car. Howe
 colour, wheels, audio system) that, when changed, would reflect an 'update'. By comparing these properties to their previous values, we can 
 determine the 'equality' of the car.
 
-These roles - identity and equality - are expressed by the `CollectionIdentifiable` and `Equatable` protocols, respectively. Tableau will
+These roles - identity and equality - are expressed by the `CollectionIdentifiable` and `Equatable` protocols, respectively. Braid will
 use the `collectionId` (like a car's license plate) you provide to track where items have moved and, if your model conforms to `Equatable`, 
 will use its `==` method to see if items that didn't move were updated (thus reloading its cell).
 
 - [Getting Started](1-GettingStarted.md)
 - **Updating data**
 - [Other data binding methods](3-DataBindingMethods.md)
-- [Custom cell events](4-CustomCellEvents)
+- [Custom cell events](4-CustomCellEvents.md)
 - [Hiding, showing, and ordering sections automatically](5-SectionDisplayBehaviour.md)
 - [Binding chain scopes](6-AdvancedBindingChains.md)
 - [Providing dimensions](7-ProvidingDimensions.md)
 - [Tips, tricks, and FAQ](8-TipsTricksFAQ.md)
-- [How Tableau works](9-HowItWorks.md)
+- [How Braid works](9-HowItWorks.md)

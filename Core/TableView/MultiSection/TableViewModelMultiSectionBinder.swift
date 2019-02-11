@@ -15,7 +15,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
      
      The given handler is called whenever a cell in one of the sections being bound  is tapped, passing in the row and
      cell that was tapped. The cell will be safely cast to the cell type bound to the section if this method is called
-     in a chain after the `bind(cellType:viewModels:)` method.
+     in a chain after a cell binding method method.
      
      - parameter handler: The closure to be called whenever a cell is tapped in the bound section.
      - parameter section: The section in which a cell was tapped.
@@ -26,7 +26,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ tappedCell: C, _ model: M) -> Void)
+    public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ cell: C, _ model: M) -> Void)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
         let tappedHandler: CellTapCallback<S> = {  [weak binder = self.binder] (section, row, cell) in
@@ -54,8 +54,8 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
      
      The given handler is called whenever a cell in one of the sections being bound is dequeued, passing in the row and
      the dequeued cell. The cell will be safely cast to the cell type bound to the section if this method is called in a
-     chain after the `bind(cellType:viewModels:)` method. This method can be used to perform any additional
-     configuration of the cell.
+     chain after a cell binding method method. This method can be used to perform any additional configuration of the
+     cell.
      
      - parameter handler: The closure to be called whenever a cell is dequeued in one of the bound sections.
      - parameter section: The section in which a cell was dequeued.
@@ -66,7 +66,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ dequeuedCell: C, _ model: M) -> Void)
+    public func onDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ cell: C, _ model: M) -> Void)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
         let dequeueCallback: CellDequeueCallback<S> = { [weak binder = self.binder] (section, row, cell) in
@@ -102,7 +102,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
      - parameter section: The section in which a cell emitted an event.
      - parameter row: The row of the cell that emitted an event.
      - parameter cell: The cell that emitted an event.
-     - paramter event: The custom event that the cell emitted.
+     - parameter event: The custom event that the cell emitted.
      - parameter model: The model object that the cell was dequeued to represent in the table.
      
      - returns: A section binder to continue the binding chain with.
@@ -121,6 +121,34 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
             }
             handler(section, row, cell, event, model)
         }
+        return self
+    }
+    
+    /**
+     Add handlers for various dimensions of cells for the section being bound.
+     
+     This method is called with handlers that provide dimensions like cell or header heights and estimated heights. The
+     various handlers are made with the static functions on `MultiSectionDimension`. A typical dimension-binding call
+     looks something like this:
+     
+     ```
+     binder.onSections(.first, .second)
+        .dimensions(
+            .cellHeight { section, row, model in UITableViewAutomaticDimension },
+            .estimatedCellHeight { _, _, _ in 100 },
+            .headerHeight { _ in 50 })
+     ```
+     
+     - parameter dimensions: A variadic list of dimensions bound for the section being bound. These 'dimension' objects
+     are returned from the various dimension-binding static functions on `SingleSectionModelDimension`.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func dimensions(_ dimensions: MultiSectionModelDimension<S, M>...)
+        -> TableViewModelMultiSectionBinder<C, S, M>
+    {
+        self._dimensions(dimensions)
         return self
     }
     
@@ -236,7 +264,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     }
     
     @discardableResult
-    public func dimensions(_ dimensions: MultiSectionModelDimension<S, M>...)
+    override public func dimensions(_ dimensions: MultiSectionDimension<S>...)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
         self._dimensions(dimensions)
