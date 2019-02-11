@@ -8,18 +8,18 @@ internal protocol _TableViewDataModelDelegate: AnyObject {
 /// An object that holds all the data for a table view at a given moment. Diffs can be generated between data model
 /// instances to animate table view changes.
 internal class _TableViewDataModel<S: TableViewSection> {
-    private(set) var sectionModels: [SectionModel<S>] = [] {
+    private(set) var sectionModels: [_TableViewSectionDataModel<S>] = [] {
         didSet { self.delegate?.dataModelDidChange() }
     }
     
     /**
      Returns the section model for the given section. If one does not already exist, one will be created.
     */
-    func sectionModel(for section: S) -> SectionModel<S> {
+    func sectionModel(for section: S) -> _TableViewSectionDataModel<S> {
         if let sectionModel = self.sectionModels.first(where: { $0.section == section }) {
             return sectionModel
         }
-        let sectionModel = SectionModel(section: section)
+        let sectionModel = _TableViewSectionDataModel(section: section)
         sectionModel.itemEqualityChecker = self.delegate?.itemEqualityChecker(for: section)
         sectionModel.onUpdate = { [weak self] in
             self?.delegate?.dataModelDidChange()
@@ -31,7 +31,7 @@ internal class _TableViewDataModel<S: TableViewSection> {
     /**
      Returns the item for the given row and section.
     */
-    func item(inSection section: S, row: Int) -> TableViewItem? {
+    func item(inSection section: S, row: Int) -> _TableViewItemModel? {
         let model = self.sectionModels.first { $0.section == section }
         if model?.items.indices.contains(row) == true {
             return model?.items[row]
@@ -93,7 +93,7 @@ internal class _TableViewDataModel<S: TableViewSection> {
         self.footerTitleBound = other.footerTitleBound
         self.footerViewBound = other.footerViewBound
         self.displayedSections = other.displayedSections
-        self.sectionModels = other.sectionModels.map { SectionModel(from: $0) }
+        self.sectionModels = other.sectionModels.map { _TableViewSectionDataModel(from: $0) }
         for sectionModel in self.sectionModels {
             sectionModel.onUpdate = { [weak self] in
                 self?.delegate?.dataModelDidChange()
@@ -158,7 +158,7 @@ extension _TableViewDataModel {
     }
 }
 
-internal class SectionModel<S: TableViewSection> {
+internal class _TableViewSectionDataModel<S: TableViewSection> {
     enum CellDataType {
         case models
         case viewModels
@@ -175,7 +175,7 @@ internal class SectionModel<S: TableViewSection> {
     var headerViewModel: Any? = nil {
         didSet { self.onUpdate?() }
     }
-    var items: [TableViewItem] = [] {
+    var items: [_TableViewItemModel] = [] {
         didSet { self.onUpdate?() }
     }
     var footerTitle: String? = nil {
@@ -194,7 +194,7 @@ internal class SectionModel<S: TableViewSection> {
         self.section = section
     }
     
-    fileprivate init(from other: SectionModel<S>) {
+    fileprivate init(from other: _TableViewSectionDataModel<S>) {
         self.headerTitle = other.headerTitle
         self.headerViewModel = other.headerViewModel
         self.cellDataType = other.cellDataType
@@ -206,7 +206,7 @@ internal class SectionModel<S: TableViewSection> {
     }
 }
 
-extension SectionModel: Collection {
+extension _TableViewSectionDataModel: Collection {
     typealias Index = Int
 
     subscript(i: Int) -> Any {
@@ -243,7 +243,7 @@ extension SectionModel: Collection {
     }
 }
 
-internal struct TableViewItem {
+internal struct _TableViewItemModel {
     var isNumberPlaceholder: Bool
     var model: Any?
     var viewModel: Any?

@@ -23,7 +23,7 @@ internal extension SectionedTableViewBinder {
         }
         
         // mark that the affected sections were updated via models and view model
-        let type: SectionModel<S>.CellDataType
+        let type: _TableViewSectionDataModel<S>.CellDataType
         if models != nil && viewModels != nil {
             type = .modelsViewModels
         } else if models != nil {
@@ -31,31 +31,31 @@ internal extension SectionedTableViewBinder {
         } else {
             type = .viewModels
         }
-        let dataTypes: [S: SectionModel<S>.CellDataType] = modelsOrViewModels.mapValues { _ in type }
+        let dataTypes: [S: _TableViewSectionDataModel<S>.CellDataType] = modelsOrViewModels.mapValues { _ in type }
         for (section, cellDataType) in dataTypes {
             self.nextDataModel.sectionModel(for: section).cellDataType = cellDataType
         }
 
-        var items: [S: [TableViewItem]] = [:]
+        var items: [S: [_TableViewItemModel]] = [:]
         if let models = models, let viewModels = viewModels {
             items = models.reduce(into: [:]) { result, value in
                 let (section, _models) = value
                 guard let _viewModels = viewModels[section] else { fatalError("something weird weird") }
-                result[section] = zip(_models, _viewModels).map { TableViewItem(isNumberPlaceholder: false, model: $0, viewModel: $1) }
+                result[section] = zip(_models, _viewModels).map { _TableViewItemModel(isNumberPlaceholder: false, model: $0, viewModel: $1) }
             }
         } else if let models = models {
             items = models.mapValues { _models in
-                return _models.map { TableViewItem(isNumberPlaceholder: false, model: $0, viewModel: nil) }
+                return _models.map { _TableViewItemModel(isNumberPlaceholder: false, model: $0, viewModel: nil) }
             }
         } else if let viewModels = viewModels {
             items = viewModels.mapValues { _viewModels in
-                return _viewModels.map { TableViewItem(isNumberPlaceholder: false, model: nil, viewModel: $0) }
+                return _viewModels.map { _TableViewItemModel(isNumberPlaceholder: false, model: nil, viewModel: $0) }
             }
         }
         
         self.update(fromDataIn: items,
                     resettingMissingSectionsWith: [],
-                    updatingKeyPath: \SectionModel<S>.items,
+                    updatingKeyPath: \_TableViewSectionDataModel<S>.items,
                     affectedSections: affectedSections,
                     dataType: .cell)
     }
@@ -72,14 +72,14 @@ internal extension SectionedTableViewBinder {
             self.nextDataModel.sectionModel(for: section).cellDataType = .number
         }
 
-        let items: [S: [TableViewItem]] = numCells.mapValues { numberOfCells in
+        let items: [S: [_TableViewItemModel]] = numCells.mapValues { numberOfCells in
             return (0..<numberOfCells).map { _ in
-                return TableViewItem(isNumberPlaceholder: true, model: nil, viewModel: nil)
+                return _TableViewItemModel(isNumberPlaceholder: true, model: nil, viewModel: nil)
             }
         }
         self.update(fromDataIn: items,
                     resettingMissingSectionsWith: [],
-                    updatingKeyPath: \SectionModel<S>.items,
+                    updatingKeyPath: \_TableViewSectionDataModel<S>.items,
                     affectedSections: affectedSections,
                     dataType: .cell)
     }
@@ -101,7 +101,7 @@ internal extension SectionedTableViewBinder {
         
         self.update(fromDataIn: titles,
                     resettingMissingSectionsWith: nil,
-                    updatingKeyPath: \SectionModel<S>.headerTitle,
+                    updatingKeyPath: \_TableViewSectionDataModel<S>.headerTitle,
                     affectedSections: affectedSections,
                     dataType: .header)
     }
@@ -117,7 +117,7 @@ internal extension SectionedTableViewBinder {
         
         self.update(fromDataIn: viewModels,
                     resettingMissingSectionsWith: nil,
-                    updatingKeyPath: \SectionModel<S>.headerViewModel,
+                    updatingKeyPath: \_TableViewSectionDataModel<S>.headerViewModel,
                     affectedSections: affectedSections,
                     dataType: .header)
     }
@@ -139,7 +139,7 @@ internal extension SectionedTableViewBinder {
         
         self.update(fromDataIn: titles,
                     resettingMissingSectionsWith: nil,
-                    updatingKeyPath: \SectionModel<S>.footerTitle,
+                    updatingKeyPath: \_TableViewSectionDataModel<S>.footerTitle,
                     affectedSections: affectedSections,
                     dataType: .footer)
     }
@@ -156,7 +156,7 @@ internal extension SectionedTableViewBinder {
         let nonNilViewModels: [S: Any] = viewModels.filter { $0.value != nil }.mapValues { return $0! }
         self.update(fromDataIn: nonNilViewModels,
                     resettingMissingSectionsWith: nil,
-                    updatingKeyPath: \SectionModel<S>.footerViewModel,
+                    updatingKeyPath: \_TableViewSectionDataModel<S>.footerViewModel,
                     affectedSections: affectedSections,
                     dataType: .footer)
     }
@@ -172,7 +172,7 @@ private extension SectionedTableViewBinder {
     func update<V>(
         fromDataIn new: [S: V],
         resettingMissingSectionsWith resetValue: V,
-        updatingKeyPath keyPath: ReferenceWritableKeyPath<SectionModel<S>, V>,
+        updatingKeyPath keyPath: ReferenceWritableKeyPath<_TableViewSectionDataModel<S>, V>,
         affectedSections: SectionBindingScope<S>,
         dataType: DataUpdateType)
     {
