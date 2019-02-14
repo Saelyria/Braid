@@ -24,6 +24,17 @@ internal extension SectionedTableViewBinder {
             assertionFailure("ERROR: Didn't return the right cell type - something went awry!")
             return UITableViewCell()
         }
+        
+        if self.automaticallyRegister {
+            if let nibCellType = cellType as? (UITableViewCell & UINibInitable).Type {
+                let reuseIdentifier = (cellType as? ReuseIdentifiable.Type)?.reuseIdentifier
+                    ?? cellType.classNameReuseIdentifier
+                let nib = UINib(nibName: nibCellType.nibName, bundle: nibCellType.bundle)
+                self.tableView.register(nib, forCellReuseIdentifier: reuseIdentifier)
+            } else {
+                self.tableView.register(cellType)
+            }
+        }
 
         self._addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
     }
@@ -45,6 +56,17 @@ internal extension SectionedTableViewBinder {
             }
             assertionFailure("ERROR: Didn't return the right cell type - something went awry!")
             return UITableViewCell()
+        }
+        
+        if self.automaticallyRegister {
+            if let nibCellType = cellType as? (UITableViewCell & UINibInitable).Type {
+                let reuseIdentifier = (cellType as? ReuseIdentifiable.Type)?.reuseIdentifier
+                    ?? cellType.classNameReuseIdentifier
+                let nib = UINib(nibName: nibCellType.nibName, bundle: nibCellType.bundle)
+                self.tableView.register(nib, forCellReuseIdentifier: reuseIdentifier)
+            } else {
+                self.tableView.register(cellType)
+            }
         }
         
         self._addDequeueBlock(cellDequeueBlock, affectedSections: affectedSections)
@@ -310,6 +332,17 @@ private extension SectionedTableViewBinder {
                 self.handlers.dynamicSectionsFooterDequeueBlock = dequeueBlock
             case .forAnySection:
                 assertionFailure("Can't add footer dequeue blocks for 'any section'")
+            }
+        }
+        
+        if self.automaticallyRegister {
+            if let nibType = type as? (UITableViewHeaderFooterView & UINibInitable).Type {
+                let reuseIdentifier = (nibType as? ReuseIdentifiable.Type)?.reuseIdentifier
+                    ?? nibType.classNameReuseIdentifier
+                let nib = UINib(nibName: nibType.nibName, bundle: nibType.bundle)
+                self.tableView.register(nib, forHeaderFooterViewReuseIdentifier: reuseIdentifier)
+            } else {
+                self.tableView.register(type)
             }
         }
     }

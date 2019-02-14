@@ -38,39 +38,43 @@ make its raw value `Int` and make it `Comparable` so that we can have our binder
 5. This is where we'll store which form item the user is currently interacting with, especially for the date picking cells. The
 `determineFormItems(from:activeItem:)` method takes this variable into account to determine whether or not to insert date pickers.
 
-6. Here we bind a 'cell provider' (a closure that is called with the table view, section, row, and model to dequeue a cell for) along with a closure
+6. Since we're using a 'cell provider' closure to create our cells instead of giving cell types to the binder, we need to manually register our
+cells. Braid gives us two convenience methods for our cells to register them - if the cells conform to `UINibInitable`, they'll automatically be
+registered using their nibs; otherwise, they are registered by class.
+
+7. Here we bind a 'cell provider' (a closure that is called with the table view, section, row, and model to dequeue a cell for) along with a closure
 that will return our `displayedFormItems` model. The compiler will figure out that the model type being bound is `FormItem`, so our 'cell
 provider' closure will get passed in this item. We have a function a little further down called `dequeueCell(forFormItem:tableView:)` that
 will switch over the form item and return an appropriate cell - call that here then we're good. The models that our cells are dequeued for are
 returns from our `determineFormItems(from:activeItem)` method, which will, given the form data we've collected so far and the form
 item that is currently active (i.e. being interacted with), return a dictionary of which form items should currently be shown for each section.
 
-7. Now we'll start binding logic to our sections, starting with the 'title and location' section. The start the chain, we use this 
+8. Now we'll start binding logic to our sections, starting with the 'title and location' section. The start the chain, we use this 
 `assuming(modelType:)` method. If you've read through the documentation, you know that model information is only available for handlers
 if they come *after* a cell binding method that provides it. However, we did that binding on the 'all sections' chain. To solve this, we can use
 this 'assuming model type' method to tell the binder 'I'm certain that the cells on this section are using this model type, so just pass in the 
 models to handlers on this chain'. We're sure that `FormItem` is the model type for all following sections, so this is fine - our app won't crash.
 
-8. Right after that, we add our first custom event handler. These handlers work by having you declare the type of cell you want to receieve
+9. Right after that, we add our first custom event handler. These handlers work by having you declare the type of cell you want to receieve
 events from (in this case, our text field cells), then passing in a handler that gets called whenever events from cells of that type on the given
 section are called. Since we assumed the model type to be `FormItem`, the form items for the cells will get passed in. We can then switch
 over the passed-in event and form item to store text on the appropriate property on our 'form data' variable.
 
-9. Our binding chain for the 'time' section is largely the same as for the 'title and location' section. To start it off, when the switch in this 
+10. Our binding chain for the 'time' section is largely the same as for the 'title and location' section. To start it off, when the switch in this 
 section gets toggled, we set the 'is all day' flag on the 'form data' object, then reload the binder. The binder will respond by calling the closure
 we gave it for `models` in the `onAllSections` chain, which will now return a new set of form items for the 'time' section. It'll do a bunch of
 diffing stuff then animate away the 'start time' and 'end time' cells, or vice-versa.
 
-10. Here we'll listen for taps from title-details cells (i.e. our 'date', 'start time', and 'end time' cells) for the section. When these cells are
+11. Here we'll listen for taps from title-details cells (i.e. our 'date', 'start time', and 'end time' cells) for the section. When these cells are
 tapped, we want date picker cells to appear below them and have the picked dates reflected back on the cells. As mentioned previously (and
 as we'll explain more in depth when we get to the method), we use the `activeFormItem` property in our form item calculation method as one
 of the inputs, so we just need to set that then tell the binder to refresh from its bound data.
 
-11. In the next chain handler, we do basically the same thing as in the 'title and location' section chain - listen for date changes from any date
+12. In the next chain handler, we do basically the same thing as in the 'title and location' section chain - listen for date changes from any date
 picker cells we have in the section, switch on the passed-in event and form item, and put the entered date into the correct value on our
 form data object.
 
-12. Same story here with the 'notes' section.
+13. Same story here with the 'notes' section.
 
 The rest of the implementation is just the cell dequeueing method that will return cells appropriate to given form items, the method used to
 return the form items that should be shown for the given form data, and some date formatter objects that we use to turn our picked dates into

@@ -220,6 +220,10 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     /// Whether the binder should animate changes in data on its table view. Defaults to `true`.
     public var animateChanges: Bool = true
     
+    /// Whether the binder should automatically register cells and header/footer views bound to it when cell types are
+    /// given. Defaults to `true`.
+    public var automaticallyRegister: Bool = true
+    
     /// An object that will perform table view animations on behalf of the table view binder.
     public weak var updateDelegate: TableViewUpdateDelegate?
     

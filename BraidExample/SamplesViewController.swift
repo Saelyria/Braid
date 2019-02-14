@@ -43,7 +43,6 @@ class SamplesViewController: UIViewController {
         
         self.tableView = UITableView(frame: self.view.frame, style: .grouped)
         self.view.addSubview(self.tableView)
-        self.tableView.register(TitleDetailTableViewCell.self)
         
         self.binder = TableViewBinder(tableView: self.tableView)
         
