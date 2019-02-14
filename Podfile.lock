@@ -1,6 +1,6 @@
 PODS:
-  - Braid/Core (0.1.0)
-  - Braid/Rx (0.1.0):
+  - Braid/Core (0.1.1)
+  - Braid/Rx (0.1.1):
     - Braid/Core
     - RxCocoa (~> 4.4)
     - RxSwift (~> 4.4)
@@ -29,7 +29,7 @@ EXTERNAL SOURCES:
     :path: "."
 
 SPEC CHECKSUMS:
-  Braid: ba5a9c0a24187d6a0a866e2a50ed3c4499b4a06b
+  Braid: 25773f732b044f3c12671f5205a524d696a0909b
   Nimble: 04f732da099ea4d153122aec8c2a88fd0c7219ae
   RxAtomic: eacf60db868c96bfd63320e28619fe29c179656f
   RxCocoa: df63ebf7b9a70d6b4eeea407ed5dd4efc8979749
