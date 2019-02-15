@@ -153,6 +153,12 @@ Braid is available through [CocoaPods](http://cocoapods.org). To install it, sim
 pod 'Braid'
 ```
 
+If you are using RxSwift with Braid, you have to include the Rx subspec of Braid, like so:
+
+```ruby
+pod 'Braid/Rx'
+```
+
 ## Contributors
 
 Aaron Bosnjak (email: aaron.bosnjak707@gmail.com, Twitter: @aaron_bosnjak)

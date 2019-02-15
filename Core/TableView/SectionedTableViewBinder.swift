@@ -1,5 +1,5 @@
 import UIKit
-#if RX_TABLEAU
+#if RX_BRAID
 import RxSwift
 #endif
 
@@ -187,7 +187,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
                 print("WARNING: This table binder was setup to manage section visibility based on its data - ignoring attempt to set the 'displayedSections'.")
                 return
             }
-#if RX_TABLEAU
+#if RX_BRAID
             self.displayedSectionsSubject.onNext(self.displayedSections)
 #endif
             self.nextDataModel.displayedSections = newValue
@@ -239,7 +239,7 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     var tableUpdateOperation: Operation?
     var viewEventOperations: [Operation] = []
     
-#if RX_TABLEAU
+#if RX_BRAID
     let disposeBag = DisposeBag()
     let displayedSectionsSubject = BehaviorSubject<[S]>(value: [])
 #endif

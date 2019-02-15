@@ -78,7 +78,7 @@ titles.
 
 RxSwift is added with extensions on `Reactive` in the RxSwift subspec of Braid. It adds methods to the section binders to allow their
 'bind cell type' methods to be given `Observable` model/view model arrays, and works in basically the same way as their vanilla counterparts.
-Only real weird thing is that, when the Rx subspec is included in the project, there's a Swift flag named `RX_TABLEAU` that gets defined that
+Only real weird thing is that, when the Rx subspec is included in the project, there's a Swift flag named `RX_BRAID` that gets defined that
 adds stuff like a dispose bag to the table binder to save its section binders' subscriptions.
 
 With that, that's pretty much how everything works - you should hopefully know enough now that you can read through the source and have 
