@@ -241,14 +241,16 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     public override func cellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
-        return super.cellHeight(handler)
+        super.cellHeight(handler)
+        return self
     }
     
     @discardableResult
     public override func estimatedCellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
-        return super.estimatedCellHeight(handler)
+        super.estimatedCellHeight(handler)
+        return self
     }
     
     /**
@@ -268,8 +270,8 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     public func cellHeight(_ handler: @escaping (_ section: S, _ row: Int, _ model: M) -> CGFloat)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
-        let storedHandler: (S, Int) -> CGFloat = { section, row in
-            guard let model = binder.currentDataModel.item(inSection: section, row: row)?.model as? M else {
+        let storedHandler: (S, Int) -> CGFloat = { [weak binder = self.binder] section, row in
+            guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                 fatalError("Didn't get the right model type, something went awry!")
             }
             return handler(section, row, model)
@@ -305,8 +307,8 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     public func estimatedCellHeight(_ handler: @escaping (_ section: S, _ row: Int, _ model: M) -> CGFloat)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
-        let storedHandler: (S, Int) -> CGFloat = { section, row in
-            guard let model = binder.currentDataModel.item(inSection: section, row: row)?.model as? M else {
+        let storedHandler: (S, Int) -> CGFloat = { [weak binder = self.binder] section, row in
+            guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                 fatalError("Didn't get the right model type, something went awry!")
             }
             return handler(section, row, model)
@@ -329,28 +331,32 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     public override func headerHeight(_ handler: @escaping (_ section: S) -> CGFloat)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
-        return super.headerHeight(handler)
+        super.headerHeight(handler)
+        return self
     }
     
     @discardableResult
     public override func estimatedHeaderHeight(_ handler: @escaping (_ section: S) -> CGFloat)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
-        return super.estimatedHeaderHeight(handler)
+        super.estimatedHeaderHeight(handler)
+        return self
     }
     
     @discardableResult
     public override func footerHeight(_ handler: @escaping (_ section: S) -> CGFloat)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
-        return super.footerHeight(handler)
+        super.footerHeight(handler)
+        return self
     }
     
     @discardableResult
     public override func estimatedFooterHeight(_ handler: @escaping (_ section: S) -> CGFloat)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
-        return super.estimatedFooterHeight(handler)
+        super.estimatedFooterHeight(handler)
+        return self
     }
 
 }

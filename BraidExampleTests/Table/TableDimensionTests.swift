@@ -25,16 +25,16 @@ class TableDimensionTests: TableTestCase {
         
         self.binder.onSection(.first)
             .bind(cellType: TestCell.self, models: [1, 2, 3])
-            .dimensions(
-                .cellHeight { _, _ in 1 })
+            .cellHeight { _, _ in 1 }
+        
         
         self.binder.onSections(.second, .third)
             .bind(cellType: TestCell.self, models: [
                 .second: [1, 2],
                 .third: [1]
             ])
-            .dimensions(
-                .cellHeight { _, _ in 2 })
+            .cellHeight { _, _ in 2 }
+
                 
         self.binder.finish()
         

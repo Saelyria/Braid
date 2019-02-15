@@ -234,14 +234,16 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     public override func cellHeight(_ handler: @escaping (_ row: Int) -> CGFloat)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
-        return super.cellHeight(handler)
+        super.cellHeight(handler)
+        return self
     }
     
     @discardableResult
     public override func estimatedCellHeight(_ handler: @escaping (_ row: Int) -> CGFloat)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
-        return super.estimatedCellHeight(handler)
+        super.estimatedCellHeight(handler)
+        return self
     }
     
     /**
@@ -260,6 +262,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     public func cellHeight(_ handler: @escaping (_ row: Int, _ model: M) -> CGFloat)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
+        let section = self.section
         self.binder.handlers.sectionCellHeightBlocks[section] = { [weak binder = self.binder] (_, row: Int) in
             guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                 fatalError("Didn't get the right model type - something went awry!")
@@ -285,6 +288,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     public func estimatedCellHeight(_ handler: @escaping (_ row: Int, _ model: M) -> CGFloat)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
+        let section = self.section
         self.binder.handlers.sectionEstimatedCellHeightBlocks[section] = { [weak binder = self.binder] (_, row: Int) in
             guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                 fatalError("Didn't get the right model type - something went awry!")
@@ -295,31 +299,35 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     @discardableResult
-    public override class func headerHeight(_ handler: @escaping () -> CGFloat)
+    public override func headerHeight(_ handler: @escaping () -> CGFloat)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
-        return super.headerHeight(handler)
+        super.headerHeight(handler)
+        return self
     }
     
     @discardableResult
     public override func estimatedHeaderHeight(_ handler: @escaping () -> CGFloat)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
-        return super.estimatedHeaderHeight(handler)
+        super.estimatedHeaderHeight(handler)
+        return self
     }
     
     @discardableResult
     public override func footerHeight(_ handler: @escaping () -> CGFloat)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
-        return super.footerHeight(handler)
+        super.footerHeight(handler)
+        return self
     }
     
     @discardableResult
     public override func estimatedFooterHeight(_ handler: @escaping () -> CGFloat)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
-        return super.estimatedFooterHeight(handler)
+        super.estimatedFooterHeight(handler)
+        return self
     }
 
 }

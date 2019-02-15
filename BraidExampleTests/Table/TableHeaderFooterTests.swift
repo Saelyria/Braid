@@ -38,10 +38,10 @@ class TableHeaderFooterTests: TableTestCase {
             .bind(footerTitles: [.fourth: "F4"])
         
         self.binder.onAnySection()
-            .dimensions(
-                .cellHeight { _, _ in 2 },
-                .headerHeight { _ in 1 },
-                .footerHeight { _ in 1 })
+            .cellHeight { _, _ in 2 }
+            .headerHeight { _ in 1 }
+            .footerHeight { _ in 1 }
+        
         
         self.binder.finish()
         
@@ -137,10 +137,9 @@ class TableHeaderFooterTests: TableTestCase {
             .bind(cellType: TestCell.self, models: [.fourth: []])
         
         self.binder.onAnySection()
-            .dimensions(
-                .cellHeight { _, _ in 2 },
-                .headerHeight { _ in 1 },
-                .footerHeight { _ in 1 })
+            .cellHeight { _, _ in 2 }
+            .headerHeight { _ in 1 }
+            .footerHeight { _ in 1 }
         
         self.binder.finish()
         
@@ -299,10 +298,9 @@ class TableHeaderFooterTests: TableTestCase {
             .bind(cellType: TestCell.self, models: [.fourth: []])
         
         self.binder.onAnySection()
-            .dimensions(
-                .cellHeight { _, _ in 2 },
-                .headerHeight { _ in 1 },
-                .footerHeight { _ in 1 })
+            .cellHeight { _, _ in 2 }
+            .headerHeight { _ in 1 }
+            .footerHeight { _ in 1 }
         
         self.binder.finish()
         

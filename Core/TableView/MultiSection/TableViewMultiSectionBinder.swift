@@ -1012,6 +1012,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
         case .forAnySection:
             self.binder.handlers.anySectionHeaderHeightBlock = handler
         }
+        return self
     }
     
     /**
@@ -1059,6 +1060,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
         case .forAnySection:
             self.binder.handlers.anySectionFooterHeightBlock = handler
         }
+        return self
     }
     
     /**
@@ -1083,5 +1085,6 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
         case .forAnySection:
             self.binder.handlers.anySectionFooterEstimatedHeightBlock = handler
         }
+        return self
     }
 }
