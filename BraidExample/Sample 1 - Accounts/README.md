@@ -29,11 +29,10 @@ framework is highly recommended before continuing.
 3. The observable object that we will bind to the binder in various ways that it will pull its cell data from. Events from this behaviour relay are
     emitted whenever the 'Refresh' button is tapped and the mock network request gives us a new array of `Account` objects.
 
-4. Here, we instantiate the actual `UITableView` object, and register the cells we're going to use with it. Braid provides convienient 
-    `register` methods on table views for cells that conform to `ReuseIdentifiable` that registers the cell with the reuse identifier given by 
-    conformance to this protocol. If the cell conforms to `UINibInitable`,  then this method will register the cell's nib instead of the class. 
-    Note that the table view is just created locally - the binder object (and our view, since it's added as a subview) will hold the reference to the
-    table, so we don't need a property for it on our view controller.
+4. Here, we instantiate the actual `UITableView` object, and register the cells we're going to use with it. Braid can automatically register our
+    cells for us when we bind them by name. If the cell conforms to `UINibInitable`,  then this method will register the cell's nib instead of the 
+    class.  Note that the table view is just created locally - the binder object (and our view, since it's added as a subview) will hold the reference 
+    to the table, so we don't need a property for it on our view controller if we don't use it anywhere else.
     
 5. Here we instantiate the 'binder' object. The init method is given the table view it will perform the binding on along with the enum type we 
     want the table's sections to be described by.

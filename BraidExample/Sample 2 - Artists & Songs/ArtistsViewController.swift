@@ -32,7 +32,6 @@ class ArtistsViewController: UIViewController {
         tableView.sectionFooterHeight = 0.0
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 40
-        tableView.register(TitleDetailTableViewCell.self)
         
         self.binder = SectionedTableViewBinder(tableView: tableView, sectionedBy: Section.self)
         self.binder.sectionDisplayBehavior = .hidesSectionsWithNoCellData

@@ -889,38 +889,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         
         return self
     }
-
-    /**
-     Add handlers for various dimensions of cells for the section being bound.
-     
-     This method is called with handlers that provide dimensions like cell or header heights and estimated heights. The
-     various handlers are made with the static functions on `MultiSectionDimension`. A typical dimension-binding call
-     looks something like this:
-     
-     ```
-     binder.onSection(.first)
-        .dimensions(
-            .cellHeight { row in UITableViewAutomaticDimension },
-            .estimatedCellHeight { row in 100 },
-            .headerHeight { 50 })
-     ```
-     
-     - parameter dimensions: A variadic list of dimensions bound for the section being bound. These 'dimension' objects
-        are returned from the various dimension-binding static functions on `SingleSectionDimension`.
-     
-     - returns: A section binder to continue the binding chain with.
-     */
-    @discardableResult
-    public func dimensions(_ dimensions: SingleSectionDimension<S>...) -> TableViewSingleSectionBinder<C, S> {
-        self._dimensions(dimensions)
-        return self
-    }
     
-    internal func _dimensions(_ dimensions: [SingleSectionDimension<S>]) {
-        for dimension in dimensions {
-            dimension.bindingFunc(self.binder, self.section)
-        }
-    }
     
     /**
      Adds model type information to the binding chain.
@@ -932,9 +901,111 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter modelType: The type of the models that were bound to the section on another binding chain.
      
      - returns: A section binder to continue the binding chain with that allows cast model types to be given to items in
-        its chain.
-    */
+     its chain.
+     */
     public func assuming<M>(modelType: M.Type) -> TableViewModelSingleSectionBinder<C, S, M> {
         return TableViewModelSingleSectionBinder(binder: self.binder, section: self.section)
+    }
+    
+    // MARK: -
+
+    /**
+     Adds a handler to provide the cell height for cells in the declared section.
+     
+     The given handler is called whenever the section reloads for each visible row, passing in the row the handler
+     should provide the height for.
+     
+     - parameter handler: The closure to be called that will return the height for cells in the section.
+     - parameter row: The row of the cell to provide the height for.
+     
+     - returns: The argument to a 'dimensions' call.
+     */
+    @discardableResult
+    public func cellHeight(_ handler: @escaping (_ row: Int) -> CGFloat) -> TableViewSingleSectionBinder<C, S> {
+        self.binder.handlers.sectionCellHeightBlocks[section] = { (_, row: Int) in
+            return handler(row)
+        }
+        return self
+    }
+    
+    /**
+     Adds a handler to provide the estimated cell height for cells in the declared section.
+     
+     The given handler is called whenever the section reloads for each visible row, passing in the row the handler
+     should provide the estimated height for.
+     
+     - parameter handler: The closure to be called that will return the estimated height for cells in the section.
+     - parameter row: The row of the cell to provide the estimated height for.
+     
+     - returns: The argument to a 'dimensions' call.
+     */
+    @discardableResult
+    public func estimatedCellHeight(_ handler: @escaping (_ row: Int) -> CGFloat)
+        -> TableViewSingleSectionBinder<C, S>
+    {
+        self.binder.handlers.sectionEstimatedCellHeightBlocks[section] = { (_, row: Int) in
+            return handler(row)
+        }
+        return self
+    }
+    
+    /**
+     Adds a callback handler to provide the height for the section header in the declared section.
+     
+     - parameter handler: The closure to be called that will return the height for the section header.
+     
+     - returns: The argument to a 'dimensions' call.
+     */
+    @discardableResult
+    public func headerHeight(_ handler: @escaping () -> CGFloat) -> TableViewSingleSectionBinder<C, S> {
+        self.binder.handlers.sectionHeaderHeightBlocks[section] = { (_) in
+            return handler()
+        }
+        return self
+    }
+    
+    /**
+     Adds a callback handler to provide the estimated height for the section header in the declared section.
+     
+     - parameter handler: The closure to be called that will return the estimated height for the section header.
+     
+     - returns: The argument to a 'dimensions' call.
+     */
+    @discardableResult
+    public func estimatedHeaderHeight(_ handler: @escaping () -> CGFloat) -> TableViewSingleSectionBinder<C, S> {
+        self.binder.handlers.sectionHeaderEstimatedHeightBlocks[section] = { (_) in
+            return handler()
+        }
+        return self
+    }
+    
+    /**
+     Adds a callback handler to provide the height for the section footer in the declared section.
+     
+     - parameter handler: The closure to be called that will return the height for the section footer.
+     
+     - returns: The argument to a 'dimensions' call.
+     */
+    @discardableResult
+    public func footerHeight(_ handler: @escaping () -> CGFloat) -> TableViewSingleSectionBinder<C, S> {
+        self.binder.handlers.sectionFooterHeightBlocks[section] = { (_) in
+            return handler()
+        }
+        return self
+    }
+    
+    /**
+     Adds a callback handler to provide the estimated height for the section footer in the declared section.
+     
+     - parameter handler: The closure to be called that will return the estimated height for the section footer.
+     
+     - returns: The argument to a 'dimensions' call.
+     */
+    @discardableResult
+    public func estimatedFooterHeight(_ handler: @escaping () -> CGFloat) -> TableViewSingleSectionBinder<C, S> {
+        self.binder.handlers.sectionFooterEstimatedHeightBlocks[section] = { (_) in
+            return handler()
+        }
+        return self
     }
 }

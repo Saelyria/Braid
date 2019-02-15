@@ -28,14 +28,11 @@ class AccountsViewController: UIViewController {
         
         // 4.
         let tableView = UITableView(frame: self.view.frame, style: .grouped)
-        tableView.register(CenterLabelTableViewCell.self)
-        tableView.register(TitleDetailTableViewCell.self)
         self.view.addSubview(tableView)
         tableView.frame = self.view.frame
         
         // 5.
         self.binder = SectionedTableViewBinder(tableView: tableView, sectionedBy: Section.self)
-//        self.binder.animateChanges = false
         
         // 6.
         self.binder.sectionDisplayBehavior = .hidesSectionsWithNoCellData

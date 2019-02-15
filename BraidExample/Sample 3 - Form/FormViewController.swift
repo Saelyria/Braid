@@ -19,6 +19,7 @@ class FormViewController: UIViewController {
         
         self.title = "Add Event"
         
+        // 6.
         let tableView = UITableView(frame: self.view.frame, style: .grouped)
         tableView.register(TitleDetailTableViewCell.self)
         tableView.register(ToggleTableViewCell.self)
@@ -34,7 +35,7 @@ class FormViewController: UIViewController {
         self.binder.rowUpdateAnimation = .none
         self.binder.sectionUpdateAnimation = .none
         
-        // 6.
+        // 7.
         self.binder.onAllSections()
             .bind(
                 cellProvider: { [unowned self] tableView, _, _, formItem in
@@ -43,10 +44,10 @@ class FormViewController: UIViewController {
                     return self.determineFormItems(from: self.formData, activeItem: self.activeFormItem)
                 })
         
-        // 7.
+        // 8.
         self.binder.onSections(.titleAndLocation)
             .assuming(modelType: FormItem.self)
-            // 8.
+            // 9.
             .onEvent(from: TextFieldTableViewCell.self) { [unowned self] _, _, _, event, formItem in
                 switch (event, formItem) {
                 case (.textEntered(let text), .title):
@@ -57,7 +58,7 @@ class FormViewController: UIViewController {
                 }
             }
         
-        // 9.
+        // 10.
         self.binder.onSection(.time)
             .assuming(modelType: FormItem.self)
             .onEvent(from: ToggleTableViewCell.self) { [unowned self] _, _, event in
@@ -68,7 +69,7 @@ class FormViewController: UIViewController {
                     self.binder.refresh()
                 }
             }
-            // 10.
+            // 11.
             .onTapped { _, cell, formItem in
                 cell.setSelected(false, animated: true)
                 if cell is TitleDetailTableViewCell {
@@ -80,7 +81,7 @@ class FormViewController: UIViewController {
                     self.binder.refresh()
                 }
             }
-            // 11.
+            // 12.
             .onEvent(from: DatePickerTableViewCell.self) { [unowned self] _, _, event, formItem in
                 switch (event, formItem) {
                 case (.dateSelected(let date), .datePicker):
@@ -94,7 +95,7 @@ class FormViewController: UIViewController {
                 self.binder.refresh()
             }
         
-        // 12.
+        // 13.
         self.binder.onSection(.notes)
             .assuming(modelType: FormItem.self)
             .onEvent(from: TextViewTableViewCell.self) { [unowned self] _, _, event, formItem in

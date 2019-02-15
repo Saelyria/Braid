@@ -49,10 +49,8 @@ class HomeViewController: UIViewController {
         self.tableView = UITableView(frame: self.view.frame, style: .grouped)
         self.view.addSubview(self.tableView)
         self.tableView.allowsSelection = false
-        self.tableView.register(CenterLabelTableViewCell.self)
         self.tableView.register(TitleDetailTableViewCell.self)
         self.tableView.register(ImageTitleSubtitleTableViewCell.self)
-        self.tableView.register(SectionHeaderView.self)
         
         self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
         // 5.

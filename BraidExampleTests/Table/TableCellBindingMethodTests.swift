@@ -495,7 +495,7 @@ class TableCellBindingMethodTests: TableTestCase {
                 }
         }
         
-        self.binder.onAnySection().dimensions(.cellHeight { _,_ in 2 })
+        self.binder.onAnySection().cellHeight { _,_ in 2 }
         
         self.binder.finish()
         
@@ -1204,7 +1204,7 @@ class TableCellBindingMethodTests: TableTestCase {
                 }
         }
         
-        self.binder.onAnySection().dimensions(.cellHeight { _,_ in 2 })
+        self.binder.onAnySection().cellHeight { _,_ in 2 }
         
         self.binder.finish()
         
