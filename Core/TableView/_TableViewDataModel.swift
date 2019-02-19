@@ -194,7 +194,7 @@ internal class _TableViewSectionDataModel<S: TableViewSection> {
         didSet { self.onUpdate?() }
     }
     var cellEditingStyle: UITableViewCell.EditingStyle = .none
-    var allowedMovableSections: [S] = []
+    var allowedMovableSections: [S]?
     
     var cellDataType: CellDataType = .models
     

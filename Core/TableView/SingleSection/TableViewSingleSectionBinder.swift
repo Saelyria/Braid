@@ -964,19 +964,29 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     }
     
     @discardableResult
-    public func onEdit(_ handler: @escaping (Int, UITableViewCell.EditingStyle) -> Void) -> TableViewSingleSectionBinder<C, S> {
-        self.binder.handlers.sectionCellEditedCallbacks[self.section] = { _, row, style in
-            handler(row, style)
+    public func allowMoving(toSections: [S] = [], rowIsMovable: ((Int) -> Bool)? = nil)
+        -> TableViewSingleSectionBinder<C, S>
+    {
+        if let rowIsMovable = rowIsMovable {
+            self.binder.handlers.sectionCellMovableBlocks[self.section] = { _ , row in rowIsMovable(row) }
+        }
+        self.binder.nextDataModel.sectionModel(for: self.section).allowedMovableSections = toSections
+        return self
+    }
+    
+    @discardableResult
+    public func onDelete(_ handler: @escaping (Int, CellDeletionSource<S>) -> Void) -> TableViewSingleSectionBinder<C, S> {
+        self.binder.handlers.sectionCellDeletedCallbacks[self.section] = { _, row, source in
+            handler(row, source)
         }
         return self
     }
     
     @discardableResult
-    public func allowMoving(rowIsMovable: ((Int) -> Bool)? = nil) -> TableViewSingleSectionBinder<C, S> {
-        if let rowIsMovable = rowIsMovable {
-            self.binder.handlers.sectionCellMovableBlocks[self.section] = { _ , row in rowIsMovable(row) }
+    public func onInsert(_ handler: @escaping (Int, CellInsertionSource<S>) -> Void) -> TableViewSingleSectionBinder<C, S> {
+        self.binder.handlers.sectionCellInsertedCallbacks[self.section] = { _, row, source in
+            handler(row, source)
         }
-//        self.binder.nextDataModel.sectionModel(for: self.section).isEditable = true
         return self
     }
     

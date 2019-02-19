@@ -1,5 +1,15 @@
 import UIKit
 
+public enum CellDeletionSource<S: TableViewSection> {
+    case moved(toSection: S, row: Int)
+    case editing
+}
+
+public enum CellInsertionSource<S: TableViewSection> {
+    case moved(fromSection: S, row: Int)
+    case editing
+}
+
 /// A closure type that returns a table view cell when given a section, table view, and index path.
 typealias CellDequeueBlock<S: TableViewSection> = (S, UITableView, IndexPath) -> UITableViewCell
 /// A closure type that returns a table header/footer view when given a section and table view.
@@ -126,8 +136,10 @@ class _TableViewBindingHandlers<S: TableViewSection> {
     lazy var sectionCellEditableStyleBlocks: [S: (S, Int) -> UITableViewCell.EditingStyle] = { [:] }()
     var dynamicSectionCellEditableStyleBlock: ((S, Int) -> UITableViewCell.EditingStyle)?
     
-    lazy var sectionCellEditedCallbacks: [S: (S, Int, UITableViewCell.EditingStyle) -> Void] = { [:] }()
-    var dynamicSectionCellEditedCallback: ((S, Int, UITableViewCell.EditingStyle) -> Void)?
+    lazy var sectionCellDeletedCallbacks: [S: (S, Int, CellDeletionSource<S>) -> Void] = { [:] }()
+    var dynamicSectionCellDeletedCallback: ((S, Int, CellDeletionSource<S>) -> Void)?
+    lazy var sectionCellInsertedCallbacks: [S: (S, Int, CellInsertionSource<S>) -> Void] = { [:] }()
+    var dynamicSectionCellInsertedCallback: ((S, Int, CellInsertionSource<S>) -> Void)?
     
     // Blocks to call to determine whether a cell in a section is movable.
     lazy var sectionCellMovableBlocks: [S: (S, Int) -> Bool] = { [:] }()

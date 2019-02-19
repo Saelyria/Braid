@@ -48,11 +48,18 @@ class AttendeesViewController: UIViewController {
                   models: { [unowned self] in self.firstSectionModels },
                   mapToViewModels: { TitleDetailTableViewCell.ViewModel(collectionId: $0.collectionId, title: $0.name) })
             .allowEditing(style: .delete)
-            .onEdit { [unowned self] (row, _) in
-                let model = self.firstSectionModels[row]
+            .allowMoving(toSections: [.invited])
+            .onDelete { row, _ in
                 self.firstSectionModels.remove(at: row)
-                self.secondSectionModels.append(model)
                 self.binder.refresh()
+            }
+            .onInsert { row, source in
+                switch source {
+                case let .moved(_, fromRow):
+                    let model = self.secondSectionModels[fromRow]
+                    self.firstSectionModels.insert(model, at: row)
+                default: break
+                }
             }
         
         self.binder.onSection(.invited)
@@ -61,12 +68,6 @@ class AttendeesViewController: UIViewController {
                   models: { [unowned self] in self.secondSectionModels },
                   mapToViewModels: { TitleDetailTableViewCell.ViewModel(collectionId: $0.collectionId, title: $0.name) })
             .allowEditing(style: .insert)
-            .onEdit { [unowned self] (row, _) in
-                let model = self.secondSectionModels[row]
-                self.secondSectionModels.remove(at: row)
-                self.firstSectionModels.append(model)
-                self.binder.refresh()
-            }
         
         self.binder.finish()
         

@@ -200,11 +200,51 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         let section = self.dataModel.displayedSections[indexPath.section]
         
-        let callback = (self.dataModel.uniquelyBoundCellSections.contains(section)
-            || self.binder.handlers.sectionCellEditedCallbacks[section] != nil) ?
-                self.binder.handlers.sectionCellEditedCallbacks[section] :
-                self.binder.handlers.dynamicSectionCellEditedCallback
-        callback?(section, indexPath.row, editingStyle)
+        if editingStyle == .delete {
+            let callback = (self.dataModel.uniquelyBoundCellSections.contains(section)
+                || self.binder.handlers.sectionCellDeletedCallbacks[section] != nil) ?
+                    self.binder.handlers.sectionCellDeletedCallbacks[section] :
+                    self.binder.handlers.dynamicSectionCellDeletedCallback
+            callback?(section, indexPath.row, .editing)
+        } else if editingStyle == .insert {
+            let callback = (self.dataModel.uniquelyBoundCellSections.contains(section)
+                || self.binder.handlers.sectionCellInsertedCallbacks[section] != nil) ?
+                    self.binder.handlers.sectionCellInsertedCallbacks[section] :
+                    self.binder.handlers.dynamicSectionCellInsertedCallback
+            callback?(section, indexPath.row, .editing)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        let section = self.dataModel.displayedSections[indexPath.section]
+        
+        let canMoveBlock = (self.dataModel.uniquelyBoundCellSections.contains(section)
+            || self.binder.handlers.sectionCellMovableBlocks[section] != nil) ?
+                self.binder.handlers.sectionCellMovableBlocks[section] :
+            self.binder.handlers.dynamicSectionCellMovableBlock
+        
+        if let canMoveBlock = canMoveBlock {
+            return canMoveBlock(section, indexPath.row)
+        } else {
+            return self.dataModel.sectionModel(for: section).allowedMovableSections != nil
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let fromSection = self.dataModel.displayedSections[sourceIndexPath.section]
+        let toSection = self.dataModel.displayedSections[destinationIndexPath.section]
+        
+        let deleteCallback = (self.dataModel.uniquelyBoundCellSections.contains(fromSection)
+            || self.binder.handlers.sectionCellDeletedCallbacks[fromSection] != nil) ?
+                self.binder.handlers.sectionCellDeletedCallbacks[fromSection] :
+                self.binder.handlers.dynamicSectionCellDeletedCallback
+        deleteCallback?(fromSection, sourceIndexPath.row, .moved(toSection: toSection, row: destinationIndexPath.row))
+        
+        let insertCallback = (self.dataModel.uniquelyBoundCellSections.contains(toSection)
+            || self.binder.handlers.sectionCellInsertedCallbacks[toSection] != nil) ?
+                self.binder.handlers.sectionCellInsertedCallbacks[toSection] :
+            self.binder.handlers.dynamicSectionCellInsertedCallback
+        insertCallback?(fromSection, destinationIndexPath.row, .moved(fromSection: toSection, row: destinationIndexPath.row))
     }
     
     // MARK: -
