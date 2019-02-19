@@ -901,10 +901,83 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter modelType: The type of the models that were bound to the section on another binding chain.
      
      - returns: A section binder to continue the binding chain with that allows cast model types to be given to items in
-     its chain.
+        its chain.
      */
     public func assuming<M>(modelType: M.Type) -> TableViewModelSingleSectionBinder<C, S, M> {
         return TableViewModelSingleSectionBinder(binder: self.binder, section: self.section)
+    }
+    
+    // MARK: -
+
+    /**
+     Enables editing (i.e. insertion or deletion controls) for the section.
+     
+     This method must be called on the chain to enable insertion or deletion actions on the section, passing in the
+     editing style (`delete` or `insert`) for items in the section. This method should typically be paired with an
+     `onEdit(_:)` method after it on the chain.
+     
+     - parameter style: The editing style to apply for cells in the bound section.
+     - parameter rowIsEditable: An optional closure that returns whether editing should be allowed for the given row.
+     
+     - returns: A section binder to continue the binding chain with.
+    */
+    @discardableResult
+    public func allowEditing(
+        style: UITableViewCell.EditingStyle = .delete,
+        rowIsEditable: ((_ row: Int) -> Bool)? = nil)
+        -> TableViewSingleSectionBinder<C, S>
+    {
+        guard style != .none else {
+            print("WARNING: Section '\(self.section)' was setup to allow editing, but the given editing style was 'none'.")
+            return self
+        }
+        if let rowIsEditable = rowIsEditable {
+            self.binder.handlers.sectionCellEditableBlocks[self.section] = { _, row in rowIsEditable(row) }
+        }
+        self.binder.nextDataModel.sectionModel(for: self.section).cellEditingStyle = style
+        return self
+    }
+    
+    /**
+     Enables editing (i.e. insertion or deletion controls) for the section.
+     
+     This method must be called on the chain to enable insertion or deletion actions on the section, passing in a
+     closure that will return the editing style (`delete` or `insert`) for items in the section. This method should
+     typically be paired with an `onEdit(_:)` method after it on the chain.
+     
+     - parameter styleForRow: A closure that returns the editing style to apply a row in the bound section.
+     - parameter rowIsEditable: An optional closure that returns whether editing should be allowed for the given row.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func allowEditing(
+        styleForRow: (_ row: Int) -> UITableViewCell.EditingStyle,
+        rowIsEditable: ((_ row: Int) -> Bool)? = nil)
+        -> TableViewSingleSectionBinder<C, S>
+    {
+        if let rowIsEditable = rowIsEditable {
+            self.binder.handlers.sectionCellEditableBlocks[self.section] = { _, row in rowIsEditable(row) }
+        }
+        self.binder.nextDataModel.sectionModel(for: self.section).cellEditingStyle = .delete
+        return self
+    }
+    
+    @discardableResult
+    public func onEdit(_ handler: @escaping (Int, UITableViewCell.EditingStyle) -> Void) -> TableViewSingleSectionBinder<C, S> {
+        self.binder.handlers.sectionCellEditedCallbacks[self.section] = { _, row, style in
+            handler(row, style)
+        }
+        return self
+    }
+    
+    @discardableResult
+    public func allowMoving(rowIsMovable: ((Int) -> Bool)? = nil) -> TableViewSingleSectionBinder<C, S> {
+        if let rowIsMovable = rowIsMovable {
+            self.binder.handlers.sectionCellMovableBlocks[self.section] = { _ , row in rowIsMovable(row) }
+        }
+//        self.binder.nextDataModel.sectionModel(for: self.section).isEditable = true
+        return self
     }
     
     // MARK: -

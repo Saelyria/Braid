@@ -33,6 +33,7 @@
 		AB5C715B21EC66F4006DC4B0 /* DatePickerTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB5C715A21EC66F4006DC4B0 /* DatePickerTableViewCell.xib */; };
 		AB5D696D21E95DC200386B8D /* TextFieldTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB5D696C21E95DC200386B8D /* TextFieldTableViewCell.xib */; };
 		AB5D696F21E95DD200386B8D /* TextViewTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB5D696E21E95DD200386B8D /* TextViewTableViewCell.xib */; };
+		AB867DDB221A02150033898B /* AttendeesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB867DDA221A02150033898B /* AttendeesViewController.swift */; };
 		AB86C3BF2141718C00FA4945 /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */; };
 		ABA89D5B21EEC07000033093 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = ABA89D5A21EEC07000033093 /* README.md */; };
 		ABB46A1521F2ACC6009A00A2 /* FormItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46A1421F2ACC6009A00A2 /* FormItem.swift */; };
@@ -109,6 +110,7 @@
 		AB5C715A21EC66F4006DC4B0 /* DatePickerTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DatePickerTableViewCell.xib; sourceTree = "<group>"; };
 		AB5D696C21E95DC200386B8D /* TextFieldTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextFieldTableViewCell.xib; sourceTree = "<group>"; };
 		AB5D696E21E95DD200386B8D /* TextViewTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextViewTableViewCell.xib; sourceTree = "<group>"; };
+		AB867DDA221A02150033898B /* AttendeesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttendeesViewController.swift; sourceTree = "<group>"; };
 		AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
 		ABA89D5A21EEC07000033093 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		ABB2841221F55E8C0041E84A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -194,6 +196,7 @@
 				ABC1AD1C21E6BF3E00BAC644 /* Sample 3 - Form */,
 				ABE0F35D21B49DC10098950D /* Sample 4 - News Feed */,
 				AB577BA82179662400CD2363 /* Sample 5 - Dynamic Home Page */,
+				AB867DD9221A01D20033898B /* Same 6 - Editable Attendees */,
 				AB577B9D21759F8B00CD2363 /* Shared Views */,
 				9381334F20B6EDFA00CBF8F6 /* Resources */,
 				938132E320B6463200CBF8F6 /* Info.plist */,
@@ -255,6 +258,14 @@
 				ABE0F35721AD10340098950D /* Mocks */,
 			);
 			path = "Sample 5 - Dynamic Home Page";
+			sourceTree = "<group>";
+		};
+		AB867DD9221A01D20033898B /* Same 6 - Editable Attendees */ = {
+			isa = PBXGroup;
+			children = (
+				AB867DDA221A02150033898B /* AttendeesViewController.swift */,
+			);
+			path = "Same 6 - Editable Attendees";
 			sourceTree = "<group>";
 		};
 		ABC1AD1C21E6BF3E00BAC644 /* Sample 3 - Form */ = {
@@ -572,6 +583,7 @@
 				AB577BC52181105500CD2363 /* HomeService.swift in Sources */,
 				AB577B9F2175A6EE00CD2363 /* CenterLabelTableViewCell.swift in Sources */,
 				93C36A4820DAFF97006B7ECF /* SamplesViewController.swift in Sources */,
+				AB867DDB221A02150033898B /* AttendeesViewController.swift in Sources */,
 				ABE0F36121B4AA830098950D /* NewsFeedService.swift in Sources */,
 				AB577BD22183D7F200CD2363 /* Product.swift in Sources */,
 				ABC1AD2121E7269500BAC644 /* TextFieldTableViewCell.swift in Sources */,

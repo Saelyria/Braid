@@ -115,4 +115,21 @@ class _TableViewBindingHandlers<S: TableViewSection> {
     lazy var sectionDequeuedCallbacks: [S: CellDequeueCallback<S>] = { [:] }()
     var dynamicSectionsCellDequeuedCallback: CellDequeueCallback<S>?
     var anySectionDequeuedCallback: CellDequeueCallback<S>?
+    
+    // MARK: -
+    
+    // Blocks to call to determine whether a cell in a section is editable.
+    lazy var sectionCellEditableBlocks: [S: (S, Int) -> Bool] = { [:] }()
+    var dynamicSectionCellEditableBlock: ((S, Int) -> Bool)?
+    
+    // Blocks to call to determine the editing style of a cell in a section.
+    lazy var sectionCellEditableStyleBlocks: [S: (S, Int) -> UITableViewCell.EditingStyle] = { [:] }()
+    var dynamicSectionCellEditableStyleBlock: ((S, Int) -> UITableViewCell.EditingStyle)?
+    
+    lazy var sectionCellEditedCallbacks: [S: (S, Int, UITableViewCell.EditingStyle) -> Void] = { [:] }()
+    var dynamicSectionCellEditedCallback: ((S, Int, UITableViewCell.EditingStyle) -> Void)?
+    
+    // Blocks to call to determine whether a cell in a section is movable.
+    lazy var sectionCellMovableBlocks: [S: (S, Int) -> Bool] = { [:] }()
+    var dynamicSectionCellMovableBlock: ((S, Int) -> Bool)?
 }

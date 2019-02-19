@@ -81,6 +81,15 @@ internal class _TableViewDataModel<S: TableViewSection> {
         }.map { $0.section })
     }
     
+    var hasEditableSections: Bool {
+        return self.sectionModels.reduce(into: false, { (result, sectionModel) in
+            if result == true {
+                return
+            }
+            result = sectionModel.cellEditingStyle != .none
+        })
+    }
+    
     init() { }
     
     init(from other: _TableViewDataModel<S>) {
@@ -184,6 +193,8 @@ internal class _TableViewSectionDataModel<S: TableViewSection> {
     var footerViewModel: Any? = nil {
         didSet { self.onUpdate?() }
     }
+    var cellEditingStyle: UITableViewCell.EditingStyle = .none
+    var allowedMovableSections: [S] = []
     
     var cellDataType: CellDataType = .models
     
@@ -203,6 +214,7 @@ internal class _TableViewSectionDataModel<S: TableViewSection> {
         self.footerViewModel = other.footerViewModel
         self.itemEqualityChecker = other.itemEqualityChecker
         self.section = other.section
+        self.cellEditingStyle = other.cellEditingStyle
     }
 }
 

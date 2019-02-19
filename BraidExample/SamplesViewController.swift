@@ -35,6 +35,12 @@ class SamplesViewController: UIViewController {
             title: "Sample 5 - Home Page",
             subtitle: "A dynamic home page whose section information is given in a server response.",
             detail: "",
+            accessoryType: .disclosureIndicator),
+        TitleDetailTableViewCell.ViewModel(
+            collectionId: "6",
+            title: "Sample 6 - Editable Table",
+            subtitle: "A table whose items can be inserted, deleted, and moved between sections.",
+            detail: "",
             accessoryType: .disclosureIndicator)]
     
     override func viewDidLoad() {
@@ -61,6 +67,8 @@ class SamplesViewController: UIViewController {
                     self.navigationController?.pushViewController(NewsFeedViewController(), animated: true)
                 case 4:
                     self.navigationController?.pushViewController(HomeViewController(), animated: true)
+                case 5:
+                    self.navigationController?.pushViewController(AttendeesViewController(), animated: true)
                 default: break
                 }
             }

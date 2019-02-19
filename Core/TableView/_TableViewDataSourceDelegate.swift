@@ -48,6 +48,11 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
                 || self.binder.handlers.dynamicSectionsFooterHeightBlock != nil
                 || self.binder.handlers.anySectionFooterHeightBlock != nil
             
+        case #selector(UITableViewDataSource.tableView(_:canEditRowAt:)):
+            return self.binder.nextDataModel.hasEditableSections
+        case #selector(UITableViewDataSource.tableView(_:commit:forRowAt:)):
+            return self.binder.nextDataModel.hasEditableSections
+            
         case #selector(UITableViewDelegate.tableView(_:willDisplay:forRowAt:)):
             return !self.binder.handlers.sectionPrefetchBehavior.isEmpty
                 || self.binder.handlers.dynamicSectionPrefetchBehavior != nil
@@ -56,6 +61,8 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
             return super.responds(to: aSelector)
         }
     }
+    
+    // MARK: -
 
     func numberOfSections(in tableView: UITableView) -> Int {
         return self.dataModel.displayedSections.count
@@ -96,6 +103,8 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
             }
         }
     }
+    
+    // MARK: -
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         let section = self.dataModel.displayedSections[section]
@@ -142,6 +151,8 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         return dequeueBlock?(section, tableView)
     }
     
+    // MARK: -
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let section = self.dataModel.displayedSections[indexPath.section]
         
@@ -153,6 +164,50 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         callback?(section, indexPath.row, cell)
         self.binder.handlers.anySectionCellTappedCallback?(section, indexPath.row, cell)
     }
+    
+    // MARK: -
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        let section = self.dataModel.displayedSections[indexPath.section]
+        
+        let canEditBlock = (self.dataModel.uniquelyBoundCellSections.contains(section)
+            || self.binder.handlers.sectionCellEditableBlocks[section] != nil) ?
+                self.binder.handlers.sectionCellEditableBlocks[section] :
+                self.binder.handlers.dynamicSectionCellEditableBlock
+        
+        if let canEditBlock = canEditBlock {
+            return canEditBlock(section, indexPath.row)
+        } else {
+            return self.dataModel.sectionModel(for: section).cellEditingStyle != .none
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        let section = self.dataModel.displayedSections[indexPath.section]
+        
+        let styleBlock = (self.dataModel.uniquelyBoundCellSections.contains(section)
+            || self.binder.handlers.sectionCellEditableStyleBlocks[section] != nil) ?
+                self.binder.handlers.sectionCellEditableStyleBlocks[section] :
+                self.binder.handlers.dynamicSectionCellEditableStyleBlock
+        
+        if let styleBlock = styleBlock {
+            return styleBlock(section, indexPath.row)
+        } else {
+            return self.dataModel.sectionModel(for: section).cellEditingStyle
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        let section = self.dataModel.displayedSections[indexPath.section]
+        
+        let callback = (self.dataModel.uniquelyBoundCellSections.contains(section)
+            || self.binder.handlers.sectionCellEditedCallbacks[section] != nil) ?
+                self.binder.handlers.sectionCellEditedCallbacks[section] :
+                self.binder.handlers.dynamicSectionCellEditedCallback
+        callback?(section, indexPath.row, editingStyle)
+    }
+    
+    // MARK: -
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let section = self.dataModel.displayedSections[indexPath.section]

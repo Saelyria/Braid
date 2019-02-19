@@ -19,6 +19,20 @@ final class TitleDetailTableViewCell: UITableViewCell, ViewModelBindable, UINibI
         let subtitle: String?
         let detail: String?
         let accessoryType: UITableViewCell.AccessoryType
+        
+        init(
+            collectionId: String,
+            title: String,
+            subtitle: String? = nil,
+            detail: String? = nil,
+            accessoryType: UITableViewCell.AccessoryType = .none)
+        {
+            self.collectionId = collectionId
+            self.title = title
+            self.subtitle = subtitle
+            self.detail = detail
+            self.accessoryType = accessoryType
+        }
     }
     
     var viewModel: TitleDetailTableViewCell.ViewModel? {
