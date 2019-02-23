@@ -64,16 +64,19 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         let section = self.dataModel.displayedSections[indexPath.section]
         
         // We can't fall back to the 'all sections' cell dequeue block - might expect a different cell type.
-        let _dequeueBlock = (self.dataModel.uniquelyBoundCellSections.contains(section)
-        || self.binder.handlers.cellProviders.namedSection[section] != nil) ?
-            self.binder.handlers.cellProviders.namedSection[section] :
-            self.binder.handlers.cellProviders.dynamicSections
-        guard let dequeueBlock = _dequeueBlock else {
+        let handlerSet = self.binder.handlers.cellProviders
+        let provider: ((S, UITableView, IndexPath) -> UITableViewCell)?
+        if self.dataModel.uniquelyBoundCellSections.contains(section) || handlerSet.namedSection[section] != nil {
+            provider = self.binder.handlers.cellProviders.namedSection[section]
+        } else {
+            provider = self.binder.handlers.cellProviders.dynamicSections
+        }
+        guard let _provider = provider else {
             assertionFailure("A 'cell provider' could not be found, something went awry!")
             return UITableViewCell()
         }
         
-        let cell = dequeueBlock(section, tableView, indexPath)
+        let cell = _provider(section, tableView, indexPath)
         return cell
     }
     

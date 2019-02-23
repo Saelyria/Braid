@@ -124,7 +124,8 @@ internal extension SectionedTableViewBinder {
     /// sets a callback handler that the cell will call in its `emit(event:)` method.
     private func setEventCallback(onCell cell: UITableViewCell, section: S, row: Int) {
         if let eventCell = cell as? UITableViewCell & AnyViewEventEmitting {
-            if self.currentDataModel.uniquelyBoundCellSections.contains(section) == true {
+            if self.currentDataModel.uniquelyBoundCellSections.contains(section) == true
+            || self.handlers.viewEventHandlers.namedSection[section] != nil {
                 eventCell.eventEmitHandler = { [weak self] cell, event in
                     let eventEmitOperation = BlockOperation(block: {
                         guard let cell = cell as? UITableViewCell else { fatalError("Wasn't a cell") }
