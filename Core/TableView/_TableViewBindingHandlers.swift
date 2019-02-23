@@ -1,5 +1,10 @@
 import UIKit
 
+public enum CellMovementOption<S: TableViewSection> {
+    case to(sections: S...)
+    case toAnySection
+}
+
 public enum CellDeletionSource<S: TableViewSection> {
     case moved(toSection: S, row: Int)
     case editing
@@ -10,138 +15,206 @@ public enum CellInsertionSource<S: TableViewSection> {
     case editing
 }
 
-/// A closure type that returns a table view cell when given a section, table view, and index path.
-typealias CellDequeueBlock<S: TableViewSection> = (S, UITableView, IndexPath) -> UITableViewCell
-/// A closure type that returns a table header/footer view when given a section and table view.
-typealias HeaderFooterDequeueBlock<S: TableViewSection> = (S, UITableView) -> UITableViewHeaderFooterView?
-/// A closure type that calls a 'tapped' callback handler with a given section, row, and table view cell.
-typealias CellTapCallback<S: TableViewSection> = (S, Int, UITableViewCell) -> Void
-/// A closure type that calls a 'cell dequeued' callback handler with a given section, row, and table view cell.
-typealias CellDequeueCallback<S: TableViewSection> = (S, Int, UITableViewCell) -> Void
-/// A closure type that returns the height for a cell when given a section and row.
-typealias CellHeightBlock<S: TableViewSection> = (S, Int) -> CGFloat
-/// A closure type that returns the height for a table header/footer when given a section.
-typealias HeaderFooterHeightBlock<S: TableViewSection> = (S) -> CGFloat
-
-typealias ViewEventEmittingHandler<S: TableViewSection> = (S, Int, UITableViewCell, _ event: Any) -> Void
-
 /// An object that stores the various handlers the binder uses.
 class _TableViewBindingHandlers<S: TableViewSection> {
+    /// A class that holds the handlers for different 'section scopes' for a type of callback.
+    class HandlerSet<H> {
+        fileprivate(set) lazy var namedSection: [S: H] = { [:] }()
+        fileprivate(set) var dynamicSections: H?
+        fileprivate(set) var anySection: H? {
+            willSet {
+                if !self.allowAnySection { fatalError("This type of handler does not allow binding to 'any section'.") }
+            }
+        }
+        
+        var hasHandler: Bool {
+            return (!self.namedSection.isEmpty
+                || self.dynamicSections != nil
+                || (self.allowAnySection && self.anySection != nil))
+        }
+        
+        fileprivate var allowAnySection: Bool
+        
+        fileprivate init(allowAnySection: Bool) {
+            self.allowAnySection = allowAnySection
+        }
+    }
+    
     // Cell handlers
     
     // Closures that will update the data on the binder's data model when 'refresh' is called
     lazy var modelUpdaters: [() -> Void] = { [] }()
     
     // Closures to call to dequeue a cell in a section.
-    lazy var sectionDequeueBlocks: [S: CellDequeueBlock<S>] = { [:] }()
-    var dynamicSectionDequeueBlock: CellDequeueBlock<S>?
+    lazy var cellProviders: HandlerSet<(S, UITableView, IndexPath) -> UITableViewCell> = {
+        HandlerSet(allowAnySection: false)
+    }()
 
     // Closures to call to get the height for a cell in a section.
-    lazy var sectionCellHeightBlocks: [S: CellHeightBlock<S>] = { [:] }()
-    var dynamicSectionsCellHeightBlock: CellHeightBlock<S>?
-    var anySectionCellHeightBlock: CellHeightBlock<S>?
+    lazy var cellHeightProviders: HandlerSet<(S, Int) -> CGFloat> = {
+        HandlerSet(allowAnySection: true)
+    }()
     
     // Closures to call to get the estimated height for a cell in a section.
-    lazy var sectionEstimatedCellHeightBlocks: [S: CellHeightBlock<S>] = { [:] }()
-    var dynamicSectionsEstimatedCellHeightBlock: CellHeightBlock<S>?
-    var anySectionEstimatedCellHeightBlock: CellHeightBlock<S>?
+    lazy var cellEstimatedHeightProviders: HandlerSet<(S, Int) -> CGFloat> = {
+        HandlerSet(allowAnySection: true)
+    }()
     
     // A function for each section that determines whether the model for a given row was updated. In most cases, this
     // will be a wrapper around `Equatable` conformance. These functions return nil if it can't compare the objects
     // given to it (e.g. weren't the right type).
-    lazy var sectionItemEqualityCheckers: [S: (Any, Any) -> Bool?] = { [:] }()
-    var dynamicSectionItemEqualityChecker: ((Any, Any) -> Bool?)?
-    
-    // Handlers for custom cell view events in a section. Each section has another dictionary under it where the key is
-    // a string describing a cell type that has view events, and the value is the handler associated with it that is
-    // called whenever a cell of that type in the section emits an event.
-    lazy var sectionViewEventHandlers: [S: [String: ViewEventEmittingHandler<S>]] = { [:] }()
-    lazy var dynamicSectionViewEventHandler: [String: ViewEventEmittingHandler<S>] = { [:] }()
+    lazy var itemEqualityCheckers: HandlerSet<(Any, Any) -> Bool?> = {
+        HandlerSet(allowAnySection: false)
+    }()
     
     // The prefetch behaviour for a section.
-    lazy var sectionPrefetchBehavior: [S: PrefetchBehavior] = { [:] }()
-    var dynamicSectionPrefetchBehavior: PrefetchBehavior?
+    lazy var prefetchBehaviors: HandlerSet<PrefetchBehavior> = {
+        HandlerSet(allowAnySection: false)
+    }()
     
     // Closures to be called to handle prefetching data.
-    lazy var sectionPrefetchHandlers: [S: (Int) -> Void] = { [:] }()
-    var dynamicSectionPrefetchHandler: ((Int) -> Void)?
+    lazy var prefetchHandlers: HandlerSet<(Int) -> Void> = {
+        HandlerSet(allowAnySection: false)
+    }()
     
     // MARK: -
     
     // Closures to call to get the titles for section headers
-    lazy var sectionHeaderTitleProviders: [S: () -> String?] = { [:] }()
-    var dynamicSectionHeaderTitleProvider: ((S) -> String?)?
+    lazy var headerTitleProviders: HandlerSet<(S) -> String?> = {
+        HandlerSet(allowAnySection: false)
+    }()
     
     // Closures to call to get the view models for section footers
-    lazy var sectionHeaderViewModelProviders: [S: () -> Any?] = { [:] }()
-    var dynamicSectionHeaderViewModelProvider: ((S) -> Any?)?
+    lazy var headerViewModelProviders: HandlerSet<(S) -> Any?> = {
+        HandlerSet(allowAnySection: false)
+    }()
     
     // Blocks to call to dequeue a header in a section.
-    lazy var sectionHeaderDequeueBlocks: [S: HeaderFooterDequeueBlock<S>] = { [:] }()
-    var dynamicSectionsHeaderDequeueBlock: HeaderFooterDequeueBlock<S>?
+    lazy var headerViewProviders: HandlerSet<(S, UITableView) -> UITableViewHeaderFooterView?> = {
+        HandlerSet(allowAnySection: false)
+    }()
 
     // Blocks to call to get the height for a header.
-    lazy var sectionHeaderHeightBlocks: [S: HeaderFooterHeightBlock<S>] = { [:] }()
-    var dynamicSectionsHeaderHeightBlock: HeaderFooterHeightBlock<S>?
-    var anySectionHeaderHeightBlock: HeaderFooterHeightBlock<S>?
+    lazy var headerHeightProviders: HandlerSet<(S) -> CGFloat> = {
+        HandlerSet(allowAnySection: true)
+    }()
 
     // Blocks to call to get the estimated height for a header.
-    lazy var sectionHeaderEstimatedHeightBlocks: [S: HeaderFooterHeightBlock<S>] = { [:] }()
-    var dynamicSectionsHeaderEstimatedHeightBlock: HeaderFooterHeightBlock<S>?
-    var anySectionHeaderEstimatedHeightBlock: HeaderFooterHeightBlock<S>?
+    lazy var headerEstimatedHeightProviders: HandlerSet<(S) -> CGFloat> = {
+        HandlerSet(allowAnySection: true)
+    }()
     
     // MARK: -
     
     // Closures to call to get the titles for section footers
-    lazy var sectionFooterTitleProviders: [S: () -> String?] = { [:] }()
-    var dynamicSectionFooterTitleProvider: ((S) -> String?)?
+    lazy var footerTitleProviders: HandlerSet<(S) -> String?> = {
+        HandlerSet(allowAnySection: false)
+    }()
     
     // Closures to call to get the view models for section footers
-    lazy var sectionFooterViewModelProviders: [S: () -> Any?] = { [:] }()
-    var dynamicSectionFooterViewModelProvider: ((S) -> Any?)?
+    lazy var footerViewModelProviders: HandlerSet<(S) -> Any?> = {
+        HandlerSet(allowAnySection: false)
+    }()
     
     // Blocks to call to dequeue a footer in a section.
-    lazy var sectionFooterDequeueBlocks: [S: HeaderFooterDequeueBlock<S>] = { [:] }()
-    var dynamicSectionsFooterDequeueBlock: HeaderFooterDequeueBlock<S>?
+    lazy var footerViewProviders: HandlerSet<(S, UITableView) -> UITableViewHeaderFooterView?> = {
+        HandlerSet(allowAnySection: false)
+    }()
 
     // Blocks to call to get the height for a section footer.
-    lazy var sectionFooterHeightBlocks: [S: HeaderFooterHeightBlock<S>] = { [:] }()
-    var dynamicSectionsFooterHeightBlock: HeaderFooterHeightBlock<S>?
-    var anySectionFooterHeightBlock: HeaderFooterHeightBlock<S>?
+    lazy var footerHeightProviders: HandlerSet<(S) -> CGFloat> = {
+        HandlerSet(allowAnySection: true)
+    }()
 
     // Blocks to call to get the estimated height for a section footer.
-    lazy var sectionFooterEstimatedHeightBlocks: [S: HeaderFooterHeightBlock<S>] = { [:] }()
-    var dynamicSectionsFooterEstimatedHeightBlock: HeaderFooterHeightBlock<S>?
-    var anySectionFooterEstimatedHeightBlock: HeaderFooterHeightBlock<S>?
+    lazy var footerEstimatedHeightProviders: HandlerSet<(S) -> CGFloat> = {
+        HandlerSet(allowAnySection: true)
+    }()
 
     // MARK: -
     
     // Blocks to call when a cell is tapped in a section.
-    lazy var sectionCellTappedCallbacks: [S: CellTapCallback<S>] = { [:] }()
-    var dynamicSectionsCellTappedCallback: CellTapCallback<S>?
-    var anySectionCellTappedCallback: CellTapCallback<S>?
+    lazy var cellTappedHandlers: HandlerSet<(S, Int, UITableViewCell) -> Void> = {
+        HandlerSet(allowAnySection: true)
+    }()
 
     // Blocks to call when a cell is dequeued in a section.
-    lazy var sectionDequeuedCallbacks: [S: CellDequeueCallback<S>] = { [:] }()
-    var dynamicSectionsCellDequeuedCallback: CellDequeueCallback<S>?
-    var anySectionDequeuedCallback: CellDequeueCallback<S>?
+    lazy var cellDequeuedHandlers: HandlerSet<(S, Int, UITableViewCell) -> Void> = {
+        HandlerSet(allowAnySection: true)
+    }()
+    
+    // Handlers for custom cell view events in a section. Each section has another dictionary under it where the key is
+    // a string describing a cell type that has view events, and the value is the handler associated with it that is
+    // called whenever a cell of that type in the section emits an event.
+    lazy var viewEventHandlers: HandlerSet<[String :(S, Int, UITableViewCell, _ event: Any) -> Void]> = {
+        HandlerSet(allowAnySection: false)
+    }()
     
     // MARK: -
     
     // Blocks to call to determine whether a cell in a section is editable.
-    lazy var sectionCellEditableBlocks: [S: (S, Int) -> Bool] = { [:] }()
-    var dynamicSectionCellEditableBlock: ((S, Int) -> Bool)?
+    lazy var cellEditableProviders: HandlerSet<(S, Int) -> Bool> = {
+        HandlerSet(allowAnySection: false)
+    }()
     
     // Blocks to call to determine the editing style of a cell in a section.
-    lazy var sectionCellEditableStyleBlocks: [S: (S, Int) -> UITableViewCell.EditingStyle] = { [:] }()
-    var dynamicSectionCellEditableStyleBlock: ((S, Int) -> UITableViewCell.EditingStyle)?
+    lazy var cellEditingStyleProviders: HandlerSet<(S, Int) -> UITableViewCell.EditingStyle> = {
+        HandlerSet(allowAnySection: false)
+    }()
     
-    lazy var sectionCellDeletedCallbacks: [S: (S, Int, CellDeletionSource<S>) -> Void] = { [:] }()
-    var dynamicSectionCellDeletedCallback: ((S, Int, CellDeletionSource<S>) -> Void)?
-    lazy var sectionCellInsertedCallbacks: [S: (S, Int, CellInsertionSource<S>) -> Void] = { [:] }()
-    var dynamicSectionCellInsertedCallback: ((S, Int, CellInsertionSource<S>) -> Void)?
+    lazy var cellDeletedHandlers: HandlerSet<(S, Int, CellDeletionSource<S>) -> Void> = {
+        HandlerSet(allowAnySection: false)
+    }()
+    
+    lazy var cellInsertedHandlers: HandlerSet<(S, Int, CellInsertionSource<S>) -> Void> = {
+        HandlerSet(allowAnySection: false)
+    }()
     
     // Blocks to call to determine whether a cell in a section is movable.
-    lazy var sectionCellMovableBlocks: [S: (S, Int) -> Bool] = { [:] }()
-    var dynamicSectionCellMovableBlock: ((S, Int) -> Bool)?
+    lazy var cellMovableProviders: HandlerSet<(S, Int) -> Bool> = {
+        HandlerSet(allowAnySection: false)
+    }()
+}
+
+extension _TableViewBindingHandlers {
+    func add<H>(
+        _ handler: H,
+        toHandlerSetAt keyPath: ReferenceWritableKeyPath<_TableViewBindingHandlers<S>, HandlerSet<H>>,
+        forScope affectedSectionScope: SectionBindingScope<S>)
+    {
+        // the 'view event handlers' are further held under a dictionary for each cell type, so need to be handled
+        // differently.
+        if keyPath == \_TableViewBindingHandlers.viewEventHandlers {
+            let handlerSet = self.viewEventHandlers
+            guard let dict = handler as? [String :(S, Int, UITableViewCell, _ event: Any) -> Void] else { fatalError() }
+            switch affectedSectionScope {
+            case .forNamedSections(let sections):
+                for section in sections {
+                    if handlerSet.namedSection[section] == nil {
+                        handlerSet.namedSection[section] = [:]
+                    }
+                    handlerSet.namedSection[section]?.merge(dict, uniquingKeysWith: { $1 })
+                }
+            case .forAllUnnamedSections:
+                if handlerSet.dynamicSections == nil {
+                    handlerSet.dynamicSections = [:]
+                }
+                handlerSet.dynamicSections?.merge(dict, uniquingKeysWith: { $1 })
+            case .forAnySection:
+                fatalError("Not allowed")
+            }
+        } else {
+            let handlerSet: HandlerSet<H> = self[keyPath: keyPath]
+            switch affectedSectionScope {
+            case .forNamedSections(let sections):
+                for section in sections {
+                    handlerSet.namedSection[section] = handler
+                }
+            case .forAllUnnamedSections:
+                handlerSet.dynamicSections = handler
+            case .forAnySection:
+                handlerSet.anySection = handler
+            }
+        }
+    }
 }

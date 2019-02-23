@@ -611,19 +611,19 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      section'. The binder will call the given 'prefetch handler' (according to the given behaviour) when new data should
      be prefetched.
      
-     - parameter prefetchBehaviour: A behavior indicating when a data prefetch should start. Defaults to 'when there are
+     - parameter prefetchBehavior: A behavior indicating when a data prefetch should start. Defaults to 'when there are
         two cells left in before the end of the section'.
      - parameter prefetchHandler: A closure called that should prefetch new data for the section.
      - parameter startingIndex: The starting index from which data should be fetched for.
     */
     @discardableResult
     public func prefetch(
-        when prefetchBehaviour: PrefetchBehavior = .cellsFromEnd(2),
+        when prefetchBehavior: PrefetchBehavior = .cellsFromEnd(2),
         with prefetchHandler: @escaping (_ startingIndex: Int) -> Void)
         -> TableViewSingleSectionBinder<C, S>
     {
-        self.binder.handlers.sectionPrefetchBehavior[self.section] = prefetchBehaviour
-        self.binder.handlers.sectionPrefetchHandlers[self.section] = prefetchHandler
+        self.binder.handlers.add(prefetchBehavior, toHandlerSetAt: \.prefetchBehaviors, forScope: self.affectedSectionScope)
+        self.binder.handlers.add(prefetchHandler, toHandlerSetAt: \.prefetchHandlers, forScope: self.affectedSectionScope)
         return self
     }
 
@@ -662,7 +662,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<C, S>
         where H: UITableViewHeaderFooterView & ViewModelBindable
     {
-        self.binder.handlers.sectionHeaderViewModelProviders[self.section] = viewModel
+        let handler: (S) -> Any? = { _ in viewModel() }
+        self.binder.handlers.add(handler, toHandlerSetAt: \.headerViewModelProviders, forScope: self.affectedSectionScope)
         self.binder.addHeaderDequeueBlock(headerType: headerType, affectedSections: self.affectedSectionScope)
         let scope = self.affectedSectionScope
         let section = self.section
@@ -705,7 +706,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         headerTitle: @escaping () -> String?)
         -> TableViewSingleSectionBinder<C, S>
     {
-        self.binder.handlers.sectionHeaderTitleProviders[self.section] = headerTitle
+        let handler: (S) -> String? = { _ in return headerTitle() }
+        self.binder.handlers.add(handler, toHandlerSetAt: \.headerTitleProviders, forScope: self.affectedSectionScope)
         self.binder.nextDataModel.uniquelyBoundHeaderSections.append(self.section)
         let scope = self.affectedSectionScope
         let section = self.section
@@ -748,7 +750,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<C, S>
         where F: UITableViewHeaderFooterView & ViewModelBindable
     {
-        self.binder.handlers.sectionFooterViewModelProviders[self.section] = viewModel
+        let handler: (S) -> Any? = { _ in viewModel() }
+        self.binder.handlers.add(handler, toHandlerSetAt: \.footerViewModelProviders, forScope: self.affectedSectionScope)
         self.binder.addFooterDequeueBlock(footerType: footerType, affectedSections: self.affectedSectionScope)
         let scope = self.affectedSectionScope
         let section = self.section
@@ -791,7 +794,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         footerTitle: @escaping () -> String?)
         -> TableViewSingleSectionBinder<C, S>
     {
-        self.binder.handlers.sectionFooterTitleProviders[self.section] = footerTitle
+        let handler: (S) -> String? = { _ in footerTitle() }
+        self.binder.handlers.add(handler, toHandlerSetAt: \.footerTitleProviders, forScope: self.affectedSectionScope)
         self.binder.nextDataModel.uniquelyBoundFooterSections.append(self.section)
         let scope = self.affectedSectionScope
         let section = self.section
@@ -820,15 +824,14 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func onDequeue(_ handler: @escaping (_ row: Int, _ cell: C) -> Void)
         -> TableViewSingleSectionBinder<C, S>
     {
-        let dequeueCallback: CellDequeueCallback<S> = { (_, row, cell) in
+        let handler: (S, Int, UITableViewCell) -> Void = { (_, row, cell) in
             guard let cell = cell as? C else {
                 assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
                 return
             }
             handler(row, cell)
         }
-        
-        self.binder.handlers.sectionDequeuedCallbacks[self.section] = dequeueCallback
+        self.binder.handlers.add(handler, toHandlerSetAt: \.cellDequeuedHandlers, forScope: self.affectedSectionScope)
         return self
     }
     
@@ -848,15 +851,14 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func onTapped(_ handler: @escaping (_ row: Int, _ cell: C) -> Void)
         -> TableViewSingleSectionBinder<C, S>
     {
-        let tappedHandler: CellTapCallback<S> = { (_, row, cell) in
+        let handler: (S, Int, UITableViewCell) -> Void = { (_, row, cell) in
             guard let cell = cell as? C else {
                 assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
                 return
             }
             handler(row, cell)
         }
-        
-        self.binder.handlers.sectionCellTappedCallbacks[self.section] = tappedHandler
+        self.binder.handlers.add(handler, toHandlerSetAt: \.cellTappedHandlers, forScope: self.affectedSectionScope)
         return self
     }
     
@@ -890,7 +892,6 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         return self
     }
     
-    
     /**
      Adds model type information to the binding chain.
      
@@ -923,7 +924,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     */
     @discardableResult
     public func allowEditing(
-        style: UITableViewCell.EditingStyle = .delete,
+        style: UITableViewCell.EditingStyle,
         rowIsEditable: ((_ row: Int) -> Bool)? = nil)
         -> TableViewSingleSectionBinder<C, S>
     {
@@ -932,7 +933,9 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
             return self
         }
         if let rowIsEditable = rowIsEditable {
-            self.binder.handlers.sectionCellEditableBlocks[self.section] = { _, row in rowIsEditable(row) }
+            self.binder.handlers.add({ _, row in rowIsEditable(row) },
+                                     toHandlerSetAt: \.cellEditableProviders,
+                                     forScope: self.affectedSectionScope)
         }
         self.binder.nextDataModel.sectionModel(for: self.section).cellEditingStyle = style
         return self
@@ -957,36 +960,42 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<C, S>
     {
         if let rowIsEditable = rowIsEditable {
-            self.binder.handlers.sectionCellEditableBlocks[self.section] = { _, row in rowIsEditable(row) }
+            self.binder.handlers.add(
+                {_, row in rowIsEditable(row) }, toHandlerSetAt: \.cellEditableProviders, forScope: self.affectedSectionScope)
         }
         self.binder.nextDataModel.sectionModel(for: self.section).cellEditingStyle = .delete
         return self
     }
     
     @discardableResult
-    public func allowMoving(toSections: [S] = [], rowIsMovable: ((Int) -> Bool)? = nil)
+    public func allowMoving(_ movementOption: CellMovementOption<S>, rowIsMovable: ((Int) -> Bool)? = nil)
         -> TableViewSingleSectionBinder<C, S>
     {
         if let rowIsMovable = rowIsMovable {
-            self.binder.handlers.sectionCellMovableBlocks[self.section] = { _ , row in rowIsMovable(row) }
+            self.binder.handlers.add(
+                { _ , row in rowIsMovable(row) }, toHandlerSetAt: \.cellMovableProviders, forScope: self.affectedSectionScope)
         }
-        self.binder.nextDataModel.sectionModel(for: self.section).allowedMovableSections = toSections
+        self.binder.nextDataModel.sectionModel(for: self.section).movementOption = movementOption
         return self
     }
     
     @discardableResult
-    public func onDelete(_ handler: @escaping (Int, CellDeletionSource<S>) -> Void) -> TableViewSingleSectionBinder<C, S> {
-        self.binder.handlers.sectionCellDeletedCallbacks[self.section] = { _, row, source in
-            handler(row, source)
-        }
+    public func onDelete(_ handler: @escaping (Int, CellDeletionSource<S>) -> Void)
+        -> TableViewSingleSectionBinder<C, S>
+    {
+        self.binder.handlers.add({ _, row, source in handler(row, source) },
+                                 toHandlerSetAt: \.cellDeletedHandlers,
+                                 forScope: self.affectedSectionScope)
         return self
     }
     
     @discardableResult
-    public func onInsert(_ handler: @escaping (Int, CellInsertionSource<S>) -> Void) -> TableViewSingleSectionBinder<C, S> {
-        self.binder.handlers.sectionCellInsertedCallbacks[self.section] = { _, row, source in
-            handler(row, source)
-        }
+    public func onInsert(_ handler: @escaping (Int, CellInsertionSource<S>) -> Void)
+        -> TableViewSingleSectionBinder<C, S>
+    {
+        self.binder.handlers.add({ _, row, source in handler(row, source) },
+                                 toHandlerSetAt: \.cellInsertedHandlers,
+                                 forScope: self.affectedSectionScope)
         return self
     }
     
@@ -1005,9 +1014,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func cellHeight(_ handler: @escaping (_ row: Int) -> CGFloat) -> TableViewSingleSectionBinder<C, S> {
-        self.binder.handlers.sectionCellHeightBlocks[section] = { (_, row: Int) in
-            return handler(row)
-        }
+        let handler: (S, Int) -> CGFloat = { _, row in handler(row) }
+        self.binder.handlers.add(handler, toHandlerSetAt: \.cellHeightProviders, forScope: self.affectedSectionScope)
         return self
     }
     
@@ -1026,9 +1034,9 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     public func estimatedCellHeight(_ handler: @escaping (_ row: Int) -> CGFloat)
         -> TableViewSingleSectionBinder<C, S>
     {
-        self.binder.handlers.sectionEstimatedCellHeightBlocks[section] = { (_, row: Int) in
-            return handler(row)
-        }
+        let handler: (S, Int) -> CGFloat = { _, row in handler(row) }
+        self.binder.handlers.add(
+            handler, toHandlerSetAt: \.cellEstimatedHeightProviders, forScope: self.affectedSectionScope)
         return self
     }
     
@@ -1041,9 +1049,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func headerHeight(_ handler: @escaping () -> CGFloat) -> TableViewSingleSectionBinder<C, S> {
-        self.binder.handlers.sectionHeaderHeightBlocks[section] = { (_) in
-            return handler()
-        }
+        self.binder.handlers.add(
+            {_ in handler() }, toHandlerSetAt: \.headerHeightProviders, forScope: self.affectedSectionScope)
         return self
     }
     
@@ -1056,9 +1063,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func estimatedHeaderHeight(_ handler: @escaping () -> CGFloat) -> TableViewSingleSectionBinder<C, S> {
-        self.binder.handlers.sectionHeaderEstimatedHeightBlocks[section] = { (_) in
-            return handler()
-        }
+        self.binder.handlers.add(
+            {_ in handler() }, toHandlerSetAt: \.headerEstimatedHeightProviders, forScope: self.affectedSectionScope)
         return self
     }
     
@@ -1071,9 +1077,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func footerHeight(_ handler: @escaping () -> CGFloat) -> TableViewSingleSectionBinder<C, S> {
-        self.binder.handlers.sectionFooterHeightBlocks[section] = { (_) in
-            return handler()
-        }
+        self.binder.handlers.add(
+            {_ in handler() }, toHandlerSetAt: \.footerHeightProviders, forScope: self.affectedSectionScope)
         return self
     }
     
@@ -1086,9 +1091,8 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      */
     @discardableResult
     public func estimatedFooterHeight(_ handler: @escaping () -> CGFloat) -> TableViewSingleSectionBinder<C, S> {
-        self.binder.handlers.sectionFooterEstimatedHeightBlocks[section] = { (_) in
-            return handler()
-        }
+        self.binder.handlers.add(
+            {_ in handler() }, toHandlerSetAt: \.footerEstimatedHeightProviders, forScope: self.affectedSectionScope)
         return self
     }
 }

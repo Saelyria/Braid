@@ -48,8 +48,14 @@ class AttendeesViewController: UIViewController {
                   models: { [unowned self] in self.firstSectionModels },
                   mapToViewModels: { TitleDetailTableViewCell.ViewModel(collectionId: $0.collectionId, title: $0.name) })
             .allowEditing(style: .delete)
-            .allowMoving(toSections: [.invited])
-            .onDelete { row, _ in
+            .allowMoving(.to(sections: .invited))
+            .onDelete { row, source in
+                switch source {
+                case .editing:
+                    let model = self.firstSectionModels[row]
+                    self.secondSectionModels.append(model)
+                default: break
+                }
                 self.firstSectionModels.remove(at: row)
                 self.binder.refresh()
             }
@@ -58,6 +64,7 @@ class AttendeesViewController: UIViewController {
                 case let .moved(_, fromRow):
                     let model = self.secondSectionModels[fromRow]
                     self.firstSectionModels.insert(model, at: row)
+                    self.binder.refresh()
                 default: break
                 }
             }
@@ -68,6 +75,23 @@ class AttendeesViewController: UIViewController {
                   models: { [unowned self] in self.secondSectionModels },
                   mapToViewModels: { TitleDetailTableViewCell.ViewModel(collectionId: $0.collectionId, title: $0.name) })
             .allowEditing(style: .insert)
+            .allowMoving(.to(sections: .attending))
+            .onDelete { row, _ in
+                self.secondSectionModels.remove(at: row)
+                self.binder.refresh()
+            }
+            .onInsert { row, source in
+                switch source {
+                case .editing:
+                    let model = self.secondSectionModels[row]
+                    self.firstSectionModels.append(model)
+                    self.secondSectionModels.remove(at: row)
+                case let .moved(_, fromRow):
+                    let model = self.firstSectionModels[fromRow]
+                    self.secondSectionModels.insert(model, at: row)
+                }
+                self.binder.refresh()
+            }
         
         self.binder.finish()
         

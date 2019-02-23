@@ -31,7 +31,7 @@ public class AnySectionBinder<S: TableViewSection> {
     public func onDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ cell: UITableViewCell) -> Void)
         -> AnySectionBinder<S>
     {
-        self.binder.handlers.anySectionDequeuedCallback = handler
+        self.binder.handlers.add(handler, toHandlerSetAt: \.cellDequeuedHandlers, forScope: .forAnySection)
         return self
     }
     
@@ -52,7 +52,7 @@ public class AnySectionBinder<S: TableViewSection> {
     public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ cell: UITableViewCell) -> Void)
         -> AnySectionBinder<S>
     {
-        self.binder.handlers.anySectionCellTappedCallback = handler
+        self.binder.handlers.add(handler, toHandlerSetAt: \.cellTappedHandlers, forScope: .forAnySection)
         return self
     }
 
@@ -70,7 +70,7 @@ public class AnySectionBinder<S: TableViewSection> {
      */
     @discardableResult
     public func cellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> AnySectionBinder<S> {
-        self.binder.handlers.anySectionCellHeightBlock = handler
+        self.binder.handlers.add(handler, toHandlerSetAt: \.cellHeightProviders, forScope: .forAnySection)
         return self
     }
     
@@ -88,7 +88,7 @@ public class AnySectionBinder<S: TableViewSection> {
      */
     @discardableResult
     public func estimatedCellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat) -> AnySectionBinder<S> {
-        self.binder.handlers.anySectionEstimatedCellHeightBlock = handler
+        self.binder.handlers.add(handler, toHandlerSetAt: \.cellEstimatedHeightProviders, forScope: .forAnySection)
         return self
     }
     
@@ -102,7 +102,7 @@ public class AnySectionBinder<S: TableViewSection> {
      */
     @discardableResult
     public func headerHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> AnySectionBinder<S> {
-        self.binder.handlers.anySectionHeaderHeightBlock = handler
+        self.binder.handlers.add(handler, toHandlerSetAt: \.headerHeightProviders, forScope: .forAnySection)
         return self
     }
     
@@ -116,7 +116,7 @@ public class AnySectionBinder<S: TableViewSection> {
      */
     @discardableResult
     public func estimatedHeaderHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> AnySectionBinder<S> {
-        self.binder.handlers.anySectionHeaderEstimatedHeightBlock = handler
+        self.binder.handlers.add(handler, toHandlerSetAt: \.headerEstimatedHeightProviders, forScope: .forAnySection)
         return self
     }
     
@@ -130,7 +130,7 @@ public class AnySectionBinder<S: TableViewSection> {
      */
     @discardableResult
     public func footerHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> AnySectionBinder<S> {
-        self.binder.handlers.anySectionFooterHeightBlock = handler
+        self.binder.handlers.add(handler, toHandlerSetAt: \.footerHeightProviders, forScope: .forAnySection)
         return self
     }
     
@@ -144,7 +144,7 @@ public class AnySectionBinder<S: TableViewSection> {
      */
     @discardableResult
     public func estimatedFooterHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> AnySectionBinder<S> {
-        self.binder.handlers.anySectionFooterEstimatedHeightBlock = handler
+        self.binder.handlers.add(handler, toHandlerSetAt: \.footerEstimatedHeightProviders, forScope: .forAnySection)
         return self
     }
 }

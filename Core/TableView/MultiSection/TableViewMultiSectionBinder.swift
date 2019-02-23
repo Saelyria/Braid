@@ -826,24 +826,14 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
     public func onDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ cell: C) -> Void)
         -> TableViewMultiSectionBinder<C, S>
     {
-        let callback: CellDequeueCallback<S> = { (section: S, row: Int, cell: UITableViewCell) in
+        let handler: (S, Int, UITableViewCell) -> Void = { (section, row, cell) in
             guard let cell = cell as? C else {
                 assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
                 return
             }
             handler(section, row, cell)
         }
-        
-        switch self.affectedSectionScope {
-        case .forNamedSections(let sections):
-            for section in sections {
-                self.binder.handlers.sectionDequeuedCallbacks[section] = callback
-            }
-        case .forAllUnnamedSections:
-            self.binder.handlers.dynamicSectionsCellDequeuedCallback = callback
-        default: break
-        }
-        
+        self.binder.handlers.add(handler, toHandlerSetAt: \.cellDequeuedHandlers, forScope: self.affectedSectionScope)
         return self
     }
     
@@ -865,24 +855,14 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
     public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ cell: C) -> Void)
         -> TableViewMultiSectionBinder<C, S>
     {
-        let callback: CellTapCallback<S> = { (section: S, row: Int, tappedCell: UITableViewCell) in
+        let handler: (S, Int, UITableViewCell) -> Void = { (section, row, tappedCell) in
             guard let tappedCell = tappedCell as? C else {
                 assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
                 return
             }
             handler(section, row, tappedCell)
         }
-        
-        switch self.affectedSectionScope {
-        case .forNamedSections(let sections):
-            for section in sections {
-                self.binder.handlers.sectionCellTappedCallbacks[section] = callback
-            }
-        case .forAllUnnamedSections:
-            self.binder.handlers.dynamicSectionsCellTappedCallback = callback
-        default: break
-        }
-        
+        self.binder.handlers.add(handler, toHandlerSetAt: \.cellTappedHandlers, forScope: self.affectedSectionScope)
         return self
     }
     
@@ -935,6 +915,96 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
     // MARK: -
     
     /**
+     Enables editing (i.e. insertion or deletion controls) for the section.
+     
+     This method must be called on the chain to enable insertion or deletion actions on the section, passing in the
+     editing style (`delete` or `insert`) for items in the section. This method should typically be paired with an
+     `onEdit(_:)` method after it on the chain.
+     
+     - parameter style: The editing style to apply for cells in the bound section.
+     - parameter rowIsEditable: An optional closure that returns whether editing should be allowed for the given row.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func allowEditing(
+        style: [S: UITableViewCell.EditingStyle],
+        rowIsEditable: ((_ section: S, _ row: Int) -> Bool)? = nil)
+        -> TableViewMultiSectionBinder<C, S>
+    {
+        guard style != .none else {
+            print("WARNING: Sections were setup to allow editing, but the given editing style was 'none'.")
+            return self
+        }
+        if let rowIsEditable = rowIsEditable {
+            self.binder.handlers.add(
+                rowIsEditable, toHandlerSetAt: \.cellEditableProviders, forScope: self.affectedSectionScope)
+        }
+//        self.binder.nextDataModel.sectionModel(for: self.section).cellEditingStyle = style
+        return self
+    }
+    
+    /**
+     Enables editing (i.e. insertion or deletion controls) for the section.
+     
+     This method must be called on the chain to enable insertion or deletion actions on the section, passing in a
+     closure that will return the editing style (`delete` or `insert`) for items in the section. This method should
+     typically be paired with an `onEdit(_:)` method after it on the chain.
+     
+     - parameter styleForRow: A closure that returns the editing style to apply a row in the bound section.
+     - parameter rowIsEditable: An optional closure that returns whether editing should be allowed for the given row.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func allowEditing(
+        styleForRow: @escaping (_ section: S, _ row: Int) -> UITableViewCell.EditingStyle,
+        rowIsEditable: ((_ section: S, _ row: Int) -> Bool)? = nil)
+        -> TableViewMultiSectionBinder<C, S>
+    {
+        self.binder.handlers.add(
+            styleForRow, toHandlerSetAt: \.cellEditingStyleProviders, forScope: self.affectedSectionScope)
+        if let rowIsEditable = rowIsEditable {
+            self.binder.handlers.add(
+                rowIsEditable, toHandlerSetAt: \.cellEditableProviders, forScope: self.affectedSectionScope)
+        }
+        // TODO: implement
+//        self.binder.nextDataModel.sectionModel(for: self.section).cellEditingStyle = .delete
+        return self
+    }
+    
+    @discardableResult
+    public func allowMoving(_ movementOption: CellMovementOption<S>, rowIsMovable: ((Int) -> Bool)? = nil)
+        -> TableViewMultiSectionBinder<C, S>
+    {
+        if let rowIsMovable = rowIsMovable {
+            self.binder.handlers.add({ _ , row in rowIsMovable(row) },
+                                     toHandlerSetAt: \.cellMovableProviders,
+                                     forScope: self.affectedSectionScope)
+        }
+//        self.binder.nextDataModel.sectionModel(for: self.section).movementOption = movementOption
+        return self
+    }
+    
+    @discardableResult
+    public func onDelete(_ handler: @escaping (S, Int, CellDeletionSource<S>) -> Void)
+        -> TableViewMultiSectionBinder<C, S>
+    {
+        self.binder.handlers.add(handler, toHandlerSetAt: \.cellDeletedHandlers, forScope: self.affectedSectionScope)
+        return self
+    }
+    
+    @discardableResult
+    public func onInsert(_ handler: @escaping (S, Int, CellInsertionSource<S>) -> Void)
+        -> TableViewMultiSectionBinder<C, S>
+    {
+        self.binder.handlers.add(handler, toHandlerSetAt: \.cellInsertedHandlers, forScope: self.affectedSectionScope)
+        return self
+    }
+    
+    // MARK: -
+    
+    /**
      Adds a handler to provide the cell height for cells in the declared sections.
      
      The given handler is called whenever the section reloads for each visible row, passing in the row the handler
@@ -950,16 +1020,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
     public func cellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat)
         -> TableViewMultiSectionBinder<C, S>
     {
-        switch self.affectedSectionScope {
-        case .forNamedSections(let sections):
-            for section in sections {
-                self.binder.handlers.sectionCellHeightBlocks[section] = handler
-            }
-        case .forAllUnnamedSections:
-            self.binder.handlers.dynamicSectionsCellHeightBlock = handler
-        case .forAnySection:
-            self.binder.handlers.anySectionCellHeightBlock = handler
-        }
+        self.binder.handlers.add(handler, toHandlerSetAt: \.cellHeightProviders, forScope: self.affectedSectionScope)
         return self
     }
     
@@ -979,16 +1040,8 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
     public func estimatedCellHeight(_ handler: @escaping (_ section: S, _ row: Int) -> CGFloat)
         -> TableViewMultiSectionBinder<C, S>
     {
-        switch self.affectedSectionScope {
-        case .forNamedSections(let sections):
-            for section in sections {
-                self.binder.handlers.sectionEstimatedCellHeightBlocks[section] = handler
-            }
-        case .forAllUnnamedSections:
-            self.binder.handlers.dynamicSectionsEstimatedCellHeightBlock = handler
-        case .forAnySection:
-            self.binder.handlers.anySectionEstimatedCellHeightBlock = handler
-        }
+        self.binder.handlers.add(
+            handler, toHandlerSetAt: \.cellEstimatedHeightProviders, forScope: self.affectedSectionScope)
         return self
     }
     
@@ -1002,16 +1055,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      */
     @discardableResult
     public func headerHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> TableViewMultiSectionBinder<C, S> {
-        switch self.affectedSectionScope {
-        case .forNamedSections(let sections):
-            for section in sections {
-                self.binder.handlers.sectionHeaderHeightBlocks[section] = handler
-            }
-        case .forAllUnnamedSections:
-            self.binder.handlers.dynamicSectionsHeaderHeightBlock = handler
-        case .forAnySection:
-            self.binder.handlers.anySectionHeaderHeightBlock = handler
-        }
+        self.binder.handlers.add(handler, toHandlerSetAt: \.headerHeightProviders, forScope: self.affectedSectionScope)
         return self
     }
     
@@ -1027,16 +1071,8 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
     public func estimatedHeaderHeight(_ handler: @escaping (_ section: S) -> CGFloat)
         -> TableViewMultiSectionBinder<C, S>
     {
-        switch self.affectedSectionScope {
-        case .forNamedSections(let sections):
-            for section in sections {
-                self.binder.handlers.sectionHeaderEstimatedHeightBlocks[section] = handler
-            }
-        case .forAllUnnamedSections:
-            self.binder.handlers.dynamicSectionsHeaderEstimatedHeightBlock = handler
-        case .forAnySection:
-            self.binder.handlers.anySectionHeaderEstimatedHeightBlock = handler
-        }
+        self.binder.handlers.add(
+            handler, toHandlerSetAt: \.headerEstimatedHeightProviders, forScope: self.affectedSectionScope)
         return self
     }
     
@@ -1050,16 +1086,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      */
     @discardableResult
     public func footerHeight(_ handler: @escaping (_ section: S) -> CGFloat) -> TableViewMultiSectionBinder<C, S> {
-        switch self.affectedSectionScope {
-        case .forNamedSections(let sections):
-            for section in sections {
-                self.binder.handlers.sectionFooterHeightBlocks[section] = handler
-            }
-        case .forAllUnnamedSections:
-            self.binder.handlers.dynamicSectionsFooterHeightBlock = handler
-        case .forAnySection:
-            self.binder.handlers.anySectionFooterHeightBlock = handler
-        }
+        self.binder.handlers.add(handler, toHandlerSetAt: \.footerHeightProviders, forScope: self.affectedSectionScope)
         return self
     }
     
@@ -1075,16 +1102,8 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
     public func estimatedFooterHeight(_ handler: @escaping (_ section: S) -> CGFloat)
         -> TableViewMultiSectionBinder<C, S>
     {
-        switch self.affectedSectionScope {
-        case .forNamedSections(let sections):
-            for section in sections {
-                self.binder.handlers.sectionFooterEstimatedHeightBlocks[section] = handler
-            }
-        case .forAllUnnamedSections:
-            self.binder.handlers.dynamicSectionsFooterEstimatedHeightBlock = handler
-        case .forAnySection:
-            self.binder.handlers.anySectionFooterEstimatedHeightBlock = handler
-        }
+        self.binder.handlers.add(
+            handler, toHandlerSetAt: \.footerEstimatedHeightProviders, forScope: self.affectedSectionScope)
         return self
     }
 }

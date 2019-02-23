@@ -29,23 +29,13 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     public func onTapped(_ handler: @escaping (_ section: S, _ row: Int, _ cell: C, _ model: M) -> Void)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
-        let tappedHandler: CellTapCallback<S> = {  [weak binder = self.binder] (section, row, cell) in
-            guard let cell = cell as? C,
-            let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
-                assertionFailure("ERROR: Cell or model wasn't the right type; something went awry!")
+        super.onTapped { [weak binder = self.binder] (section, row, cell) in
+            guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
+                assertionFailure("ERROR: Model wasn't the right type; something went awry!")
                 return
             }
             handler(section, row, cell, model)
         }
-        
-        if let sections = self.sections {
-            for section in sections {
-                self.binder.handlers.sectionCellTappedCallbacks[section] = tappedHandler
-            }
-        } else {
-            self.binder.handlers.dynamicSectionsCellTappedCallback = tappedHandler
-        }
-
         return self
     }
     
@@ -69,23 +59,13 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     public func onDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ cell: C, _ model: M) -> Void)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
-        let dequeueCallback: CellDequeueCallback<S> = { [weak binder = self.binder] (section, row, cell) in
-            guard let cell = cell as? C,
-            let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
-                assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
+        super.onDequeue { [weak binder = self.binder] (section, row, cell) in
+            guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
+                assertionFailure("ERROR: Model wasn't the right type; something went awry!")
                 return
             }
             handler(section, row, cell, model)
         }
-        
-        if let sections = self.sections {
-            for section in sections {
-                self.binder.handlers.sectionDequeuedCallbacks[section] = dequeueCallback
-            }
-        } else {
-            self.binder.handlers.dynamicSectionsCellDequeuedCallback = dequeueCallback
-        }
-
         return self
     }
     
@@ -270,22 +250,11 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     public func cellHeight(_ handler: @escaping (_ section: S, _ row: Int, _ model: M) -> CGFloat)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
-        let storedHandler: (S, Int) -> CGFloat = { [weak binder = self.binder] section, row in
+        super.cellHeight { [weak binder = self.binder] section, row in
             guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                 fatalError("Didn't get the right model type, something went awry!")
             }
             return handler(section, row, model)
-        }
-        
-        switch self.affectedSectionScope {
-        case .forNamedSections(let sections):
-            for section in sections {
-                self.binder.handlers.sectionCellHeightBlocks[section] = storedHandler
-            }
-        case .forAllUnnamedSections:
-            self.binder.handlers.dynamicSectionsCellHeightBlock = storedHandler
-        case .forAnySection:
-            self.binder.handlers.anySectionCellHeightBlock = storedHandler
         }
         return self
     }
@@ -307,22 +276,11 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     public func estimatedCellHeight(_ handler: @escaping (_ section: S, _ row: Int, _ model: M) -> CGFloat)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
-        let storedHandler: (S, Int) -> CGFloat = { [weak binder = self.binder] section, row in
+        super.estimatedCellHeight { [weak binder = self.binder] section, row in
             guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                 fatalError("Didn't get the right model type, something went awry!")
             }
             return handler(section, row, model)
-        }
-        
-        switch self.affectedSectionScope {
-        case .forNamedSections(let sections):
-            for section in sections {
-                self.binder.handlers.sectionEstimatedCellHeightBlocks[section] = storedHandler
-            }
-        case .forAllUnnamedSections:
-            self.binder.handlers.dynamicSectionsEstimatedCellHeightBlock = storedHandler
-        case .forAnySection:
-            self.binder.handlers.anySectionEstimatedCellHeightBlock = storedHandler
         }
         return self
     }

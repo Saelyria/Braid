@@ -32,16 +32,13 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         let section = self.section
-        let tappedHandler: CellTapCallback<S> = {  [weak binder = self.binder] (_, row, cell) in
-            guard let cell = cell as? C,
-            let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
-                assertionFailure("ERROR: Cell or model wasn't the right type; something went awry!")
+        super.onTapped {  [weak binder = self.binder] (row, cell) in
+            guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
+                assertionFailure("ERROR: Model wasn't the right type; something went awry!")
                 return
             }
             handler(row, cell, model)
         }
-        
-        self.binder.handlers.sectionCellTappedCallbacks[section] = tappedHandler
         return self
     }
     
@@ -65,16 +62,13 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         let section = self.section
-        let dequeueCallback: CellDequeueCallback<S> = { [weak binder = self.binder] (_, row, cell) in
-            guard let cell = cell as? C, let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
-                assertionFailure("ERROR: Cell wasn't the right type; something went awry!")
+        super.onDequeue { [weak binder = self.binder] (row, cell) in
+            guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
+                assertionFailure("ERROR: Model wasn't the right type; something went awry!")
                 return
             }
             handler(row, cell, model)
         }
-        
-        self.binder.handlers.sectionDequeuedCallbacks[section] = dequeueCallback
-        
         return self
     }
     
@@ -103,17 +97,13 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         where EventCell: UITableViewCell & ViewEventEmitting
     {
         let section = self.section
-        let modelHandler: (Int, UITableViewCell, Any) -> Void = { [weak binder = self.binder] row, cell, event in
-            guard let cell = cell as? EventCell, let event = event as? EventCell.ViewEvent,
-                let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
-                    assertionFailure("ERROR: Cell, event, or model wasn't the right type; something went awry!")
-                    return
+        super.onEvent(from: cellType) { [weak binder = self.binder] row, cell, event in
+            guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
+                assertionFailure("ERROR: Model wasn't the right type; something went awry!")
+                return
             }
             handler(row, cell, event, model)
         }
-        self.binder.addEventEmittingHandler(
-            cellType: EventCell.self, handler: modelHandler, affectedSections: self.affectedSectionScope)
-        
         return self
     }
     
@@ -263,7 +253,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         let section = self.section
-        self.binder.handlers.sectionCellHeightBlocks[section] = { [weak binder = self.binder] (_, row: Int) in
+        super.cellHeight { [weak binder = self.binder] (row: Int) in
             guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                 fatalError("Didn't get the right model type - something went awry!")
             }
@@ -289,7 +279,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         let section = self.section
-        self.binder.handlers.sectionEstimatedCellHeightBlocks[section] = { [weak binder = self.binder] (_, row: Int) in
+        super.estimatedCellHeight { [weak binder = self.binder] (row: Int) in
             guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
                 fatalError("Didn't get the right model type - something went awry!")
             }
