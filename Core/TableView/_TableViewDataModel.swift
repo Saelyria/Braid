@@ -42,12 +42,6 @@ internal class _TableViewDataModel<S: TableViewSection> {
     
     weak var delegate: SectionedTableViewBinder<S>?
     
-    // The sections that were bound uniquely with either the `onSection` or `onSections` methods. This is used to
-    // ensure that updates to data bound with `onAllSections` does not overwrite data for these sections.
-    var uniquelyBoundCellSections: [S] = []
-    var uniquelyBoundHeaderSections: [S] = []
-    var uniquelyBoundFooterSections: [S] = []
-    
     var headerViewBound: Bool = false
     var footerViewBound: Bool = false
     var headerTitleBound: Bool = false
@@ -94,9 +88,6 @@ internal class _TableViewDataModel<S: TableViewSection> {
     
     init(from other: _TableViewDataModel<S>) {
         self.delegate = other.delegate
-        self.uniquelyBoundCellSections = other.uniquelyBoundCellSections
-        self.uniquelyBoundFooterSections = other.uniquelyBoundFooterSections
-        self.uniquelyBoundHeaderSections = other.uniquelyBoundHeaderSections
         self.headerTitleBound = other.headerTitleBound
         self.headerViewBound = other.headerViewBound
         self.footerTitleBound = other.footerTitleBound

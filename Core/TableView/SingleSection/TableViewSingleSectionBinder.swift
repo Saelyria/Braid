@@ -708,7 +708,6 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     {
         let handler: (S) -> String? = { _ in return headerTitle() }
         self.binder.handlers.add(handler, toHandlerSetAt: \.headerTitleProviders, forScope: self.affectedSectionScope)
-        self.binder.nextDataModel.uniquelyBoundHeaderSections.append(self.section)
         let scope = self.affectedSectionScope
         let section = self.section
         self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
@@ -796,7 +795,6 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     {
         let handler: (S) -> String? = { _ in footerTitle() }
         self.binder.handlers.add(handler, toHandlerSetAt: \.footerTitleProviders, forScope: self.affectedSectionScope)
-        self.binder.nextDataModel.uniquelyBoundFooterSections.append(self.section)
         let scope = self.affectedSectionScope
         let section = self.section
         self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in

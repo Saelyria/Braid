@@ -45,6 +45,12 @@ class _TableViewBindingHandlers<S: TableViewSection> {
     // Closures that will update the data on the binder's data model when 'refresh' is called
     lazy var modelUpdaters: [() -> Void] = { [] }()
     
+    // The sections that were bound uniquely with either the `onSection` or `onSections` methods. This is used to
+    // ensure that updates to data bound with `onAllSections` does not overwrite data for these sections.
+    fileprivate(set) var uniquelyBoundCellSections: [S] = []
+    fileprivate(set) var uniquelyBoundHeaderSections: [S] = []
+    fileprivate(set) var uniquelyBoundFooterSections: [S] = []
+    
     // Closures to call to dequeue a cell in a section.
     lazy var cellProviders: HandlerSet<(S, UITableView, IndexPath) -> UITableViewCell> = {
         HandlerSet(allowAnySection: false)
@@ -209,6 +215,17 @@ extension _TableViewBindingHandlers {
             case .forNamedSections(let sections):
                 for section in sections {
                     handlerSet.namedSection[section] = handler
+                }
+                if keyPath == \_TableViewBindingHandlers.cellProviders {
+                    self.uniquelyBoundCellSections.append(contentsOf: sections)
+                } else if keyPath == \_TableViewBindingHandlers.headerViewProviders
+                || keyPath == \_TableViewBindingHandlers.headerViewModelProviders
+                || keyPath == \_TableViewBindingHandlers.headerTitleProviders {
+                    self.uniquelyBoundHeaderSections.append(contentsOf: sections)
+                } else if keyPath == \_TableViewBindingHandlers.footerViewProviders
+                || keyPath == \_TableViewBindingHandlers.footerViewModelProviders
+                || keyPath == \_TableViewBindingHandlers.footerTitleProviders {
+                    self.uniquelyBoundFooterSections.append(contentsOf: sections)
                 }
             case .forAllUnnamedSections:
                 handlerSet.dynamicSections = handler

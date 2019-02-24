@@ -462,7 +462,7 @@ public extension SectionedTableViewBinder.SectionDisplayBehavior where S: Compar
 
 extension SectionedTableViewBinder: _TableViewDataModelDelegate {
     func itemEqualityChecker(for section: S) -> ((Any, Any) -> Bool?)? {
-        if self.nextDataModel.uniquelyBoundCellSections.contains(section) {
+        if self.handlers.uniquelyBoundCellSections.contains(section) {
             return self.handlers.itemEqualityCheckers.namedSection[section]
         }
         return self.handlers.itemEqualityCheckers.dynamicSections

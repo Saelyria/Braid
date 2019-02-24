@@ -792,11 +792,6 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
         footerTitles: @escaping () -> [S: String?])
         -> TableViewMultiSectionBinder<C, S>
     {
-        switch self.affectedSectionScope {
-        case .forNamedSections(let sections):
-            self.binder.nextDataModel.uniquelyBoundFooterSections.append(contentsOf: sections)
-        default: break
-        }
         let scope = self.affectedSectionScope
         self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
             binder?.updateFooterTitles(footerTitles(), affectedSections: scope)

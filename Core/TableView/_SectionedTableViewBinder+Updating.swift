@@ -92,13 +92,6 @@ internal extension SectionedTableViewBinder {
      */
     func updateHeaderTitles(_ titles: [S: String?], affectedSections: SectionBindingScope<S>) {
         self.nextDataModel.headerTitleBound = true
-        
-        switch affectedSections {
-        case .forNamedSections(let sections):
-            self.nextDataModel.uniquelyBoundHeaderSections.append(contentsOf: sections)
-        default: break
-        }
-        
         self.update(fromDataIn: titles,
                     resettingMissingSectionsWith: nil,
                     updatingKeyPath: \_TableViewSectionDataModel<S>.headerTitle,
@@ -115,7 +108,8 @@ internal extension SectionedTableViewBinder {
     func updateHeaderViewModels(_ viewModels: [S: Any?], affectedSections: SectionBindingScope<S>) {
         self.nextDataModel.headerViewBound = true
         
-        self.update(fromDataIn: viewModels,
+        let nonNilViewModels: [S: Any] = viewModels.filter { $0.value != nil }.mapValues { return $0! }
+        self.update(fromDataIn: nonNilViewModels,
                     resettingMissingSectionsWith: nil,
                     updatingKeyPath: \_TableViewSectionDataModel<S>.headerViewModel,
                     affectedSections: affectedSections,
@@ -130,13 +124,6 @@ internal extension SectionedTableViewBinder {
      */
     func updateFooterTitles(_ titles: [S: String?], affectedSections: SectionBindingScope<S>) {
         self.nextDataModel.footerTitleBound = true
-        
-        switch affectedSections {
-        case .forNamedSections(let sections):
-            self.nextDataModel.uniquelyBoundFooterSections.append(contentsOf: sections)
-        default: break
-        }
-        
         self.update(fromDataIn: titles,
                     resettingMissingSectionsWith: nil,
                     updatingKeyPath: \_TableViewSectionDataModel<S>.footerTitle,
@@ -224,9 +211,9 @@ private extension SectionedTableViewBinder {
             
             let uniquelyBoundSections: [S]
             switch dataType {
-            case .cell: uniquelyBoundSections = self.nextDataModel.uniquelyBoundCellSections
-            case .header: uniquelyBoundSections = self.nextDataModel.uniquelyBoundHeaderSections
-            case .footer: uniquelyBoundSections = self.nextDataModel.uniquelyBoundFooterSections
+            case .cell: uniquelyBoundSections = self.handlers.uniquelyBoundCellSections
+            case .header: uniquelyBoundSections = self.handlers.uniquelyBoundHeaderSections
+            case .footer: uniquelyBoundSections = self.handlers.uniquelyBoundFooterSections
             }
             
             sectionsToIterate.subtract(uniquelyBoundSections)
