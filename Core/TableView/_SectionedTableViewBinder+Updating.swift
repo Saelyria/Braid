@@ -106,10 +106,8 @@ internal extension SectionedTableViewBinder {
      - parameter affectedSections: The section scope affected by this update.
      */
     func updateHeaderViewModels(_ viewModels: [S: Any?], affectedSections: SectionBindingScope<S>) {
-        self.nextDataModel.headerViewBound = true
-        
-        let nonNilViewModels: [S: Any] = viewModels.filter { $0.value != nil }.mapValues { return $0! }
-        self.update(fromDataIn: nonNilViewModels,
+        self.nextDataModel.headerViewBound = true        
+        self.update(fromDataIn: viewModels,
                     resettingMissingSectionsWith: nil,
                     updatingKeyPath: \_TableViewSectionDataModel<S>.headerViewModel,
                     affectedSections: affectedSections,
@@ -139,9 +137,7 @@ internal extension SectionedTableViewBinder {
      */
     func updateFooterViewModels(_ viewModels: [S: Any?], affectedSections: SectionBindingScope<S>) {
         self.nextDataModel.footerViewBound = true
-        
-        let nonNilViewModels: [S: Any] = viewModels.filter { $0.value != nil }.mapValues { return $0! }
-        self.update(fromDataIn: nonNilViewModels,
+        self.update(fromDataIn: viewModels,
                     resettingMissingSectionsWith: nil,
                     updatingKeyPath: \_TableViewSectionDataModel<S>.footerViewModel,
                     affectedSections: affectedSections,
@@ -187,8 +183,14 @@ private extension SectionedTableViewBinder {
             // mark either the cells or header/footers for the affected sections as dirty so they're reloaded
             switch dataType {
             case .cell:
+                self.nextDataModel.uniquelyBoundCellSections.append(contentsOf: sections)
                 self.nextDataModel.cellUpdatedSections = self.nextDataModel.cellUpdatedSections.union(sections)
-            case .header, .footer:
+            case .header:
+                self.nextDataModel.uniquelyBoundHeaderSections.append(contentsOf: sections)
+                self.nextDataModel.headerFooterUpdatedSections =
+                    self.nextDataModel.headerFooterUpdatedSections.union(sections)
+            case .footer:
+                self.nextDataModel.uniquelyBoundFooterSections.append(contentsOf: sections)
                 self.nextDataModel.headerFooterUpdatedSections =
                     self.nextDataModel.headerFooterUpdatedSections.union(sections)
             }
@@ -211,9 +213,9 @@ private extension SectionedTableViewBinder {
             
             let uniquelyBoundSections: [S]
             switch dataType {
-            case .cell: uniquelyBoundSections = self.handlers.uniquelyBoundCellSections
-            case .header: uniquelyBoundSections = self.handlers.uniquelyBoundHeaderSections
-            case .footer: uniquelyBoundSections = self.handlers.uniquelyBoundFooterSections
+            case .cell: uniquelyBoundSections = self.nextDataModel.uniquelyBoundCellSections
+            case .header: uniquelyBoundSections = self.nextDataModel.uniquelyBoundHeaderSections
+            case .footer: uniquelyBoundSections = self.nextDataModel.uniquelyBoundFooterSections
             }
             
             sectionsToIterate.subtract(uniquelyBoundSections)

@@ -113,7 +113,7 @@ internal extension SectionedTableViewBinder {
     
     /// calls the `onDequeue` method appropriate to how the binding chain was setup
     private func callOnDequeue(cell: UITableViewCell, section: S, row: Int) {
-        if self.handlers.uniquelyBoundCellSections.contains(section) == true {
+        if self.nextDataModel.uniquelyBoundCellSections.contains(section) == true {
             self.handlers.cellDequeuedHandlers.namedSection[section]?(section, row, cell)
         } else {
             self.handlers.cellDequeuedHandlers.dynamicSections?(section, row, cell)
@@ -124,7 +124,7 @@ internal extension SectionedTableViewBinder {
     /// sets a callback handler that the cell will call in its `emit(event:)` method.
     private func setEventCallback(onCell cell: UITableViewCell, section: S, row: Int) {
         if let eventCell = cell as? UITableViewCell & AnyViewEventEmitting {
-            if self.handlers.uniquelyBoundCellSections.contains(section) == true
+            if self.nextDataModel.uniquelyBoundCellSections.contains(section) == true
             || self.handlers.viewEventHandlers.namedSection[section] != nil {
                 eventCell.eventEmitHandler = { [weak self] cell, event in
                     let eventEmitOperation = BlockOperation(block: {

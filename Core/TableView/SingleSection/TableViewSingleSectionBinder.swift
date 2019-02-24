@@ -662,8 +662,6 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<C, S>
         where H: UITableViewHeaderFooterView & ViewModelBindable
     {
-        let handler: (S) -> Any? = { _ in viewModel() }
-        self.binder.handlers.add(handler, toHandlerSetAt: \.headerViewModelProviders, forScope: self.affectedSectionScope)
         self.binder.addHeaderDequeueBlock(headerType: headerType, affectedSections: self.affectedSectionScope)
         let scope = self.affectedSectionScope
         let section = self.section
@@ -706,8 +704,6 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         headerTitle: @escaping () -> String?)
         -> TableViewSingleSectionBinder<C, S>
     {
-        let handler: (S) -> String? = { _ in return headerTitle() }
-        self.binder.handlers.add(handler, toHandlerSetAt: \.headerTitleProviders, forScope: self.affectedSectionScope)
         let scope = self.affectedSectionScope
         let section = self.section
         self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in
@@ -749,8 +745,6 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         -> TableViewSingleSectionBinder<C, S>
         where F: UITableViewHeaderFooterView & ViewModelBindable
     {
-        let handler: (S) -> Any? = { _ in viewModel() }
-        self.binder.handlers.add(handler, toHandlerSetAt: \.footerViewModelProviders, forScope: self.affectedSectionScope)
         self.binder.addFooterDequeueBlock(footerType: footerType, affectedSections: self.affectedSectionScope)
         let scope = self.affectedSectionScope
         let section = self.section
@@ -793,8 +787,6 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
         footerTitle: @escaping () -> String?)
         -> TableViewSingleSectionBinder<C, S>
     {
-        let handler: (S) -> String? = { _ in footerTitle() }
-        self.binder.handlers.add(handler, toHandlerSetAt: \.footerTitleProviders, forScope: self.affectedSectionScope)
         let scope = self.affectedSectionScope
         let section = self.section
         self.binder.handlers.modelUpdaters.append { [weak binder = self.binder] in

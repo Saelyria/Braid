@@ -43,13 +43,7 @@ class _TableViewBindingHandlers<S: TableViewSection> {
     // Cell handlers
     
     // Closures that will update the data on the binder's data model when 'refresh' is called
-    lazy var modelUpdaters: [() -> Void] = { [] }()
-    
-    // The sections that were bound uniquely with either the `onSection` or `onSections` methods. This is used to
-    // ensure that updates to data bound with `onAllSections` does not overwrite data for these sections.
-    fileprivate(set) var uniquelyBoundCellSections: [S] = []
-    fileprivate(set) var uniquelyBoundHeaderSections: [S] = []
-    fileprivate(set) var uniquelyBoundFooterSections: [S] = []
+    var modelUpdaters: [() -> Void] = []
     
     // Closures to call to dequeue a cell in a section.
     lazy var cellProviders: HandlerSet<(S, UITableView, IndexPath) -> UITableViewCell> = {
@@ -85,16 +79,6 @@ class _TableViewBindingHandlers<S: TableViewSection> {
     
     // MARK: -
     
-    // Closures to call to get the titles for section headers
-    lazy var headerTitleProviders: HandlerSet<(S) -> String?> = {
-        HandlerSet(allowAnySection: false)
-    }()
-    
-    // Closures to call to get the view models for section footers
-    lazy var headerViewModelProviders: HandlerSet<(S) -> Any?> = {
-        HandlerSet(allowAnySection: false)
-    }()
-    
     // Blocks to call to dequeue a header in a section.
     lazy var headerViewProviders: HandlerSet<(S, UITableView) -> UITableViewHeaderFooterView?> = {
         HandlerSet(allowAnySection: false)
@@ -111,16 +95,6 @@ class _TableViewBindingHandlers<S: TableViewSection> {
     }()
     
     // MARK: -
-    
-    // Closures to call to get the titles for section footers
-    lazy var footerTitleProviders: HandlerSet<(S) -> String?> = {
-        HandlerSet(allowAnySection: false)
-    }()
-    
-    // Closures to call to get the view models for section footers
-    lazy var footerViewModelProviders: HandlerSet<(S) -> Any?> = {
-        HandlerSet(allowAnySection: false)
-    }()
     
     // Blocks to call to dequeue a footer in a section.
     lazy var footerViewProviders: HandlerSet<(S, UITableView) -> UITableViewHeaderFooterView?> = {
@@ -215,17 +189,6 @@ extension _TableViewBindingHandlers {
             case .forNamedSections(let sections):
                 for section in sections {
                     handlerSet.namedSection[section] = handler
-                }
-                if keyPath == \_TableViewBindingHandlers.cellProviders {
-                    self.uniquelyBoundCellSections.append(contentsOf: sections)
-                } else if keyPath == \_TableViewBindingHandlers.headerViewProviders
-                || keyPath == \_TableViewBindingHandlers.headerViewModelProviders
-                || keyPath == \_TableViewBindingHandlers.headerTitleProviders {
-                    self.uniquelyBoundHeaderSections.append(contentsOf: sections)
-                } else if keyPath == \_TableViewBindingHandlers.footerViewProviders
-                || keyPath == \_TableViewBindingHandlers.footerViewModelProviders
-                || keyPath == \_TableViewBindingHandlers.footerTitleProviders {
-                    self.uniquelyBoundFooterSections.append(contentsOf: sections)
                 }
             case .forAllUnnamedSections:
                 handlerSet.dynamicSections = handler
