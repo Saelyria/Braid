@@ -20,7 +20,6 @@ internal class _TableViewDataModel<S: TableViewSection> {
             return sectionModel
         }
         let sectionModel = _TableViewSectionDataModel(section: section)
-        sectionModel.itemEqualityChecker = self.delegate?.itemEqualityChecker(for: section)
         sectionModel.onUpdate = { [weak self] in
             self?.delegate?.dataModelDidChange()
         }
@@ -117,6 +116,7 @@ extension _TableViewDataModel {
     func diff(from other: _TableViewDataModel<S>) -> _NestedExtendedDiff? {
         let selfSectionModels = self.displayedSections.map { self.sectionModel(for: $0) }
         let otherSectionModels = other.displayedSections.map { other.sectionModel(for: $0) }
+        let binder = self.delegate ?? other.delegate
         guard var diff = try? selfSectionModels.nestedExtendedDiff(
             to: otherSectionModels,
             isSameSection: { $0.section == $1.section },
@@ -127,7 +127,7 @@ extension _TableViewDataModel {
                 return nil
             },
             isEqualElement: { sectionModel, lhs, rhs in
-                return sectionModel.itemEqualityChecker?(lhs, rhs)
+                return binder?.itemEqualityChecker(for: sectionModel.section)?(lhs, rhs)
         }) else {
             return nil
         }
@@ -172,22 +172,21 @@ internal class _TableViewSectionDataModel<S: TableViewSection> {
         case number
     }
     
-    
     let section: S
     
-    var headerTitle: String? = nil {
+    var headerTitle: String? {
         didSet { self.onUpdate?() }
     }
-    var headerViewModel: Any? = nil {
+    var headerViewModel: Any? {
         didSet { self.onUpdate?() }
     }
     var items: [_TableViewItemModel] = [] {
         didSet { self.onUpdate?() }
     }
-    var footerTitle: String? = nil {
+    var footerTitle: String? {
         didSet { self.onUpdate?() }
     }
-    var footerViewModel: Any? = nil {
+    var footerViewModel: Any? {
         didSet { self.onUpdate?() }
     }
     var cellEditingStyle: UITableViewCell.EditingStyle = .none
@@ -195,7 +194,6 @@ internal class _TableViewSectionDataModel<S: TableViewSection> {
     
     var cellDataType: CellDataType = .models
     
-    fileprivate var itemEqualityChecker: ((Any, Any) -> Bool?)? = nil
     fileprivate var onUpdate: (() -> Void)?
     
     fileprivate init(section: S) {
@@ -209,7 +207,6 @@ internal class _TableViewSectionDataModel<S: TableViewSection> {
         self.items = other.items
         self.footerTitle = other.footerTitle
         self.footerViewModel = other.footerViewModel
-        self.itemEqualityChecker = other.itemEqualityChecker
         self.section = other.section
         self.cellEditingStyle = other.cellEditingStyle
     }
