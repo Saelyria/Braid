@@ -20,7 +20,6 @@ internal class _TableViewDataModel<S: TableViewSection> {
             return sectionModel
         }
         let sectionModel = _TableViewSectionDataModel(section: section)
-        sectionModel.itemEqualityChecker = self.delegate?.itemEqualityChecker(for: section)
         sectionModel.onUpdate = { [weak self] in
             self?.delegate?.dataModelDidChange()
         }
@@ -111,6 +110,7 @@ extension _TableViewDataModel {
     func diff(from other: _TableViewDataModel<S>) -> _NestedExtendedDiff? {
         let selfSectionModels = self.displayedSections.map { self.sectionModel(for: $0) }
         let otherSectionModels = other.displayedSections.map { other.sectionModel(for: $0) }
+        let delegate = self.delegate ?? other.delegate
         guard var diff = try? selfSectionModels.nestedExtendedDiff(
             to: otherSectionModels,
             isSameSection: { $0.section == $1.section },
@@ -121,7 +121,7 @@ extension _TableViewDataModel {
                 return nil
             },
             isEqualElement: { sectionModel, lhs, rhs in
-                return sectionModel.itemEqualityChecker?(lhs, rhs)
+                return delegate?.itemEqualityChecker(for: sectionModel.section)?(lhs, rhs)
         }) else {
             return nil
         }
@@ -187,7 +187,6 @@ internal class _TableViewSectionDataModel<S: TableViewSection> {
     
     var cellDataType: CellDataType = .models
     
-    fileprivate var itemEqualityChecker: ((Any, Any) -> Bool?)? = nil
     fileprivate var onUpdate: (() -> Void)?
     
     fileprivate init(section: S) {
@@ -201,7 +200,6 @@ internal class _TableViewSectionDataModel<S: TableViewSection> {
         self.items = other.items
         self.footerTitle = other.footerTitle
         self.footerViewModel = other.footerViewModel
-        self.itemEqualityChecker = other.itemEqualityChecker
         self.section = other.section
     }
 }
