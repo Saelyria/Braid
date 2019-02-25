@@ -37,11 +37,11 @@ extension SectionedTableViewBinder {
         self.sectionHeaderFooterUpdateAnimation = .none
     }
     
-    func cellsInSections() -> [S: [TestCell]] {
+    func cellsInSections<C>(type: C.Type) -> [S: [C]] {
         return self.displayedSections.reduce([:], { (result, section) in
             var result = result
             let cellArray = (0..<self.rows(in: section))
-                .map { row in self.cell(for: section, row) as? TestCell }
+                .map { row in self.cell(for: section, row) as? C }
                 .compactMap { $0 }
             result[section] = cellArray
             return result

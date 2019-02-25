@@ -466,7 +466,7 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.finish()
         
-        cells = self.binder.cellsInSections()
+        cells = self.binder.cellsInSections(type: TestCell.self)
         models = cells.mapValues { $0.map { $0.model as? TestModel }.compactMap { $0 } }
         
         // test we got the right number of cells and that they relate to the right cells on the table
@@ -515,7 +515,7 @@ class TableCellBindingMethodTests: TableTestCase {
         
         expect(self.tableView.visibleCells.count).toEventually(equal(9))
         
-        cells = self.binder.cellsInSections()
+        cells = self.binder.cellsInSections(type: TestCell.self)
         models = cells.mapValues { $0.map { $0.model as? TestModel }.compactMap { $0 } }
         
         expect(cells.count).toEventually(equal(4))
@@ -559,139 +559,120 @@ class TableCellBindingMethodTests: TableTestCase {
     func testCellTypeViewModelClosureBindingMethod() {
         self.binder.displayedSections = [.first, .second, .third, .fourth]
         
-        var dequeuedCells: [Section: [TestViewModelCell]] = [.first: [], .second: [], .third: [], .fourth: []]
+        var cells: [Section: [TestViewModelCell]] = [.first: [], .second: [], .third: [], .fourth: []]
         var viewModels: [Section: [TestViewModelCell.ViewModel?]] = [.first: [], .second: [], .third: [], .fourth: []]
         
-        var firstModels: [TestViewModelCell.ViewModel] = ["1-1", "1-2"].map { TestViewModelCell.ViewModel(id: $0) }
-        var secondModels: [TestViewModelCell.ViewModel] = ["2-1", "2-2"].map { TestViewModelCell.ViewModel(id: $0) }
-        var thirdModels: [TestViewModelCell.ViewModel] = ["3-1", "3-2"].map { TestViewModelCell.ViewModel(id: $0) }
-        var fourthModels: [TestViewModelCell.ViewModel] = ["4-1", "4-2"].map { TestViewModelCell.ViewModel(id: $0) }
+        var firstViewModels: [TestViewModelCell.ViewModel] = self.firstSectionModels.map { TestViewModelCell.ViewModel(id: $0.value) }
+        var secondThirdViewModels: [Section: [TestViewModelCell.ViewModel]] = self.secondThirdSectionModels.mapValues {
+            $0.map { TestViewModelCell.ViewModel(id: $0.value) }
+        }
+        var fourthViewModels: [Section: [TestViewModelCell.ViewModel]] = self.fourthSectionModels.mapValues {
+            $0.map { TestViewModelCell.ViewModel(id: $0.value) }
+        }
         
         self.binder.onSection(.first)
-            .bind(cellType: TestViewModelCell.self, viewModels: { firstModels })
-            .onDequeue { row, cell in
-                if dequeuedCells[.first]?.indices.contains(row) == false {
-                    dequeuedCells[.first]?.insert(cell, at: row)
-                    viewModels[.first]?.insert(cell.viewModel, at: row)
-                } else {
-                    dequeuedCells[.first]?[row] = cell
-                    viewModels[.first]?[row] = cell.viewModel
-                }
-        }
+            .bind(cellType: TestViewModelCell.self, viewModels: { firstViewModels })
         
         self.binder.onSections(.second, .third)
-            .bind(cellType: TestViewModelCell.self, viewModels: {[
-                .second: secondModels,
-                .third: thirdModels
-                ]})
-            .onDequeue { section, row, cell in
-                if dequeuedCells[section]?.indices.contains(row) == false {
-                    dequeuedCells[section]?.insert(cell, at: row)
-                    viewModels[section]?.insert(cell.viewModel, at: row)
-                } else {
-                    dequeuedCells[section]?[row] = cell
-                    viewModels[section]?[row] = cell.viewModel
-                }
-        }
+            .bind(cellType: TestViewModelCell.self, viewModels: { secondThirdViewModels })
         
         self.binder.onAllOtherSections()
-            .bind(cellType: TestViewModelCell.self, viewModels: {[
-                .fourth: fourthModels
-                ]})
-            .onDequeue { section, row, cell in
-                if dequeuedCells[section]?.indices.contains(row) == false {
-                    dequeuedCells[section]?.insert(cell, at: row)
-                    viewModels[section]?.insert(cell.viewModel, at: row)
-                } else {
-                    dequeuedCells[section]?[row] = cell
-                    viewModels[section]?[row] = cell.viewModel
-                }
-        }
+            .bind(cellType: TestViewModelCell.self, viewModels: { fourthViewModels })
         
         self.binder.finish()
         
+        cells = self.binder.cellsInSections(type: TestViewModelCell.self)
+        viewModels = cells.mapValues { $0.map { $0.viewModel } }
+        
         // test we got the right number of cells and that they relate to the right cells on the table
-        expect(self.tableView.visibleCells.count).toEventually(equal(8))
+        expect(self.tableView.visibleCells.count).toEventually(equal(10))
         
-        expect(dequeuedCells.count).toEventually(equal(4))
-        expect(dequeuedCells[.first]?.count).toEventually(equal(2))
-        expect(dequeuedCells[.second]?.count).toEventually(equal(2))
-        expect(dequeuedCells[.third]?.count).toEventually(equal(2))
-        expect(dequeuedCells[.fourth]?.count).toEventually(equal(2))
+        expect(cells.count).toEventually(equal(4))
+        expect(cells[.first]?.count).toEventually(equal(1))
+        expect(cells[.second]?.count).toEventually(equal(2))
+        expect(cells[.third]?.count).toEventually(equal(3))
+        expect(cells[.fourth]?.count).toEventually(equal(4))
         
-        expect(dequeuedCells[.first]?[safe: 0]).toEventually(be(self.tableView.visibleCells[0]))
-        expect(dequeuedCells[.first]?[safe: 1]).toEventually(be(self.tableView.visibleCells[1]))
-        expect(dequeuedCells[.second]?[safe: 0]).toEventually(be(self.tableView.visibleCells[2]))
-        expect(dequeuedCells[.second]?[safe: 1]).toEventually(be(self.tableView.visibleCells[3]))
-        expect(dequeuedCells[.third]?[safe: 0]).toEventually(be(self.tableView.visibleCells[4]))
-        expect(dequeuedCells[.third]?[safe: 1]).toEventually(be(self.tableView.visibleCells[5]))
-        expect(dequeuedCells[.fourth]?[safe: 0]).toEventually(be(self.tableView.visibleCells[6]))
-        expect(dequeuedCells[.fourth]?[safe: 1]).toEventually(be(self.tableView.visibleCells[7]))
+        expect(cells[.first]?[safe: 0]).toEventually(be(self.tableView.visibleCells[0]))
+        expect(cells[.second]?[safe: 0]).toEventually(be(self.tableView.visibleCells[1]))
+        expect(cells[.second]?[safe: 1]).toEventually(be(self.tableView.visibleCells[2]))
+        expect(cells[.third]?[safe: 0]).toEventually(be(self.tableView.visibleCells[3]))
+        expect(cells[.third]?[safe: 1]).toEventually(be(self.tableView.visibleCells[4]))
+        expect(cells[.third]?[safe: 2]).toEventually(be(self.tableView.visibleCells[5]))
+        expect(cells[.fourth]?[safe: 0]).toEventually(be(self.tableView.visibleCells[6]))
+        expect(cells[.fourth]?[safe: 1]).toEventually(be(self.tableView.visibleCells[7]))
+        expect(cells[.fourth]?[safe: 2]).toEventually(be(self.tableView.visibleCells[8]))
+        expect(cells[.fourth]?[safe: 3]).toEventually(be(self.tableView.visibleCells[9]))
+        
+        // test that we got the right number of models
+        expect(viewModels.count).toEventually(equal(4))
+        expect(viewModels[.first]?.count).toEventually(equal(1))
+        expect(viewModels[.second]?.count).toEventually(equal(2))
+        expect(viewModels[.third]?.count).toEventually(equal(3))
+        expect(viewModels[.fourth]?.count).toEventually(equal(4))
+        
+        expect(viewModels[.first]?[safe: 0]??.id).toEventually(equal("1-1"))
+        expect(viewModels[.second]?[safe: 0]??.id).toEventually(equal("2-1"))
+        expect(viewModels[.second]?[safe: 1]??.id).toEventually(equal("2-2"))
+        expect(viewModels[.third]?[safe: 0]??.id).toEventually(equal("3-1"))
+        expect(viewModels[.third]?[safe: 1]??.id).toEventually(equal("3-2"))
+        expect(viewModels[.third]?[safe: 2]??.id).toEventually(equal("3-3"))
+        expect(viewModels[.fourth]?[safe: 0]??.id).toEventually(equal("4-1"))
+        expect(viewModels[.fourth]?[safe: 1]??.id).toEventually(equal("4-2"))
+        expect(viewModels[.fourth]?[safe: 2]??.id).toEventually(equal("4-3"))
+        expect(viewModels[.fourth]?[safe: 3]??.id).toEventually(equal("4-4"))
+        
+        // update the models then refresh the table
+        self.firstSectionModels = ["1-1", "1-2"]
+        self.secondThirdSectionModels = [.second: ["2-1", "2-2*"], .third: ["3-1", "3-2"]]
+        self.fourthSectionModels = [.fourth: ["4-2*", "4-3", "4-1"]]
+        firstViewModels = self.firstSectionModels.map { TestViewModelCell.ViewModel(id: $0.value) }
+        secondThirdViewModels = self.secondThirdSectionModels.mapValues {
+            $0.map { TestViewModelCell.ViewModel(id: $0.value) }
+        }
+        fourthViewModels = self.fourthSectionModels.mapValues {
+            $0.map { TestViewModelCell.ViewModel(id: $0.value) }
+        }
+        self.binder.refresh()
+        
+        expect(self.tableView.visibleCells.count).toEventually(equal(9))
+        
+        cells = self.binder.cellsInSections(type: TestViewModelCell.self)
+        viewModels = cells.mapValues { $0.map { $0.viewModel } }
+        
+        expect(cells.count).toEventually(equal(4))
+        expect(cells[.first]?.count).toEventually(equal(2))
+        expect(cells[.second]?.count).toEventually(equal(2))
+        expect(cells[.third]?.count).toEventually(equal(2))
+        expect(cells[.fourth]?.count).toEventually(equal(3))
+        
+        expect(cells[.first]?[safe: 0]).toEventually(be(self.tableView.visibleCells[0]))
+        expect(cells[.first]?[safe: 1]).toEventually(be(self.tableView.visibleCells[1]))
+        expect(cells[.second]?[safe: 0]).toEventually(be(self.tableView.visibleCells[2]))
+        expect(cells[.second]?[safe: 1]).toEventually(be(self.tableView.visibleCells[3]))
+        expect(cells[.third]?[safe: 0]).toEventually(be(self.tableView.visibleCells[4]))
+        expect(cells[.third]?[safe: 1]).toEventually(be(self.tableView.visibleCells[5]))
+        expect(cells[.fourth]?[safe: 0]).toEventually(be(self.tableView.visibleCells[6]))
+        expect(cells[.fourth]?[safe: 1]).toEventually(be(self.tableView.visibleCells[7]))
+        expect(cells[.fourth]?[safe: 2]).toEventually(be(self.tableView.visibleCells[8]))
         
         // test that we got the right number of models
         expect(viewModels.count).toEventually(equal(4))
         expect(viewModels[.first]?.count).toEventually(equal(2))
         expect(viewModels[.second]?.count).toEventually(equal(2))
         expect(viewModels[.third]?.count).toEventually(equal(2))
-        expect(viewModels[.fourth]?.count).toEventually(equal(2))
+        expect(viewModels[.fourth]?.count).toEventually(equal(3))
         
         expect(viewModels[.first]?[safe: 0]??.id).toEventually(equal("1-1"))
         expect(viewModels[.first]?[safe: 1]??.id).toEventually(equal("1-2"))
         expect(viewModels[.second]?[safe: 0]??.id).toEventually(equal("2-1"))
-        expect(viewModels[.second]?[safe: 1]??.id).toEventually(equal("2-2"))
+        expect(viewModels[.second]?[safe: 1]??.id).toEventually(equal("2-2*"))
         expect(viewModels[.third]?[safe: 0]??.id).toEventually(equal("3-1"))
         expect(viewModels[.third]?[safe: 1]??.id).toEventually(equal("3-2"))
-        expect(viewModels[.fourth]?[safe: 0]??.id).toEventually(equal("4-1"))
-        expect(viewModels[.fourth]?[safe: 1]??.id).toEventually(equal("4-2"))
-        
-        // update the models then refresh the table
-        firstModels = ["1-1", "1-2*", "1-3"].map { TestViewModelCell.ViewModel(id: $0) }
-        secondModels = ["2-1", "2-2*", "2-3"].map { TestViewModelCell.ViewModel(id: $0) }
-        thirdModels = ["3-1", "3-2*", "3-3"].map { TestViewModelCell.ViewModel(id: $0) }
-        fourthModels = ["4-1", "4-2*", "4-3"].map { TestViewModelCell.ViewModel(id: $0) }
-        self.binder.refresh()
-        
-        expect(self.tableView.visibleCells.count).toEventually(equal(12))
-        
-        expect(dequeuedCells.count).toEventually(equal(4))
-        expect(dequeuedCells[.first]?.count).toEventually(equal(3))
-        expect(dequeuedCells[.second]?.count).toEventually(equal(3))
-        expect(dequeuedCells[.third]?.count).toEventually(equal(3))
-        expect(dequeuedCells[.fourth]?.count).toEventually(equal(3))
-        
-        expect(dequeuedCells[.first]?[safe: 0]).toEventually(be(self.tableView.visibleCells[0]))
-        expect(dequeuedCells[.first]?[safe: 1]).toEventually(be(self.tableView.visibleCells[1]))
-        expect(dequeuedCells[.first]?[safe: 2]).toEventually(be(self.tableView.visibleCells[2]))
-        expect(dequeuedCells[.second]?[safe: 0]).toEventually(be(self.tableView.visibleCells[3]))
-        expect(dequeuedCells[.second]?[safe: 1]).toEventually(be(self.tableView.visibleCells[4]))
-        expect(dequeuedCells[.second]?[safe: 2]).toEventually(be(self.tableView.visibleCells[5]))
-        expect(dequeuedCells[.third]?[safe: 0]).toEventually(be(self.tableView.visibleCells[6]))
-        expect(dequeuedCells[.third]?[safe: 1]).toEventually(be(self.tableView.visibleCells[7]))
-        expect(dequeuedCells[.third]?[safe: 2]).toEventually(be(self.tableView.visibleCells[8]))
-        expect(dequeuedCells[.fourth]?[safe: 0]).toEventually(be(self.tableView.visibleCells[9]))
-        expect(dequeuedCells[.fourth]?[safe: 1]).toEventually(be(self.tableView.visibleCells[10]))
-        expect(dequeuedCells[.fourth]?[safe: 2]).toEventually(be(self.tableView.visibleCells[11]))
-        
-        // test that we got the right number of models
-        expect(viewModels.count).toEventually(equal(4))
-        expect(viewModels[.first]?.count).toEventually(equal(3))
-        expect(viewModels[.second]?.count).toEventually(equal(3))
-        expect(viewModels[.third]?.count).toEventually(equal(3))
-        expect(viewModels[.fourth]?.count).toEventually(equal(3))
-        
-        expect(viewModels[.first]?[safe: 0]??.id).toEventually(equal("1-1"))
-        expect(viewModels[.first]?[safe: 1]??.id).toEventually(equal("1-2*"))
-        expect(viewModels[.first]?[safe: 2]??.id).toEventually(equal("1-3"))
-        expect(viewModels[.second]?[safe: 0]??.id).toEventually(equal("2-1"))
-        expect(viewModels[.second]?[safe: 1]??.id).toEventually(equal("2-2*"))
-        expect(viewModels[.second]?[safe: 2]??.id).toEventually(equal("2-3"))
-        expect(viewModels[.third]?[safe: 0]??.id).toEventually(equal("3-1"))
-        expect(viewModels[.third]?[safe: 1]??.id).toEventually(equal("3-2*"))
-        expect(viewModels[.third]?[safe: 2]??.id).toEventually(equal("3-3"))
-        expect(viewModels[.fourth]?[safe: 0]??.id).toEventually(equal("4-1"))
-        expect(viewModels[.fourth]?[safe: 1]??.id).toEventually(equal("4-2*"))
-        expect(viewModels[.fourth]?[safe: 2]??.id).toEventually(equal("4-3"))
-    }
+        expect(viewModels[.third]?[safe: 2]??.id).toEventually(beNil())
+        expect(viewModels[.fourth]?[safe: 0]??.id).toEventually(equal("4-2*"))
+        expect(viewModels[.fourth]?[safe: 1]??.id).toEventually(equal("4-3"))
+        expect(viewModels[.fourth]?[safe: 2]??.id).toEventually(equal("4-1"))    }
     
     /*
      Test the 'cell type + model + view model mapping' binding chain method.
