@@ -5,7 +5,7 @@ class TestCell: UITableViewCell {
     var model: Any?
 }
 
-class TestViewModelCell: UITableViewCell, ViewModelBindable {
+class TestViewModelCell: TestCell, ViewModelBindable {
     struct ViewModel {
         let id: String
     }
