@@ -17,6 +17,7 @@
 		93C36A4A20DB02E0006B7ECF /* TitleDetailTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 93C36A4920DB02E0006B7ECF /* TitleDetailTableViewCell.xib */; };
 		AA8B7612901AEED60C395EB0 /* Pods_BraidExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5FEBC5088F0D7E30632BBD0 /* Pods_BraidExample.framework */; };
 		AB05A86C2223B31B00C9C3E3 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB05A86B2223B31B00C9C3E3 /* Models.swift */; };
+		AB05A86E2224FEA800C9C3E3 /* MockUpdateDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB05A86D2224FEA800C9C3E3 /* MockUpdateDelegate.swift */; };
 		AB18253121E5254E004FE239 /* TableDisplayBehaviorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB18253021E5254E004FE239 /* TableDisplayBehaviorTests.swift */; };
 		AB1CCB9E21D8391A00EB1CDE /* TableHeaderFooterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1CCB9D21D8391A00EB1CDE /* TableHeaderFooterTests.swift */; };
 		AB577B9C21759F6C00CD2363 /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB577B9B21759F6C00CD2363 /* AccountService.swift */; };
@@ -90,6 +91,7 @@
 		93C36A4720DAFF97006B7ECF /* SamplesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamplesViewController.swift; sourceTree = "<group>"; };
 		93C36A4920DB02E0006B7ECF /* TitleDetailTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TitleDetailTableViewCell.xib; sourceTree = "<group>"; };
 		AB05A86B2223B31B00C9C3E3 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		AB05A86D2224FEA800C9C3E3 /* MockUpdateDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockUpdateDelegate.swift; sourceTree = "<group>"; };
 		AB18253021E5254E004FE239 /* TableDisplayBehaviorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableDisplayBehaviorTests.swift; sourceTree = "<group>"; };
 		AB1CCB9D21D8391A00EB1CDE /* TableHeaderFooterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableHeaderFooterTests.swift; sourceTree = "<group>"; };
 		AB577B9B21759F6C00CD2363 /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
@@ -331,6 +333,7 @@
 				AB05A86B2223B31B00C9C3E3 /* Models.swift */,
 				ABE0F37421BE24F30098950D /* Cells.swift */,
 				ABE0F37921BE282A0098950D /* TableTestCase.swift */,
+				AB05A86D2224FEA800C9C3E3 /* MockUpdateDelegate.swift */,
 			);
 			path = "Test Classes";
 			sourceTree = "<group>";
@@ -588,6 +591,7 @@
 				AB1CCB9E21D8391A00EB1CDE /* TableHeaderFooterTests.swift in Sources */,
 				ABE0F36B21BE20380098950D /* TableDimensionTests.swift in Sources */,
 				AB18253121E5254E004FE239 /* TableDisplayBehaviorTests.swift in Sources */,
+				AB05A86E2224FEA800C9C3E3 /* MockUpdateDelegate.swift in Sources */,
 				ABE0F37A21BE282A0098950D /* TableTestCase.swift in Sources */,
 				ABE0F37521BE24F30098950D /* Cells.swift in Sources */,
 				ABE0F37C21BE30730098950D /* TableCellBindingMethodTests.swift in Sources */,

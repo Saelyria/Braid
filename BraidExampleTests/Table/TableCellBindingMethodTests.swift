@@ -14,18 +14,47 @@ class TableCellBindingMethodTests: TableTestCase {
     }
     
     var binder: SectionedTableViewBinder<Section>!
-    var firstSectionModels: [TestModel] = []
-    var secondThirdSectionModels: [Section: [TestModel]] = [:]
-    var fourthSectionModels: [Section: [TestModel]] = [:]
+    var updateDelegate: MockUpdateDelegate!
+    
+    let firstSectionModels: [TestModel] = [
+        TestModel(0, "1-0")]
+    let secondThirdSectionModels: [Section: [TestModel]] = [
+        .second: [
+            TestModel(1, "2-0"),
+            TestModel(2, "2-1")],
+        .third: [
+            TestModel(3, "3-0"),
+            TestModel(4, "3-1"),
+            TestModel(5, "3-2")]]
+    let fourthSectionModels: [Section: [TestModel]] = [
+        .fourth: [
+            TestModel(6, "4-0"),
+            TestModel(7, "4-1"),
+            TestModel(8, "4-2"),
+            TestModel(9, "4-3")]]
+    
+    let updatedFirstSectionModels: [TestModel] = [
+        TestModel(0, "1-0"),
+        TestModel(0, "1-1")]
+    let updatedSecondThirdSectionModels: [Section: [TestModel]] = [
+        .second: [
+            TestModel(1, "2-0"),
+            TestModel(2, "2-1*")],
+        .third: [
+            TestModel(4, "3-1"),
+            TestModel(5, "3-2")]]
+    let updatedFourthSectionModels: [Section: [TestModel]] = [
+        .fourth: [
+            TestModel(7, "4-1*"),
+            TestModel(8, "4-2"),
+            TestModel(9, "4-0")]]
     
     override func setUp() {
         super.setUp()
         self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
+        self.updateDelegate = MockUpdateDelegate()
+        self.binder.updateDelegate = self.updateDelegate
         self.binder.setupForTesting()
-        
-        self.firstSectionModels = ["1-1"]
-        self.secondThirdSectionModels = [.second: ["2-1", "2-2"], .third: ["3-1", "3-2", "3-3"]]
-        self.fourthSectionModels = [.fourth: ["4-1", "4-2", "4-3", "4-4"]]
     }
     
     // MARK: -
@@ -90,16 +119,16 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(models[.third]?.count).toEventually(equal(3))
         expect(models[.fourth]?.count).toEventually(equal(4))
         
-        expect(models[.first]?[safe: 0]).toEventually(equal("1-1"))
-        expect(models[.second]?[safe: 0]).toEventually(equal("2-1"))
-        expect(models[.second]?[safe: 1]).toEventually(equal("2-2"))
-        expect(models[.third]?[safe: 0]).toEventually(equal("3-1"))
-        expect(models[.third]?[safe: 1]).toEventually(equal("3-2"))
-        expect(models[.third]?[safe: 2]).toEventually(equal("3-3"))
-        expect(models[.fourth]?[safe: 0]).toEventually(equal("4-1"))
-        expect(models[.fourth]?[safe: 1]).toEventually(equal("4-2"))
-        expect(models[.fourth]?[safe: 2]).toEventually(equal("4-3"))
-        expect(models[.fourth]?[safe: 3]).toEventually(equal("4-4"))
+        expect(models[.first]?[safe: 0]).toEventually(equal(TestModel(0, "1-0")))
+        expect(models[.second]?[safe: 0]).toEventually(equal(TestModel(1, "2-0")))
+        expect(models[.second]?[safe: 1]).toEventually(equal(TestModel(2, "2-1")))
+        expect(models[.third]?[safe: 0]).toEventually(equal(TestModel(3, "3-0")))
+        expect(models[.third]?[safe: 1]).toEventually(equal(TestModel(4, "3-1")))
+        expect(models[.third]?[safe: 2]).toEventually(equal(TestModel(5, "3-2")))
+        expect(models[.fourth]?[safe: 0]).toEventually(equal(TestModel(6, "4-0")))
+        expect(models[.fourth]?[safe: 1]).toEventually(equal(TestModel(7, "4-1")))
+        expect(models[.fourth]?[safe: 2]).toEventually(equal(TestModel(8, "4-2")))
+        expect(models[.fourth]?[safe: 3]).toEventually(equal(TestModel(9, "4-3")))
     }
     
     /*
@@ -173,7 +202,6 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(dequeuedCells[.fourth]?[safe: 1]).toEventually(be(self.tableView.visibleCells[7]))
         expect(dequeuedCells[.fourth]?[safe: 2]).toEventually(be(self.tableView.visibleCells[8]))
         expect(dequeuedCells[.fourth]?[safe: 3]).toEventually(be(self.tableView.visibleCells[9]))
-        
         
         // test that we got the right number of models
         expect(viewModels.count).toEventually(equal(4))
@@ -264,16 +292,16 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(models[.third]?.count).toEventually(equal(3))
         expect(models[.fourth]?.count).toEventually(equal(4))
         
-        expect(models[.first]?[safe: 0]).toEventually(equal("1-1"))
-        expect(models[.second]?[safe: 0]).toEventually(equal("2-1"))
-        expect(models[.second]?[safe: 1]).toEventually(equal("2-2"))
-        expect(models[.third]?[safe: 0]).toEventually(equal("3-1"))
-        expect(models[.third]?[safe: 1]).toEventually(equal("3-2"))
-        expect(models[.third]?[safe: 2]).toEventually(equal("3-3"))
-        expect(models[.fourth]?[safe: 0]).toEventually(equal("4-1"))
-        expect(models[.fourth]?[safe: 1]).toEventually(equal("4-2"))
-        expect(models[.fourth]?[safe: 2]).toEventually(equal("4-3"))
-        expect(models[.fourth]?[safe: 3]).toEventually(equal("4-4"))
+        expect(models[.first]?[safe: 0]).toEventually(equal(TestModel(0, "1-0")))
+        expect(models[.second]?[safe: 0]).toEventually(equal(TestModel(1, "2-0")))
+        expect(models[.second]?[safe: 1]).toEventually(equal(TestModel(2, "2-1")))
+        expect(models[.third]?[safe: 0]).toEventually(equal(TestModel(3, "3-0")))
+        expect(models[.third]?[safe: 1]).toEventually(equal(TestModel(4, "3-1")))
+        expect(models[.third]?[safe: 2]).toEventually(equal(TestModel(5, "3-2")))
+        expect(models[.fourth]?[safe: 0]).toEventually(equal(TestModel(6, "4-0")))
+        expect(models[.fourth]?[safe: 1]).toEventually(equal(TestModel(7, "4-1")))
+        expect(models[.fourth]?[safe: 2]).toEventually(equal(TestModel(8, "4-2")))
+        expect(models[.fourth]?[safe: 3]).toEventually(equal(TestModel(9, "4-3")))
         
         // test that we got the right number of view models
         expect(viewModels.count).toEventually(equal(4))
@@ -282,16 +310,16 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(viewModels[.third]?.count).toEventually(equal(3))
         expect(viewModels[.fourth]?.count).toEventually(equal(4))
         
-        expect(viewModels[.first]?[safe: 0]??.id).toEventually(equal("1-1"))
-        expect(viewModels[.second]?[safe: 0]??.id).toEventually(equal("2-1"))
-        expect(viewModels[.second]?[safe: 1]??.id).toEventually(equal("2-2"))
-        expect(viewModels[.third]?[safe: 0]??.id).toEventually(equal("3-1"))
-        expect(viewModels[.third]?[safe: 1]??.id).toEventually(equal("3-2"))
-        expect(viewModels[.third]?[safe: 2]??.id).toEventually(equal("3-3"))
-        expect(viewModels[.fourth]?[safe: 0]??.id).toEventually(equal("4-1"))
-        expect(viewModels[.fourth]?[safe: 1]??.id).toEventually(equal("4-2"))
-        expect(viewModels[.fourth]?[safe: 2]??.id).toEventually(equal("4-3"))
-        expect(viewModels[.fourth]?[safe: 3]??.id).toEventually(equal("4-4"))
+        expect(viewModels[.first]?[safe: 0]??.id).toEventually(equal("1-0"))
+        expect(viewModels[.second]?[safe: 0]??.id).toEventually(equal("2-0"))
+        expect(viewModels[.second]?[safe: 1]??.id).toEventually(equal("2-1"))
+        expect(viewModels[.third]?[safe: 0]??.id).toEventually(equal("3-0"))
+        expect(viewModels[.third]?[safe: 1]??.id).toEventually(equal("3-1"))
+        expect(viewModels[.third]?[safe: 2]??.id).toEventually(equal("3-2"))
+        expect(viewModels[.fourth]?[safe: 0]??.id).toEventually(equal("4-0"))
+        expect(viewModels[.fourth]?[safe: 1]??.id).toEventually(equal("4-1"))
+        expect(viewModels[.fourth]?[safe: 2]??.id).toEventually(equal("4-2"))
+        expect(viewModels[.fourth]?[safe: 3]??.id).toEventually(equal("4-3"))
     }
 
     /*
@@ -366,16 +394,16 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(models[.third]?.count).toEventually(equal(3))
         expect(models[.fourth]?.count).toEventually(equal(4))
         
-        expect(models[.first]?[safe: 0]).toEventually(equal("1-1"))
-        expect(models[.second]?[safe: 0]).toEventually(equal("2-1"))
-        expect(models[.second]?[safe: 1]).toEventually(equal("2-2"))
-        expect(models[.third]?[safe: 0]).toEventually(equal("3-1"))
-        expect(models[.third]?[safe: 1]).toEventually(equal("3-2"))
-        expect(models[.third]?[safe: 2]).toEventually(equal("3-3"))
-        expect(models[.fourth]?[safe: 0]).toEventually(equal("4-1"))
-        expect(models[.fourth]?[safe: 1]).toEventually(equal("4-2"))
-        expect(models[.fourth]?[safe: 2]).toEventually(equal("4-3"))
-        expect(models[.fourth]?[safe: 3]).toEventually(equal("4-4"))
+        expect(models[.first]?[safe: 0]).toEventually(equal(TestModel(0, "1-0")))
+        expect(models[.second]?[safe: 0]).toEventually(equal(TestModel(1, "2-0")))
+        expect(models[.second]?[safe: 1]).toEventually(equal(TestModel(2, "2-1")))
+        expect(models[.third]?[safe: 0]).toEventually(equal(TestModel(3, "3-0")))
+        expect(models[.third]?[safe: 1]).toEventually(equal(TestModel(4, "3-1")))
+        expect(models[.third]?[safe: 2]).toEventually(equal(TestModel(5, "3-2")))
+        expect(models[.fourth]?[safe: 0]).toEventually(equal(TestModel(6, "4-0")))
+        expect(models[.fourth]?[safe: 1]).toEventually(equal(TestModel(7, "4-1")))
+        expect(models[.fourth]?[safe: 2]).toEventually(equal(TestModel(8, "4-2")))
+        expect(models[.fourth]?[safe: 3]).toEventually(equal(TestModel(9, "4-3")))
     }
     
     /*
@@ -439,6 +467,9 @@ class TableCellBindingMethodTests: TableTestCase {
      Test the 'cell type + model' binding chain method.
      */
     func testCellTypeModelClosureBindingMethod() {
+        var updates: CollectionUpdate?
+        self.updateDelegate?.onUpdate = { updates = $0 }
+        
         self.binder.displayedSections = [.first, .second, .third, .fourth]
         
         var cells: [Section: [TestCell]] = [.first: [], .second: [], .third: [], .fourth: []]
@@ -472,40 +503,40 @@ class TableCellBindingMethodTests: TableTestCase {
         // test we got the right number of cells and that they relate to the right cells on the table
         expect(self.tableView.visibleCells.count).toEventually(equal(10))
         
-        expect(cells.count).toEventually(equal(4))
-        expect(cells[.first]?.count).toEventually(equal(1))
-        expect(cells[.second]?.count).toEventually(equal(2))
-        expect(cells[.third]?.count).toEventually(equal(3))
-        expect(cells[.fourth]?.count).toEventually(equal(4))
+        expect(cells.count).to(equal(4))
+        expect(cells[.first]?.count).to(equal(1))
+        expect(cells[.second]?.count).to(equal(2))
+        expect(cells[.third]?.count).to(equal(3))
+        expect(cells[.fourth]?.count).to(equal(4))
         
-        expect(cells[.first]?[safe: 0]).toEventually(be(self.tableView.visibleCells[0]))
-        expect(cells[.second]?[safe: 0]).toEventually(be(self.tableView.visibleCells[1]))
-        expect(cells[.second]?[safe: 1]).toEventually(be(self.tableView.visibleCells[2]))
-        expect(cells[.third]?[safe: 0]).toEventually(be(self.tableView.visibleCells[3]))
-        expect(cells[.third]?[safe: 1]).toEventually(be(self.tableView.visibleCells[4]))
-        expect(cells[.third]?[safe: 2]).toEventually(be(self.tableView.visibleCells[5]))
-        expect(cells[.fourth]?[safe: 0]).toEventually(be(self.tableView.visibleCells[6]))
-        expect(cells[.fourth]?[safe: 1]).toEventually(be(self.tableView.visibleCells[7]))
-        expect(cells[.fourth]?[safe: 2]).toEventually(be(self.tableView.visibleCells[8]))
-        expect(cells[.fourth]?[safe: 3]).toEventually(be(self.tableView.visibleCells[9]))
+        expect(cells[.first]?[safe: 0]).to(be(self.tableView.visibleCells[0]))
+        expect(cells[.second]?[safe: 0]).to(be(self.tableView.visibleCells[1]))
+        expect(cells[.second]?[safe: 1]).to(be(self.tableView.visibleCells[2]))
+        expect(cells[.third]?[safe: 0]).to(be(self.tableView.visibleCells[3]))
+        expect(cells[.third]?[safe: 1]).to(be(self.tableView.visibleCells[4]))
+        expect(cells[.third]?[safe: 2]).to(be(self.tableView.visibleCells[5]))
+        expect(cells[.fourth]?[safe: 0]).to(be(self.tableView.visibleCells[6]))
+        expect(cells[.fourth]?[safe: 1]).to(be(self.tableView.visibleCells[7]))
+        expect(cells[.fourth]?[safe: 2]).to(be(self.tableView.visibleCells[8]))
+        expect(cells[.fourth]?[safe: 3]).to(be(self.tableView.visibleCells[9]))
         
         // test that we got the right number of models
-        expect(models.count).toEventually(equal(4))
-        expect(models[.first]?.count).toEventually(equal(1))
-        expect(models[.second]?.count).toEventually(equal(2))
-        expect(models[.third]?.count).toEventually(equal(3))
-        expect(models[.fourth]?.count).toEventually(equal(4))
+        expect(models.count).to(equal(4))
+        expect(models[.first]?.count).to(equal(1))
+        expect(models[.second]?.count).to(equal(2))
+        expect(models[.third]?.count).to(equal(3))
+        expect(models[.fourth]?.count).to(equal(4))
         
-        expect(models[.first]?[safe: 0]).toEventually(equal("1-1"))
-        expect(models[.second]?[safe: 0]).toEventually(equal("2-1"))
-        expect(models[.second]?[safe: 1]).toEventually(equal("2-2"))
-        expect(models[.third]?[safe: 0]).toEventually(equal("3-1"))
-        expect(models[.third]?[safe: 1]).toEventually(equal("3-2"))
-        expect(models[.third]?[safe: 2]).toEventually(equal("3-3"))
-        expect(models[.fourth]?[safe: 0]).toEventually(equal("4-1"))
-        expect(models[.fourth]?[safe: 1]).toEventually(equal("4-2"))
-        expect(models[.fourth]?[safe: 2]).toEventually(equal("4-3"))
-        expect(models[.fourth]?[safe: 3]).toEventually(equal("4-4"))
+        expect(models[.first]?[safe: 0]).to(equal(TestModel(0, "1-0")))
+        expect(models[.second]?[safe: 0]).to(equal(TestModel(1, "2-0")))
+        expect(models[.second]?[safe: 1]).to(equal(TestModel(2, "2-1")))
+        expect(models[.third]?[safe: 0]).to(equal(TestModel(3, "3-0")))
+        expect(models[.third]?[safe: 1]).to(equal(TestModel(4, "3-1")))
+        expect(models[.third]?[safe: 2]).to(equal(TestModel(5, "3-2")))
+        expect(models[.fourth]?[safe: 0]).to(equal(TestModel(6, "4-0")))
+        expect(models[.fourth]?[safe: 1]).to(equal(TestModel(7, "4-1")))
+        expect(models[.fourth]?[safe: 2]).to(equal(TestModel(8, "4-2")))
+        expect(models[.fourth]?[safe: 3]).to(equal(TestModel(9, "4-3")))
         
         // update the models then refresh the table
         self.firstSectionModels = ["1-1", "1-2"]
@@ -518,39 +549,43 @@ class TableCellBindingMethodTests: TableTestCase {
         cells = self.binder.cellsInSections(type: TestCell.self)
         models = cells.mapValues { $0.map { $0.model as? TestModel }.compactMap { $0 } }
         
-        expect(cells.count).toEventually(equal(4))
-        expect(cells[.first]?.count).toEventually(equal(2))
-        expect(cells[.second]?.count).toEventually(equal(2))
-        expect(cells[.third]?.count).toEventually(equal(2))
-        expect(cells[.fourth]?.count).toEventually(equal(3))
+        expect(cells.count).to(equal(4))
+        expect(cells[.first]?.count).to(equal(2))
+        expect(cells[.second]?.count).to(equal(2))
+        expect(cells[.third]?.count).to(equal(2))
+        expect(cells[.fourth]?.count).to(equal(3))
         
-        expect(cells[.first]?[safe: 0]).toEventually(be(self.tableView.visibleCells[0]))
-        expect(cells[.first]?[safe: 1]).toEventually(be(self.tableView.visibleCells[1]))
-        expect(cells[.second]?[safe: 0]).toEventually(be(self.tableView.visibleCells[2]))
-        expect(cells[.second]?[safe: 1]).toEventually(be(self.tableView.visibleCells[3]))
-        expect(cells[.third]?[safe: 0]).toEventually(be(self.tableView.visibleCells[4]))
-        expect(cells[.third]?[safe: 1]).toEventually(be(self.tableView.visibleCells[5]))
-        expect(cells[.fourth]?[safe: 0]).toEventually(be(self.tableView.visibleCells[6]))
-        expect(cells[.fourth]?[safe: 1]).toEventually(be(self.tableView.visibleCells[7]))
-        expect(cells[.fourth]?[safe: 2]).toEventually(be(self.tableView.visibleCells[8]))
+        expect(cells[.first]?[safe: 0]).to(be(self.tableView.visibleCells[0]))
+        expect(cells[.first]?[safe: 1]).to(be(self.tableView.visibleCells[1]))
+        expect(cells[.second]?[safe: 0]).to(be(self.tableView.visibleCells[2]))
+        expect(cells[.second]?[safe: 1]).to(be(self.tableView.visibleCells[3]))
+        expect(cells[.third]?[safe: 0]).to(be(self.tableView.visibleCells[4]))
+        expect(cells[.third]?[safe: 1]).to(be(self.tableView.visibleCells[5]))
+        expect(cells[.fourth]?[safe: 0]).to(be(self.tableView.visibleCells[6]))
+        expect(cells[.fourth]?[safe: 1]).to(be(self.tableView.visibleCells[7]))
+        expect(cells[.fourth]?[safe: 2]).to(be(self.tableView.visibleCells[8]))
         
         // test that we got the right number of models
-        expect(models.count).toEventually(equal(4))
-        expect(models[.first]?.count).toEventually(equal(2))
-        expect(models[.second]?.count).toEventually(equal(2))
-        expect(models[.third]?.count).toEventually(equal(2))
-        expect(models[.fourth]?.count).toEventually(equal(3))
+        expect(models.count).to(equal(4))
+        expect(models[.first]?.count).to(equal(2))
+        expect(models[.second]?.count).to(equal(2))
+        expect(models[.third]?.count).to(equal(2))
+        expect(models[.fourth]?.count).to(equal(3))
         
-        expect(models[.first]?[safe: 0]).toEventually(equal("1-1"))
-        expect(models[.first]?[safe: 1]).toEventually(equal("1-2"))
-        expect(models[.second]?[safe: 0]).toEventually(equal("2-1"))
-        expect(models[.second]?[safe: 1]).toEventually(equal("2-2*"))
-        expect(models[.third]?[safe: 0]).toEventually(equal("3-1"))
-        expect(models[.third]?[safe: 1]).toEventually(equal("3-2"))
-        expect(models[.third]?[safe: 2]).toEventually(beNil())
-        expect(models[.fourth]?[safe: 0]).toEventually(equal("4-2*"))
-        expect(models[.fourth]?[safe: 1]).toEventually(equal("4-3"))
-        expect(models[.fourth]?[safe: 2]).toEventually(equal("4-1"))
+        expect(models[.first]?[safe: 0]).to(equal("1-1"))
+        expect(models[.first]?[safe: 1]).to(equal("1-2"))
+        expect(models[.second]?[safe: 0]).to(equal("2-1"))
+        expect(models[.second]?[safe: 1]).to(equal("2-2*"))
+        expect(models[.third]?[safe: 0]).to(equal("3-1"))
+        expect(models[.third]?[safe: 1]).to(equal("3-2"))
+        expect(models[.third]?[safe: 2]).to(beNil())
+        expect(models[.fourth]?[safe: 0]).to(equal("4-2*"))
+        expect(models[.fourth]?[safe: 1]).to(equal("4-3"))
+        expect(models[.fourth]?[safe: 2]).to(equal("4-1"))
+        
+        expect(updates?.itemInsertions).to(contain(IndexPath(row: 1, section: 0)))
+        expect(updates?.itemUpdates).to(contain(IndexPath(row: 1, section: 1)))
+        expect(updates?.itemDeletions).to(contain(IndexPath(row: 2, section: 1)))
     }
     
     /*

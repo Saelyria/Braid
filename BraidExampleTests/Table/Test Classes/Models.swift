@@ -1,12 +1,11 @@
 import Braid
 
-struct TestModel: ExpressibleByStringLiteral, CollectionIdentifiable, Equatable {
+struct TestModel: CollectionIdentifiable, Equatable {
+    let collectionId: String
     let value: String
-    var collectionId: String {
-        return self.value
-    }
     
-    init(stringLiteral value: String) {
+    init(_ id: Int, _ value: String) {
+        self.collectionId = String(id)
         self.value = value
     }
 }
