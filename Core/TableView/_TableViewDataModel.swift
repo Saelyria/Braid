@@ -135,12 +135,27 @@ extension _TableViewDataModel {
         // Reload sections whose header or footer were updated
         for section in other.headerFooterUpdatedSections.filter({ !other.cellUpdatedSections.contains($0) }) {
             guard let i = other.displayedSections.firstIndex(of: section) else { continue }
+            // If the section was deleted or inserted, don't add it to the sections to update
+            guard diff.elements.filter({ element in
+                switch element {
+                case .deleteSection(let at), .insertSection(let at): return at == i
+                default: return false
+                }
+            }).isEmpty else { continue }
             diff.elements.append(.updateSectionHeaderFooter(i))
         }
         
         // Reload sections that were updated whose items weren't equatable
         for section in other.cellUpdatedSections.filter({ other.delegate?.itemEqualityChecker(for: $0) == nil }) {
             guard let i = other.displayedSections.firstIndex(of: section) else { continue }
+            // If the section was deleted or inserted, don't add it to the sections to update
+            guard diff.elements.filter({ element in
+                switch element {
+                case .deleteSection(let at), .insertSection(let at): return at == i
+                default: return false
+                }
+            }).isEmpty else { continue }
+            
             diff.elements.append(.updateUndiffableSection(i))
             
             // For undiffable sections, perform inserts/deletes on the end of the section if the counts are different

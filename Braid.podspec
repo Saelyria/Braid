@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'Braid'
-  s.version          = '1.0.0'
+  s.version          = '1.0.1'
   s.summary          = 'Declarative, type-safe table view binding.'
   s.description      = <<-DESC
   Braid is a table view binding library that makes setup for table views more declarative, more functional, and

@@ -166,7 +166,7 @@ internal extension SectionedTableViewBinder {
     {
         let handler: (Any, Any) -> Bool? = { (lhs, rhs) in
             guard let lhs = lhs as? I, let rhs = rhs as? I else { return nil }
-            return lhs == rhs
+            return lhs.collectionId == rhs.collectionId && lhs == rhs
         }
         self.handlers.add(handler, toHandlerSetAt: \.itemEqualityCheckers, forScope: affectedSections)
     }

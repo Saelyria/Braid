@@ -509,19 +509,35 @@ extension SectionedTableViewBinder: _TableViewDataModelDelegate {
             if let delegate = self.updateDelegate {
                 delegate.animate(updates: update, on: self.tableView)
             } else {
-                self.tableView.beginUpdates()
-                self.tableView.deleteRows(at: update.itemDeletions, with: self.rowDeletionAnimation)
-                self.tableView.insertRows(at: update.itemInsertions, with: self.rowInsertionAnimation)
-                update.itemMoves.forEach { self.tableView.moveRow(at: $0.from, to: $0.to) }
-                self.tableView.deleteSections(update.sectionDeletions, with: self.sectionDeletionAnimation)
-                self.tableView.insertSections(update.sectionInsertions, with: self.sectionInsertionAnimation)
-                update.sectionMoves.forEach { self.tableView.moveSection($0.from, toSection: $0.to) }
-                self.tableView.endUpdates()
-                
-                self.tableView.reloadRows(at: update.itemUpdates, with: self.rowUpdateAnimation)
-                self.tableView.reloadSections(update.sectionUpdates, with: self.sectionUpdateAnimation)
-                self.tableView.reloadSections(update.sectionHeaderFooterUpdates, with: self.sectionHeaderFooterUpdateAnimation)
-                self.tableView.reloadSections(update.undiffableSectionUpdates, with: self.undiffableSectionUpdateAnimation)
+                if #available(iOS 11.0, *) {
+                    self.tableView.performBatchUpdates({
+                        self.tableView.deleteRows(at: update.itemDeletions, with: self.rowDeletionAnimation)
+                        self.tableView.insertRows(at: update.itemInsertions, with: self.rowInsertionAnimation)
+                        update.itemMoves.forEach { self.tableView.moveRow(at: $0.from, to: $0.to) }
+                        self.tableView.deleteSections(update.sectionDeletions, with: self.sectionDeletionAnimation)
+                        self.tableView.insertSections(update.sectionInsertions, with: self.sectionInsertionAnimation)
+                        update.sectionMoves.forEach { self.tableView.moveSection($0.from, toSection: $0.to) }
+                        
+                        self.tableView.reloadRows(at: update.itemUpdates, with: self.rowUpdateAnimation)
+                        self.tableView.reloadSections(update.sectionUpdates, with: self.sectionUpdateAnimation)
+                        self.tableView.reloadSections(update.sectionHeaderFooterUpdates, with: self.sectionHeaderFooterUpdateAnimation)
+                        self.tableView.reloadSections(update.undiffableSectionUpdates, with: self.undiffableSectionUpdateAnimation)
+                    }, completion: nil)
+                } else {
+                    self.tableView.beginUpdates()
+                    self.tableView.deleteRows(at: update.itemDeletions, with: self.rowDeletionAnimation)
+                    self.tableView.insertRows(at: update.itemInsertions, with: self.rowInsertionAnimation)
+                    update.itemMoves.forEach { self.tableView.moveRow(at: $0.from, to: $0.to) }
+                    self.tableView.deleteSections(update.sectionDeletions, with: self.sectionDeletionAnimation)
+                    self.tableView.insertSections(update.sectionInsertions, with: self.sectionInsertionAnimation)
+                    update.sectionMoves.forEach { self.tableView.moveSection($0.from, toSection: $0.to) }
+                    
+                    self.tableView.reloadRows(at: update.itemUpdates, with: self.rowUpdateAnimation)
+                    self.tableView.reloadSections(update.sectionUpdates, with: self.sectionUpdateAnimation)
+                    self.tableView.reloadSections(update.sectionHeaderFooterUpdates, with: self.sectionHeaderFooterUpdateAnimation)
+                    self.tableView.reloadSections(update.undiffableSectionUpdates, with: self.undiffableSectionUpdateAnimation)
+                    self.tableView.endUpdates()
+                }
             }
         })
         
