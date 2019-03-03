@@ -16,9 +16,9 @@ class TableCellBindingMethodTests: TableTestCase {
     var binder: SectionedTableViewBinder<Section>!
     var updateDelegate: MockUpdateDelegate!
     
-    let firstSectionModels: [TestModel] = [
+    let initialFirstSectionModels: [TestModel] = [
         TestModel(0, "1-0")]
-    let secondThirdSectionModels: [Section: [TestModel]] = [
+    let initialSecondThirdSectionModels: [Section: [TestModel]] = [
         .second: [
             TestModel(1, "2-0"),
             TestModel(2, "2-1")],
@@ -26,7 +26,7 @@ class TableCellBindingMethodTests: TableTestCase {
             TestModel(3, "3-0"),
             TestModel(4, "3-1"),
             TestModel(5, "3-2")]]
-    let fourthSectionModels: [Section: [TestModel]] = [
+    let initialFourthSectionModels: [Section: [TestModel]] = [
         .fourth: [
             TestModel(6, "4-0"),
             TestModel(7, "4-1"),
@@ -35,7 +35,7 @@ class TableCellBindingMethodTests: TableTestCase {
     
     let updatedFirstSectionModels: [TestModel] = [
         TestModel(0, "1-0"),
-        TestModel(0, "1-1")]
+        TestModel(10, "1-1")]
     let updatedSecondThirdSectionModels: [Section: [TestModel]] = [
         .second: [
             TestModel(1, "2-0"),
@@ -69,21 +69,21 @@ class TableCellBindingMethodTests: TableTestCase {
         var models: [Section: [TestModel]] = [.first: [], .second: [], .third: [], .fourth: []]
 
         self.binder.onSection(.first)
-            .bind(cellType: TestCell.self, models: firstSectionModels)
+            .bind(cellType: TestCell.self, models: self.initialFirstSectionModels)
             .onDequeue { row, cell, model in
                 dequeuedCells[.first]?.insert(cell, at: row)
                 models[.first]?.insert(model, at: row)
             }
         
         self.binder.onSections(.second, .third)
-            .bind(cellType: TestCell.self, models: secondThirdSectionModels)
+            .bind(cellType: TestCell.self, models: self.initialSecondThirdSectionModels)
             .onDequeue { section, row, cell, model in
                 dequeuedCells[section]?.insert(cell, at: row)
                 models[section]?.insert(model, at: row)
             }
         
         self.binder.onAllOtherSections()
-            .bind(cellType: TestCell.self, models: fourthSectionModels)
+            .bind(cellType: TestCell.self, models: self.initialFourthSectionModels)
             .onDequeue { section, row, cell, model in
                 dequeuedCells[section]?.insert(cell, at: row)
                 models[section]?.insert(model, at: row)
@@ -141,41 +141,24 @@ class TableCellBindingMethodTests: TableTestCase {
         var viewModels: [Section: [TestViewModelCell.ViewModel?]] = [.first: [], .second: [], .third: [], .fourth: []]
         
         self.binder.onSection(.first)
-            .bind(cellType: TestViewModelCell.self, viewModels: [
-                TestViewModelCell.ViewModel(id: "1-1"),
-            ])
+            .bind(cellType: TestViewModelCell.self,
+                  viewModels: self.initialFirstSectionModels.map { TestViewModelCell.ViewModel(id: $0.value) })
             .onDequeue { row, cell in
                 dequeuedCells[.first]?.insert(cell, at: row)
                 viewModels[.first]?.insert(cell.viewModel, at: row)
             }
         
         self.binder.onSections(.second, .third)
-            .bind(cellType: TestViewModelCell.self, viewModels: [
-                .second: [
-                    TestViewModelCell.ViewModel(id: "2-1"),
-                    TestViewModelCell.ViewModel(id: "2-2"),
-                ],
-                .third: [
-                    TestViewModelCell.ViewModel(id: "3-1"),
-                    TestViewModelCell.ViewModel(id: "3-2"),
-                    TestViewModelCell.ViewModel(id: "3-3")
-
-                ]
-            ])
+            .bind(cellType: TestViewModelCell.self,
+                  viewModels: self.initialSecondThirdSectionModels.mapValues { $0.map { TestViewModelCell.ViewModel(id: $0.value) } })
             .onDequeue { section, row, cell in
                 dequeuedCells[section]?.insert(cell, at: row)
                 viewModels[section]?.insert(cell.viewModel, at: row)
             }
         
         self.binder.onAllOtherSections()
-            .bind(cellType: TestViewModelCell.self, viewModels: [
-                .fourth: [
-                    TestViewModelCell.ViewModel(id: "4-1"),
-                    TestViewModelCell.ViewModel(id: "4-2"),
-                    TestViewModelCell.ViewModel(id: "4-3"),
-                    TestViewModelCell.ViewModel(id: "4-4")
-                ]
-            ])
+            .bind(cellType: TestViewModelCell.self,
+                  viewModels: self.initialFourthSectionModels.mapValues { $0.map { TestViewModelCell.ViewModel(id: $0.value) } })
             .onDequeue { section, row, cell in
                 dequeuedCells[section]?.insert(cell, at: row)
                 viewModels[section]?.insert(cell.viewModel, at: row)
@@ -210,16 +193,16 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(viewModels[.third]?.count).toEventually(equal(3))
         expect(viewModels[.fourth]?.count).toEventually(equal(4))
         
-        expect(viewModels[.first]?[safe: 0]??.id).toEventually(equal("1-1"))
-        expect(viewModels[.second]?[safe: 0]??.id).toEventually(equal("2-1"))
-        expect(viewModels[.second]?[safe: 1]??.id).toEventually(equal("2-2"))
-        expect(viewModels[.third]?[safe: 0]??.id).toEventually(equal("3-1"))
-        expect(viewModels[.third]?[safe: 1]??.id).toEventually(equal("3-2"))
-        expect(viewModels[.third]?[safe: 2]??.id).toEventually(equal("3-3"))
-        expect(viewModels[.fourth]?[safe: 0]??.id).toEventually(equal("4-1"))
-        expect(viewModels[.fourth]?[safe: 1]??.id).toEventually(equal("4-2"))
-        expect(viewModels[.fourth]?[safe: 2]??.id).toEventually(equal("4-3"))
-        expect(viewModels[.fourth]?[safe: 3]??.id).toEventually(equal("4-4"))
+        expect(viewModels[.first]?[safe: 0]??.id).toEventually(equal("1-0"))
+        expect(viewModels[.second]?[safe: 0]??.id).toEventually(equal("2-0"))
+        expect(viewModels[.second]?[safe: 1]??.id).toEventually(equal("2-1"))
+        expect(viewModels[.third]?[safe: 0]??.id).toEventually(equal("3-0"))
+        expect(viewModels[.third]?[safe: 1]??.id).toEventually(equal("3-1"))
+        expect(viewModels[.third]?[safe: 2]??.id).toEventually(equal("3-2"))
+        expect(viewModels[.fourth]?[safe: 0]??.id).toEventually(equal("4-0"))
+        expect(viewModels[.fourth]?[safe: 1]??.id).toEventually(equal("4-1"))
+        expect(viewModels[.fourth]?[safe: 2]??.id).toEventually(equal("4-2"))
+        expect(viewModels[.fourth]?[safe: 3]??.id).toEventually(equal("4-3"))
     }
     
     /*
@@ -234,7 +217,7 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onSection(.first)
             .bind(cellType: TestViewModelCell.self,
-                  models: firstSectionModels,
+                  models: self.initialFirstSectionModels,
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0.value) })
             .onDequeue { row, cell, model in
                 dequeuedCells[.first]?.insert(cell, at: row)
@@ -244,7 +227,7 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onSections(.second, .third)
             .bind(cellType: TestViewModelCell.self,
-                  models: secondThirdSectionModels,
+                  models: self.initialSecondThirdSectionModels,
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0.value) })
             .onDequeue { section, row, cell, model in
                 dequeuedCells[section]?.insert(cell, at: row)
@@ -254,7 +237,7 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onAllOtherSections()
             .bind(cellType: TestViewModelCell.self,
-                  models: fourthSectionModels,
+                  models: self.initialFourthSectionModels,
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0.value) })
             .onDequeue { section, row, cell, model in
                 dequeuedCells[section]?.insert(cell, at: row)
@@ -336,7 +319,7 @@ class TableCellBindingMethodTests: TableTestCase {
                 cellProvider: { table, row, model in
                     models[.first]?.insert(model, at: row)
                     return table.dequeue(TestCell.self)
-                }, models: firstSectionModels)
+                }, models: self.initialFirstSectionModels)
             .onDequeue { row, cell, model in
                 expect(model).to(equal(models[.first]?[row]))
                 dequeuedCells[.first]?.insert(cell as! TestCell, at: row)
@@ -347,7 +330,7 @@ class TableCellBindingMethodTests: TableTestCase {
                 cellProvider: { (table, section, row, model: TestModel) in
                     models[section]?.insert(model, at: row)
                     return table.dequeue(TestCell.self)
-                }, models: secondThirdSectionModels)
+                }, models: self.initialSecondThirdSectionModels)
             .onDequeue { section, row, cell, model in
                 expect(model).to(equal(models[section]?[row]))
                 dequeuedCells[section]?.insert(cell as! TestCell, at: row)
@@ -358,7 +341,7 @@ class TableCellBindingMethodTests: TableTestCase {
                 cellProvider: { (table, section, row, model: TestModel) in
                     models[section]?.insert(model, at: row)
                     return table.dequeue(TestCell.self)
-                }, models: fourthSectionModels)
+                }, models: self.initialFourthSectionModels)
             .onDequeue { section, row, cell, model in
                 expect(model).to(equal(models[section]?[row]))
                 dequeuedCells[section]?.insert(cell as! TestCell, at: row)
@@ -470,25 +453,29 @@ class TableCellBindingMethodTests: TableTestCase {
         var updates: CollectionUpdate?
         self.updateDelegate?.onUpdate = { updates = $0 }
         
+        var firstSectionModels = self.initialFirstSectionModels
+        var secondThirdSectionModels = self.initialSecondThirdSectionModels
+        var fourthSectionModels = self.initialFourthSectionModels
+        
         self.binder.displayedSections = [.first, .second, .third, .fourth]
         
         var cells: [Section: [TestCell]] = [.first: [], .second: [], .third: [], .fourth: []]
         var models: [Section: [TestModel]] = [.first: [], .second: [], .third: [], .fourth: []]
         
         self.binder.onSection(.first)
-            .bind(cellType: TestCell.self, models: { [unowned self] in self.firstSectionModels })
+            .bind(cellType: TestCell.self, models: { firstSectionModels })
             .onDequeue { row, cell, model in
                 cell.model = model
             }
         
         self.binder.onSections(.second, .third)
-            .bind(cellType: TestCell.self, models: { [unowned self] in self.secondThirdSectionModels })
+            .bind(cellType: TestCell.self, models: { secondThirdSectionModels })
             .onDequeue { section, row, cell, model in
                 cell.model = model
             }
         
         self.binder.onAllOtherSections()
-            .bind(cellType: TestCell.self, models: { [unowned self] in self.fourthSectionModels })
+            .bind(cellType: TestCell.self, models: { fourthSectionModels })
             .onDequeue { section, row, cell, model in
                 cell.model = model
             }
@@ -539,9 +526,9 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(models[.fourth]?[safe: 3]).to(equal(TestModel(9, "4-3")))
         
         // update the models then refresh the table
-        self.firstSectionModels = ["1-1", "1-2"]
-        self.secondThirdSectionModels = [.second: ["2-1", "2-2*"], .third: ["3-1", "3-2"]]
-        self.fourthSectionModels = [.fourth: ["4-2*", "4-3", "4-1"]]
+        firstSectionModels = self.updatedFirstSectionModels
+        secondThirdSectionModels = self.updatedSecondThirdSectionModels
+        fourthSectionModels = self.updatedFourthSectionModels
         self.binder.refresh()
         
         expect(self.tableView.visibleCells.count).toEventually(equal(9))
@@ -572,20 +559,22 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(models[.third]?.count).to(equal(2))
         expect(models[.fourth]?.count).to(equal(3))
         
-        expect(models[.first]?[safe: 0]).to(equal("1-1"))
-        expect(models[.first]?[safe: 1]).to(equal("1-2"))
-        expect(models[.second]?[safe: 0]).to(equal("2-1"))
-        expect(models[.second]?[safe: 1]).to(equal("2-2*"))
-        expect(models[.third]?[safe: 0]).to(equal("3-1"))
-        expect(models[.third]?[safe: 1]).to(equal("3-2"))
-        expect(models[.third]?[safe: 2]).to(beNil())
-        expect(models[.fourth]?[safe: 0]).to(equal("4-2*"))
-        expect(models[.fourth]?[safe: 1]).to(equal("4-3"))
-        expect(models[.fourth]?[safe: 2]).to(equal("4-1"))
+        expect(models[.first]?[safe: 0]).to(equal(TestModel(0, "1-0")))
+        expect(models[.first]?[safe: 1]).to(equal(TestModel(10, "1-1")))
+        expect(models[.second]?[safe: 0]).to(equal(TestModel(1, "2-0")))
+        expect(models[.second]?[safe: 1]).to(equal(TestModel(2, "2-1*")))
+        expect(models[.third]?[safe: 0]).to(equal(TestModel(4, "3-1")))
+        expect(models[.third]?[safe: 1]).to(equal(TestModel(5, "3-2")))
+        expect(models[.fourth]?[safe: 0]).to(equal(TestModel(7, "4-1*")))
+        expect(models[.fourth]?[safe: 1]).to(equal(TestModel(8, "4-2")))
+        expect(models[.fourth]?[safe: 2]).to(equal(TestModel(9, "4-0")))
         
         expect(updates?.itemInsertions).to(contain(IndexPath(row: 1, section: 0)))
         expect(updates?.itemUpdates).to(contain(IndexPath(row: 1, section: 1)))
-        expect(updates?.itemDeletions).to(contain(IndexPath(row: 2, section: 1)))
+        expect(updates?.itemDeletions).to(contain(IndexPath(row: 0, section: 2)))
+        expect(updates?.itemDeletions).to(contain(IndexPath(row: 0, section: 3)))
+        expect(updates?.itemUpdates).to(contain(IndexPath(row: 1, section: 3)))
+        expect(updates?.itemUpdates).to(contain(IndexPath(row: 3, section: 3)))
     }
     
     /*
@@ -597,11 +586,11 @@ class TableCellBindingMethodTests: TableTestCase {
         var cells: [Section: [TestViewModelCell]] = [.first: [], .second: [], .third: [], .fourth: []]
         var viewModels: [Section: [TestViewModelCell.ViewModel?]] = [.first: [], .second: [], .third: [], .fourth: []]
         
-        var firstViewModels: [TestViewModelCell.ViewModel] = self.firstSectionModels.map { TestViewModelCell.ViewModel(id: $0.value) }
-        var secondThirdViewModels: [Section: [TestViewModelCell.ViewModel]] = self.secondThirdSectionModels.mapValues {
+        var firstViewModels: [TestViewModelCell.ViewModel] = self.initialFirstSectionModels.map { TestViewModelCell.ViewModel(id: $0.value) }
+        var secondThirdViewModels: [Section: [TestViewModelCell.ViewModel]] = self.initialSecondThirdSectionModels.mapValues {
             $0.map { TestViewModelCell.ViewModel(id: $0.value) }
         }
-        var fourthViewModels: [Section: [TestViewModelCell.ViewModel]] = self.fourthSectionModels.mapValues {
+        var fourthViewModels: [Section: [TestViewModelCell.ViewModel]] = self.initialFourthSectionModels.mapValues {
             $0.map { TestViewModelCell.ViewModel(id: $0.value) }
         }
         
@@ -646,26 +635,23 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(viewModels[.third]?.count).toEventually(equal(3))
         expect(viewModels[.fourth]?.count).toEventually(equal(4))
         
-        expect(viewModels[.first]?[safe: 0]??.id).toEventually(equal("1-1"))
-        expect(viewModels[.second]?[safe: 0]??.id).toEventually(equal("2-1"))
-        expect(viewModels[.second]?[safe: 1]??.id).toEventually(equal("2-2"))
-        expect(viewModels[.third]?[safe: 0]??.id).toEventually(equal("3-1"))
-        expect(viewModels[.third]?[safe: 1]??.id).toEventually(equal("3-2"))
-        expect(viewModels[.third]?[safe: 2]??.id).toEventually(equal("3-3"))
-        expect(viewModels[.fourth]?[safe: 0]??.id).toEventually(equal("4-1"))
-        expect(viewModels[.fourth]?[safe: 1]??.id).toEventually(equal("4-2"))
-        expect(viewModels[.fourth]?[safe: 2]??.id).toEventually(equal("4-3"))
-        expect(viewModels[.fourth]?[safe: 3]??.id).toEventually(equal("4-4"))
+        expect(viewModels[.first]?[safe: 0]??.id).toEventually(equal("1-0"))
+        expect(viewModels[.second]?[safe: 0]??.id).toEventually(equal("2-0"))
+        expect(viewModels[.second]?[safe: 1]??.id).toEventually(equal("2-1"))
+        expect(viewModels[.third]?[safe: 0]??.id).toEventually(equal("3-0"))
+        expect(viewModels[.third]?[safe: 1]??.id).toEventually(equal("3-1"))
+        expect(viewModels[.third]?[safe: 2]??.id).toEventually(equal("3-2"))
+        expect(viewModels[.fourth]?[safe: 0]??.id).toEventually(equal("4-0"))
+        expect(viewModels[.fourth]?[safe: 1]??.id).toEventually(equal("4-1"))
+        expect(viewModels[.fourth]?[safe: 2]??.id).toEventually(equal("4-2"))
+        expect(viewModels[.fourth]?[safe: 3]??.id).toEventually(equal("4-3"))
         
         // update the models then refresh the table
-        self.firstSectionModels = ["1-1", "1-2"]
-        self.secondThirdSectionModels = [.second: ["2-1", "2-2*"], .third: ["3-1", "3-2"]]
-        self.fourthSectionModels = [.fourth: ["4-2*", "4-3", "4-1"]]
-        firstViewModels = self.firstSectionModels.map { TestViewModelCell.ViewModel(id: $0.value) }
-        secondThirdViewModels = self.secondThirdSectionModels.mapValues {
+        firstViewModels = self.updatedFirstSectionModels.map { TestViewModelCell.ViewModel(id: $0.value) }
+        secondThirdViewModels = self.updatedSecondThirdSectionModels.mapValues {
             $0.map { TestViewModelCell.ViewModel(id: $0.value) }
         }
-        fourthViewModels = self.fourthSectionModels.mapValues {
+        fourthViewModels = self.updatedFourthSectionModels.mapValues {
             $0.map { TestViewModelCell.ViewModel(id: $0.value) }
         }
         self.binder.refresh()
@@ -698,16 +684,15 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(viewModels[.third]?.count).toEventually(equal(2))
         expect(viewModels[.fourth]?.count).toEventually(equal(3))
         
-        expect(viewModels[.first]?[safe: 0]??.id).toEventually(equal("1-1"))
-        expect(viewModels[.first]?[safe: 1]??.id).toEventually(equal("1-2"))
-        expect(viewModels[.second]?[safe: 0]??.id).toEventually(equal("2-1"))
-        expect(viewModels[.second]?[safe: 1]??.id).toEventually(equal("2-2*"))
+        expect(viewModels[.first]?[safe: 0]??.id).toEventually(equal("1-0"))
+        expect(viewModels[.first]?[safe: 1]??.id).toEventually(equal("1-1"))
+        expect(viewModels[.second]?[safe: 0]??.id).toEventually(equal("2-0"))
+        expect(viewModels[.second]?[safe: 1]??.id).toEventually(equal("2-1*"))
         expect(viewModels[.third]?[safe: 0]??.id).toEventually(equal("3-1"))
         expect(viewModels[.third]?[safe: 1]??.id).toEventually(equal("3-2"))
-        expect(viewModels[.third]?[safe: 2]??.id).toEventually(beNil())
-        expect(viewModels[.fourth]?[safe: 0]??.id).toEventually(equal("4-2*"))
-        expect(viewModels[.fourth]?[safe: 1]??.id).toEventually(equal("4-3"))
-        expect(viewModels[.fourth]?[safe: 2]??.id).toEventually(equal("4-1"))
+        expect(viewModels[.fourth]?[safe: 0]??.id).toEventually(equal("4-1*"))
+        expect(viewModels[.fourth]?[safe: 1]??.id).toEventually(equal("4-2"))
+        expect(viewModels[.fourth]?[safe: 2]??.id).toEventually(equal("4-0"))
     }
     
     /*
@@ -720,9 +705,13 @@ class TableCellBindingMethodTests: TableTestCase {
         var models: [Section: [TestModel]] = [.first: [], .second: [], .third: [], .fourth: []]
         var viewModels: [Section: [TestViewModelCell.ViewModel?]] = [.first: [], .second: [], .third: [], .fourth: []]
         
+        var firstSectionModels = self.initialFirstSectionModels
+        var secondThirdSectionModels = self.initialSecondThirdSectionModels
+        var fourthSectionModels = self.initialFourthSectionModels
+        
         self.binder.onSection(.first)
             .bind(cellType: TestViewModelCell.self,
-                  models: { [unowned self] in self.firstSectionModels },
+                  models: { firstSectionModels },
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0.value) })
             .onDequeue { (_, cell, model) in
                 cell.model = model
@@ -730,7 +719,7 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onSections(.second, .third)
             .bind(cellType: TestViewModelCell.self,
-                  models: { [unowned self] in self.secondThirdSectionModels },
+                  models: { secondThirdSectionModels },
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0.value) })
             .onDequeue { (_, _, cell, model) in
                 cell.model = model
@@ -738,7 +727,7 @@ class TableCellBindingMethodTests: TableTestCase {
         
         self.binder.onAllOtherSections()
             .bind(cellType: TestViewModelCell.self,
-                  models: { [unowned self] in self.fourthSectionModels },
+                  models: { fourthSectionModels },
                   mapToViewModels: { TestViewModelCell.ViewModel(id: $0.value) })
             .onDequeue { (_, _, cell, model) in
                 cell.model = model
@@ -782,31 +771,31 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(viewModels[.third]?.count).to(equal(3))
         expect(viewModels[.fourth]?.count).to(equal(4))
         
-        expect(models[.first]?[safe: 0]).to(equal("1-1"))
-        expect(models[.second]?[safe: 0]).to(equal("2-1"))
-        expect(models[.second]?[safe: 1]).to(equal("2-2"))
-        expect(models[.third]?[safe: 0]).to(equal("3-1"))
-        expect(models[.third]?[safe: 1]).to(equal("3-2"))
-        expect(models[.third]?[safe: 2]).to(equal("3-3"))
-        expect(models[.fourth]?[safe: 0]).to(equal("4-1"))
-        expect(models[.fourth]?[safe: 1]).to(equal("4-2"))
-        expect(models[.fourth]?[safe: 2]).to(equal("4-3"))
-        expect(models[.fourth]?[safe: 3]).to(equal("4-4"))
-        expect(viewModels[.first]?[safe: 0]??.id).to(equal("1-1"))
-        expect(viewModels[.second]?[safe: 0]??.id).to(equal("2-1"))
-        expect(viewModels[.second]?[safe: 1]??.id).to(equal("2-2"))
-        expect(viewModels[.third]?[safe: 0]??.id).to(equal("3-1"))
-        expect(viewModels[.third]?[safe: 1]??.id).to(equal("3-2"))
-        expect(viewModels[.third]?[safe: 2]??.id).to(equal("3-3"))
-        expect(viewModels[.fourth]?[safe: 0]??.id).to(equal("4-1"))
-        expect(viewModels[.fourth]?[safe: 1]??.id).to(equal("4-2"))
-        expect(viewModels[.fourth]?[safe: 2]??.id).to(equal("4-3"))
-        expect(viewModels[.fourth]?[safe: 3]??.id).to(equal("4-4"))
+        expect(models[.first]?[safe: 0]).to(equal(TestModel(0, "1-0")))
+        expect(models[.second]?[safe: 0]).to(equal(TestModel(1, "2-0")))
+        expect(models[.second]?[safe: 1]).to(equal(TestModel(2, "2-1")))
+        expect(models[.third]?[safe: 0]).to(equal(TestModel(3, "3-0")))
+        expect(models[.third]?[safe: 1]).to(equal(TestModel(4, "3-1")))
+        expect(models[.third]?[safe: 2]).to(equal(TestModel(5, "3-2")))
+        expect(models[.fourth]?[safe: 0]).to(equal(TestModel(6, "4-0")))
+        expect(models[.fourth]?[safe: 1]).to(equal(TestModel(7, "4-1")))
+        expect(models[.fourth]?[safe: 2]).to(equal(TestModel(8, "4-2")))
+        expect(models[.fourth]?[safe: 3]).to(equal(TestModel(9, "4-3")))
+        expect(viewModels[.first]?[safe: 0]??.id).to(equal("1-0"))
+        expect(viewModels[.second]?[safe: 0]??.id).to(equal("2-0"))
+        expect(viewModels[.second]?[safe: 1]??.id).to(equal("2-1"))
+        expect(viewModels[.third]?[safe: 0]??.id).to(equal("3-0"))
+        expect(viewModels[.third]?[safe: 1]??.id).to(equal("3-1"))
+        expect(viewModels[.third]?[safe: 2]??.id).to(equal("3-2"))
+        expect(viewModels[.fourth]?[safe: 0]??.id).to(equal("4-0"))
+        expect(viewModels[.fourth]?[safe: 1]??.id).to(equal("4-1"))
+        expect(viewModels[.fourth]?[safe: 2]??.id).to(equal("4-2"))
+        expect(viewModels[.fourth]?[safe: 3]??.id).to(equal("4-3"))
         
         // update the models then refresh the table
-        self.firstSectionModels = ["1-1", "1-2"]
-        self.secondThirdSectionModels = [.second: ["2-1", "2-2*"], .third: ["3-1", "3-2"]]
-        self.fourthSectionModels = [.fourth: ["4-2*", "4-3", "4-1"]]
+        firstSectionModels = self.updatedFirstSectionModels
+        secondThirdSectionModels = self.updatedSecondThirdSectionModels
+        fourthSectionModels = self.updatedFourthSectionModels
         self.binder.refresh()
         
         expect(self.tableView.visibleCells.count).toEventually(equal(9))
@@ -843,26 +832,24 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(viewModels[.third]?.count).to(equal(2))
         expect(viewModels[.fourth]?.count).to(equal(3))
         
-        expect(models[.first]?[safe: 0]).to(equal("1-1"))
-        expect(models[.first]?[safe: 1]).to(equal("1-2"))
-        expect(models[.second]?[safe: 0]).to(equal("2-1"))
-        expect(models[.second]?[safe: 1]).to(equal("2-2*"))
-        expect(models[.third]?[safe: 0]).to(equal("3-1"))
-        expect(models[.third]?[safe: 1]).to(equal("3-2"))
-        expect(models[.third]?[safe: 2]).to(beNil())
-        expect(models[.fourth]?[safe: 0]).to(equal("4-2*"))
-        expect(models[.fourth]?[safe: 1]).to(equal("4-3"))
-        expect(models[.fourth]?[safe: 2]).to(equal("4-1"))
-        expect(viewModels[.first]?[safe: 0]??.id).to(equal("1-1"))
-        expect(viewModels[.first]?[safe: 1]??.id).to(equal("1-2"))
-        expect(viewModels[.second]?[safe: 0]??.id).to(equal("2-1"))
-        expect(viewModels[.second]?[safe: 1]??.id).to(equal("2-2*"))
+        expect(models[.first]?[safe: 0]).to(equal(TestModel(0, "1-0")))
+        expect(models[.first]?[safe: 1]).to(equal(TestModel(10, "1-1")))
+        expect(models[.second]?[safe: 0]).to(equal(TestModel(1, "2-0")))
+        expect(models[.second]?[safe: 1]).to(equal(TestModel(2, "2-1*")))
+        expect(models[.third]?[safe: 0]).to(equal(TestModel(4, "3-1")))
+        expect(models[.third]?[safe: 1]).to(equal(TestModel(5, "3-2")))
+        expect(models[.fourth]?[safe: 0]).to(equal(TestModel(7, "4-1*")))
+        expect(models[.fourth]?[safe: 1]).to(equal(TestModel(8, "4-2")))
+        expect(models[.fourth]?[safe: 2]).to(equal(TestModel(9, "4-0")))
+        expect(viewModels[.first]?[safe: 0]??.id).to(equal("1-0"))
+        expect(viewModels[.first]?[safe: 1]??.id).to(equal("1-1"))
+        expect(viewModels[.second]?[safe: 0]??.id).to(equal("2-0"))
+        expect(viewModels[.second]?[safe: 1]??.id).to(equal("2-1*"))
         expect(viewModels[.third]?[safe: 0]??.id).to(equal("3-1"))
         expect(viewModels[.third]?[safe: 1]??.id).to(equal("3-2"))
-        expect(viewModels[.third]?[safe: 2]??.id).to(beNil())
-        expect(viewModels[.fourth]?[safe: 0]??.id).to(equal("4-2*"))
-        expect(viewModels[.fourth]?[safe: 1]??.id).to(equal("4-3"))
-        expect(viewModels[.fourth]?[safe: 2]??.id).to(equal("4-1"))
+        expect(viewModels[.fourth]?[safe: 0]??.id).to(equal("4-1*"))
+        expect(viewModels[.fourth]?[safe: 1]??.id).to(equal("4-2"))
+        expect(viewModels[.fourth]?[safe: 2]??.id).to(equal("4-0"))
     }
     
     /*
@@ -874,13 +861,17 @@ class TableCellBindingMethodTests: TableTestCase {
         var cells: [Section: [TestCell]] = [.first: [], .second: [], .third: [], .fourth: []]
         var models: [Section: [TestModel]] = [.first: [], .second: [], .third: [], .fourth: []]
         
+        var firstSectionModels = self.initialFirstSectionModels
+        var secondThirdSectionModels = self.initialSecondThirdSectionModels
+        var fourthSectionModels = self.initialFourthSectionModels
+        
         self.binder.onSection(.first)
             .bind(
                 cellProvider: { table, row, model in
                     let cell = table.dequeue(TestCell.self)
                     cell.model = model
                     return cell
-                }, models: { [unowned self] in self.firstSectionModels })
+                }, models: { firstSectionModels })
         
         self.binder.onSections(.second, .third)
             .bind(
@@ -888,7 +879,7 @@ class TableCellBindingMethodTests: TableTestCase {
                     let cell = table.dequeue(TestCell.self)
                     cell.model = model
                     return cell
-                }, models: { [unowned self] in self.secondThirdSectionModels })
+                }, models: { secondThirdSectionModels })
         
         self.binder.onAllOtherSections()
             .bind(
@@ -896,7 +887,7 @@ class TableCellBindingMethodTests: TableTestCase {
                     let cell = table.dequeue(TestCell.self)
                     cell.model = model
                     return cell
-            }, models: { [unowned self] in self.fourthSectionModels })
+            }, models: { fourthSectionModels })
         
         self.binder.finish()
         
@@ -930,21 +921,21 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(models[.third]?.count).to(equal(3))
         expect(models[.fourth]?.count).to(equal(4))
         
-        expect(models[.first]?[safe: 0]).to(equal("1-1"))
-        expect(models[.second]?[safe: 0]).to(equal("2-1"))
-        expect(models[.second]?[safe: 1]).to(equal("2-2"))
-        expect(models[.third]?[safe: 0]).to(equal("3-1"))
-        expect(models[.third]?[safe: 1]).to(equal("3-2"))
-        expect(models[.third]?[safe: 2]).to(equal("3-3"))
-        expect(models[.fourth]?[safe: 0]).to(equal("4-1"))
-        expect(models[.fourth]?[safe: 1]).to(equal("4-2"))
-        expect(models[.fourth]?[safe: 2]).to(equal("4-3"))
-        expect(models[.fourth]?[safe: 3]).to(equal("4-4"))
+        expect(models[.first]?[safe: 0]).to(equal(TestModel(0, "1-0")))
+        expect(models[.second]?[safe: 0]).to(equal(TestModel(1, "2-0")))
+        expect(models[.second]?[safe: 1]).to(equal(TestModel(2, "2-1")))
+        expect(models[.third]?[safe: 0]).to(equal(TestModel(3, "3-0")))
+        expect(models[.third]?[safe: 1]).to(equal(TestModel(4, "3-1")))
+        expect(models[.third]?[safe: 2]).to(equal(TestModel(5, "3-2")))
+        expect(models[.fourth]?[safe: 0]).to(equal(TestModel(6, "4-0")))
+        expect(models[.fourth]?[safe: 1]).to(equal(TestModel(7, "4-1")))
+        expect(models[.fourth]?[safe: 2]).to(equal(TestModel(8, "4-2")))
+        expect(models[.fourth]?[safe: 3]).to(equal(TestModel(9, "4-3")))
         
         // update the models then refresh the table
-        self.firstSectionModels = ["1-1", "1-2"]
-        self.secondThirdSectionModels = [.second: ["2-1", "2-2*"], .third: ["3-1", "3-2"]]
-        self.fourthSectionModels = [.fourth: ["4-2*", "4-3", "4-1"]]
+        firstSectionModels = self.updatedFirstSectionModels
+        secondThirdSectionModels = self.updatedSecondThirdSectionModels
+        fourthSectionModels = self.updatedFourthSectionModels
         self.binder.refresh()
         
         expect(self.tableView.visibleCells.count).toEventually(equal(9))
@@ -975,16 +966,15 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(models[.third]?.count).to(equal(2))
         expect(models[.fourth]?.count).to(equal(3))
         
-        expect(models[.first]?[safe: 0]).to(equal("1-1"))
-        expect(models[.first]?[safe: 1]).to(equal("1-2"))
-        expect(models[.second]?[safe: 0]).to(equal("2-1"))
-        expect(models[.second]?[safe: 1]).to(equal("2-2*"))
-        expect(models[.third]?[safe: 0]).to(equal("3-1"))
-        expect(models[.third]?[safe: 1]).to(equal("3-2"))
-        expect(models[.third]?[safe: 2]).to(beNil())
-        expect(models[.fourth]?[safe: 0]).to(equal("4-2*"))
-        expect(models[.fourth]?[safe: 1]).to(equal("4-3"))
-        expect(models[.fourth]?[safe: 2]).to(equal("4-1"))
+        expect(models[.first]?[safe: 0]).to(equal(TestModel(0, "1-0")))
+        expect(models[.first]?[safe: 1]).to(equal(TestModel(10, "1-1")))
+        expect(models[.second]?[safe: 0]).to(equal(TestModel(1, "2-0")))
+        expect(models[.second]?[safe: 1]).to(equal(TestModel(2, "2-1*")))
+        expect(models[.third]?[safe: 0]).to(equal(TestModel(4, "3-1")))
+        expect(models[.third]?[safe: 1]).to(equal(TestModel(5, "3-2")))
+        expect(models[.fourth]?[safe: 0]).to(equal(TestModel(7, "4-1*")))
+        expect(models[.fourth]?[safe: 1]).to(equal(TestModel(8, "4-2")))
+        expect(models[.fourth]?[safe: 2]).to(equal(TestModel(9, "4-0")))
     }
     
     /*
@@ -1078,9 +1068,9 @@ class TableCellBindingMethodTests: TableTestCase {
         var cells: [Section: [TestCell]] = [.first: [], .second: [], .third: [], .fourth: []]
         var models: [Section: [TestModel]] = [.first: [], .second: [], .third: [], .fourth: []]
         
-        let firstModels: BehaviorSubject<[TestModel]> = BehaviorSubject(value: self.firstSectionModels)
-        let secondThirdModels: BehaviorSubject<[Section: [TestModel]]> = BehaviorSubject(value: self.secondThirdSectionModels)
-        let fourthModels: BehaviorSubject<[Section: [TestModel]]> = BehaviorSubject(value: self.fourthSectionModels)
+        let firstModels: BehaviorSubject<[TestModel]> = BehaviorSubject(value: self.initialFirstSectionModels)
+        let secondThirdModels: BehaviorSubject<[Section: [TestModel]]> = BehaviorSubject(value: self.initialSecondThirdSectionModels)
+        let fourthModels: BehaviorSubject<[Section: [TestModel]]> = BehaviorSubject(value: self.initialFourthSectionModels)
         
         self.binder.onSection(.first)
             .rx.bind(cellType: TestCell.self, models: firstModels.asObservable())
@@ -1134,21 +1124,21 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(models[.third]?.count).to(equal(3))
         expect(models[.fourth]?.count).to(equal(4))
         
-        expect(models[.first]?[safe: 0]).to(equal("1-1"))
-        expect(models[.second]?[safe: 0]).to(equal("2-1"))
-        expect(models[.second]?[safe: 1]).to(equal("2-2"))
-        expect(models[.third]?[safe: 0]).to(equal("3-1"))
-        expect(models[.third]?[safe: 1]).to(equal("3-2"))
-        expect(models[.third]?[safe: 2]).to(equal("3-3"))
-        expect(models[.fourth]?[safe: 0]).to(equal("4-1"))
-        expect(models[.fourth]?[safe: 1]).to(equal("4-2"))
-        expect(models[.fourth]?[safe: 2]).to(equal("4-3"))
-        expect(models[.fourth]?[safe: 3]).to(equal("4-4"))
+        expect(models[.first]?[safe: 0]).to(equal(TestModel(0, "1-0")))
+        expect(models[.second]?[safe: 0]).to(equal(TestModel(1, "2-0")))
+        expect(models[.second]?[safe: 1]).to(equal(TestModel(2, "2-1")))
+        expect(models[.third]?[safe: 0]).to(equal(TestModel(3, "3-0")))
+        expect(models[.third]?[safe: 1]).to(equal(TestModel(4, "3-1")))
+        expect(models[.third]?[safe: 2]).to(equal(TestModel(5, "3-2")))
+        expect(models[.fourth]?[safe: 0]).to(equal(TestModel(6, "4-0")))
+        expect(models[.fourth]?[safe: 1]).to(equal(TestModel(7, "4-1")))
+        expect(models[.fourth]?[safe: 2]).to(equal(TestModel(8, "4-2")))
+        expect(models[.fourth]?[safe: 3]).to(equal(TestModel(9, "4-3")))
         
         // update the models then refresh the table
-        firstModels.on(.next(["1-1", "1-2"]))
-        secondThirdModels.on(.next([.second: ["2-1", "2-2*"], .third: ["3-1", "3-2"]]))
-        fourthModels.on(.next([.fourth: ["4-2*", "4-3", "4-1"]]))
+        firstModels.on(.next(self.updatedFirstSectionModels))
+        secondThirdModels.on(.next(self.updatedSecondThirdSectionModels))
+        fourthModels.on(.next(self.updatedFourthSectionModels))
         
         expect(self.tableView.visibleCells.count).toEventually(equal(9))
         
@@ -1178,16 +1168,15 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(models[.third]?.count).to(equal(2))
         expect(models[.fourth]?.count).to(equal(3))
         
-        expect(models[.first]?[safe: 0]).to(equal("1-1"))
-        expect(models[.first]?[safe: 1]).to(equal("1-2"))
-        expect(models[.second]?[safe: 0]).to(equal("2-1"))
-        expect(models[.second]?[safe: 1]).to(equal("2-2*"))
-        expect(models[.third]?[safe: 0]).to(equal("3-1"))
-        expect(models[.third]?[safe: 1]).to(equal("3-2"))
-        expect(models[.third]?[safe: 2]).to(beNil())
-        expect(models[.fourth]?[safe: 0]).to(equal("4-2*"))
-        expect(models[.fourth]?[safe: 1]).to(equal("4-3"))
-        expect(models[.fourth]?[safe: 2]).to(equal("4-1"))
+        expect(models[.first]?[safe: 0]).to(equal(TestModel(0, "1-0")))
+        expect(models[.first]?[safe: 1]).to(equal(TestModel(10, "1-1")))
+        expect(models[.second]?[safe: 0]).to(equal(TestModel(1, "2-0")))
+        expect(models[.second]?[safe: 1]).to(equal(TestModel(2, "2-1*")))
+        expect(models[.third]?[safe: 0]).to(equal(TestModel(4, "3-1")))
+        expect(models[.third]?[safe: 1]).to(equal(TestModel(5, "3-2")))
+        expect(models[.fourth]?[safe: 0]).to(equal(TestModel(7, "4-1*")))
+        expect(models[.fourth]?[safe: 1]).to(equal(TestModel(8, "4-2")))
+        expect(models[.fourth]?[safe: 2]).to(equal(TestModel(9, "4-0")))
     }
     
     /*
@@ -1200,13 +1189,13 @@ class TableCellBindingMethodTests: TableTestCase {
         var viewModels: [Section: [TestViewModelCell.ViewModel?]] = [.first: [], .second: [], .third: [], .fourth: []]
         
         let firstModels: BehaviorSubject<[TestViewModelCell.ViewModel]>
-            = BehaviorSubject(value: self.firstSectionModels.map { TestViewModelCell.ViewModel(id: $0.value) })
+            = BehaviorSubject(value: self.initialFirstSectionModels.map { TestViewModelCell.ViewModel(id: $0.value) })
         let secondThirdModels: BehaviorSubject<[Section: [TestViewModelCell.ViewModel]]>
-            = BehaviorSubject(value: self.secondThirdSectionModels.mapValues {
+            = BehaviorSubject(value: self.initialSecondThirdSectionModels.mapValues {
                 $0.map { TestViewModelCell.ViewModel(id: $0.value) }
             })
         let fourthModels: BehaviorSubject<[Section: [TestViewModelCell.ViewModel]]>
-            = BehaviorSubject(value: self.fourthSectionModels.mapValues {
+            = BehaviorSubject(value: self.initialFourthSectionModels.mapValues {
                 $0.map { TestViewModelCell.ViewModel(id: $0.value) }
             })
         
@@ -1251,29 +1240,25 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(viewModels[.third]?.count).toEventually(equal(3))
         expect(viewModels[.fourth]?.count).toEventually(equal(4))
         
-        expect(viewModels[.first]?[safe: 0]??.id).toEventually(equal("1-1"))
-        expect(viewModels[.second]?[safe: 0]??.id).toEventually(equal("2-1"))
-        expect(viewModels[.second]?[safe: 1]??.id).toEventually(equal("2-2"))
-        expect(viewModels[.third]?[safe: 0]??.id).toEventually(equal("3-1"))
-        expect(viewModels[.third]?[safe: 1]??.id).toEventually(equal("3-2"))
-        expect(viewModels[.third]?[safe: 2]??.id).toEventually(equal("3-3"))
-        expect(viewModels[.fourth]?[safe: 0]??.id).toEventually(equal("4-1"))
-        expect(viewModels[.fourth]?[safe: 1]??.id).toEventually(equal("4-2"))
-        expect(viewModels[.fourth]?[safe: 2]??.id).toEventually(equal("4-3"))
-        expect(viewModels[.fourth]?[safe: 3]??.id).toEventually(equal("4-4"))
+        expect(viewModels[.first]?[safe: 0]??.id).toEventually(equal("1-0"))
+        expect(viewModels[.second]?[safe: 0]??.id).toEventually(equal("2-0"))
+        expect(viewModels[.second]?[safe: 1]??.id).toEventually(equal("2-1"))
+        expect(viewModels[.third]?[safe: 0]??.id).toEventually(equal("3-0"))
+        expect(viewModels[.third]?[safe: 1]??.id).toEventually(equal("3-1"))
+        expect(viewModels[.third]?[safe: 2]??.id).toEventually(equal("3-2"))
+        expect(viewModels[.fourth]?[safe: 0]??.id).toEventually(equal("4-0"))
+        expect(viewModels[.fourth]?[safe: 1]??.id).toEventually(equal("4-1"))
+        expect(viewModels[.fourth]?[safe: 2]??.id).toEventually(equal("4-2"))
+        expect(viewModels[.fourth]?[safe: 3]??.id).toEventually(equal("4-3"))
         
         // update the models then refresh the table
-        self.firstSectionModels = ["1-1", "1-2"]
-        self.secondThirdSectionModels = [.second: ["2-1", "2-2*"], .third: ["3-1", "3-2"]]
-        self.fourthSectionModels = [.fourth: ["4-2*", "4-3", "4-1"]]
-        firstModels.on(.next(self.firstSectionModels.map { TestViewModelCell.ViewModel(id: $0.value) }))
-        secondThirdModels.on(.next(self.secondThirdSectionModels.mapValues {
+        firstModels.on(.next(self.updatedFirstSectionModels.map { TestViewModelCell.ViewModel(id: $0.value) }))
+        secondThirdModels.on(.next(self.updatedSecondThirdSectionModels.mapValues {
             $0.map { TestViewModelCell.ViewModel(id: $0.value) }
         }))
-        fourthModels.on(.next(self.fourthSectionModels.mapValues {
+        fourthModels.on(.next(self.updatedFourthSectionModels.mapValues {
             $0.map { TestViewModelCell.ViewModel(id: $0.value) }
         }))
-        self.binder.refresh()
         
         expect(self.tableView.visibleCells.count).toEventually(equal(9))
         
@@ -1303,16 +1288,15 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(viewModels[.third]?.count).toEventually(equal(2))
         expect(viewModels[.fourth]?.count).toEventually(equal(3))
         
-        expect(viewModels[.first]?[safe: 0]??.id).toEventually(equal("1-1"))
-        expect(viewModels[.first]?[safe: 1]??.id).toEventually(equal("1-2"))
-        expect(viewModels[.second]?[safe: 0]??.id).toEventually(equal("2-1"))
-        expect(viewModels[.second]?[safe: 1]??.id).toEventually(equal("2-2*"))
+        expect(viewModels[.first]?[safe: 0]??.id).toEventually(equal("1-0"))
+        expect(viewModels[.first]?[safe: 1]??.id).toEventually(equal("1-1"))
+        expect(viewModels[.second]?[safe: 0]??.id).toEventually(equal("2-0"))
+        expect(viewModels[.second]?[safe: 1]??.id).toEventually(equal("2-1*"))
         expect(viewModels[.third]?[safe: 0]??.id).toEventually(equal("3-1"))
         expect(viewModels[.third]?[safe: 1]??.id).toEventually(equal("3-2"))
-        expect(viewModels[.third]?[safe: 2]??.id).toEventually(beNil())
-        expect(viewModels[.fourth]?[safe: 0]??.id).toEventually(equal("4-2*"))
-        expect(viewModels[.fourth]?[safe: 1]??.id).toEventually(equal("4-3"))
-        expect(viewModels[.fourth]?[safe: 2]??.id).toEventually(equal("4-1"))
+        expect(viewModels[.fourth]?[safe: 0]??.id).toEventually(equal("4-1*"))
+        expect(viewModels[.fourth]?[safe: 1]??.id).toEventually(equal("4-2"))
+        expect(viewModels[.fourth]?[safe: 2]??.id).toEventually(equal("4-0"))
     }
     
     /*
@@ -1325,11 +1309,11 @@ class TableCellBindingMethodTests: TableTestCase {
         var models: [Section: [TestModel]] = [.first: [], .second: [], .third: [], .fourth: []]
         var viewModels: [Section: [TestViewModelCell.ViewModel?]] = [.first: [], .second: [], .third: [], .fourth: []]
         
-        let firstModels: BehaviorSubject<[TestModel]> = BehaviorSubject(value: self.firstSectionModels)
+        let firstModels: BehaviorSubject<[TestModel]> = BehaviorSubject(value: self.initialFirstSectionModels)
         let secondThirdModels: BehaviorSubject<[Section: [TestModel]]>
-            = BehaviorSubject(value: self.secondThirdSectionModels)
+            = BehaviorSubject(value: self.initialSecondThirdSectionModels)
         let fourthModels: BehaviorSubject<[Section: [TestModel]]>
-            = BehaviorSubject(value: self.fourthSectionModels)
+            = BehaviorSubject(value: self.initialFourthSectionModels)
         
         self.binder.onSection(.first)
             .rx.bind(cellType: TestViewModelCell.self,
@@ -1393,34 +1377,31 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(viewModels[.third]?.count).to(equal(3))
         expect(viewModels[.fourth]?.count).to(equal(4))
         
-        expect(models[.first]?[safe: 0]).to(equal("1-1"))
-        expect(models[.second]?[safe: 0]).to(equal("2-1"))
-        expect(models[.second]?[safe: 1]).to(equal("2-2"))
-        expect(models[.third]?[safe: 0]).to(equal("3-1"))
-        expect(models[.third]?[safe: 1]).to(equal("3-2"))
-        expect(models[.third]?[safe: 2]).to(equal("3-3"))
-        expect(models[.fourth]?[safe: 0]).to(equal("4-1"))
-        expect(models[.fourth]?[safe: 1]).to(equal("4-2"))
-        expect(models[.fourth]?[safe: 2]).to(equal("4-3"))
-        expect(models[.fourth]?[safe: 3]).to(equal("4-4"))
-        expect(viewModels[.first]?[safe: 0]??.id).to(equal("1-1"))
-        expect(viewModels[.second]?[safe: 0]??.id).to(equal("2-1"))
-        expect(viewModels[.second]?[safe: 1]??.id).to(equal("2-2"))
-        expect(viewModels[.third]?[safe: 0]??.id).to(equal("3-1"))
-        expect(viewModels[.third]?[safe: 1]??.id).to(equal("3-2"))
-        expect(viewModels[.third]?[safe: 2]??.id).to(equal("3-3"))
-        expect(viewModels[.fourth]?[safe: 0]??.id).to(equal("4-1"))
-        expect(viewModels[.fourth]?[safe: 1]??.id).to(equal("4-2"))
-        expect(viewModels[.fourth]?[safe: 2]??.id).to(equal("4-3"))
-        expect(viewModels[.fourth]?[safe: 3]??.id).to(equal("4-4"))
+        expect(models[.first]?[safe: 0]).to(equal(TestModel(0, "1-0")))
+        expect(models[.second]?[safe: 0]).to(equal(TestModel(1, "2-0")))
+        expect(models[.second]?[safe: 1]).to(equal(TestModel(2, "2-1")))
+        expect(models[.third]?[safe: 0]).to(equal(TestModel(3, "3-0")))
+        expect(models[.third]?[safe: 1]).to(equal(TestModel(4, "3-1")))
+        expect(models[.third]?[safe: 2]).to(equal(TestModel(5, "3-2")))
+        expect(models[.fourth]?[safe: 0]).to(equal(TestModel(6, "4-0")))
+        expect(models[.fourth]?[safe: 1]).to(equal(TestModel(7, "4-1")))
+        expect(models[.fourth]?[safe: 2]).to(equal(TestModel(8, "4-2")))
+        expect(models[.fourth]?[safe: 3]).to(equal(TestModel(9, "4-3")))
+        expect(viewModels[.first]?[safe: 0]??.id).to(equal("1-0"))
+        expect(viewModels[.second]?[safe: 0]??.id).to(equal("2-0"))
+        expect(viewModels[.second]?[safe: 1]??.id).to(equal("2-1"))
+        expect(viewModels[.third]?[safe: 0]??.id).to(equal("3-0"))
+        expect(viewModels[.third]?[safe: 1]??.id).to(equal("3-1"))
+        expect(viewModels[.third]?[safe: 2]??.id).to(equal("3-2"))
+        expect(viewModels[.fourth]?[safe: 0]??.id).to(equal("4-0"))
+        expect(viewModels[.fourth]?[safe: 1]??.id).to(equal("4-1"))
+        expect(viewModels[.fourth]?[safe: 2]??.id).to(equal("4-2"))
+        expect(viewModels[.fourth]?[safe: 3]??.id).to(equal("4-3"))
         
         // update the models then refresh the table
-        self.firstSectionModels = ["1-1", "1-2"]
-        self.secondThirdSectionModels = [.second: ["2-1", "2-2*"], .third: ["3-1", "3-2"]]
-        self.fourthSectionModels = [.fourth: ["4-2*", "4-3", "4-1"]]
-        firstModels.on(.next(self.firstSectionModels))
-        secondThirdModels.on(.next(self.secondThirdSectionModels))
-        fourthModels.on(.next(self.fourthSectionModels))
+        firstModels.on(.next(self.updatedFirstSectionModels))
+        secondThirdModels.on(.next(self.updatedSecondThirdSectionModels))
+        fourthModels.on(.next(self.updatedFourthSectionModels))
         
         expect(self.tableView.visibleCells.count).toEventually(equal(9))
         
@@ -1456,26 +1437,24 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(viewModels[.third]?.count).to(equal(2))
         expect(viewModels[.fourth]?.count).to(equal(3))
         
-        expect(models[.first]?[safe: 0]).to(equal("1-1"))
-        expect(models[.first]?[safe: 1]).to(equal("1-2"))
-        expect(models[.second]?[safe: 0]).to(equal("2-1"))
-        expect(models[.second]?[safe: 1]).to(equal("2-2*"))
-        expect(models[.third]?[safe: 0]).to(equal("3-1"))
-        expect(models[.third]?[safe: 1]).to(equal("3-2"))
-        expect(models[.third]?[safe: 2]).to(beNil())
-        expect(models[.fourth]?[safe: 0]).to(equal("4-2*"))
-        expect(models[.fourth]?[safe: 1]).to(equal("4-3"))
-        expect(models[.fourth]?[safe: 2]).to(equal("4-1"))
-        expect(viewModels[.first]?[safe: 0]??.id).to(equal("1-1"))
-        expect(viewModels[.first]?[safe: 1]??.id).to(equal("1-2"))
-        expect(viewModels[.second]?[safe: 0]??.id).to(equal("2-1"))
-        expect(viewModels[.second]?[safe: 1]??.id).to(equal("2-2*"))
+        expect(models[.first]?[safe: 0]).to(equal(TestModel(0, "1-0")))
+        expect(models[.first]?[safe: 1]).to(equal(TestModel(10, "1-1")))
+        expect(models[.second]?[safe: 0]).to(equal(TestModel(1, "2-0")))
+        expect(models[.second]?[safe: 1]).to(equal(TestModel(2, "2-1*")))
+        expect(models[.third]?[safe: 0]).to(equal(TestModel(4, "3-1")))
+        expect(models[.third]?[safe: 1]).to(equal(TestModel(5, "3-2")))
+        expect(models[.fourth]?[safe: 0]).to(equal(TestModel(7, "4-1*")))
+        expect(models[.fourth]?[safe: 1]).to(equal(TestModel(8, "4-2")))
+        expect(models[.fourth]?[safe: 2]).to(equal(TestModel(9, "4-0")))
+        expect(viewModels[.first]?[safe: 0]??.id).to(equal("1-0"))
+        expect(viewModels[.first]?[safe: 1]??.id).to(equal("1-1"))
+        expect(viewModels[.second]?[safe: 0]??.id).to(equal("2-0"))
+        expect(viewModels[.second]?[safe: 1]??.id).to(equal("2-1*"))
         expect(viewModels[.third]?[safe: 0]??.id).to(equal("3-1"))
         expect(viewModels[.third]?[safe: 1]??.id).to(equal("3-2"))
-        expect(viewModels[.third]?[safe: 2]??.id).to(beNil())
-        expect(viewModels[.fourth]?[safe: 0]??.id).to(equal("4-2*"))
-        expect(viewModels[.fourth]?[safe: 1]??.id).to(equal("4-3"))
-        expect(viewModels[.fourth]?[safe: 2]??.id).to(equal("4-1"))
+        expect(viewModels[.fourth]?[safe: 0]??.id).to(equal("4-1*"))
+        expect(viewModels[.fourth]?[safe: 1]??.id).to(equal("4-2"))
+        expect(viewModels[.fourth]?[safe: 2]??.id).to(equal("4-0"))
     }
     
     /*
@@ -1487,11 +1466,11 @@ class TableCellBindingMethodTests: TableTestCase {
         var cells: [Section: [TestCell]] = [.first: [], .second: [], .third: [], .fourth: []]
         var models: [Section: [TestModel]] = [.first: [], .second: [], .third: [], .fourth: []]
         
-        let firstModels: BehaviorSubject<[TestModel]> =  BehaviorSubject(value: self.firstSectionModels)
+        let firstModels: BehaviorSubject<[TestModel]> =  BehaviorSubject(value: self.initialFirstSectionModels)
         let secondThirdModels: BehaviorSubject<[Section: [TestModel]]>
-            = BehaviorSubject(value: self.secondThirdSectionModels)
+            = BehaviorSubject(value: self.initialSecondThirdSectionModels)
         let fourthModels: BehaviorSubject<[Section: [TestModel]]>
-            = BehaviorSubject(value: self.fourthSectionModels)
+            = BehaviorSubject(value: self.initialFourthSectionModels)
         
         self.binder.onSection(.first)
             .rx.bind(
@@ -1549,21 +1528,21 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(models[.third]?.count).to(equal(3))
         expect(models[.fourth]?.count).to(equal(4))
         
-        expect(models[.first]?[safe: 0]).to(equal("1-1"))
-        expect(models[.second]?[safe: 0]).to(equal("2-1"))
-        expect(models[.second]?[safe: 1]).to(equal("2-2"))
-        expect(models[.third]?[safe: 0]).to(equal("3-1"))
-        expect(models[.third]?[safe: 1]).to(equal("3-2"))
-        expect(models[.third]?[safe: 2]).to(equal("3-3"))
-        expect(models[.fourth]?[safe: 0]).to(equal("4-1"))
-        expect(models[.fourth]?[safe: 1]).to(equal("4-2"))
-        expect(models[.fourth]?[safe: 2]).to(equal("4-3"))
-        expect(models[.fourth]?[safe: 3]).to(equal("4-4"))
+        expect(models[.first]?[safe: 0]).to(equal(TestModel(0, "1-0")))
+        expect(models[.second]?[safe: 0]).to(equal(TestModel(1, "2-0")))
+        expect(models[.second]?[safe: 1]).to(equal(TestModel(2, "2-1")))
+        expect(models[.third]?[safe: 0]).to(equal(TestModel(3, "3-0")))
+        expect(models[.third]?[safe: 1]).to(equal(TestModel(4, "3-1")))
+        expect(models[.third]?[safe: 2]).to(equal(TestModel(5, "3-2")))
+        expect(models[.fourth]?[safe: 0]).to(equal(TestModel(6, "4-0")))
+        expect(models[.fourth]?[safe: 1]).to(equal(TestModel(7, "4-1")))
+        expect(models[.fourth]?[safe: 2]).to(equal(TestModel(8, "4-2")))
+        expect(models[.fourth]?[safe: 3]).to(equal(TestModel(9, "4-3")))
         
         // update the models then refresh the table
-        firstModels.on(.next(["1-1", "1-2"]))
-        secondThirdModels.on(.next([.second: ["2-1", "2-2*"], .third: ["3-1", "3-2"]]))
-        fourthModels.on(.next([.fourth: ["4-2*", "4-3", "4-1"]]))
+        firstModels.on(.next(self.updatedFirstSectionModels))
+        secondThirdModels.on(.next(self.updatedSecondThirdSectionModels))
+        fourthModels.on(.next(self.updatedFourthSectionModels))
         
         expect(self.tableView.visibleCells.count).toEventually(equal(9))
         
@@ -1593,16 +1572,15 @@ class TableCellBindingMethodTests: TableTestCase {
         expect(models[.third]?.count).to(equal(2))
         expect(models[.fourth]?.count).to(equal(3))
         
-        expect(models[.first]?[safe: 0]).to(equal("1-1"))
-        expect(models[.first]?[safe: 1]).to(equal("1-2"))
-        expect(models[.second]?[safe: 0]).to(equal("2-1"))
-        expect(models[.second]?[safe: 1]).to(equal("2-2*"))
-        expect(models[.third]?[safe: 0]).to(equal("3-1"))
-        expect(models[.third]?[safe: 1]).to(equal("3-2"))
-        expect(models[.third]?[safe: 2]).to(beNil())
-        expect(models[.fourth]?[safe: 0]).to(equal("4-2*"))
-        expect(models[.fourth]?[safe: 1]).to(equal("4-3"))
-        expect(models[.fourth]?[safe: 2]).to(equal("4-1"))
+        expect(models[.first]?[safe: 0]).to(equal(TestModel(0, "1-0")))
+        expect(models[.first]?[safe: 1]).to(equal(TestModel(10, "1-1")))
+        expect(models[.second]?[safe: 0]).to(equal(TestModel(1, "2-0")))
+        expect(models[.second]?[safe: 1]).to(equal(TestModel(2, "2-1*")))
+        expect(models[.third]?[safe: 0]).to(equal(TestModel(4, "3-1")))
+        expect(models[.third]?[safe: 1]).to(equal(TestModel(5, "3-2")))
+        expect(models[.fourth]?[safe: 0]).to(equal(TestModel(7, "4-1*")))
+        expect(models[.fourth]?[safe: 1]).to(equal(TestModel(8, "4-2")))
+        expect(models[.fourth]?[safe: 2]).to(equal(TestModel(9, "4-0")))
    }
     
     /*

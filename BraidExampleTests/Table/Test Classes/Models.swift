@@ -9,4 +9,3 @@ struct TestModel: CollectionIdentifiable, Equatable {
         self.value = value
     }
 }
-
