@@ -219,6 +219,68 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     // MARK: -
+    
+    @discardableResult
+    override public func allowEditing(
+        style: UITableViewCell.EditingStyle,
+        rowIsEditable: ((_ row: Int) -> Bool)? = nil)
+        -> TableViewModelSingleSectionBinder<C, S, M>
+    {
+        super.allowEditing(style: style, rowIsEditable: rowIsEditable)
+        return self
+    }
+    
+    /**
+     Enables editing (i.e. insertion or deletion controls) for the section.
+     
+     This method must be called on the chain to enable insertion or deletion actions on the section, passing in a
+     closure that will return the editing style (`delete` or `insert`) for items in the section. This method should
+     typically be paired with an `onEdit(_:)` method after it on the chain.
+     
+     - parameter styleForRow: A closure that returns the editing style to apply a row in the bound section.
+     - parameter rowIsEditable: An optional closure that returns whether editing should be allowed for the given row.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    override public func allowEditing(
+        styleForRow: (_ row: Int) -> UITableViewCell.EditingStyle,
+        rowIsEditable: ((_ row: Int) -> Bool)? = nil)
+        -> TableViewModelSingleSectionBinder<C, S, M>
+    {
+        super.allowEditing(styleForRow: styleForRow, rowIsEditable: rowIsEditable)
+        return self
+    }
+    
+    @discardableResult
+    override public func allowMoving(_ movementOption: CellMovementOption<S>, rowIsMovable: ((Int) -> Bool)? = nil)
+        -> TableViewModelSingleSectionBinder<C, S, M>
+    {
+        super.allowMoving(movementOption, rowIsMovable: rowIsMovable)
+        return self
+    }
+    
+    @discardableResult
+    override public func onDelete(_ handler: @escaping (Int, CellDeletionSource<S>) -> Void)
+        -> TableViewSingleSectionBinder<C, S>
+    {
+        self.binder.handlers.add({ _, row, source in handler(row, source) },
+                                 toHandlerSetAt: \.cellDeletedHandlers,
+                                 forScope: self.affectedSectionScope)
+        return self
+    }
+    
+    @discardableResult
+    override public func onInsert(_ handler: @escaping (Int, CellInsertionSource<S>) -> Void)
+        -> TableViewSingleSectionBinder<C, S>
+    {
+        self.binder.handlers.add({ _, row, source in handler(row, source) },
+                                 toHandlerSetAt: \.cellInsertedHandlers,
+                                 forScope: self.affectedSectionScope)
+        return self
+    }
+    
+    // MARK: -
 
     @discardableResult
     public override func cellHeight(_ handler: @escaping (_ row: Int) -> CGFloat)

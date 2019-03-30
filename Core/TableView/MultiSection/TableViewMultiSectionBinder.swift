@@ -927,9 +927,11 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
         rowIsEditable: ((_ section: S, _ row: Int) -> Bool)? = nil)
         -> TableViewMultiSectionBinder<C, S>
     {
-        guard style != .none else {
-            print("WARNING: Sections were setup to allow editing, but the given editing style was 'none'.")
-            return self
+        for (_, value) in style {
+            guard value != .none else {
+                print("WARNING: Sections were setup to allow editing, but the given editing style was 'none'.")
+                return self
+            }
         }
         if let rowIsEditable = rowIsEditable {
             self.binder.handlers.add(

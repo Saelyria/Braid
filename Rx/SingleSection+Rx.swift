@@ -11,7 +11,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      handle dequeuing of your cells based on the observable view models array.
     */
     @discardableResult
-    public func bind<NC>(
+    func bind<NC>(
         cellType: NC.Type,
         viewModels: Observable<[NC.ViewModel]>)
         -> TableViewSingleSectionBinder<NC, Base.S>
@@ -27,7 +27,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      handle dequeuing of your cells based on the observable view models array.
      */
     @discardableResult
-    public func bind<NC>(
+    func bind<NC>(
         cellType: NC.Type,
         viewModels: Observable<[NC.ViewModel]>)
         -> TableViewSingleSectionBinder<NC, Base.S>

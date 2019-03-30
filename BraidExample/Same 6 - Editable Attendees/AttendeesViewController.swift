@@ -48,7 +48,7 @@ class AttendeesViewController: UIViewController {
                   models: { [unowned self] in self.firstSectionModels },
                   mapToViewModels: { TitleDetailTableViewCell.ViewModel(collectionId: $0.collectionId, title: $0.name) })
             .allowEditing(style: .delete)
-            .allowMoving(.to(sections: .invited))
+            .allowMoving(.to(sections: [.invited]))
             .onDelete { row, source in
                 switch source {
                 case .editing:
@@ -75,7 +75,7 @@ class AttendeesViewController: UIViewController {
                   models: { [unowned self] in self.secondSectionModels },
                   mapToViewModels: { TitleDetailTableViewCell.ViewModel(collectionId: $0.collectionId, title: $0.name) })
             .allowEditing(style: .insert)
-            .allowMoving(.to(sections: .attending))
+            .allowMoving(.to(sections: [.attending]))
             .onDelete { row, _ in
                 self.secondSectionModels.remove(at: row)
                 self.binder.refresh()
@@ -96,7 +96,11 @@ class AttendeesViewController: UIViewController {
         self.binder.finish()
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-            barButtonSystemItem: .edit, target: self, action: #selector(editButtonTapped))
+            barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
+    }
+    
+    @objc private func addButtonPressed() {
+        
     }
     
     @objc private func editButtonTapped() {

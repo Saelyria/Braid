@@ -1,7 +1,7 @@
 import UIKit
 
 public enum CellMovementOption<S: TableViewSection> {
-    case to(sections: S...)
+    case to(sections: [S])
     case toAnySection
 }
 
