@@ -20,5 +20,5 @@ target 'BraidExampleTests' do
     #  pod 'Braid', :path => '.'
     pod 'RxCocoa', '~> 4.4'
     pod 'RxSwift', '~> 4.4'
-    pod 'Nimble', '~> 7'
+    pod 'Nimble', '~> 8'
 end

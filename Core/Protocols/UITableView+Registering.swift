@@ -8,7 +8,7 @@ public extension UITableView {
      
      - parameter cellType: The cell to register to the table view.
     */
-    public func register<T:UITableViewCell & UINibInitable>(_ cellType: T.Type) {
+    func register<T:UITableViewCell & UINibInitable>(_ cellType: T.Type) {
         let reuseIdentifier = (cellType as? ReuseIdentifiable.Type)?.reuseIdentifier
             ?? cellType.classNameReuseIdentifier
         let nib = UINib(nibName: T.nibName, bundle: T.bundle)
@@ -22,7 +22,7 @@ public extension UITableView {
      
      - parameter cellType: The cell to register to the table view.
     */
-    public func register<T: UITableViewCell>(_ cellType: T.Type) {
+    func register<T: UITableViewCell>(_ cellType: T.Type) {
         let reuseIdentifier = (cellType as? ReuseIdentifiable.Type)?.reuseIdentifier
             ?? cellType.classNameReuseIdentifier
         self.register(T.self, forCellReuseIdentifier: reuseIdentifier)
@@ -35,7 +35,7 @@ public extension UITableView {
      
      - parameter headerFooterType: The header/footer view type to register to the table view.
     */
-    public func register<T>(_ headerFooterType: T.Type)
+    func register<T>(_ headerFooterType: T.Type)
         where T: UITableViewHeaderFooterView & UINibInitable
     {
         let nib = UINib(nibName: T.nibName, bundle: T.bundle)
@@ -51,7 +51,7 @@ public extension UITableView {
      
      - parameter headerFooterType: The header/footer view type to register to the table view.
     */
-    public func register<T: UITableViewHeaderFooterView>(_ headerFooterType: T.Type) {
+    func register<T: UITableViewHeaderFooterView>(_ headerFooterType: T.Type) {
         let reuseIdentifier = (headerFooterType as? ReuseIdentifiable.Type)?.reuseIdentifier
             ?? headerFooterType.classNameReuseIdentifier
         self.register(T.self, forHeaderFooterViewReuseIdentifier: reuseIdentifier)
@@ -65,7 +65,7 @@ public extension UITableView {
      
      - returns: A dequeued instance of the cell type.
     */
-    public func dequeue<T: UITableViewCell>(_ cellType: T.Type) -> T {
+    func dequeue<T: UITableViewCell>(_ cellType: T.Type) -> T {
         let reuseIdentifier = (cellType as? ReuseIdentifiable.Type)?.reuseIdentifier
             ?? cellType.classNameReuseIdentifier
         guard let cell = self.dequeueReusableCell(withIdentifier: reuseIdentifier) as? T else {
@@ -82,7 +82,7 @@ public extension UITableView {
      
      - returns: A dequeued instance of the header/footer view type.
     */
-    public func dequeue<T: UITableViewHeaderFooterView>(_ headerFooterType: T.Type) -> T {
+    func dequeue<T: UITableViewHeaderFooterView>(_ headerFooterType: T.Type) -> T {
         let reuseIdentifier = (headerFooterType as? ReuseIdentifiable.Type)?.reuseIdentifier
             ?? headerFooterType.classNameReuseIdentifier
         guard let cell = self.dequeueReusableHeaderFooterView(withIdentifier: reuseIdentifier) as? T else {

@@ -20,7 +20,7 @@ public protocol CollectionIdentifiable {
 }
 
 public extension CollectionIdentifiable where Self: RawRepresentable, Self.RawValue: Hashable {
-    public var collectionId: String {
+    var collectionId: String {
         return String(self.rawValue.hashValue)
     }
 }

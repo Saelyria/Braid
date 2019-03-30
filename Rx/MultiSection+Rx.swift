@@ -8,7 +8,7 @@ public extension Reactive where Base: TableViewMultiSectionBinderProtocol {
      Bind the given cell type to the declared sections, creating them based on the view models from a given observable.
      */
     @discardableResult
-    public func bind<NC>(
+    func bind<NC>(
         cellType: NC.Type,
         viewModels: Observable<[Base.S: [NC.ViewModel]]>)
         -> TableViewMultiSectionBinder<NC, Base.S>
@@ -21,7 +21,7 @@ public extension Reactive where Base: TableViewMultiSectionBinderProtocol {
      Bind the given cell type to the declared sections, creating them based on the view models from a given observable.
      */
     @discardableResult
-    public func bind<NC>(
+    func bind<NC>(
         cellType: NC.Type,
         viewModels: Observable<[Base.S: [NC.ViewModel]]>)
         -> TableViewMultiSectionBinder<NC, Base.S>
@@ -64,7 +64,7 @@ public extension Reactive where Base: TableViewMultiSectionBinderProtocol {
      array of models mapped to view models by a given function.
      */
     @discardableResult
-    public func bind<NC, NM>(
+    func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[Base.S: [NM]]>,
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
@@ -79,7 +79,7 @@ public extension Reactive where Base: TableViewMultiSectionBinderProtocol {
      array of models mapped to view models by a given function.
      */
     @discardableResult
-    public func bind<NC, NM>(
+    func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[Base.S: [NM]]>,
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
@@ -100,7 +100,7 @@ public extension Reactive where Base: TableViewMultiSectionBinderProtocol {
      array of models mapped to view models by a given function.
      */
     @discardableResult
-    public func bind<NC, NM>(
+    func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[Base.S: [NM]]>,
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
@@ -121,7 +121,7 @@ public extension Reactive where Base: TableViewMultiSectionBinderProtocol {
      array of models mapped to view models by a given function.
      */
     @discardableResult
-    public func bind<NC, NM>(
+    func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[Base.S: [NM]]>,
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
@@ -176,7 +176,7 @@ public extension Reactive where Base: TableViewMultiSectionBinderProtocol {
      given the model and the dequeued cell.
      */
     @discardableResult
-    public func bind<NC, NM>(
+    func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[Base.S: [NM]]>)
         -> TableViewModelMultiSectionBinder<NC, Base.S, NM>
@@ -196,7 +196,7 @@ public extension Reactive where Base: TableViewMultiSectionBinderProtocol {
      given the model and the dequeued cell.
      */
     @discardableResult
-    public func bind<NC, NM>(
+    func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[Base.S: [NM]]>)
         -> TableViewModelMultiSectionBinder<NC, Base.S, NM>
@@ -251,7 +251,7 @@ public extension Reactive where Base: TableViewMultiSectionBinderProtocol {
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind<NM>(
+    func bind<NM>(
         cellProvider: @escaping (UITableView, _ section: Base.S, _ row: Int, _ model: NM) -> UITableViewCell,
         models: Observable<[Base.S: [NM]]>)
         -> TableViewModelMultiSectionBinder<UITableViewCell, Base.S, NM>
@@ -277,7 +277,7 @@ public extension Reactive where Base: TableViewMultiSectionBinderProtocol {
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind<NM>(
+    func bind<NM>(
         cellProvider: @escaping (UITableView, _ section: Base.S, _ row: Int, _ model: NM) -> UITableViewCell,
         models: Observable<[Base.S: [NM]]>)
         -> TableViewModelMultiSectionBinder<UITableViewCell, Base.S, NM>
@@ -336,7 +336,7 @@ public extension Reactive where Base: TableViewMultiSectionBinderProtocol {
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind(
+    func bind(
         cellProvider: @escaping (UITableView, _ section: Base.S, _ row: Int) -> UITableViewCell,
         numberOfCells: Observable<[Base.S: Int]>)
         -> TableViewMultiSectionBinder<Base.C, Base.S>
@@ -364,7 +364,7 @@ public extension Reactive where Base: TableViewMultiSectionBinderProtocol {
      Bind the given header type to the declared section with the given observable for their view models.
      */
     @discardableResult
-    public func bind<H>(
+    func bind<H>(
         headerType: H.Type,
         viewModels: Observable<[Base.S: H.ViewModel?]>)
         -> Base
@@ -390,7 +390,7 @@ public extension Reactive where Base: TableViewMultiSectionBinderProtocol {
      Bind the given observable titles to the section's header.
      */
     @discardableResult
-    public func bind(headerTitles: Observable<[Base.S: String?]>) -> Base {
+    func bind(headerTitles: Observable<[Base.S: String?]>) -> Base {
         guard let bindResult = self.base as? TableViewMultiSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
@@ -409,7 +409,7 @@ public extension Reactive where Base: TableViewMultiSectionBinderProtocol {
      Bind the given footer type to the declared section with the given observable for its view model.
     */
     @discardableResult
-    public func bind<F>(
+    func bind<F>(
         footerType: F.Type,
         viewModels: Observable<[Base.S: F.ViewModel?]>)
         -> Base
@@ -435,7 +435,7 @@ public extension Reactive where Base: TableViewMultiSectionBinderProtocol {
      Bind the given observable title to the section's footer.
     */
     @discardableResult
-    public func bind(footerTitles: Observable<[Base.S: String?]>) -> Base {
+    func bind(footerTitles: Observable<[Base.S: String?]>) -> Base {
         guard let bindResult = self.base as? TableViewMultiSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
