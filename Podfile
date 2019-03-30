@@ -8,8 +8,8 @@ target 'BraidExample' do
   
   pod 'Braid/Rx', :path => '.'
 #  pod 'Braid', :path => '.'
-  pod 'RxCocoa', '~> 4.4'
-  pod 'RxSwift', '~> 4.4'
+  pod 'RxCocoa', '~> 4.4.2'
+  pod 'RxSwift', '~> 4.4.2'
 end
 
 target 'BraidExampleTests' do
@@ -18,7 +18,7 @@ target 'BraidExampleTests' do
     
     pod 'Braid/Rx', :path => '.'
     #  pod 'Braid', :path => '.'
-    pod 'RxCocoa', '~> 4.4'
-    pod 'RxSwift', '~> 4.4'
-    pod 'Nimble', '~> 7'
+    pod 'RxCocoa', '~> 4.4.2'
+    pod 'RxSwift', '~> 4.4.2'
+    pod 'Nimble', '~> 8'
 end

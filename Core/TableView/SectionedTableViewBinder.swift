@@ -15,8 +15,8 @@ public extension TableViewSection {
 }
 
 public extension TableViewSection where Self: CollectionIdentifiable {
-    public var hashValue: Int {
-        return self.collectionId.hashValue
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(self.collectionId)
     }
 }
 
@@ -438,7 +438,7 @@ public extension SectionedTableViewBinder.SectionDisplayBehavior where S: Compar
      The table binder will automatically hide sections when there are no cell items for it regardless of whether a
      header/footer is bound for the section. The sections will be sorted according to their `Comparable` conformance.
     */
-    public static var hidesSectionsWithNoCellData: SectionedTableViewBinder.SectionDisplayBehavior {
+    static var hidesSectionsWithNoCellData: SectionedTableViewBinder.SectionDisplayBehavior {
         let orderingFunc = { (unordered: [S]) -> [S] in
             return unordered.sorted()
         }
@@ -451,7 +451,7 @@ public extension SectionedTableViewBinder.SectionDisplayBehavior where S: Compar
      behavior means that a section will still be shown if it has a header or footer, even when it has no cells to show.
      The sections will be sorted according to their `Comparable` conformance.
     */
-    public static var hidesSectionsWithNoData: SectionedTableViewBinder.SectionDisplayBehavior {
+    static var hidesSectionsWithNoData: SectionedTableViewBinder.SectionDisplayBehavior {
         let orderingFunc = { (unordered: [S]) -> [S] in
             return unordered.sorted()
         }
