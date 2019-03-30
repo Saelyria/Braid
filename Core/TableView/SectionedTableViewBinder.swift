@@ -15,8 +15,8 @@ public extension TableViewSection {
 }
 
 public extension TableViewSection where Self: CollectionIdentifiable {
-    var hashValue: Int {
-        return self.collectionId.hashValue
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(self.collectionId)
     }
 }
 
