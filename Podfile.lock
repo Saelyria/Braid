@@ -4,7 +4,7 @@ PODS:
     - Braid/Core
     - RxCocoa (~> 4.4)
     - RxSwift (~> 4.4)
-  - Nimble (8.0.0)
+  - Nimble (8.0.1)
   - RxAtomic (4.4.0)
   - RxCocoa (4.4.0):
     - RxSwift (~> 4.0)
@@ -14,8 +14,8 @@ PODS:
 DEPENDENCIES:
   - Braid/Rx (from `.`)
   - Nimble (~> 8)
-  - RxCocoa (~> 4)
-  - RxSwift (~> 4)
+  - RxCocoa (~> 4.4)
+  - RxSwift (~> 4.4)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -30,11 +30,11 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Braid: ef9e4421fbb1d06c60cdfbcc21aa5a34efbbd654
-  Nimble: a0e6f95b4b91a4f66b6da3512b6bebc07c9cbf49
+  Nimble: 45f786ae66faa9a709624227fae502db55a8bdd0
   RxAtomic: eacf60db868c96bfd63320e28619fe29c179656f
   RxCocoa: df63ebf7b9a70d6b4eeea407ed5dd4efc8979749
   RxSwift: 5976ecd04fc2fefd648827c23de5e11157faa973
 
-PODFILE CHECKSUM: a2404fd6ecfbd92d1c6848edf8be15f52ebe1262
+PODFILE CHECKSUM: e38f7e55c070a52ea9330966e09a0901c2b2fc93
 
 COCOAPODS: 1.5.3

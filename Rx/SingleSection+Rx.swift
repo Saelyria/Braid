@@ -74,7 +74,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      handler to your chain when using this method to configure dequeued cells with their associated model objects.
     */
     @discardableResult
-    public func bind<NC, NM>(
+    func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[NM]>)
         -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
@@ -92,7 +92,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      handler to your chain when using this method to configure dequeued cells with their associated model objects.
      */
     @discardableResult
-    public func bind<NC, NM>(
+    func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[NM]>)
         -> TableViewModelSingleSectionBinder<NC, Base.S, NM>
@@ -139,7 +139,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      associated model using the given `mapToViewModel` function.
      */
     @discardableResult
-    public func bind<NC, NM>(
+    func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[NM]>,
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
@@ -159,7 +159,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      associated model using the given `mapToViewModel` function.
      */
     @discardableResult
-    public func bind<NC, NM>(
+    func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[NM]>,
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
@@ -185,7 +185,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      associated model using the given `mapToViewModel` function.
      */
     @discardableResult
-    public func bind<NC, NM>(
+    func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[NM]>,
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
@@ -211,7 +211,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      associated model using the given `mapToViewModel` function.
      */
     @discardableResult
-    public func bind<NC, NM>(
+    func bind<NC, NM>(
         cellType: NC.Type,
         models: Observable<[NM]>,
         mapToViewModels: @escaping (NM) -> NC.ViewModel)
@@ -267,7 +267,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind<NM>(
+    func bind<NM>(
         cellProvider: @escaping (_ tableView: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: Observable<[NM]>)
         -> TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>
@@ -291,7 +291,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind<NM>(
+    func bind<NM>(
         cellProvider: @escaping (_ tableView: UITableView, _ row: Int, _ model: NM) -> UITableViewCell,
         models: Observable<[NM]>)
         -> TableViewModelSingleSectionBinder<UITableViewCell, Base.S, NM>
@@ -349,7 +349,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func bind(
+    func bind(
         cellProvider: @escaping (_ tableView: UITableView, _ row: Int) -> UITableViewCell,
         numberOfCells: Observable<Int>)
         -> TableViewSingleSectionBinder<Base.C, Base.S>
@@ -378,7 +378,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      
      */
     @discardableResult
-    public func bind<H>(headerType: H.Type, viewModel: Observable<H.ViewModel?>) -> Base
+    func bind<H>(headerType: H.Type, viewModel: Observable<H.ViewModel?>) -> Base
     where H: UITableViewHeaderFooterView & ViewModelBindable {
         guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
@@ -401,7 +401,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      Bind the given observable title to the section's header.
      */
     @discardableResult
-    public func bind(headerTitle: Observable<String?>) -> Base {
+    func bind(headerTitle: Observable<String?>) -> Base {
         guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
@@ -425,7 +425,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      header's section when the given observable view model changes.
      */
     @discardableResult
-    public func bind<F>(footerType: F.Type, viewModel: Observable<F.ViewModel?>) -> Base
+    func bind<F>(footerType: F.Type, viewModel: Observable<F.ViewModel?>) -> Base
     where F: UITableViewHeaderFooterView & ViewModelBindable {
         guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
@@ -448,7 +448,7 @@ public extension Reactive where Base: TableViewSingleSectionBinderProtocol {
      Bind the given observable title to the section's footer.
      */
     @discardableResult
-    public func bind(footerTitle: Observable<String?>) -> Base {
+    func bind(footerTitle: Observable<String?>) -> Base {
         guard let bindResult = self.base as? TableViewSingleSectionBinder<Base.C, Base.S> else {
             fatalError("ERROR: Couldn't convert `base` into a bind result; something went awry!")
         }
