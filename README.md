@@ -1,7 +1,7 @@
 ![Braid](braid.jpg)
 
 <p align="center">
-<a href="https://travis-ci.com/Saelyria/Braid"><img src="https://travis-ci.com/Saelyria/Braid.svg?branch=master" alt="Build status" /></a>
+<a href="https://travis-ci.com/Saelyria/Braid"><img src="https://travis-ci.com/Saelyria/Braid.svg?branch=master&style=flat-square" alt="Build status" /></a>
 <img src="https://img.shields.io/badge/platform-iOS-blue.svg?style=flat-square" alt="Platform iOS" />
 <a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift5-compatible-4BC51D.svg?style=flat-square" alt="Swift 5 compatible" /></a>
 <a href="https://cocoapods.org/pods/Braid"><img src="https://img.shields.io/cocoapods/v/Braid.svg?style=flat-square" alt="CocoaPods compatible" /></a>
