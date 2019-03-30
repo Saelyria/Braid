@@ -463,7 +463,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-BraidExample/Pods-BraidExample-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-BraidExample/Pods-BraidExample-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Braid/Braid.framework",
 				"${BUILT_PRODUCTS_DIR}/RxAtomic/RxAtomic.framework",
 				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
@@ -478,7 +478,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BraidExample/Pods-BraidExample-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BraidExample/Pods-BraidExample-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		29CF50FF5DBA1AA16C9761DF /* [CP] Check Pods Manifest.lock */ = {
@@ -529,7 +529,7 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-BraidExampleTests/Pods-BraidExampleTests-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-BraidExampleTests/Pods-BraidExampleTests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Braid/Braid.framework",
 				"${BUILT_PRODUCTS_DIR}/RxAtomic/RxAtomic.framework",
 				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
@@ -548,7 +548,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BraidExampleTests/Pods-BraidExampleTests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BraidExampleTests/Pods-BraidExampleTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
