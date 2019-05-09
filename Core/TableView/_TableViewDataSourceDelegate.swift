@@ -258,6 +258,8 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         guard sourceIndexPath != destinationIndexPath else { return }
         
+        self.binder.isPerformingCellMoving = true
+        
         let fromSection = self.dataModel.displayedSections[sourceIndexPath.section]
         let toSection = self.dataModel.displayedSections[destinationIndexPath.section]
         
@@ -268,16 +270,30 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         } else {
             deleteHandler = self.binder.handlers.cellDeletedHandlers.dynamicSections
         }
+        let beforeDeletionCount: Int = self.dataModel.sectionModel(for: fromSection).count
         deleteHandler?(fromSection, sourceIndexPath.row, .moved(toSection: toSection, row: destinationIndexPath.row))
+        self.binder.refresh()
+        assert(beforeDeletionCount == self.binder.nextDataModel.sectionModel(for: fromSection).count + 1, "A model wasn't deleted")
         
         let insertHandler: ((S, Int, CellInsertionSource<S>) -> Void)?
-        if self.dataModel.uniquelyBoundCellSections.contains(fromSection)
-            || self.binder.handlers.cellInsertedHandlers.namedSection[fromSection] != nil {
-            insertHandler = self.binder.handlers.cellInsertedHandlers.namedSection[fromSection]
+        if self.dataModel.uniquelyBoundCellSections.contains(toSection)
+            || self.binder.handlers.cellInsertedHandlers.namedSection[toSection] != nil {
+            insertHandler = self.binder.handlers.cellInsertedHandlers.namedSection[toSection]
         } else {
             insertHandler = self.binder.handlers.cellInsertedHandlers.dynamicSections
         }
-        insertHandler?(fromSection, destinationIndexPath.row, .moved(fromSection: toSection, row: sourceIndexPath.row))
+        // If destination index path is in the same section and before the source index path, decrement the 'to row' by
+        // 1 to account for the row that was deleted
+        let toRow: Int = (fromSection == toSection && destinationIndexPath.row > sourceIndexPath.row) ?
+            destinationIndexPath.row - 1 : destinationIndexPath.row
+        let beforeInsertionCount: Int = self.dataModel.sectionModel(for: toSection).count
+        insertHandler?(toSection, toRow, .moved(fromSection: fromSection, row: sourceIndexPath.row))
+        self.binder.refresh()
+        if fromSection == toSection {
+            assert(beforeInsertionCount == self.binder.nextDataModel.sectionModel(for: toSection).count, "A model wasn't inserted")
+        } else {
+            assert(beforeInsertionCount == self.binder.nextDataModel.sectionModel(for: toSection).count - 1, "A model wasn't inserted")
+        }
     }
     
     // MARK: -

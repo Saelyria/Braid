@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -51,6 +51,7 @@
 		ABE0F37521BE24F30098950D /* Cells.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE0F37421BE24F30098950D /* Cells.swift */; };
 		ABE0F37A21BE282A0098950D /* TableTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE0F37921BE282A0098950D /* TableTestCase.swift */; };
 		ABE0F37C21BE30730098950D /* TableCellBindingMethodTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE0F37B21BE30730098950D /* TableCellBindingMethodTests.swift */; };
+		ABE838FF2283EAC40008A5B7 /* AttendeesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABE838FE2283EAC30008A5B7 /* AttendeesViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -132,6 +133,7 @@
 		ABE0F37421BE24F30098950D /* Cells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cells.swift; sourceTree = "<group>"; };
 		ABE0F37921BE282A0098950D /* TableTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableTestCase.swift; sourceTree = "<group>"; };
 		ABE0F37B21BE30730098950D /* TableCellBindingMethodTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableCellBindingMethodTests.swift; sourceTree = "<group>"; };
+		ABE838FE2283EAC30008A5B7 /* AttendeesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AttendeesViewController.swift; sourceTree = "<group>"; };
 		B5FEBC5088F0D7E30632BBD0 /* Pods_BraidExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BraidExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE17F9A4879165AF43849970 /* Pods_BraidExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BraidExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -198,6 +200,7 @@
 				ABC1AD1C21E6BF3E00BAC644 /* Sample 3 - Form */,
 				ABE0F35D21B49DC10098950D /* Sample 4 - News Feed */,
 				AB577BA82179662400CD2363 /* Sample 5 - Dynamic Home Page */,
+				ABE838FD2283EAC30008A5B7 /* Sample 6 - Editable Attendees */,
 				AB577B9D21759F8B00CD2363 /* Shared Views */,
 				9381334F20B6EDFA00CBF8F6 /* Resources */,
 				938132E320B6463200CBF8F6 /* Info.plist */,
@@ -336,6 +339,14 @@
 				AB05A86D2224FEA800C9C3E3 /* MockUpdateDelegate.swift */,
 			);
 			path = "Test Classes";
+			sourceTree = "<group>";
+		};
+		ABE838FD2283EAC30008A5B7 /* Sample 6 - Editable Attendees */ = {
+			isa = PBXGroup;
+			children = (
+				ABE838FE2283EAC30008A5B7 /* AttendeesViewController.swift */,
+			);
+			path = "Sample 6 - Editable Attendees";
 			sourceTree = "<group>";
 		};
 		EBF40F86B284BBBC4E5ACCEB /* Frameworks */ = {
@@ -552,6 +563,7 @@
 				AB577BD62184DC6F00CD2363 /* ImageTitleSubtitleTableViewCell.swift in Sources */,
 				AB86C3BF2141718C00FA4945 /* SectionHeaderView.swift in Sources */,
 				AB577BDD2189769800CD2363 /* AccountDetailViewController.swift in Sources */,
+				ABE838FF2283EAC40008A5B7 /* AttendeesViewController.swift in Sources */,
 				9381335120B6EE2A00CBF8F6 /* TitleDetailTableViewCell.swift in Sources */,
 				ABE0F35F21B49DD90098950D /* NewsFeedViewController.swift in Sources */,
 				AB577BAA2179665400CD2363 /* HomeViewController.swift in Sources */,

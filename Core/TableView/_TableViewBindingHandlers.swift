@@ -1,17 +1,35 @@
 import UIKit
 
+/**
+ An enum describing rules for which sections cells from a section can be moved to.
+ */
 public enum CellMovementOption<S: TableViewSection> {
+    /// The cells from this section can only be moved to the sections in the given array. Note that this array must
+    /// explicitly include the section the cell came from to be able to move the cell within its original section.
     case to(sections: [S])
+    
+//    case toAnySection(where: (S) -> Bool)
+    /// The cells from this section can be moved to any section on the table.
     case toAnySection
 }
 
+/**
+ An enum that describes the reason a cell in a section was deleted.
+ */
 public enum CellDeletionSource<S: TableViewSection> {
+    /// The existing cell was moved to the given section and row.
     case moved(toSection: S, row: Int)
+    /// The cell was deleted via an editing control.
     case editing
 }
 
+/**
+ An enum that describes where a cell inserted in a section came from.
+ */
 public enum CellInsertionSource<S: TableViewSection> {
+    /// An existing cell was moved from the given section and row.
     case moved(fromSection: S, row: Int)
+    /// A new cell was created and inserted via an editing control.
     case editing
 }
 

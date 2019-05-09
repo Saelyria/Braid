@@ -17,8 +17,8 @@ class AttendeesViewController: UIViewController {
     
     private var tableView: UITableView!
     private var binder: SectionedTableViewBinder<Section>!
-    private var firstSectionModels: [Person] = []
-    private var secondSectionModels: [Person] = []
+    private var peopleAttending: [Person] = []
+    private var peopleInvited: [Person] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,8 +29,8 @@ class AttendeesViewController: UIViewController {
         self.view.addSubview(self.tableView)
         self.tableView.setEditing(true, animated: false)
         
-        self.firstSectionModels = [Person(name: "Jonathan"), Person(name: "Omar"), Person(name: "Sara")]
-        self.secondSectionModels = [Person(name: "Yvonne"), Person(name: "Kalinda")]
+        self.peopleAttending = [Person(name: "Jonathan"), Person(name: "Omar"), Person(name: "Sara")]
+        self.peopleInvited = [Person(name: "Yvonne"), Person(name: "Kalinda")]
         
         self.binder = SectionedTableViewBinder(tableView: self.tableView, sectionedBy: Section.self)
         self.binder.sectionDisplayBehavior = .hidesSectionsWithNoData
@@ -46,45 +46,27 @@ class AttendeesViewController: UIViewController {
         self.binder.onSection(.attending)
             .bind(headerTitle: "ATTENDING")
             .bind(cellType: TitleDetailTableViewCell.self,
-                  models: { [unowned self] in self.firstSectionModels },
+                  models: { [unowned self] in self.peopleAttending },
                   mapToViewModels: { TitleDetailTableViewCell.ViewModel(collectionId: $0.collectionId, title: $0.name) })
             .allowMoving(.to(sections: [.invited]))
             .onDelete { row, _ in
-                self.firstSectionModels.remove(at: row)
-                self.binder.refresh()
+                self.peopleAttending.remove(at: row)
             }
-            .onInsert { row, source in
-                switch source {
-                case let .moved(_, fromRow):
-                    let model = self.secondSectionModels[fromRow]
-                    self.firstSectionModels.insert(model, at: row)
-                    self.binder.refresh()
-                default: break
-                }
+            .onInsert { row, _, model in
+                self.peopleAttending.insert(model!, at: row)
             }
         
         self.binder.onSection(.invited)
             .bind(headerTitle: "INVITED")
             .bind(cellType: TitleDetailTableViewCell.self,
-                  models: { [unowned self] in self.secondSectionModels },
+                  models: { [unowned self] in self.peopleInvited },
                   mapToViewModels: { TitleDetailTableViewCell.ViewModel(collectionId: $0.collectionId, title: $0.name) })
             .allowMoving(.to(sections: [.attending]))
             .onDelete { row, _ in
-                self.secondSectionModels.remove(at: row)
-                self.binder.refresh()
+                self.peopleInvited.remove(at: row)
             }
             .onInsert { row, _, model in
-                self.secondSectionModels.insert(model, at: row)
-                switch source {
-                case .editing:
-                    let model = self.secondSectionModels[row]
-                    self.firstSectionModels.append(model)
-                    self.secondSectionModels.remove(at: row)
-                case let .moved(_, fromRow):
-                    let model = self.firstSectionModels[fromRow]
-                    
-                }
-                self.binder.refresh()
+                self.peopleInvited.insert(model!, at: row)
             }
         
         self.binder.finish()
@@ -94,6 +76,6 @@ class AttendeesViewController: UIViewController {
     }
     
     @objc private func addButtonPressed() {
-        self.firstSectionModels.append(Person(name: "Name"))
+        self.peopleAttending.append(Person(name: "Name"))
     }
 }

@@ -222,6 +222,10 @@ public class SectionedTableViewBinder<Section: TableViewSection>: SectionedTable
     /// Whether the binder should animate changes in data on its table view. Defaults to `true`.
     public var animateChanges: Bool = true
     
+    /// A flag set by the data source/delegate object that indicates that a move, insert, or delete operation was
+    /// started by the table, so when its data is updated, it should not tell the table view to reload itself.
+    internal var isPerformingCellMoving: Bool = false
+    
     /// Whether the binder should automatically register cells and header/footer views bound to it when cell types are
     /// given. Defaults to `true`.
     public var automaticallyRegister: Bool = true
@@ -491,6 +495,14 @@ extension SectionedTableViewBinder: _TableViewDataModelDelegate {
             }
             
             self.applyDisplayedSectionBehavior()
+            
+            // When the data model is updated because of a cell insertion/deletion/movement that started from the table,
+            // we only want to create the next data model - the table view has already updated its view state.
+            if self.isPerformingCellMoving {
+                self.isPerformingCellMoving = false
+                self.createNextDataModel()
+                return
+            }
             
             if !self.animateChanges {
                 self.createNextDataModel()

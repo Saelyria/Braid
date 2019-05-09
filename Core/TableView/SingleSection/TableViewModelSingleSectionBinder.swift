@@ -123,14 +123,20 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     @discardableResult
-    public func onInsert(_ handler: @escaping (_ row: Int, _ source: CellInsertionSource<S>, _ model: M) -> Void)
+    public func onInsert(_ handler: @escaping (_ row: Int, _ source: CellInsertionSource<S>, _ model: M?) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
-        let section = self.section
         super.onInsert { [weak binder = self.binder] row, source in
-            guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
-                assertionFailure("ERROR: Model wasn't the right type; something went awry!")
-                return
+            let model: M?
+            switch source {
+            case let .moved(fromSection, fromRow):
+                guard let _model = binder?.currentDataModel.item(inSection: fromSection, row: fromRow)?.model as? M else {
+                    assertionFailure("ERROR: Model wasn't the right type; something went awry!")
+                    return
+                }
+                model = _model
+            default:
+                model = nil
             }
             handler(row, source, model)
         }
@@ -291,7 +297,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     @discardableResult
-    override public func onDelete(_ handler: @escaping (Int, CellDeletionSource<S>) -> Void)
+    override public func onDelete(_ handler: @escaping (_ indexRemovedFrom: Int, CellDeletionSource<S>) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         self.binder.handlers.add({ _, row, source in handler(row, source) },
@@ -301,7 +307,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     @discardableResult
-    override public func onInsert(_ handler: @escaping (Int, CellInsertionSource<S>) -> Void)
+    override public func onInsert(_ handler: @escaping (_ indexInsertedAt: Int, CellInsertionSource<S>) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         self.binder.handlers.add({ _, row, source in handler(row, source) },
