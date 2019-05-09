@@ -135,7 +135,9 @@ public protocol SectionedTableViewBinderProtocol: AnyObject {
  conformance) to be compatible with a data binder. Specifically, they must at least conform to `ReuseIdentifiable`, and
  should conform to `UINibInitable` if they are meant to be created from a Nib.
  */
-public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBinderProtocol {
+public class SectionedTableViewBinder<Section: TableViewSection>: SectionedTableViewBinderProtocol {
+    public typealias S = Section
+    
     /// A behaviour detailing how sections on the managed table view are displayed in terms of order and visibility.
     public struct SectionDisplayBehavior {
         internal enum _Behavior {
@@ -433,13 +435,13 @@ public class SectionedTableViewBinder<S: TableViewSection>: SectionedTableViewBi
     }
 }
 
-public extension SectionedTableViewBinder.SectionDisplayBehavior where S: Comparable {
+public extension SectionedTableViewBinder.SectionDisplayBehavior where Section: Comparable {
     /**
      The table binder will automatically hide sections when there are no cell items for it regardless of whether a
      header/footer is bound for the section. The sections will be sorted according to their `Comparable` conformance.
     */
     static var hidesSectionsWithNoCellData: SectionedTableViewBinder.SectionDisplayBehavior {
-        let orderingFunc = { (unordered: [S]) -> [S] in
+        let orderingFunc = { (unordered: [Section]) -> [Section] in
             return unordered.sorted()
         }
         return SectionedTableViewBinder.SectionDisplayBehavior(
@@ -452,7 +454,7 @@ public extension SectionedTableViewBinder.SectionDisplayBehavior where S: Compar
      The sections will be sorted according to their `Comparable` conformance.
     */
     static var hidesSectionsWithNoData: SectionedTableViewBinder.SectionDisplayBehavior {
-        let orderingFunc = { (unordered: [S]) -> [S] in
+        let orderingFunc = { (unordered: [Section]) -> [Section] in
             return unordered.sorted()
         }
         return SectionedTableViewBinder.SectionDisplayBehavior(

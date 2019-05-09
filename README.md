@@ -1,11 +1,11 @@
 ![Braid](braid.jpg)
 
 <p align="center">
-<a href="https://travis-ci.com/Saelyria/Braid"><img src="https://travis-ci.com/Saelyria/Braid.svg?branch=master" alt="Build status" /></a>
-<img src="https://img.shields.io/badge/platform-iOS-blue.svg?style=flat" alt="Platform iOS" />
-<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift4-compatible-4BC51D.svg?style=flat" alt="Swift 4.2 compatible" /></a>
-<a href="https://cocoapods.org/pods/Braid"><img src="https://img.shields.io/cocoapods/v/Braid.svg" alt="CocoaPods compatible" /></a>
-<a href="https://raw.githubusercontent.com/Saelyria/Braid/master/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat" alt="License: MIT" /></a>
+<a href="https://travis-ci.com/Saelyria/Braid"><img src="https://travis-ci.com/Saelyria/Braid.svg?branch=master&style=flat-square" alt="Build status" /></a>
+<img src="https://img.shields.io/badge/platform-iOS-blue.svg?style=flat-square" alt="Platform iOS" />
+<a href="https://developer.apple.com/swift"><img src="https://img.shields.io/badge/swift5-compatible-4BC51D.svg?style=flat-square" alt="Swift 5 compatible" /></a>
+<a href="https://cocoapods.org/pods/Braid"><img src="https://img.shields.io/cocoapods/v/Braid.svg?style=flat-square" alt="CocoaPods compatible" /></a>
+<a href="https://raw.githubusercontent.com/Saelyria/Braid/master/LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License: MIT" /></a>
 </p>
 
 Braid is a feature-packed library for making your table view setup routine smaller, more declarative, more type safe, and simply more fun. It 
