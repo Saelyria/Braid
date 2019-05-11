@@ -35,10 +35,13 @@
          location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/7-ProvidingDimensions.md">
       </FileRef>
       <FileRef
-         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/8-TipsTricksFAQ.md">
+         location = "group:8-DeletingInsertingMovingCells.md">
       </FileRef>
       <FileRef
-         location = "container:/Users/aaronbosnjak/Developer/Braid/Documentation/9-HowItWorks.md">
+         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/9-TipsTricksFAQ.md">
+      </FileRef>
+      <FileRef
+         location = "container:/Users/aaronbosnjak/Developer/Braid/Documentation/10-HowItWorks.md">
       </FileRef>
    </Group>
    <FileRef

@@ -235,8 +235,8 @@ dynamic sections, other types of cell binding methods that give you more control
 - [Hiding, showing, and ordering sections automatically](5-SectionDisplayBehaviour.md)
 - [Binding chain scopes](6-AdvancedBindingChains.md)
 - [Providing dimensions](7-ProvidingDimensions.md)
-- [Tips, tricks, and FAQ](8-TipsTricksFAQ.md)
-- [How Braid works](9-HowItWorks.md)
+- [Tips, tricks, and FAQ](9-TipsTricksFAQ.md)
+- [How Braid works](10-HowItWorks.md)
 
 If you'd prefer to poke around some working examples, there are working samples in the `BraidExample` Xcode project you can run to see 
 the end result.

@@ -140,8 +140,9 @@ project in the repository. Available tutorials to get you familiar with Braid ar
 - [Hiding, showing, and ordering sections automatically](https://github.com/Saelyria/Braid/tree/master/Documentation/5-SectionDisplayBehaviour.md)
 - [Binding chain scopes](https://github.com/Saelyria/Braid/tree/master/Documentation/6-AdvancedBindingChains.md)
 - [Providing dimensions (cell height, header height, etc.)](https://github.com/Saelyria/Braid/tree/master/Documentation/7-ProvidingDimensions.md)
-- [Tips, tricks, and FAQ](https://github.com/Saelyria/Braid/tree/master/Documentation/8-TipsTricksFAQ.md)
-- [How Braid works](https://github.com/Saelyria/Braid/tree/master/Documentation/9-HowItWorks.md)
+- [Deleting, inserting, and moving cells](https://github.com/Saelyria/Braid/tree/master/Documentation/8-DeletingInsertingMovingCells)
+- [Tips, tricks, and FAQ](https://github.com/Saelyria/Braid/tree/master/Documentation/9-TipsTricksFAQ.md)
+- [How Braid works](https://github.com/Saelyria/Braid/tree/master/Documentation/10-HowItWorks.md)
 
 > Collection view support and ability to bind cells by name like sections for form-style tables are on the way!
 

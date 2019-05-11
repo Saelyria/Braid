@@ -127,4 +127,4 @@ then diffing is done with whichever of the two is 'diffable'. If both are 'diffa
 - [Binding chain scopes](6-AdvancedBindingChains.md)
 - [Providing dimensions](7-ProvidingDimensions.md)
 - **Tips, tricks, and FAQ**
-- [How Braid works](9-HowItWorks.md)
+- [How Braid works](10-HowItWorks.md)

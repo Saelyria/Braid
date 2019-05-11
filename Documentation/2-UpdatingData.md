@@ -112,5 +112,5 @@ will use its `==` method to see if items that didn't move were updated (thus rel
 - [Hiding, showing, and ordering sections automatically](5-SectionDisplayBehaviour.md)
 - [Binding chain scopes](6-AdvancedBindingChains.md)
 - [Providing dimensions](7-ProvidingDimensions.md)
-- [Tips, tricks, and FAQ](8-TipsTricksFAQ.md)
-- [How Braid works](9-HowItWorks.md)
+- [Tips, tricks, and FAQ](9-TipsTricksFAQ.md)
+- [How Braid works](10-HowItWorks.md)

@@ -91,5 +91,5 @@ an idea of what's going on, and can maybe open a pull request with some features
 - [Hiding, showing, and ordering sections automatically](5-SectionDisplayBehaviour.md)
 - [Binding chain scopes](6-AdvancedBindingChains.md)
 - [Providing dimensions](7-ProvidingDimensions.md)
-- [Tips, tricks, and FAQ](8-TipsTricksFAQ.md)
+- [Tips, tricks, and FAQ](9-TipsTricksFAQ.md)
 - **How Braid works**

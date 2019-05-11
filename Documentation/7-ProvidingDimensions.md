@@ -46,5 +46,5 @@ binder.onSections(.first, .second)
 - [Hiding, showing, and ordering sections automatically](5-SectionDisplayBehaviour.md)
 - [Binding chain scopes](6-AdvancedBindingChains.md)
 - **Providing dimensions**
-- [Tips, tricks, and FAQ](8-TipsTricksFAQ.md)
-- [How Braid works](9-HowItWorks.md)
+- [Tips, tricks, and FAQ](9-TipsTricksFAQ.md)
+- [How Braid works](10-HowItWorks.md)
