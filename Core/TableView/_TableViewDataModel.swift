@@ -205,7 +205,7 @@ internal class _TableViewSectionDataModel<S: TableViewSection> {
         didSet { self.onUpdate?() }
     }
     var cellEditingStyle: UITableViewCell.EditingStyle = .none
-    var movementOption: CellMovementOption<S>?
+    var movementPolicy: CellMovementPolicy<S>?
     
     var cellDataType: CellDataType = .models
     
@@ -216,14 +216,15 @@ internal class _TableViewSectionDataModel<S: TableViewSection> {
     }
     
     fileprivate init(from other: _TableViewSectionDataModel<S>) {
+        self.section = other.section
         self.headerTitle = other.headerTitle
         self.headerViewModel = other.headerViewModel
         self.cellDataType = other.cellDataType
         self.items = other.items
         self.footerTitle = other.footerTitle
         self.footerViewModel = other.footerViewModel
-        self.section = other.section
         self.cellEditingStyle = other.cellEditingStyle
+        self.movementPolicy = other.movementPolicy
     }
 }
 

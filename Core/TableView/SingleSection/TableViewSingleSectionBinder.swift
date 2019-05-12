@@ -958,14 +958,14 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     }
     
     @discardableResult
-    public func allowMoving(_ movementOption: CellMovementOption<S>, rowIsMovable: ((Int) -> Bool)? = nil)
+    public func allowMoving(_ movementOption: CellMovementPolicy<S>, rowIsMovable: ((Int) -> Bool)? = nil)
         -> TableViewSingleSectionBinder<C, S>
     {
         if let rowIsMovable = rowIsMovable {
             self.binder.handlers.add(
                 { _ , row in rowIsMovable(row) }, toHandlerSetAt: \.cellMovableProviders, forScope: self.affectedSectionScope)
         }
-        self.binder.nextDataModel.sectionModel(for: self.section).movementOption = movementOption
+        self.binder.nextDataModel.sectionModel(for: self.section).movementPolicy = movementOption
         return self
     }
     

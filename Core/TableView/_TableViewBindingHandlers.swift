@@ -3,7 +3,7 @@ import UIKit
 /**
  An enum describing rules for which sections cells from a section can be moved to.
  */
-public enum CellMovementOption<S: TableViewSection> {
+public enum CellMovementPolicy<S: TableViewSection> {
     /// The cells from this section can only be moved to the sections in the given array. Note that this array must
     /// explicitly include the section the cell came from to be able to move the cell within its original section.
     case to(sections: [S])

@@ -7,6 +7,9 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     private var dataModel: _TableViewDataModel<S>! {
         return self.binder.currentDataModel
     }
+    
+    /// While moving a cell, this value is set to remember the last valid index path the cell was dragged over.
+    private var lastValidIndexPathWhileMovingCell: IndexPath?
 
     init(binder: SectionedTableViewBinder<S>) {
         self.binder = binder
@@ -191,7 +194,9 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         if let canEdit = canEdit {
             return canEdit(section, indexPath.row)
         } else {
-            return self.dataModel.sectionModel(for: section).cellEditingStyle != .none
+            let allowsEditing = self.dataModel.sectionModel(for: section).cellEditingStyle != .none
+            let allowsMovement = self.dataModel.sectionModel(for: section).movementPolicy != nil
+            return allowsEditing || allowsMovement
         }
     }
     
@@ -217,14 +222,17 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         let section = self.dataModel.displayedSections[indexPath.section]
         
         if editingStyle == .delete {
-            let handler: ((S, Int, CellDeletionSource<S>) -> Void)?
+            let deleteHandler: ((S, Int, CellDeletionSource<S>) -> Void)?
             if self.dataModel.uniquelyBoundCellSections.contains(section)
             || self.binder.handlers.cellDeletedHandlers.namedSection[section] != nil {
-                handler = self.binder.handlers.cellDeletedHandlers.namedSection[section]
+                deleteHandler = self.binder.handlers.cellDeletedHandlers.namedSection[section]
             } else {
-                handler = self.binder.handlers.cellDeletedHandlers.dynamicSections
+                deleteHandler = self.binder.handlers.cellDeletedHandlers.dynamicSections
             }
-            handler?(section, indexPath.row, .editing)
+            let beforeDeletionCount: Int = self.dataModel.sectionModel(for: section).count
+            deleteHandler?(section, indexPath.row, .editing)
+            self.binder.refresh()
+            assert(beforeDeletionCount == self.binder.nextDataModel.sectionModel(for: section).count + 1, "A model wasn't deleted")
         } else if editingStyle == .insert {
             let handler: ((S, Int, CellInsertionSource<S>) -> Void)?
             if self.dataModel.uniquelyBoundCellSections.contains(section)
@@ -233,7 +241,10 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
             } else {
                 handler = self.binder.handlers.cellInsertedHandlers.dynamicSections
             }
+            let beforeInsertionCount: Int = self.dataModel.sectionModel(for: section).count
             handler?(section, indexPath.row, .editing)
+            self.binder.refresh()
+            assert(beforeInsertionCount == self.binder.nextDataModel.sectionModel(for: section).count - 1, "A model wasn't inserted")
         }
     }
     
@@ -251,14 +262,48 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         if let canMove = canMove {
             return canMove(section, indexPath.row)
         } else {
-            return self.dataModel.sectionModel(for: section).movementOption != nil
+            return self.dataModel.sectionModel(for: section).movementPolicy != nil
         }
+    }
+    
+    func tableView(
+        _ tableView: UITableView,
+        targetIndexPathForMoveFromRowAt sourceIndexPath: IndexPath,
+        toProposedIndexPath proposedDestinationIndexPath: IndexPath) -> IndexPath
+    {
+        let section = self.dataModel.displayedSections[sourceIndexPath.section]
+        var targetIndexPath: IndexPath
+        
+        // check if the section the cell came from had a 'movement policy'. If it did, make sure the proposed index
+        // path is allowed according to the policy.
+        guard let movementPolicy = self.dataModel.sectionModel(for: section).movementPolicy else {
+            fatalError("There was no policy dictating which sections a cell are allowed to move to for section \(section) - this shouldn't be possible.")
+        }
+        switch movementPolicy {
+        case .to(sections: let allowedSections):
+            let proposedSection = self.dataModel.displayedSections[proposedDestinationIndexPath.section]
+            if allowedSections.contains(proposedSection) {
+                targetIndexPath = proposedDestinationIndexPath
+            } else {
+                // if the proposed section wasn't in the 'allowed sections' array, return the last path in the last
+                // allowed section instead
+                targetIndexPath = self.lastValidIndexPathWhileMovingCell ?? sourceIndexPath
+            }
+        case .toAnySection:
+            targetIndexPath = proposedDestinationIndexPath
+        }
+        
+        self.lastValidIndexPathWhileMovingCell = targetIndexPath
+        return targetIndexPath
     }
     
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         guard sourceIndexPath != destinationIndexPath else { return }
         
+        // Set a flag on the binder so it knows it doesn't need to reload when the data changes
         self.binder.isPerformingCellMoving = true
+        // Reset the 'last valid index path while moving cell' since we've finished moving it
+        self.lastValidIndexPathWhileMovingCell = nil
         
         let fromSection = self.dataModel.displayedSections[sourceIndexPath.section]
         let toSection = self.dataModel.displayedSections[destinationIndexPath.section]
@@ -282,17 +327,19 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         } else {
             insertHandler = self.binder.handlers.cellInsertedHandlers.dynamicSections
         }
-        // If destination index path is in the same section and before the source index path, decrement the 'to row' by
-        // 1 to account for the row that was deleted
-        let toRow: Int = (fromSection == toSection && destinationIndexPath.row > sourceIndexPath.row) ?
-            destinationIndexPath.row - 1 : destinationIndexPath.row
         let beforeInsertionCount: Int = self.dataModel.sectionModel(for: toSection).count
-        insertHandler?(toSection, toRow, .moved(fromSection: fromSection, row: sourceIndexPath.row))
+        insertHandler?(toSection, destinationIndexPath.row, .moved(fromSection: fromSection, row: sourceIndexPath.row))
         self.binder.refresh()
         if fromSection == toSection {
             assert(beforeInsertionCount == self.binder.nextDataModel.sectionModel(for: toSection).count, "A model wasn't inserted")
         } else {
             assert(beforeInsertionCount == self.binder.nextDataModel.sectionModel(for: toSection).count - 1, "A model wasn't inserted")
+        }
+        
+        // Table view don't call the 'editing style for row' method unless their 'is editing' flag is toggled
+        DispatchQueue.main.async {
+            tableView.isEditing.toggle()
+            tableView.isEditing.toggle()
         }
     }
     

@@ -971,7 +971,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
     }
     
     @discardableResult
-    public func allowMoving(_ movementOption: CellMovementOption<S>, rowIsMovable: ((Int) -> Bool)? = nil)
+    public func allowMoving(_ movementOption: CellMovementPolicy<S>, rowIsMovable: ((Int) -> Bool)? = nil)
         -> TableViewMultiSectionBinder<C, S>
     {
         if let rowIsMovable = rowIsMovable {

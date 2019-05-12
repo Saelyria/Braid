@@ -289,7 +289,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     @discardableResult
-    override public func allowMoving(_ movementOption: CellMovementOption<S>, rowIsMovable: ((Int) -> Bool)? = nil)
+    override public func allowMoving(_ movementOption: CellMovementPolicy<S>, rowIsMovable: ((Int) -> Bool)? = nil)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         super.allowMoving(movementOption, rowIsMovable: rowIsMovable)
