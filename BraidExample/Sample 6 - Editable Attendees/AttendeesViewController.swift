@@ -51,17 +51,14 @@ class AttendeesViewController: UIViewController {
             .allowMoving(.to(sections: [.invited, .attending]))
             .allowEditing(style: .delete)
             .onDelete { row, source, person in
-                print("Deleted \(person.name) in 'attending' section from \(row)")
                 switch source {
                 case .editing:
-                    print("Inserted \(person.name) in 'invited' section at \(0)")
                     self.peopleInvited.insert(person, at: 0)
                 default: break
                 }
                 self.peopleAttending.remove(at: row)
             }
             .onInsert { row, _, person in
-                print("Inserted \(person!.name) in 'attending' section at \(row)")
                 self.peopleAttending.insert(person!, at: row)
             }
         
@@ -72,11 +69,9 @@ class AttendeesViewController: UIViewController {
                   mapToViewModels: { TitleDetailTableViewCell.ViewModel(collectionId: $0.collectionId, title: $0.name) })
             .allowMoving(.to(sections: [.invited, .attending]))
             .onDelete { row, _, person in
-                print("Deleted \(person.name) in 'invited' section from \(row)")
                 self.peopleInvited.remove(at: row)
             }
             .onInsert { row, _, person in
-                print("Inserted \(person!.name) in 'invited' section at \(row)")
                 self.peopleInvited.insert(person!, at: row)
             }
         
