@@ -40,9 +40,10 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
             return self.binder.handlers.footerHeightProviders.hasHandler
             
         case #selector(UITableViewDataSource.tableView(_:canEditRowAt:)):
-            return self.binder.nextDataModel.hasEditableSections
+            return self.binder.handlers.cellMovementPolicies.hasHandler ||
+                self.binder.handlers.cellEditingStyleProviders.hasHandler
         case #selector(UITableViewDataSource.tableView(_:commit:forRowAt:)):
-            return self.binder.nextDataModel.hasEditableSections
+            return self.binder.handlers.cellEditingStyleProviders.hasHandler
             
         case #selector(UITableViewDelegate.tableView(_:willDisplay:forRowAt:)):
             return self.binder.handlers.prefetchBehaviors.hasHandler
@@ -183,21 +184,28 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         let section = self.dataModel.displayedSections[indexPath.section]
         
-        let canEdit: ((S, Int) -> Bool)?
+        var allowsEditing: Bool = false
+        let styleProvider: ((S, Int) -> UITableViewCell.EditingStyle)?
         if self.dataModel.uniquelyBoundCellSections.contains(section)
-        || self.binder.handlers.cellEditableProviders.namedSection[section] != nil {
-            canEdit = self.binder.handlers.cellEditableProviders.namedSection[section]
+        || self.binder.handlers.cellEditingStyleProviders.namedSection[section] != nil {
+            styleProvider = self.binder.handlers.cellEditingStyleProviders.namedSection[section]
         } else {
-            canEdit = self.binder.handlers.cellEditableProviders.dynamicSections
+            styleProvider = self.binder.handlers.cellEditingStyleProviders.dynamicSections
+        }
+        if let styleProvider = styleProvider {
+            allowsEditing = !(styleProvider(section, indexPath.row) == .none)
         }
         
-        if let canEdit = canEdit {
-            return canEdit(section, indexPath.row)
+        let movementPolicy: CellMovementPolicy<S>?
+        if self.dataModel.uniquelyBoundCellSections.contains(section)
+        || self.binder.handlers.cellEditingStyleProviders.namedSection[section] != nil {
+            movementPolicy = self.binder.handlers.cellMovementPolicies.namedSection[section]
         } else {
-            let allowsEditing = self.dataModel.sectionModel(for: section).cellEditingStyle != .none
-            let allowsMovement = self.dataModel.sectionModel(for: section).movementPolicy != nil
-            return allowsEditing || allowsMovement
+            movementPolicy = self.binder.handlers.cellMovementPolicies.dynamicSections
         }
+        let allowsMovement: Bool = (movementPolicy != nil)
+        
+        return allowsEditing || allowsMovement
     }
     
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
@@ -214,7 +222,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         if let styleProvider = styleProvider {
             return styleProvider(section, indexPath.row)
         } else {
-            return self.dataModel.sectionModel(for: section).cellEditingStyle
+            return .none
         }
     }
     
@@ -222,7 +230,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         let section = self.dataModel.displayedSections[indexPath.section]
         
         if editingStyle == .delete {
-            let deleteHandler: ((S, Int, CellDeletionSource<S>) -> Void)?
+            let deleteHandler: ((S, Int, CellDeletionReason<S>) -> Void)?
             if self.dataModel.uniquelyBoundCellSections.contains(section)
             || self.binder.handlers.cellDeletedHandlers.namedSection[section] != nil {
                 deleteHandler = self.binder.handlers.cellDeletedHandlers.namedSection[section]
@@ -234,7 +242,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
             self.binder.refresh()
             assert(beforeDeletionCount == self.binder.nextDataModel.sectionModel(for: section).count + 1, "A model wasn't deleted")
         } else if editingStyle == .insert {
-            let handler: ((S, Int, CellInsertionSource<S>) -> Void)?
+            let handler: ((S, Int, CellInsertionReason<S>) -> Void)?
             if self.dataModel.uniquelyBoundCellSections.contains(section)
                 || self.binder.handlers.cellInsertedHandlers.namedSection[section] != nil {
                 handler = self.binder.handlers.cellInsertedHandlers.namedSection[section]
@@ -262,7 +270,14 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         if let canMove = canMove {
             return canMove(section, indexPath.row)
         } else {
-            return self.dataModel.sectionModel(for: section).movementPolicy != nil
+            let movementPolicy: CellMovementPolicy<S>?
+            if self.dataModel.uniquelyBoundCellSections.contains(section)
+                || self.binder.handlers.cellEditingStyleProviders.namedSection[section] != nil {
+                movementPolicy = self.binder.handlers.cellMovementPolicies.namedSection[section]
+            } else {
+                movementPolicy = self.binder.handlers.cellMovementPolicies.dynamicSections
+            }
+            return movementPolicy != nil
         }
     }
     
@@ -276,17 +291,32 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         
         // check if the section the cell came from had a 'movement policy'. If it did, make sure the proposed index
         // path is allowed according to the policy.
-        guard let movementPolicy = self.dataModel.sectionModel(for: section).movementPolicy else {
+        let _movementPolicy: CellMovementPolicy<S>?
+        if self.dataModel.uniquelyBoundCellSections.contains(section)
+            || self.binder.handlers.cellEditingStyleProviders.namedSection[section] != nil {
+            _movementPolicy = self.binder.handlers.cellMovementPolicies.namedSection[section]
+        } else {
+            _movementPolicy = self.binder.handlers.cellMovementPolicies.dynamicSections
+        }
+        guard let movementPolicy = _movementPolicy else {
             fatalError("There was no policy dictating which sections a cell are allowed to move to for section \(section) - this shouldn't be possible.")
         }
         switch movementPolicy {
-        case .to(sections: let allowedSections):
+        case .toSectionsIn(let allowedSections):
             let proposedSection = self.dataModel.displayedSections[proposedDestinationIndexPath.section]
             if allowedSections.contains(proposedSection) {
                 targetIndexPath = proposedDestinationIndexPath
             } else {
                 // if the proposed section wasn't in the 'allowed sections' array, return the last path in the last
                 // allowed section instead
+                targetIndexPath = self.lastValidIndexPathWhileMovingCell ?? sourceIndexPath
+            }
+        case .toSectionsPassing(let predicate):
+            let proposedSection = self.dataModel.displayedSections[proposedDestinationIndexPath.section]
+            if predicate(proposedSection) {
+                targetIndexPath = proposedDestinationIndexPath
+            } else {
+                // if the proposed section didn't pass the predicate, return the last path in the last allowed section
                 targetIndexPath = self.lastValidIndexPathWhileMovingCell ?? sourceIndexPath
             }
         case .toAnySection:
@@ -308,7 +338,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         let fromSection = self.dataModel.displayedSections[sourceIndexPath.section]
         let toSection = self.dataModel.displayedSections[destinationIndexPath.section]
         
-        let deleteHandler: ((S, Int, CellDeletionSource<S>) -> Void)?
+        let deleteHandler: ((S, Int, CellDeletionReason<S>) -> Void)?
         if self.dataModel.uniquelyBoundCellSections.contains(fromSection)
         || self.binder.handlers.cellDeletedHandlers.namedSection[fromSection] != nil {
             deleteHandler = self.binder.handlers.cellDeletedHandlers.namedSection[fromSection]
@@ -320,7 +350,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         self.binder.refresh()
         assert(beforeDeletionCount == self.binder.nextDataModel.sectionModel(for: fromSection).count + 1, "A model wasn't deleted")
         
-        let insertHandler: ((S, Int, CellInsertionSource<S>) -> Void)?
+        let insertHandler: ((S, Int, CellInsertionReason<S>) -> Void)?
         if self.dataModel.uniquelyBoundCellSections.contains(toSection)
             || self.binder.handlers.cellInsertedHandlers.namedSection[toSection] != nil {
             insertHandler = self.binder.handlers.cellInsertedHandlers.namedSection[toSection]

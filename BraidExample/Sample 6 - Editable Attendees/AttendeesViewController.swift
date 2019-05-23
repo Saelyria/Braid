@@ -48,7 +48,7 @@ class AttendeesViewController: UIViewController {
             .bind(cellType: TitleDetailTableViewCell.self,
                   models: { [unowned self] in self.peopleAttending },
                   mapToViewModels: { TitleDetailTableViewCell.ViewModel(collectionId: $0.collectionId, title: $0.name) })
-            .allowMoving(.to(sections: [.invited, .attending]))
+            .allowMoving(.toSectionsIn([.invited, .attending]))
             .allowEditing(style: .delete)
             .onDelete { row, source, person in
                 switch source {
@@ -67,7 +67,7 @@ class AttendeesViewController: UIViewController {
             .bind(cellType: TitleDetailTableViewCell.self,
                   models: { [unowned self] in self.peopleInvited },
                   mapToViewModels: { TitleDetailTableViewCell.ViewModel(collectionId: $0.collectionId, title: $0.name) })
-            .allowMoving(.to(sections: [.invited, .attending]))
+            .allowMoving(.toSectionsIn([.invited, .attending]))
             .onDelete { row, _, person in
                 self.peopleInvited.remove(at: row)
             }

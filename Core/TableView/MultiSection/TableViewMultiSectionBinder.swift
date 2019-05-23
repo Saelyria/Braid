@@ -923,21 +923,14 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      */
     @discardableResult
     public func allowEditing(
-        style: [S: UITableViewCell.EditingStyle],
-        rowIsEditable: ((_ section: S, _ row: Int) -> Bool)? = nil)
+        style: [S: UITableViewCell.EditingStyle])
         -> TableViewMultiSectionBinder<C, S>
     {
-        for (_, value) in style {
-            guard value != .none else {
-                print("WARNING: Sections were setup to allow editing, but the given editing style was 'none'.")
-                return self
-            }
-        }
-        if let rowIsEditable = rowIsEditable {
-            self.binder.handlers.add(
-                rowIsEditable, toHandlerSetAt: \.cellEditableProviders, forScope: self.affectedSectionScope)
-        }
-//        self.binder.nextDataModel.sectionModel(for: self.section).cellEditingStyle = style
+        self.binder.handlers.add(
+            { section, _ in return style[section] ?? .none },
+            toHandlerSetAt: \.cellEditingStyleProviders,
+            forScope: self.affectedSectionScope)
+        
         return self
     }
     
@@ -955,23 +948,16 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      */
     @discardableResult
     public func allowEditing(
-        styleForRow: @escaping (_ section: S, _ row: Int) -> UITableViewCell.EditingStyle,
-        rowIsEditable: ((_ section: S, _ row: Int) -> Bool)? = nil)
+        styleForRow: @escaping (_ section: S, _ row: Int) -> UITableViewCell.EditingStyle)
         -> TableViewMultiSectionBinder<C, S>
     {
         self.binder.handlers.add(
             styleForRow, toHandlerSetAt: \.cellEditingStyleProviders, forScope: self.affectedSectionScope)
-        if let rowIsEditable = rowIsEditable {
-            self.binder.handlers.add(
-                rowIsEditable, toHandlerSetAt: \.cellEditableProviders, forScope: self.affectedSectionScope)
-        }
-        // TODO: implement
-//        self.binder.nextDataModel.sectionModel(for: self.section).cellEditingStyle = .delete
         return self
     }
     
     @discardableResult
-    public func allowMoving(_ movementOption: CellMovementPolicy<S>, rowIsMovable: ((Int) -> Bool)? = nil)
+    public func allowMoving(_ movementPolicy: CellMovementPolicy<S>, rowIsMovable: ((Int) -> Bool)? = nil)
         -> TableViewMultiSectionBinder<C, S>
     {
         if let rowIsMovable = rowIsMovable {
@@ -979,12 +965,12 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
                                      toHandlerSetAt: \.cellMovableProviders,
                                      forScope: self.affectedSectionScope)
         }
-//        self.binder.nextDataModel.sectionModel(for: self.section).movementOption = movementOption
+        self.binder.handlers.add(movementPolicy, toHandlerSetAt: \.cellMovementPolicies, forScope: self.affectedSectionScope)
         return self
     }
     
     @discardableResult
-    public func onDelete(_ handler: @escaping (S, Int, CellDeletionSource<S>) -> Void)
+    public func onDelete(_ handler: @escaping (S, Int, CellDeletionReason<S>) -> Void)
         -> TableViewMultiSectionBinder<C, S>
     {
         self.binder.handlers.add(handler, toHandlerSetAt: \.cellDeletedHandlers, forScope: self.affectedSectionScope)
@@ -992,7 +978,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
     }
     
     @discardableResult
-    public func onInsert(_ handler: @escaping (S, Int, CellInsertionSource<S>) -> Void)
+    public func onInsert(_ handler: @escaping (S, Int, CellInsertionReason<S>) -> Void)
         -> TableViewMultiSectionBinder<C, S>
     {
         self.binder.handlers.add(handler, toHandlerSetAt: \.cellInsertedHandlers, forScope: self.affectedSectionScope)

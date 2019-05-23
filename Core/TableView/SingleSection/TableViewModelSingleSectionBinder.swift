@@ -107,8 +107,28 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         return self
     }
     
+    /**
+     Adds a handler to be called when a cell is deleted from the section, whether from an editing control or being
+     moved out of it.
+     
+     In the handler, the model object that is located at the given row must be deleted from the data array that backs
+     this section so that the next time the section is reloaded, the model has been deleted. There is no need to call
+     the `refresh` method on the binder in the handler. The handler is also given a 'deletion reason', which indicates
+     whether the cell was deleted from the section because of a deletion control or because it was moved to a different
+     location on the table.
+     
+     Note that, in the case of a move, this method is called before the `onInsert` handler for where it was moved to and
+     the `row` value properly accounts for the deleted row, so no further bookkeeping should be required.
+     
+     - parameter handler: The closure to be called whenever a cell is deleted from the section.
+     - parameter row: The row the cell was deleted from in the section.
+     - parameter reason: The reason the cell was deleted.
+     - parameter model: The model the deleted cell represented that should be deleted.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
     @discardableResult
-    public func onDelete(_ handler: @escaping (_ row: Int, _ source: CellDeletionSource<S>, _ model: M) -> Void)
+    public func onDelete(_ handler: @escaping (_ row: Int, _ source: CellDeletionReason<S>, _ model: M) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         let section = self.section
@@ -122,19 +142,44 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
         return self
     }
     
+    /**
+     Adds a handler to be called when a cell is inserted into the section, whether from an editing control or being
+     moved into it.
+     
+     In the handler, a new model object must be inserted at the given row in the data array that backs this section
+     so that the next time the section is reloaded, the model will have been inserted. There is no need to call the
+     `refresh` method on the binder in the handler. The handler is also given an 'insertion reason', which indicates
+     whether the cell was inserted in the section because of a deletion control or because it was moved to a different
+     location on the table. If the cell was moved from another section, the handler can be passed in the model object
+     from the other section if it was the same type.
+     
+     Note that, in the case of a move, this method is called after the `onDelete` handler for where it was moved from
+     and the `row` value properly accounts for the deleted row, so no further bookkeeping should be required. For
+     readability, this `onInsert` handler should not handle the deletion of the model from the section it was moved
+     from - instead, it is expected that an `onDelete` handler was bound to that section's binding chain.
+     
+     - parameter handler: The closure to be called whenever a cell is deleted from the section.
+     - parameter row: The row the cell was deleted from in the section.
+     - parameter reason: The reason the cell was deleted.
+     - parameter modelIfMoved: The model object the moved cell represents if the insertion was due to a cell move. This
+        will be nil if the cell was inserted via an editing control.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
     @discardableResult
-    public func onInsert(_ handler: @escaping (_ row: Int, _ source: CellInsertionSource<S>, _ model: M?) -> Void)
+    public func onInsert(_ handler: @escaping (_ row: Int, _ reason: CellInsertionReason<S>, _ modelIfMoved: M?) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         super.onInsert { [weak binder = self.binder] row, source in
             let model: M?
             switch source {
             case let .moved(fromSection, fromRow):
-                guard let _model = binder?.currentDataModel.item(inSection: fromSection, row: fromRow)?.model as? M else {
-                    assertionFailure("ERROR: Model wasn't the right type; something went awry!")
-                    return
+                if let _model = binder?.currentDataModel.item(inSection: fromSection, row: fromRow)?.model as? M {
+                    model = _model
+                } else {
+                    print("The type of the model moved from the section '\(fromSection)' wasn't '\(M.self)' - this may or may not be expected.")
+                    model = nil
                 }
-                model = _model
             default:
                 model = nil
             }
@@ -258,33 +303,18 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     
     @discardableResult
     override public func allowEditing(
-        style: UITableViewCell.EditingStyle,
-        rowIsEditable: ((_ row: Int) -> Bool)? = nil)
+        styleForRow: @escaping (Int) -> UITableViewCell.EditingStyle)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
-        super.allowEditing(style: style, rowIsEditable: rowIsEditable)
+        super.allowEditing(styleForRow: styleForRow)
         return self
     }
     
-    /**
-     Enables editing (i.e. insertion or deletion controls) for the section.
-     
-     This method must be called on the chain to enable insertion or deletion actions on the section, passing in a
-     closure that will return the editing style (`delete` or `insert`) for items in the section. This method should
-     typically be paired with an `onEdit(_:)` method after it on the chain.
-     
-     - parameter styleForRow: A closure that returns the editing style to apply a row in the bound section.
-     - parameter rowIsEditable: An optional closure that returns whether editing should be allowed for the given row.
-     
-     - returns: A section binder to continue the binding chain with.
-     */
     @discardableResult
-    override public func allowEditing(
-        styleForRow: (_ row: Int) -> UITableViewCell.EditingStyle,
-        rowIsEditable: ((_ row: Int) -> Bool)? = nil)
+    override public func allowEditing(style: UITableViewCell.EditingStyle)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
-        super.allowEditing(styleForRow: styleForRow, rowIsEditable: rowIsEditable)
+        super.allowEditing(style: style)
         return self
     }
     
@@ -297,7 +327,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     @discardableResult
-    override public func onDelete(_ handler: @escaping (_ indexRemovedFrom: Int, CellDeletionSource<S>) -> Void)
+    override public func onDelete(_ handler: @escaping (_ indexRemovedFrom: Int, CellDeletionReason<S>) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         self.binder.handlers.add({ _, row, source in handler(row, source) },
@@ -307,7 +337,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     }
     
     @discardableResult
-    override public func onInsert(_ handler: @escaping (_ indexInsertedAt: Int, CellInsertionSource<S>) -> Void)
+    override public func onInsert(_ handler: @escaping (_ indexInsertedAt: Int, CellInsertionReason<S>) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         self.binder.handlers.add({ _, row, source in handler(row, source) },

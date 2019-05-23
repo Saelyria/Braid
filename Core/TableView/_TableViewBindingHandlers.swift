@@ -6,9 +6,9 @@ import UIKit
 public enum CellMovementPolicy<S: TableViewSection> {
     /// The cells from this section can only be moved to the sections in the given array. Note that this array must
     /// explicitly include the section the cell came from to be able to move the cell within its original section.
-    case to(sections: [S])
+    case toSectionsIn([S])
     
-//    case toAnySection(where: (S) -> Bool)
+    case toSectionsPassing((S) -> Bool)
     /// The cells from this section can be moved to any section on the table.
     case toAnySection
 }
@@ -16,7 +16,7 @@ public enum CellMovementPolicy<S: TableViewSection> {
 /**
  An enum that describes the reason a cell in a section was deleted.
  */
-public enum CellDeletionSource<S: TableViewSection> {
+public enum CellDeletionReason<S: TableViewSection> {
     /// The existing cell was moved to the given section and row.
     case moved(toSection: S, row: Int)
     /// The cell was deleted via an editing control.
@@ -26,7 +26,7 @@ public enum CellDeletionSource<S: TableViewSection> {
 /**
  An enum that describes where a cell inserted in a section came from.
  */
-public enum CellInsertionSource<S: TableViewSection> {
+public enum CellInsertionReason<S: TableViewSection> {
     /// An existing cell was moved from the given section and row.
     case moved(fromSection: S, row: Int)
     /// A new cell was created and inserted via an editing control.
@@ -150,26 +150,25 @@ class _TableViewBindingHandlers<S: TableViewSection> {
     
     // MARK: -
     
-    // Blocks to call to determine whether a cell in a section is editable.
-    lazy var cellEditableProviders: HandlerSet<(S, Int) -> Bool> = {
-        HandlerSet(allowAnySection: false)
-    }()
-    
     // Blocks to call to determine the editing style of a cell in a section.
     lazy var cellEditingStyleProviders: HandlerSet<(S, Int) -> UITableViewCell.EditingStyle> = {
         HandlerSet(allowAnySection: false)
     }()
     
-    lazy var cellDeletedHandlers: HandlerSet<(S, Int, CellDeletionSource<S>) -> Void> = {
+    lazy var cellDeletedHandlers: HandlerSet<(S, Int, CellDeletionReason<S>) -> Void> = {
         HandlerSet(allowAnySection: false)
     }()
     
-    lazy var cellInsertedHandlers: HandlerSet<(S, Int, CellInsertionSource<S>) -> Void> = {
+    lazy var cellInsertedHandlers: HandlerSet<(S, Int, CellInsertionReason<S>) -> Void> = {
         HandlerSet(allowAnySection: false)
     }()
     
     // Blocks to call to determine whether a cell in a section is movable.
     lazy var cellMovableProviders: HandlerSet<(S, Int) -> Bool> = {
+        HandlerSet(allowAnySection: false)
+    }()
+    
+    lazy var cellMovementPolicies: HandlerSet<CellMovementPolicy<S>> = {
         HandlerSet(allowAnySection: false)
     }()
 }

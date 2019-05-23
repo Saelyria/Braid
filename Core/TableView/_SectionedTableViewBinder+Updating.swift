@@ -143,17 +143,6 @@ internal extension SectionedTableViewBinder {
                     affectedSections: affectedSections,
                     dataType: .footer)
     }
-    
-    func updateEditing(
-        style: [S: UITableViewCell.EditingStyle],
-        affectedSections: SectionBindingScope<S>)
-    {
-        self.update(fromDataIn: style,
-                    resettingMissingSectionsWith: .none,
-                    updatingKeyPath: \_TableViewSectionDataModel<S>.cellEditingStyle,
-                    affectedSections: affectedSections,
-                    dataType: .cell)
-    }
 }
 
 private extension SectionedTableViewBinder {
