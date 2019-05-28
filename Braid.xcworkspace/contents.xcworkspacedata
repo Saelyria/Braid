@@ -2,7 +2,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/aaronbosnjak/Developer/Braid/Braid.podspec">
+      location = "group:Braid.podspec">
    </FileRef>
    <FileRef
       location = "group:LICENSE">
@@ -14,34 +14,34 @@
       location = "group:Documentation"
       name = "Documentation">
       <FileRef
-         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/1-GettingStarted.md">
+         location = "group:1-GettingStarted.md">
       </FileRef>
       <FileRef
-         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/2-UpdatingData.md">
+         location = "group:2-UpdatingData.md">
       </FileRef>
       <FileRef
-         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/3-DataBindingMethods.md">
+         location = "group:3-DataBindingMethods.md">
       </FileRef>
       <FileRef
-         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/4-CustomCellEvents.md">
+         location = "group:4-CustomCellEvents.md">
       </FileRef>
       <FileRef
-         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/5-SectionDisplayBehaviour.md">
+         location = "group:5-SectionDisplayBehaviour.md">
       </FileRef>
       <FileRef
-         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/6-AdvancedBindingChains.md">
+         location = "group:6-AdvancedBindingChains.md">
       </FileRef>
       <FileRef
-         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/7-ProvidingDimensions.md">
+         location = "group:7-ProvidingDimensions.md">
       </FileRef>
       <FileRef
          location = "group:8-DeletingInsertingMovingCells.md">
       </FileRef>
       <FileRef
-         location = "group:/Users/aaronbosnjak/Developer/Braid/Documentation/9-TipsTricksFAQ.md">
+         location = "group:9-TipsTricksFAQ.md">
       </FileRef>
       <FileRef
-         location = "container:/Users/aaronbosnjak/Developer/Braid/Documentation/10-HowItWorks.md">
+         location = "container:Documentation/10-HowItWorks.md">
       </FileRef>
    </Group>
    <FileRef

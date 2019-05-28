@@ -44,35 +44,36 @@ class AttendeesViewController: UIViewController {
             })
         
         self.binder.onSection(.attending)
-            .bind(headerTitle: "ATTENDING")
-            .bind(cellType: TitleDetailTableViewCell.self,
-                  models: { [unowned self] in self.peopleAttending },
-                  mapToViewModels: { TitleDetailTableViewCell.ViewModel(collectionId: $0.collectionId, title: $0.name) })
-            .allowMoving(.toSectionsIn([.invited, .attending]))
             .allowEditing(style: .delete)
-            .onDelete { row, source, person in
-                switch source {
-                case .editing:
-                    self.peopleInvited.insert(person, at: 0)
+        
+        self.binder.onSections(.attending, .invited)
+            .bind(cellType: TitleDetailTableViewCell.self,
+                  models: { [unowned self] in [.attending: self.peopleAttending, .invited: self.peopleInvited] },
+                  mapToViewModels: { TitleDetailTableViewCell.ViewModel(collectionId: $0.collectionId, title: $0.name)})
+            .bind(headerTitles: [.attending: "ATTENDING", .invited: "INVITED"])
+            .allowMoving(.toSectionsIn([.attending, .invited]))
+            .onInsert { section, row, reason, person in
+                switch section {
+                case .attending:
+                    self.peopleAttending.insert(person!, at: row)
+                case .invited:
+                    self.peopleInvited.insert(person!, at: row)
                 default: break
                 }
-                self.peopleAttending.remove(at: row)
             }
-            .onInsert { row, _, person in
-                self.peopleAttending.insert(person!, at: row)
-            }
-        
-        self.binder.onSection(.invited)
-            .bind(headerTitle: "INVITED")
-            .bind(cellType: TitleDetailTableViewCell.self,
-                  models: { [unowned self] in self.peopleInvited },
-                  mapToViewModels: { TitleDetailTableViewCell.ViewModel(collectionId: $0.collectionId, title: $0.name) })
-            .allowMoving(.toSectionsIn([.invited, .attending]))
-            .onDelete { row, _, person in
-                self.peopleInvited.remove(at: row)
-            }
-            .onInsert { row, _, person in
-                self.peopleInvited.insert(person!, at: row)
+            .onDelete { section, row, reason, person in
+                switch section {
+                case .attending:
+                    switch reason {
+                    case .editing:
+                        self.peopleInvited.insert(person, at: 0)
+                    default: break
+                    }
+                    self.peopleAttending.remove(at: row)
+                case .invited:
+                    self.peopleInvited.remove(at: row)
+                default: break
+                }
             }
         
         self.binder.finish()

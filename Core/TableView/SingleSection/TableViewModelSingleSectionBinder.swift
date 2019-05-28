@@ -170,9 +170,9 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     public func onInsert(_ handler: @escaping (_ row: Int, _ reason: CellInsertionReason<S>, _ modelIfMoved: M?) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
-        super.onInsert { [weak binder = self.binder] row, source in
+        super.onInsert { [weak binder = self.binder] row, reason in
             let model: M?
-            switch source {
+            switch reason {
             case let .moved(fromSection, fromRow):
                 if let _model = binder?.currentDataModel.item(inSection: fromSection, row: fromRow)?.model as? M {
                     model = _model
@@ -183,7 +183,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
             default:
                 model = nil
             }
-            handler(row, source, model)
+            handler(row, reason, model)
         }
         return self
     }

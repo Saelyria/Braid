@@ -104,6 +104,42 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
         return self
     }
     
+    @discardableResult
+    public func onDelete(_ handler: @escaping (S, Int, CellDeletionReason<S>, M) -> Void)
+        -> TableViewModelMultiSectionBinder<C, S, M>
+    {
+        super.onDelete { [weak binder = self.binder] section, row, reason in
+            guard let model = binder?.currentDataModel.item(inSection: section, row: row)?.model as? M else {
+                assertionFailure("ERROR: Cell or model wasn't the right type; something went awry!")
+                return
+            }
+            handler(section, row, reason, model)
+        }
+        return self
+    }
+    
+    @discardableResult
+    public func onInsert(_ handler: @escaping (S, Int, CellInsertionReason<S>, M?) -> Void)
+        -> TableViewModelMultiSectionBinder<C, S, M>
+    {
+        super.onInsert { [weak binder = self.binder] section, row, reason in
+            let model: M?
+            switch reason {
+            case let .moved(fromSection, fromRow):
+                if let _model = binder?.currentDataModel.item(inSection: fromSection, row: fromRow)?.model as? M {
+                    model = _model
+                } else {
+                    print("The type of the model moved from the section '\(fromSection)' wasn't '\(M.self)' - this may or may not be expected.")
+                    model = nil
+                }
+            default:
+                model = nil
+            }
+            handler(section, row, reason, model)
+        }
+        return self
+    }
+    
     // MARK: -
     
     @discardableResult
@@ -212,6 +248,50 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
         where EventCell: UITableViewCell & ViewEventEmitting
     {
         super.onEvent(from: cellType, handler)
+        return self
+    }
+    
+    // MARK: -
+    
+    @discardableResult
+    override public func allowEditing(
+        style: [S: UITableViewCell.EditingStyle])
+        -> TableViewModelMultiSectionBinder<C, S, M>
+    {
+        super.allowEditing(style: style)
+        return self
+    }
+
+    @discardableResult
+    override public func allowEditing(
+        styleForRow: @escaping (_ section: S, _ row: Int) -> UITableViewCell.EditingStyle)
+        -> TableViewModelMultiSectionBinder<C, S, M>
+    {
+        super.allowEditing(styleForRow: styleForRow)
+        return self
+    }
+    
+    @discardableResult
+    override public func allowMoving(_ movementPolicy: CellMovementPolicy<S>, rowIsMovable: ((S, Int) -> Bool)? = nil)
+        -> TableViewModelMultiSectionBinder<C, S, M>
+    {
+        super.allowMoving(movementPolicy, rowIsMovable: rowIsMovable)
+        return self
+    }
+    
+    @discardableResult
+    override public func onDelete(_ handler: @escaping (S, Int, CellDeletionReason<S>) -> Void)
+        -> TableViewModelMultiSectionBinder<C, S, M>
+    {
+        super.onDelete(handler)
+        return self
+    }
+    
+    @discardableResult
+    override public func onInsert(_ handler: @escaping (S, Int, CellInsertionReason<S>) -> Void)
+        -> TableViewModelMultiSectionBinder<C, S, M>
+    {
+        super.onInsert(handler)
         return self
     }
     

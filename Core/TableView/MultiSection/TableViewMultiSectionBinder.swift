@@ -957,11 +957,11 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
     }
     
     @discardableResult
-    public func allowMoving(_ movementPolicy: CellMovementPolicy<S>, rowIsMovable: ((Int) -> Bool)? = nil)
+    public func allowMoving(_ movementPolicy: CellMovementPolicy<S>, rowIsMovable: ((_ section: S, _ row: Int) -> Bool)? = nil)
         -> TableViewMultiSectionBinder<C, S>
     {
         if let rowIsMovable = rowIsMovable {
-            self.binder.handlers.add({ _ , row in rowIsMovable(row) },
+            self.binder.handlers.add({ section, row in rowIsMovable(section, row) },
                                      toHandlerSetAt: \.cellMovableProviders,
                                      forScope: self.affectedSectionScope)
         }
