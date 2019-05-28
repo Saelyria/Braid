@@ -128,7 +128,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func onDelete(_ handler: @escaping (_ row: Int, _ source: CellDeletionReason<S>, _ model: M) -> Void)
+    public func onDelete(_ handler: @escaping (_ row: Int, _ reason: CellDeletionReason<S>, _ model: M) -> Void)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         let section = self.section
@@ -149,7 +149,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
      In the handler, a new model object must be inserted at the given row in the data array that backs this section
      so that the next time the section is reloaded, the model will have been inserted. There is no need to call the
      `refresh` method on the binder in the handler. The handler is also given an 'insertion reason', which indicates
-     whether the cell was inserted in the section because of a deletion control or because it was moved to a different
+     whether the cell was inserted in the section because of an insertion control or because it was moved to a different
      location on the table. If the cell was moved from another section, the handler can be passed in the model object
      from the other section if it was the same type.
      
@@ -158,9 +158,9 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
      readability, this `onInsert` handler should not handle the deletion of the model from the section it was moved
      from - instead, it is expected that an `onDelete` handler was bound to that section's binding chain.
      
-     - parameter handler: The closure to be called whenever a cell is deleted from the section.
-     - parameter row: The row the cell was deleted from in the section.
-     - parameter reason: The reason the cell was deleted.
+     - parameter handler: The closure to be called whenever a cell is inserted into the section.
+     - parameter row: The row the cell was inserted into in the section.
+     - parameter reason: The reason the cell was inserted.
      - parameter modelIfMoved: The model object the moved cell represents if the insertion was due to a cell move. This
         will be nil if the cell was inserted via an editing control.
      

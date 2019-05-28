@@ -1,20 +1,5 @@
 import UIKit
 
-/**
- An enum that describes at what point a section binder should call a 'data prefetch' handler.
- */
-public enum PrefetchBehavior {
-    /// The default UIKit behaviour. If this is used, the binder will use a `UITableViewDataSourcePrefetching`
-    /// conformance to determine when to indicate that data should be prefetched.
-//    case tableViewDecides
-    /// The binder will incidate that data should be prefetched when the table is the given number of cells away
-    /// from the end of the section.
-    case cellsFromEnd(Int)
-    /// The binder will incidate that data should be prefetched when the table is the given distance in points away
-    /// from the end of the section.
-//    case distanceFromEnd(CGFloat)
-}
-
 /// Protocol that allows us to have Reactive extensions
 public protocol TableViewSingleSectionBinderProtocol {
     associatedtype C: UITableViewCell
@@ -956,11 +941,12 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - parameter movementPolicy: The policy that determines which sections rows from the section being bound can be
         moved to.
      - parameter rowIsMovable: A closure that can optionally be provided to declare which specific rows can be moved.
+     - parameter row: The row for which the closure is called and must return whether the row is movable.
      
      - returns: A section binder to continue the binding chain with.
     */
     @discardableResult
-    public func allowMoving(_ movementPolicy: CellMovementPolicy<S>, rowIsMovable: ((Int) -> Bool)? = nil)
+    public func allowMoving(_ movementPolicy: CellMovementPolicy<S>, rowIsMovable: ((_ row: Int) -> Bool)? = nil)
         -> TableViewSingleSectionBinder<C, S>
     {
         if let rowIsMovable = rowIsMovable {
@@ -1007,7 +993,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      In the handler, a new model object must be inserted at the given row in the data array that backs this section
      so that the next time the section is reloaded, the model will have been inserted. There is no need to call the
      `refresh` method on the binder in the handler. The handler is also given an 'insertion reason', which indicates
-     whether the cell was inserted in the section because of a deletion control or because it was moved to a different
+     whether the cell was inserted in the section because of an insertion control or because it was moved to a different
      location on the table.
      
      Note that, in the case of a move, this method is called after the `onDelete` handler for where it was moved from
@@ -1015,9 +1001,9 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      readability, this `onInsert` handler should not handle the deletion of the model from the section it was moved
      from - instead, it is expected that an `onDelete` handler was bound to that section's binding chain.
      
-     - parameter handler: The closure to be called whenever a cell is deleted from the section.
-     - parameter row: The row the cell was deleted from in the section.
-     - parameter reason: The reason the cell was deleted.
+     - parameter handler: The closure to be called whenever a cell is inserted from the section.
+     - parameter row: The row the cell was inserted into in the section.
+     - parameter reason: The reason the cell was inserted.
      
      - returns: A section binder to continue the binding chain with.
      */

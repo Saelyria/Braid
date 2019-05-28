@@ -104,6 +104,27 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
         return self
     }
     
+    /**
+     Adds a handler to be called when a cell is deleted from one of the sections, whether from an editing control or
+     being moved out of it.
+     
+     In the handler, the model object that is located at the given row must be deleted from the data array that backs
+     this section so that the next time the section is reloaded, the model has been deleted. There is no need to call
+     the `refresh` method on the binder in the handler. The handler is also given a 'deletion reason', which indicates
+     whether the cell was deleted from the section because of a deletion control or because it was moved to a different
+     location on the table.
+     
+     Note that, in the case of a move, this method is called before the `onInsert` handler for where it was moved to and
+     the `row` value properly accounts for the deleted row, so no further bookkeeping should be required.
+     
+     - parameter handler: The closure to be called whenever a cell is deleted from the section.
+     - parameter section: The section the cell was deleted from.
+     - parameter row: The row the cell was deleted from in the section.
+     - parameter reason: The reason the cell was deleted.
+     - parameter model: The model the deleted cell represented that should be deleted.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
     @discardableResult
     public func onDelete(_ handler: @escaping (S, Int, CellDeletionReason<S>, M) -> Void)
         -> TableViewModelMultiSectionBinder<C, S, M>
@@ -118,8 +139,33 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
         return self
     }
     
+    /**
+     Adds a handler to be called when a cell is inserted into one of the sections, whether from an editing control or
+     being moved into it.
+     
+     In the handler, a new model object must be inserted at the given row in the data array that backs this section
+     so that the next time the section is reloaded, the model will have been inserted. There is no need to call the
+     `refresh` method on the binder in the handler. The handler is also given an 'insertion reason', which indicates
+     whether the cell was inserted in the section because of an insertion control or because it was moved to a different
+     location on the table. If the cell was moved from another section, the handler can be passed in the model object
+     from the other section if it was the same type.
+     
+     Note that, in the case of a move, this method is called after the `onDelete` handler for where it was moved from
+     and the `row` value properly accounts for the deleted row, so no further bookkeeping should be required. For
+     readability, this `onInsert` handler should not handle the deletion of the model from the section it was moved
+     from - instead, it is expected that an `onDelete` handler was bound to that section's binding chain.
+     
+     - parameter handler: The closure to be called whenever a cell is inserted into one of the sections.
+     - parameter section: The section the cell was inserted into.
+     - parameter row: The row the cell was inserted into in the section.
+     - parameter reason: The reason the cell was inserted.
+     - parameter modelIfMoved: The model object the moved cell represents if the insertion was due to a cell move. This
+        will be nil if the cell was inserted via an editing control.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
     @discardableResult
-    public func onInsert(_ handler: @escaping (S, Int, CellInsertionReason<S>, M?) -> Void)
+    public func onInsert(_ handler: @escaping (_ section: S, _ row: Int, _ reason: CellInsertionReason<S>, _ modelIfMoved: M?) -> Void)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
         super.onInsert { [weak binder = self.binder] section, row, reason in

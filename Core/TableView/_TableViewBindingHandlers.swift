@@ -1,13 +1,30 @@
 import UIKit
 
 /**
+ An enum that describes at what point a section binder should call a 'data prefetch' handler.
+ */
+public enum PrefetchBehavior {
+    /// The default UIKit behaviour. If this is used, the binder will use a `UITableViewDataSourcePrefetching`
+    /// conformance to determine when to indicate that data should be prefetched.
+    //    case tableViewDecides
+    /// The binder will incidate that data should be prefetched when the table is the given number of cells away
+    /// from the end of the section.
+    case cellsFromEnd(Int)
+    /// The binder will incidate that data should be prefetched when the table is the given distance in points away
+    /// from the end of the section.
+    //    case distanceFromEnd(CGFloat)
+}
+
+/**
  An enum describing rules for which sections cells from a section can be moved to.
  */
 public enum CellMovementPolicy<S: TableViewSection> {
     /// The cells from this section can only be moved to the sections in the given array. Note that this array must
     /// explicitly include the section the cell came from to be able to move the cell within its original section.
     case toSectionsIn([S])
-    
+    /// The cells from this section can only be moved to sections that pass the given function. The function is called
+    /// once for each section currently displayed on the table, and should then return whether the cell is able to be
+    /// moved to that section.
     case toSectionsPassing((S) -> Bool)
     /// The cells from this section can be moved to any section on the table.
     case toAnySection
@@ -33,7 +50,14 @@ public enum CellInsertionReason<S: TableViewSection> {
     case editing
 }
 
-/// An object that stores the various handlers the binder uses.
+/**
+ An object that stores the various handlers the binder uses.
+ 
+ This object stores bound handlers let 'on tapped' or 'on dequeue' (along with other bound section metadata like
+ movement policies) by storing them in `HandlerSet` objects. These 'handler sets' are a convenient wrapper around
+ bound handlers that store them based on scope - either for a named section, for all dynamic sections, or for 'any'
+ section.
+ */
 class _TableViewBindingHandlers<S: TableViewSection> {
     /// A class that holds the handlers for different 'section scopes' for a type of callback.
     class HandlerSet<H> {
@@ -174,6 +198,8 @@ class _TableViewBindingHandlers<S: TableViewSection> {
 }
 
 extension _TableViewBindingHandlers {
+    /// Adds the given handler to be stored. The handler is stored according to the given binding scope on the given
+    /// 'handler set'.
     func add<H>(
         _ handler: H,
         toHandlerSetAt keyPath: ReferenceWritableKeyPath<_TableViewBindingHandlers<S>, HandlerSet<H>>,
