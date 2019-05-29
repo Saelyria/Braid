@@ -36,6 +36,7 @@
 		AB5D696D21E95DC200386B8D /* TextFieldTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB5D696C21E95DC200386B8D /* TextFieldTableViewCell.xib */; };
 		AB5D696F21E95DD200386B8D /* TextViewTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB5D696E21E95DD200386B8D /* TextViewTableViewCell.xib */; };
 		AB86C3BF2141718C00FA4945 /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */; };
+		AB922ADB229E03BF000207A3 /* TableCellEditingMovingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB922ADA229E03BF000207A3 /* TableCellEditingMovingTests.swift */; };
 		ABA89D5B21EEC07000033093 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = ABA89D5A21EEC07000033093 /* README.md */; };
 		ABB46A1521F2ACC6009A00A2 /* FormItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABB46A1421F2ACC6009A00A2 /* FormItem.swift */; };
 		ABC1AD1921E6BE2400BAC644 /* ToggleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC1AD1821E6BE2400BAC644 /* ToggleTableViewCell.swift */; };
@@ -115,6 +116,7 @@
 		AB5D696C21E95DC200386B8D /* TextFieldTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextFieldTableViewCell.xib; sourceTree = "<group>"; };
 		AB5D696E21E95DD200386B8D /* TextViewTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextViewTableViewCell.xib; sourceTree = "<group>"; };
 		AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
+		AB922ADA229E03BF000207A3 /* TableCellEditingMovingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableCellEditingMovingTests.swift; sourceTree = "<group>"; };
 		ABA89D5A21EEC07000033093 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		ABB2841221F55E8C0041E84A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		ABB46A1421F2ACC6009A00A2 /* FormItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormItem.swift; sourceTree = "<group>"; };
@@ -326,6 +328,7 @@
 				AB18253021E5254E004FE239 /* TableDisplayBehaviorTests.swift */,
 				AB1CCB9D21D8391A00EB1CDE /* TableHeaderFooterTests.swift */,
 				ABE0F36A21BE20380098950D /* TableDimensionTests.swift */,
+				AB922ADA229E03BF000207A3 /* TableCellEditingMovingTests.swift */,
 			);
 			path = Table;
 			sourceTree = "<group>";
@@ -584,6 +587,7 @@
 			files = (
 				AB1CCB9E21D8391A00EB1CDE /* TableHeaderFooterTests.swift in Sources */,
 				ABE0F36B21BE20380098950D /* TableDimensionTests.swift in Sources */,
+				AB922ADB229E03BF000207A3 /* TableCellEditingMovingTests.swift in Sources */,
 				AB18253121E5254E004FE239 /* TableDisplayBehaviorTests.swift in Sources */,
 				AB05A86E2224FEA800C9C3E3 /* MockUpdateDelegate.swift in Sources */,
 				ABE0F37A21BE282A0098950D /* TableTestCase.swift in Sources */,
