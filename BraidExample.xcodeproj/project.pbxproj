@@ -35,6 +35,9 @@
 		AB5C715B21EC66F4006DC4B0 /* DatePickerTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB5C715A21EC66F4006DC4B0 /* DatePickerTableViewCell.xib */; };
 		AB5D696D21E95DC200386B8D /* TextFieldTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB5D696C21E95DC200386B8D /* TextFieldTableViewCell.xib */; };
 		AB5D696F21E95DD200386B8D /* TextViewTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB5D696E21E95DD200386B8D /* TextViewTableViewCell.xib */; };
+		AB7CA64F229F51D500371408 /* RxTitleDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7CA64E229F51D500371408 /* RxTitleDetailTableViewCell.swift */; };
+		AB7CA651229F545F00371408 /* RxTitleDetailTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB7CA650229F545F00371408 /* RxTitleDetailTableViewCell.xib */; };
+		AB7CA66522A09AC700371408 /* SimpleFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7CA66422A09AC700371408 /* SimpleFormViewController.swift */; };
 		AB86C3BF2141718C00FA4945 /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */; };
 		AB922ADB229E03BF000207A3 /* TableCellEditingMovingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB922ADA229E03BF000207A3 /* TableCellEditingMovingTests.swift */; };
 		ABA89D5B21EEC07000033093 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = ABA89D5A21EEC07000033093 /* README.md */; };
@@ -115,6 +118,9 @@
 		AB5C715A21EC66F4006DC4B0 /* DatePickerTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DatePickerTableViewCell.xib; sourceTree = "<group>"; };
 		AB5D696C21E95DC200386B8D /* TextFieldTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextFieldTableViewCell.xib; sourceTree = "<group>"; };
 		AB5D696E21E95DD200386B8D /* TextViewTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextViewTableViewCell.xib; sourceTree = "<group>"; };
+		AB7CA64E229F51D500371408 /* RxTitleDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RxTitleDetailTableViewCell.swift; sourceTree = "<group>"; };
+		AB7CA650229F545F00371408 /* RxTitleDetailTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RxTitleDetailTableViewCell.xib; sourceTree = "<group>"; };
+		AB7CA66422A09AC700371408 /* SimpleFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleFormViewController.swift; sourceTree = "<group>"; };
 		AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
 		AB922ADA229E03BF000207A3 /* TableCellEditingMovingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableCellEditingMovingTests.swift; sourceTree = "<group>"; };
 		ABA89D5A21EEC07000033093 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -203,6 +209,7 @@
 				ABE0F35D21B49DC10098950D /* Sample 4 - News Feed */,
 				AB577BA82179662400CD2363 /* Sample 5 - Dynamic Home Page */,
 				ABE838FD2283EAC30008A5B7 /* Sample 6 - Editable Attendees */,
+				AB7CA647229F50CB00371408 /* Sample 7 - Reference-Type View Models */,
 				AB577B9D21759F8B00CD2363 /* Shared Views */,
 				9381334F20B6EDFA00CBF8F6 /* Resources */,
 				938132E320B6463200CBF8F6 /* Info.plist */,
@@ -233,11 +240,20 @@
 		AB577B9D21759F8B00CD2363 /* Shared Views */ = {
 			isa = PBXGroup;
 			children = (
+				AB7CA64A229F517200371408 /* Rx Cells */,
 				AB577B9E2175A6EE00CD2363 /* CenterLabelTableViewCell.swift */,
 				9381335020B6EE2A00CBF8F6 /* TitleDetailTableViewCell.swift */,
 				93C36A4920DB02E0006B7ECF /* TitleDetailTableViewCell.xib */,
 				AB577BD52184DC6F00CD2363 /* ImageTitleSubtitleTableViewCell.swift */,
 				ABE0F35821AE3F7F0098950D /* ImageTitleSubtitleTableViewCell.xib */,
+				ABC1AD1821E6BE2400BAC644 /* ToggleTableViewCell.swift */,
+				ABC1AD1A21E6BE7D00BAC644 /* ToggleTableViewCell.xib */,
+				ABC1AD2021E7269500BAC644 /* TextFieldTableViewCell.swift */,
+				AB5D696C21E95DC200386B8D /* TextFieldTableViewCell.xib */,
+				ABC1AD2221E811B100BAC644 /* TextViewTableViewCell.swift */,
+				AB5D696E21E95DD200386B8D /* TextViewTableViewCell.xib */,
+				AB5C715821EC6583006DC4B0 /* DatePickerTableViewCell.swift */,
+				AB5C715A21EC66F4006DC4B0 /* DatePickerTableViewCell.xib */,
 				AB86C3BE2141718C00FA4945 /* SectionHeaderView.swift */,
 			);
 			path = "Shared Views";
@@ -266,30 +282,31 @@
 			path = "Sample 5 - Dynamic Home Page";
 			sourceTree = "<group>";
 		};
+		AB7CA647229F50CB00371408 /* Sample 7 - Reference-Type View Models */ = {
+			isa = PBXGroup;
+			children = (
+				AB7CA66422A09AC700371408 /* SimpleFormViewController.swift */,
+			);
+			path = "Sample 7 - Reference-Type View Models";
+			sourceTree = "<group>";
+		};
+		AB7CA64A229F517200371408 /* Rx Cells */ = {
+			isa = PBXGroup;
+			children = (
+				AB7CA64E229F51D500371408 /* RxTitleDetailTableViewCell.swift */,
+				AB7CA650229F545F00371408 /* RxTitleDetailTableViewCell.xib */,
+			);
+			path = "Rx Cells";
+			sourceTree = "<group>";
+		};
 		ABC1AD1C21E6BF3E00BAC644 /* Sample 3 - Form */ = {
 			isa = PBXGroup;
 			children = (
 				ABA89D5A21EEC07000033093 /* README.md */,
-				ABC1AD1F21E7268100BAC644 /* Cells */,
 				ABC1AD1D21E6BF5200BAC644 /* FormViewController.swift */,
 				ABB46A1421F2ACC6009A00A2 /* FormItem.swift */,
 			);
 			path = "Sample 3 - Form";
-			sourceTree = "<group>";
-		};
-		ABC1AD1F21E7268100BAC644 /* Cells */ = {
-			isa = PBXGroup;
-			children = (
-				ABC1AD1821E6BE2400BAC644 /* ToggleTableViewCell.swift */,
-				ABC1AD1A21E6BE7D00BAC644 /* ToggleTableViewCell.xib */,
-				ABC1AD2021E7269500BAC644 /* TextFieldTableViewCell.swift */,
-				AB5D696C21E95DC200386B8D /* TextFieldTableViewCell.xib */,
-				ABC1AD2221E811B100BAC644 /* TextViewTableViewCell.swift */,
-				AB5D696E21E95DD200386B8D /* TextViewTableViewCell.xib */,
-				AB5C715821EC6583006DC4B0 /* DatePickerTableViewCell.swift */,
-				AB5C715A21EC66F4006DC4B0 /* DatePickerTableViewCell.xib */,
-			);
-			path = Cells;
 			sourceTree = "<group>";
 		};
 		ABE0F35721AD10340098950D /* Mocks */ = {
@@ -450,6 +467,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				93C36A4A20DB02E0006B7ECF /* TitleDetailTableViewCell.xib in Resources */,
+				AB7CA651229F545F00371408 /* RxTitleDetailTableViewCell.xib in Resources */,
 				ABC1AD1B21E6BE7E00BAC644 /* ToggleTableViewCell.xib in Resources */,
 				ABE0F36321B4AB2D0098950D /* news-items.json in Resources */,
 				ABE0F35921AE3F7F0098950D /* ImageTitleSubtitleTableViewCell.xib in Resources */,
@@ -572,9 +590,11 @@
 				AB577BAA2179665400CD2363 /* HomeViewController.swift in Sources */,
 				AB577BD42183D8C200CD2363 /* Store.swift in Sources */,
 				AB577B9C21759F6C00CD2363 /* AccountService.swift in Sources */,
+				AB7CA64F229F51D500371408 /* RxTitleDetailTableViewCell.swift in Sources */,
 				AB577BC52181105500CD2363 /* HomeService.swift in Sources */,
 				AB577B9F2175A6EE00CD2363 /* CenterLabelTableViewCell.swift in Sources */,
 				93C36A4820DAFF97006B7ECF /* SamplesViewController.swift in Sources */,
+				AB7CA66522A09AC700371408 /* SimpleFormViewController.swift in Sources */,
 				ABE0F36121B4AA830098950D /* NewsFeedService.swift in Sources */,
 				AB577BD22183D7F200CD2363 /* Product.swift in Sources */,
 				ABC1AD2121E7269500BAC644 /* TextFieldTableViewCell.swift in Sources */,

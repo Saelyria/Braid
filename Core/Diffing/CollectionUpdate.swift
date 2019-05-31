@@ -23,9 +23,12 @@ public struct CollectionUpdate {
     public let sectionInsertions: IndexSet
     /// The section integers of section that were updated.
     public let sectionUpdates: IndexSet
-    /// The section integers of section that were updated, but whose data was not 'diffable' at the item scope.
+    /// The section integers of section that were updated, but whose data was not 'diffable' (i.e. whose items did not
+    /// conform to `Equatable`) at the item scope. Generally, these sections are asked to reload to ensure that any
+    /// cell updates are reflected.
     public let undiffableSectionUpdates: IndexSet
-    /// The section integers whose header or footer were updated.
+    /// The section integers whose header or footer were updated. Table views will only update the header/footer title
+    /// or view if their section is reloaded, so generally, these sections are asked to reload.
     public let sectionHeaderFooterUpdates: IndexSet
     /// The section integers of sections that were moved.
     public let sectionMoves: [(from: Int, to: Int)]

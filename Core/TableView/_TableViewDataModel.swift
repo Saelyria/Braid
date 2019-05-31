@@ -1,3 +1,4 @@
+
 internal protocol _TableViewDataModelDelegate: AnyObject {
     associatedtype S: TableViewSection
     

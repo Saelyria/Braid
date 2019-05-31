@@ -783,6 +783,17 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
     // MARK: -
     
     /**
+     Sets a 'behavior' that describes to the binder how cells in the bound section receive model updates.
+    */
+    @discardableResult
+    public func cellsUpdateFromModelChanges(_ updateBehavior: CellUpdateBehavior)
+        -> TableViewSingleSectionBinder<C, S>
+    {
+        self.binder.handlers.add(updateBehavior, toHandlerSetAt: \.cellUpdateBehaviors, forScope: self.affectedSectionScope)
+        return self
+    }
+    
+    /**
      Adds a handler to be called whenever a cell is dequeued in the declared section.
      
      The given handler is called whenever a cell in the section is dequeued, passing in the row and the dequeued cell.

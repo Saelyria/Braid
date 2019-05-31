@@ -62,7 +62,7 @@ class SamplesViewController: UIViewController {
                 case 1:
                     self.navigationController?.pushViewController(ArtistsViewController(), animated: true)
                 case 2:
-                    self.navigationController?.pushViewController(FormViewController(), animated: true)
+                    self.navigationController?.pushViewController(SimpleFormViewController(), animated: true)
                 case 3:
                     self.navigationController?.pushViewController(NewsFeedViewController(), animated: true)
                 case 4:
