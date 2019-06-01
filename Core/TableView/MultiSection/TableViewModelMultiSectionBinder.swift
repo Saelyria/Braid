@@ -271,6 +271,14 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     // MARK: -
     
     @discardableResult
+    public override func cellsUpdate(_ updateBehavior: CellUpdateBehavior)
+        -> TableViewModelMultiSectionBinder<C, S, M>
+    {
+        super.cellsUpdate(updateBehavior)
+        return self
+    }
+    
+    @discardableResult
     public override func onDequeue(_ handler: @escaping (_ section: S, _ row: Int, _ cell: C) -> Void)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {

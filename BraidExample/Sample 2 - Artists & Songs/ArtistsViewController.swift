@@ -14,6 +14,7 @@ class ArtistsViewController: UIViewController {
     
     private let spinner = UIActivityIndicatorView(style: .gray)
     private var binder: SectionedTableViewBinder<Section>!
+    private let tableView = UITableView()
     
     private let disposeBag = DisposeBag()
     
@@ -25,13 +26,12 @@ class ArtistsViewController: UIViewController {
         self.title = "Artists"
         
         // 3.
-        let tableView = UITableView()
+        
         self.view.addSubview(tableView)
+        tableView.estimatedRowHeight = 50
+        tableView.rowHeight = UITableView.automaticDimension
         tableView.frame = self.view.frame
         tableView.tableFooterView = UIView()
-        tableView.sectionFooterHeight = 0.0
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 40
         
         self.binder = SectionedTableViewBinder(tableView: tableView, sectionedBy: Section.self)
         self.binder.sectionDisplayBehavior = .hidesSectionsWithNoCellData

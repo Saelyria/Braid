@@ -48,6 +48,8 @@ class SamplesViewController: UIViewController {
         self.title = "Samples"
         
         self.tableView = UITableView(frame: self.view.frame, style: .grouped)
+        self.tableView.estimatedRowHeight = 50
+        self.tableView.rowHeight = UITableView.automaticDimension
         self.view.addSubview(self.tableView)
         
         self.binder = TableViewBinder(tableView: self.tableView)
@@ -62,7 +64,7 @@ class SamplesViewController: UIViewController {
                 case 1:
                     self.navigationController?.pushViewController(ArtistsViewController(), animated: true)
                 case 2:
-                    self.navigationController?.pushViewController(SimpleFormViewController(), animated: true)
+                    self.navigationController?.pushViewController(FormViewController(), animated: true)
                 case 3:
                     self.navigationController?.pushViewController(NewsFeedViewController(), animated: true)
                 case 4:

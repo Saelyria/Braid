@@ -399,6 +399,8 @@ public class SectionedTableViewBinder<Section: TableViewSection>: SectionedTable
      after which point no further binding can be done on the table with the binder's `onSection` methods.
     */
     public func finish() {
+        guard self.hasFinishedBinding == false else { return }
+        
         // make sure 'refresh' is always called first, especially before the 'data source delegate' is created
         self.refresh()
         self.applyDisplayedSectionBehavior()
@@ -406,9 +408,8 @@ public class SectionedTableViewBinder<Section: TableViewSection>: SectionedTable
         
         self.tableViewDataSourceDelegate = _TableViewDataSourceDelegate(binder: self)
         self.createNextDataModel()
-        self.tableView.delegate = self.tableViewDataSourceDelegate
         self.tableView.dataSource = self.tableViewDataSourceDelegate
-        self.tableView.reloadData()
+        self.tableView.delegate = self.tableViewDataSourceDelegate
     }
     
     // Sets the current data model to the queued 'next' data model, and creates a new 'next' data model.

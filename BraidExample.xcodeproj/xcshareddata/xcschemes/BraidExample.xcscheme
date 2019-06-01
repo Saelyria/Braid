@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "262FD03BC36EAA6A0A2A91D4FCA6D4FB"
+               BlueprintIdentifier = "3B2E405FB76A0E213CE57985A423DED6"
                BuildableName = "RxAtomic.framework"
                BlueprintName = "RxAtomic"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
@@ -28,7 +28,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "767186FD6A1E82051DED08A464D9A81D"
+               BlueprintIdentifier = "7AD0C6DCDC9CEC8A3C7C10C7FEE07BE6"
                BuildableName = "RxCocoa.framework"
                BlueprintName = "RxCocoa"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
@@ -42,7 +42,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ADE5DE79484AA142F28E2ACFC89BD738"
+               BlueprintIdentifier = "EA9EA43B3B503823EE36C60D9C8A865F"
                BuildableName = "RxSwift.framework"
                BlueprintName = "RxSwift"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
@@ -70,7 +70,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F554EA343D656E7FB0C1ACC045EB2666"
+               BlueprintIdentifier = "6F13695E06195A78EA8A95F8C7ED0D2F"
                BuildableName = "Nimble.framework"
                BlueprintName = "Nimble"
                ReferencedContainer = "container:Pods/Pods.xcodeproj">

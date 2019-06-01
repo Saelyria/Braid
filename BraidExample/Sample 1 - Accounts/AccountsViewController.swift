@@ -28,6 +28,8 @@ class AccountsViewController: UIViewController {
         
         // 4.
         let tableView = UITableView(frame: self.view.frame, style: .grouped)
+        tableView.estimatedRowHeight = 50
+        tableView.rowHeight = UITableView.automaticDimension
         self.view.addSubview(tableView)
         tableView.frame = self.view.frame
         

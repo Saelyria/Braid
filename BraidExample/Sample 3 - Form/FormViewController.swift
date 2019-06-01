@@ -26,6 +26,8 @@ class FormViewController: UIViewController {
         tableView.register(TextFieldTableViewCell.self)
         tableView.register(TextViewTableViewCell.self)
         tableView.register(DatePickerTableViewCell.self)
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 50
         self.view.addSubview(tableView)
         
         self.binder = SectionedTableViewBinder(tableView: tableView, sectionedBy: Section.self)

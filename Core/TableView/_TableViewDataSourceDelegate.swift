@@ -25,7 +25,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
             return self.binder.nextDataModel.headerViewBound
         case #selector(UITableViewDelegate.tableView(_:viewForFooterInSection:)):
             return self.binder.nextDataModel.footerViewBound
-            
+
         case #selector(UITableViewDelegate.tableView(_:estimatedHeightForRowAt:)):
             return self.binder.handlers.cellEstimatedHeightProviders.hasHandler
         case #selector(UITableViewDelegate.tableView(_:estimatedHeightForHeaderInSection:)):
@@ -38,16 +38,16 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
             return self.binder.handlers.headerHeightProviders.hasHandler
         case #selector(UITableViewDelegate.tableView(_:heightForFooterInSection:)):
             return self.binder.handlers.footerHeightProviders.hasHandler
-            
+
         case #selector(UITableViewDataSource.tableView(_:canEditRowAt:)):
             return self.binder.handlers.cellMovementPolicies.hasHandler ||
                 self.binder.handlers.cellEditingStyleProviders.hasHandler
         case #selector(UITableViewDataSource.tableView(_:commit:forRowAt:)):
             return self.binder.handlers.cellEditingStyleProviders.hasHandler
-            
+
         case #selector(UITableViewDelegate.tableView(_:willDisplay:forRowAt:)):
             return self.binder.handlers.prefetchBehaviors.hasHandler
-            
+
         default:
             return super.responds(to: aSelector)
         }
@@ -60,11 +60,13 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection sectionInt: Int) -> Int {
+        guard self.dataModel.displayedSections.indices.contains(sectionInt) else { return 0 }
         let section = self.dataModel.displayedSections[sectionInt]
         return self.dataModel.sectionModel(for: section).items.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard self.dataModel.displayedSections.indices.contains(indexPath.section) else { return UITableViewCell() }
         let section = self.dataModel.displayedSections[indexPath.section]
         
         // We can't fall back to the 'all sections' cell dequeue block - might expect a different cell type.
@@ -85,6 +87,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard self.dataModel.displayedSections.indices.contains(indexPath.section) else { return }
         let section = self.dataModel.displayedSections[indexPath.section]
         
         let prefetchBehavior: PrefetchBehavior? = self.dataModel.uniquelyBoundCellSections.contains(section) ?
@@ -111,8 +114,9 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     
     // MARK: -
     
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        let section = self.dataModel.displayedSections[section]
+    func tableView(_ tableView: UITableView, titleForHeaderInSection sectionInt: Int) -> String? {
+        guard self.dataModel.displayedSections.indices.contains(sectionInt) else { return nil }
+        let section = self.dataModel.displayedSections[sectionInt]
         
         // don't return a title if the section has a header dequeue block specifically assigned or if the section
         // was not uniquely bound and there is an 'all sections' header dequeue block
@@ -124,8 +128,9 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         return self.dataModel.sectionModel(for: section).headerTitle
     }
     
-    func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        let section = self.dataModel.displayedSections[section]
+    func tableView(_ tableView: UITableView, titleForFooterInSection sectionInt: Int) -> String? {
+        guard self.dataModel.displayedSections.indices.contains(sectionInt) else { return nil }
+        let section = self.dataModel.displayedSections[sectionInt]
         
         // don't return a title if the section has a footer dequeue block specifically assigned or if the section
         // was not uniquely bound and there is an 'all sections' footer dequeue block
@@ -138,6 +143,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection sectionInt: Int) -> UIView? {
+        guard self.dataModel.displayedSections.indices.contains(sectionInt) else { return nil }
         let section = self.dataModel.displayedSections[sectionInt]
         
         // We can't fall back to the 'all sections' header dequeue block - might expect a different header type.
@@ -149,6 +155,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection sectionInt: Int) -> UIView? {
+        guard self.dataModel.displayedSections.indices.contains(sectionInt) else { return nil }
         let section = self.dataModel.displayedSections[sectionInt]
         
         let footerViewProvider: ((S, UITableView) -> UITableViewHeaderFooterView?)?
@@ -164,6 +171,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     // MARK: -
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard self.dataModel.displayedSections.indices.contains(indexPath.section) else { return }
         let section = self.dataModel.displayedSections[indexPath.section]
         
         guard let cell = tableView.cellForRow(at: indexPath) else { return }
@@ -182,6 +190,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     // MARK: -
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        guard self.dataModel.displayedSections.indices.contains(indexPath.section) else { return false }
         let section = self.dataModel.displayedSections[indexPath.section]
         
         var allowsEditing: Bool = false
@@ -209,6 +218,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        guard self.dataModel.displayedSections.indices.contains(indexPath.section) else { return .none }
         let section = self.dataModel.displayedSections[indexPath.section]
         
         let styleProvider: ((S, Int) -> UITableViewCell.EditingStyle)?
@@ -227,6 +237,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        guard self.dataModel.displayedSections.indices.contains(indexPath.section) else { return }
         let section = self.dataModel.displayedSections[indexPath.section]
         
         if editingStyle == .delete {
@@ -257,6 +268,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        guard self.dataModel.displayedSections.indices.contains(indexPath.section) else { return false }
         let section = self.dataModel.displayedSections[indexPath.section]
         
         let handlerSet = self.binder.handlers.cellMovableProviders
@@ -286,6 +298,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
         targetIndexPathForMoveFromRowAt sourceIndexPath: IndexPath,
         toProposedIndexPath proposedDestinationIndexPath: IndexPath) -> IndexPath
     {
+        guard !self.dataModel.displayedSections.isEmpty else { return sourceIndexPath }
         let section = self.dataModel.displayedSections[sourceIndexPath.section]
         var targetIndexPath: IndexPath
         
@@ -328,6 +341,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        guard !self.dataModel.displayedSections.isEmpty else { return }
         guard sourceIndexPath != destinationIndexPath else { return }
         
         // Set a flag on the binder so it knows it doesn't need to reload when the data changes
@@ -376,6 +390,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     // MARK: -
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        guard self.dataModel.displayedSections.indices.contains(indexPath.section) else { return tableView.rowHeight }
         let section = self.dataModel.displayedSections[indexPath.section]
         
         let handlerSet = self.binder.handlers.cellHeightProviders
@@ -390,6 +405,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection sectionInt: Int) -> CGFloat {
+        guard self.dataModel.displayedSections.indices.contains(sectionInt) else { return tableView.sectionHeaderHeight }
         let section = self.dataModel.displayedSections[sectionInt]
         
         let handlerSet = self.binder.handlers.headerHeightProviders
@@ -404,6 +420,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection sectionInt: Int) -> CGFloat {
+        guard self.dataModel.displayedSections.indices.contains(sectionInt) else { return tableView.sectionFooterHeight }
         let section = self.dataModel.displayedSections[sectionInt]
         
         let handlerSet = self.binder.handlers.footerHeightProviders
@@ -418,6 +435,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
 
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        guard self.dataModel.displayedSections.indices.contains(indexPath.section) else { return tableView.estimatedRowHeight }
         let section = self.dataModel.displayedSections[indexPath.section]
         
         let handlerSet = self.binder.handlers.cellEstimatedHeightProviders
@@ -432,6 +450,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
 
     func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection sectionInt: Int) -> CGFloat {
+        guard self.dataModel.displayedSections.indices.contains(sectionInt) else { return tableView.estimatedSectionHeaderHeight }
         let section = self.dataModel.displayedSections[sectionInt]
         
         let handlerSet = self.binder.handlers.headerEstimatedHeightProviders
@@ -446,6 +465,7 @@ class _TableViewDataSourceDelegate<S: TableViewSection>: NSObject, UITableViewDa
     }
 
     func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection sectionInt: Int) -> CGFloat {
+        guard self.dataModel.displayedSections.indices.contains(sectionInt) else { return tableView.estimatedSectionFooterHeight }
         let section = self.dataModel.displayedSections[sectionInt]
         
         let handlerSet = self.binder.handlers.footerEstimatedHeightProviders

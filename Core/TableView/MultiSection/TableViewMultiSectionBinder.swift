@@ -803,6 +803,30 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
     // MARK: -
     
     /**
+     Sets a 'cell update behavior' that describes to the binder how cells in the bound section receive model updates.
+     
+     By default, cells update their views (labels, buttons, etc.) by being reloaded (either via animation reloads or a
+     simple call to `reloadData()` on the table), meaning that cells need to be re-dequeued on the table, calling
+     related handlers (`onDequeue`, the handler for a manual `provider` closure, and (if the cell is
+     `ViewModelBindable`) creating new view models and assigning their `viewModel` property). This behavior is described
+     by the `.byReloading` behavior case.
+     
+     If, however, your cells are not reloaded and re-dequeued to reflect model changes (for example, if they instead
+     are given a view model object that they observe for changes), you should provide the `.manually` behavior case.
+     
+     - parameter updateBehavior: A behavior describing how cells in this section receive model updates.
+     
+     - returns: A section binder to continue the binding chain with.
+     */
+    @discardableResult
+    public func cellsUpdate(_ updateBehavior: CellUpdateBehavior)
+        -> TableViewMultiSectionBinder<C, S>
+    {
+        self.binder.handlers.add(updateBehavior, toHandlerSetAt: \.cellUpdateBehaviors, forScope: self.affectedSectionScope)
+        return self
+    }
+    
+    /**
      Adds a handler to be called whenever a cell is dequeued in one of the declared sections.
      
      The given handler is called whenever a cell in one of the sections being bound is dequeued, passing in the row and
