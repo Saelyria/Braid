@@ -121,8 +121,8 @@ extension _TableViewDataModel {
             isEqualElement: { sectionModel, lhs, rhs in
                 // if the update behavior for the section was 'manually', return that there wasn't an equality checker -
                 // we don't want to incur reloads for this update behavior
-                if let updateBehavior = self.delegate?.handlers.cellUpdateBehaviors.namedSection[sectionModel.section]
-                ?? self.delegate?.handlers.cellUpdateBehaviors.dynamicSections, updateBehavior == .manually {
+                if let updateBehavior = binder?.handlers.cellUpdateBehaviors.namedSection[sectionModel.section]
+                ?? binder?.handlers.cellUpdateBehaviors.dynamicSections, updateBehavior == .manually {
                     return nil
                 } else {
                     return binder?.itemEqualityChecker(for: sectionModel.section)?(lhs, rhs)
@@ -155,8 +155,8 @@ extension _TableViewDataModel {
                 }
             }).isEmpty else { continue }
             
-            if let updateBehavior = self.delegate?.handlers.cellUpdateBehaviors.namedSection[section]
-            ?? self.delegate?.handlers.cellUpdateBehaviors.dynamicSections, updateBehavior == .manually {
+            if let updateBehavior = binder?.handlers.cellUpdateBehaviors.namedSection[section]
+            ?? binder?.handlers.cellUpdateBehaviors.dynamicSections, updateBehavior == .manually {
                 // do nothing - the chain declared that cells are updated manually, so don't force a section reload
             } else {
                 diff.elements.append(.updateUndiffableSection(i))

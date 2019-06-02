@@ -5,7 +5,7 @@ import UIKit
  */
 public enum CellUpdateBehavior {
     /**
-     The default behavior.
+     The default behavior where cells update to model changes by being reloaded.
      
      This reload behavior is dependent on whether the items in the section are the same and if
      they also conform to `Equatable` so the binder's diffing algorithm can determine whether the cell 'changed'. If the
