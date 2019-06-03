@@ -799,7 +799,7 @@ public class TableViewSingleSectionBinder<C: UITableViewCell, S: TableViewSectio
      - returns: A section binder to continue the binding chain with.
     */
     @discardableResult
-    public func cellsUpdate(_ updateBehavior: CellUpdateBehavior)
+    public func cellsUpdate(_ updateBehavior: TableUpdateBehavior)
         -> TableViewSingleSectionBinder<C, S>
     {
         self.binder.handlers.add(updateBehavior, toHandlerSetAt: \.cellUpdateBehaviors, forScope: self.affectedSectionScope)

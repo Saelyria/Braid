@@ -271,7 +271,7 @@ public class TableViewModelMultiSectionBinder<C: UITableViewCell, S: TableViewSe
     // MARK: -
     
     @discardableResult
-    public override func cellsUpdate(_ updateBehavior: CellUpdateBehavior)
+    public override func cellsUpdate(_ updateBehavior: TableUpdateBehavior)
         -> TableViewModelMultiSectionBinder<C, S, M>
     {
         super.cellsUpdate(updateBehavior)

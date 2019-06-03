@@ -273,7 +273,7 @@ public class TableViewModelSingleSectionBinder<C: UITableViewCell, S: TableViewS
     // MARK: -
     
     @discardableResult
-    override public func cellsUpdate(_ updateBehavior: CellUpdateBehavior)
+    override public func cellsUpdate(_ updateBehavior: TableUpdateBehavior)
         -> TableViewModelSingleSectionBinder<C, S, M>
     {
         super.cellsUpdate(updateBehavior)

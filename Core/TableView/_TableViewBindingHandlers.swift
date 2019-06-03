@@ -1,29 +1,30 @@
 import UIKit
 
 /**
- An enum that can be used to describe to a binder how cells are meant to be updated when their models change.
+ An enum that can be used to describe to a binder how cells or section header/footer views are meant to be updated when
+ their models change.
  */
-public enum CellUpdateBehavior {
+public enum TableUpdateBehavior {
     /**
-     The default behavior where cells update to model changes by being reloaded.
+     The default behavior where views update to model changes by being reloaded.
      
-     This reload behavior is dependent on whether the items in the section are the same and if
-     they also conform to `Equatable` so the binder's diffing algorithm can determine whether the cell 'changed'. If the
-     items are `Equatable`, cells are told to reload if their model 'changes' (i.e. the 'before' and 'after' model for
-     the cell is no longer equal). If items in the section are not `Equatable`, the entire section is asked to reload
-     when the binder detects that there was any change in the section to ensure that cells that didn't move but whose
-     models were changed are reloaded.
+     This reload behavior is dependent on whether the items in the section are the same and if they also conform to
+     `Equatable` so the binder's diffing algorithm can determine whether the cell 'changed'. If the items are
+     `Equatable`, cells are told to reload if their model 'changes' (i.e. the 'before' and 'after' model for the cell is
+     no longer equal). If items in the section are not `Equatable`, the entire section is asked to reload when the
+     binder detects that there was any change in the section to ensure that cells that didn't move but whose models were
+     changed are reloaded.
      
-     Note that 'reloaded' cells are cells that are re-dequeued from the table view and, if they are `ViewModelBindable`,
-     have their `viewModel` property reassigned to reflect updates. If cells should not be dequeued when their
+     Note that 'reloaded' views are views that are re-dequeued from the table view and, if they are `ViewModelBindable`,
+     have their `viewModel` property reassigned to reflect updates. If views should not be dequeued when their
      underlying models update to reflect changes (e.g. if they use view models with `Observable` properties that they
      bind themselves to), you probably want to use the manual reload behavior instead.
      */
     case byReloading
     /**
-     The binder will not reload the section (or cells in the section). This behavior should be used if your cells
-     receive updates without needing to be re-dequeued, like if they are assigned view models with `Observable`
-     properties.
+     The binder will not reload the section (or cells in the section). This behavior should be used if your cells or
+     header/footer views receive updates without needing to be re-dequeued, like if they are assigned view models with
+     `Observable` properties.
      */
     case manually
 }
@@ -148,7 +149,7 @@ class _TableViewBindingHandlers<S: TableViewSection> {
     }()
     
     // The cell updating behavior for a section.
-    lazy var cellUpdateBehaviors: HandlerSet<CellUpdateBehavior> = {
+    lazy var cellUpdateBehaviors: HandlerSet<TableUpdateBehavior> = {
         HandlerSet(allowAnySection: false)
     }()
     

@@ -53,7 +53,7 @@ public class TableViewBinder {
     private let _sectionBinder: SectionedTableViewBinder<_SingleSection>
     
     /// Instantiate a new table view binder for the given table view.
-    public required init(tableView: UITableView) {
+    public init(tableView: UITableView) {
         self._sectionBinder = SectionedTableViewBinder(tableView: tableView, sectionedBy: _SingleSection.self)
         self._sectionBinder.displayedSections = [.table]
     }

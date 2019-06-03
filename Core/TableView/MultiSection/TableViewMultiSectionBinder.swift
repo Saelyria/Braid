@@ -819,7 +819,7 @@ public class TableViewMultiSectionBinder<C: UITableViewCell, S: TableViewSection
      - returns: A section binder to continue the binding chain with.
      */
     @discardableResult
-    public func cellsUpdate(_ updateBehavior: CellUpdateBehavior)
+    public func cellsUpdate(_ updateBehavior: TableUpdateBehavior)
         -> TableViewMultiSectionBinder<C, S>
     {
         self.binder.handlers.add(updateBehavior, toHandlerSetAt: \.cellUpdateBehaviors, forScope: self.affectedSectionScope)
