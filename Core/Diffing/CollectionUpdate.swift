@@ -80,8 +80,8 @@ public struct CollectionUpdate {
                 sectionDeletions.insert(at)
             case let .insertSection(at):
                 sectionInsertions.insert(at)
-            case let .moveSection(move):
-                sectionMoves.append((move.from, move.to))
+            case let .moveSection(from, to):
+                sectionMoves.append((from, to))
             case let .updateSection(at):
                 sectionUpdates.insert(at)
             case let .updateUndiffableSection(at):

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'Braid'
-  s.version          = '1.0.2'
+  s.version          = '1.0.3'
   s.summary          = 'Declarative, type-safe table view binding.'
   s.description      = <<-DESC
   Braid is a table view binding library that makes setup for table views more declarative, more functional, and
@@ -25,8 +25,8 @@ Pod::Spec.new do |s|
     ss.source_files = 'Rx/'
     ss.ios.framework = "UIKit"
     ss.dependency 'Braid/Core'
-    ss.dependency 'RxSwift', '~> 4.4'
-    ss.dependency 'RxCocoa', '~> 4.4'
+    ss.dependency 'RxSwift', '~> 5'
+    ss.dependency 'RxCocoa', '~> 5'
     ss.pod_target_xcconfig = { 'OTHER_SWIFT_FLAGS' => '-DRX_BRAID', }
   end
 end

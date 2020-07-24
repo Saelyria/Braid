@@ -42,12 +42,12 @@
       </FileRef>
    </Group>
    <FileRef
-      location = "group:/Users/aaronbosnjak/Developer/Braid/Braid.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:/Users/aaronbosnjak/Developer/Braid/BraidExample.xcodeproj">
+      location = "group:Braid.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:BraidExample.xcodeproj">
    </FileRef>
 </Workspace>

@@ -98,7 +98,7 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
             }.flatMap { move -> [_NestedExtendedDiff.Element] in
                 if let elements = try? itemOnStartIndex(advancedBy: move.0)
                     .extendedDiff(to.itemOnStartIndex(advancedBy: move.1), isSame: isSameElement, isEqual: { _,_ in false })
-                    .map { diffElement -> _NestedExtendedDiff.Element in
+                    .map({ diffElement -> _NestedExtendedDiff.Element in
                         switch diffElement {
                         case let .insert(at):
                             return .insertElement(at, section: move.1)
@@ -109,7 +109,7 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
                         case .update(let at):
                             return .updateElement(at, section: move.0)
                         }
-                    } {
+                    }) {
                     return elements
                 } else {
                     return []
@@ -134,7 +134,7 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
                 let (sections, trace) = args
                 if let elements = try? sections.0
                     .extendedDiff(sections.1, isSame: isSameElement, isEqual: { isEqualElement(sections.1, $0, $1)})
-                    .map { diffElement -> _NestedExtendedDiff.Element in
+                    .map({ diffElement -> _NestedExtendedDiff.Element in
                         switch diffElement {
                         case let .delete(at):
                             return .deleteElement(at, section: trace.from.x)
@@ -145,7 +145,7 @@ extension Collection where Index == Int, Element: Collection, Element.Index == I
                         case .update(let at):
                             return .updateElement(at, section: trace.from.x)
                         }
-                    } {
+                    }) {
                     return elements
                 } else {
                     return []
